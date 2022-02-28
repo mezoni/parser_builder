@@ -38,7 +38,7 @@ if (state.ok) {
     final runes = tag.runes;
     final short = runes.length == 1;
     return {
-      'cc': runes.first.toString(),
+      'cc': helper.toHex(runes.first),
       if (!short) 'len': tag.length.toString(),
       'tag': helper.escapeString(tag),
     };

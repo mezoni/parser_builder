@@ -60,7 +60,7 @@ int? _hex(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 35 && state.source.startsWith('#x', state.pos);
+  state.ok = state.ch == 0x23 && state.source.startsWith('#x', state.pos);
   if (state.ok) {
     state.readChar(state.pos + 2);
     $1 = '#x';
@@ -88,6 +88,7 @@ int? _rangeChar(State<String> state) {
   final $ch = state.ch;
   bool? $1;
   final $pos1 = state.pos;
+  final $ch1 = state.ch;
   String? $2;
   state.ok = true;
   switch (state.ch) {
@@ -118,6 +119,7 @@ int? _rangeChar(State<String> state) {
     $1 = true;
   } else {
     state.pos = $pos1;
+    state.ch = $ch1;
     state.ok = false;
     state.error = ErrUnknown(state.pos);
   }
@@ -177,7 +179,7 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
     $3 = _hexOrRangeChar(state);
     if (state.ok) {
       String? $4;
-      state.ok = state.ch == 45;
+      state.ok = state.ch == 0x2D;
       if (state.ok) {
         state.nextChar();
         $4 = '-';
@@ -251,7 +253,7 @@ int? _char(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 34;
+  state.ok = state.ch == 0x22;
   if (state.ok) {
     state.nextChar();
     $1 = '"';
@@ -263,7 +265,7 @@ int? _char(State<String> state) {
     $2 = _charCode(state);
     if (state.ok) {
       String? $3;
-      state.ok = state.ch == 34;
+      state.ok = state.ch == 0x22;
       if (state.ok) {
         state.nextChar();
         $3 = '"';
@@ -289,7 +291,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     final $pos = state.pos;
     final $ch = state.ch;
     String? $3;
-    state.ok = state.ch == 91;
+    state.ok = state.ch == 0x5B;
     if (state.ok) {
       state.nextChar();
       $3 = '[';
@@ -313,7 +315,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
       }
       if (state.ok) {
         String? $6;
-        state.ok = state.ch == 93;
+        state.ok = state.ch == 0x5D;
         if (state.ok) {
           state.nextChar();
           $6 = ']';
@@ -374,7 +376,7 @@ String? _verbar(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 124;
+  state.ok = state.ch == 0x7C;
   if (state.ok) {
     state.nextChar();
     $1 = '|';

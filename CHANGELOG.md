@@ -1,3 +1,7 @@
+## 0.7.1
+
+- Fixed bug in parser builder `Not`. The generated parser did not restore the value of `state.ch`
+
 ## 0.7.0
 
 - Breaking change: String parser builders have been reimplemented to use methods `state.getChar()`, `state.nextChar()`, `state.readChar()` and field `state.ch`. The methods are implemented as static extension methods for the `State<String>` class. This change generates a more readable parser source code and reduces its size by 10% and may slightly reduce parser performance by 5-10%.

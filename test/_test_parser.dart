@@ -135,7 +135,7 @@ int? anyChar(State<String> state) {
 
 String? tagAbc(State<String> state) {
   String? $0;
-  state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+  state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
   if (state.ok) {
     state.readChar(state.pos + 3);
     $0 = 'abc';
@@ -186,8 +186,7 @@ String? crlf(State<String> state) {
   if (state.ch == 0xD) {
     final pos = state.pos;
     final ch = state.ch;
-    state.nextChar();
-    if (state.ch == 0xA) {
+    if (state.nextChar() == 0xA) {
       state.nextChar();
       state.ok = true;
       $0 = '\r\n';
@@ -444,7 +443,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
   final $list = <String>[];
   for (;;) {
     String? $1;
-    state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+    state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
     if (state.ok) {
       state.readChar(state.pos + 3);
       $1 = 'abc';
@@ -458,7 +457,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     String? $2;
     for (;;) {
       String? $3;
-      state.ok = state.ch == 97;
+      state.ok = state.ch == 0x61;
       if (state.ok) {
         state.nextChar();
         $3 = 'a';
@@ -471,7 +470,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       }
       final $4 = state.error;
       String? $5;
-      state.ok = state.ch == 98;
+      state.ok = state.ch == 0x62;
       if (state.ok) {
         state.nextChar();
         $5 = 'b';
@@ -632,6 +631,7 @@ bool? noneOfTagsAbcAbdDefDegX(State<String> state) {
 bool? notC32OrC16(State<String> state) {
   bool? $0;
   final $pos = state.pos;
+  final $ch = state.ch;
   dynamic $1;
   for (;;) {
     int? $2;
@@ -656,6 +656,7 @@ bool? notC32OrC16(State<String> state) {
     $0 = true;
   } else {
     state.pos = $pos;
+    state.ch = $ch;
     state.ok = false;
     state.error = ErrUnknown(state.pos);
   }
@@ -688,7 +689,7 @@ int? oneOfC16C32(State<String> state) {
 String? optAbc(State<String> state) {
   String? $0;
   String? $1;
-  state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+  state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
   if (state.ok) {
     state.readChar(state.pos + 3);
     $1 = 'abc';
@@ -823,7 +824,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
     $pos = state.pos;
     $ch = state.ch;
     String? $2;
-    state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+    state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
     if (state.ok) {
       state.readChar(state.pos + 3);
       $2 = 'abc';
@@ -864,7 +865,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
     $pos = state.pos;
     $ch = state.ch;
     String? $2;
-    state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+    state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
     if (state.ok) {
       state.readChar(state.pos + 3);
       $2 = 'abc';
@@ -896,7 +897,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
   }
   if (state.ok) {
     String? $2;
-    state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+    state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
     if (state.ok) {
       state.readChar(state.pos + 3);
       $2 = 'abc';
@@ -970,7 +971,7 @@ bool? skipMany0C16OrC32AndAbc(State<String> state) {
     }
     if (state.ok) {
       String? $6;
-      state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+      state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
       if (state.ok) {
         state.readChar(state.pos + 3);
         $6 = 'abc';
@@ -1287,7 +1288,7 @@ String? tagsAbcAbdDefDegX(State<String> state) {
 
 String? tagC16(State<String> state) {
   String? $0;
-  state.ok = state.ch == 80;
+  state.ok = state.ch == 0x50;
   if (state.ok) {
     state.nextChar();
     $0 = 'P';
@@ -1370,7 +1371,7 @@ Tuple3<int, String, int>? tuple3C32AbcC16(State<String> state) {
 bool? valueAbcToTrueValue(State<String> state) {
   bool? $0;
   String? $1;
-  state.ok = state.ch == 97 && state.source.startsWith('abc', state.pos);
+  state.ok = state.ch == 0x61 && state.source.startsWith('abc', state.pos);
   if (state.ok) {
     state.readChar(state.pos + 3);
     $1 = 'abc';

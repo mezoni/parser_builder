@@ -13,8 +13,7 @@ state.ok = false;
 if (state.ch == 0xD) {
   final pos = state.pos;
   final ch = state.ch;
-  state.nextChar();
-  if (state.ch == 0xA) {
+  if (state.nextChar() == 0xA) {
     state.nextChar();
     state.ok = true;
     {{res}} = '\r\n';

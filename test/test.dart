@@ -1301,7 +1301,7 @@ void _testNot() {
       final state = State('$abc');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (true));
+      _expectResult(r, true);
       expect(state.pos, 0);
     }
     {
@@ -1313,19 +1313,23 @@ void _testNot() {
     }
     {
       final state = State('$s16');
+      final ch = state.ch;
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnknown(0));
+      expect(state.ch, ch);
     }
     {
       final state = State('$s32');
+      final ch = state.ch;
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnknown(0));
+      expect(state.ch, ch);
     }
   });
 }

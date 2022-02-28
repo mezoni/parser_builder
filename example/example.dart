@@ -227,7 +227,7 @@ String? _quote(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 34;
+  state.ok = state.ch == 0x22;
   if (state.ok) {
     state.nextChar();
     $1 = '"';
@@ -255,7 +255,7 @@ String? _string(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $3;
-  state.ok = state.ch == 34;
+  state.ok = state.ch == 0x22;
   if (state.ok) {
     state.nextChar();
     $3 = '"';
@@ -525,7 +525,7 @@ num? _number(State<String> state) {
 bool? _false(State<String> state) {
   bool? $0;
   String? $1;
-  state.ok = state.ch == 102 && state.source.startsWith('false', state.pos);
+  state.ok = state.ch == 0x66 && state.source.startsWith('false', state.pos);
   if (state.ok) {
     state.readChar(state.pos + 5);
     $1 = 'false';
@@ -542,7 +542,7 @@ bool? _false(State<String> state) {
 dynamic _null(State<String> state) {
   dynamic $0;
   String? $1;
-  state.ok = state.ch == 110 && state.source.startsWith('null', state.pos);
+  state.ok = state.ch == 0x6E && state.source.startsWith('null', state.pos);
   if (state.ok) {
     state.readChar(state.pos + 4);
     $1 = 'null';
@@ -559,7 +559,7 @@ dynamic _null(State<String> state) {
 bool? _true(State<String> state) {
   bool? $0;
   String? $1;
-  state.ok = state.ch == 116 && state.source.startsWith('true', state.pos);
+  state.ok = state.ch == 0x74 && state.source.startsWith('true', state.pos);
   if (state.ok) {
     state.readChar(state.pos + 4);
     $1 = 'true';
@@ -578,7 +578,7 @@ String? _openBracket(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 91;
+  state.ok = state.ch == 0x5B;
   if (state.ok) {
     state.nextChar();
     $1 = '[';
@@ -605,7 +605,7 @@ String? _comma(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 44;
+  state.ok = state.ch == 0x2C;
   if (state.ok) {
     state.nextChar();
     $1 = ',';
@@ -661,7 +661,7 @@ String? _closeBracket(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 93;
+  state.ok = state.ch == 0x5D;
   if (state.ok) {
     state.nextChar();
     $1 = ']';
@@ -712,7 +712,7 @@ String? _openBrace(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 123;
+  state.ok = state.ch == 0x7B;
   if (state.ok) {
     state.nextChar();
     $1 = '{';
@@ -739,7 +739,7 @@ String? _colon(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 58;
+  state.ok = state.ch == 0x3A;
   if (state.ok) {
     state.nextChar();
     $1 = ':';
@@ -825,7 +825,7 @@ String? _closeBrace(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 125;
+  state.ok = state.ch == 0x7D;
   if (state.ok) {
     state.nextChar();
     $1 = '}';
