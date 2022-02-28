@@ -36,7 +36,7 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
   final $pos = state.pos;
   final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 35;
+  state.ok = state.ch == 0x23;
   if (state.ok) {
     state.nextChar();
     $1 = '#';
@@ -426,7 +426,7 @@ class State<T> {
   State(this.source) {
     if (this is State<String>) {
       final this_ = this as State<String>;
-      ch = this_.getChar(0);
+      ch = this_.readChar(0);
     }
   }
 
@@ -470,12 +470,14 @@ class Tag {
 
 extension on State<String> {
   @pragma('vm:prefer-inline')
+  // ignore: unused_element
   int getChar(int index) {
     if (index < source.length) {
-      final c = source.codeUnitAt(index++);
-      return c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index);
+      final c = source.codeUnitAt(index);
+      return c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
+    } else {
+      return State.eof;
     }
-    return State.eof;
   }
 
   @pragma('vm:prefer-inline')
@@ -484,7 +486,8 @@ extension on State<String> {
     final index = pos + (ch > 0xffff ? 2 : 1);
     if (index < source.length) {
       pos = index;
-      ch = getChar(index);
+      final c = source.codeUnitAt(index);
+      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
     } else {
       pos = source.length;
       ch = State.eof;
@@ -495,8 +498,14 @@ extension on State<String> {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readChar(int index) {
-    ch = getChar(index);
-    pos = index < source.length ? index : source.length;
+    if (index < source.length) {
+      pos = index;
+      final c = source.codeUnitAt(index);
+      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
+    } else {
+      pos = source.length;
+      ch = State.eof;
+    }
     return ch;
   }
 
