@@ -1,0 +1,50 @@
+part of '../../bytes.dart';
+
+/// Parses [tag] case-insensitively with the [convert] function and returns
+/// [tag].
+///
+/// Example:
+/// ```dart
+/// TagNoCase('if')
+/// ```
+class TagNoCase extends StringParserBuilder<String> {
+  static const _template = '''
+state.ok = false;
+if (state.pos + {{len}} <= source.length) {
+  {{transform}}
+  final v1 = source.substring(state.pos, state.pos + {{len}});
+  final v2 = convert(v1);
+  if (v2 == {{tag}}) {
+    state.ok = true;
+    state.readChar(state.pos + {{len}});
+    {{res}} = v2;
+  }
+}
+if (!state.ok) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
+  final Transformer<String, String> convert;
+
+  final String tag;
+
+  const TagNoCase(this.tag, this.convert);
+
+  @override
+  Map<String, String> getTags(Context context) {
+    if (tag.isEmpty) {
+      throw ArgumentError.value(tag, 'tag', 'The tag must not be empty');
+    }
+
+    return {
+      'len': tag.length.toString(),
+      'tag': helper.escapeString(tag),
+      'transform': convert.transform('convert'),
+    };
+  }
+
+  @override
+  String getTemplate(Context context) {
+    return _template;
+  }
+}

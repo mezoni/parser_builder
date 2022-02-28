@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "build_example.dart",
+            "program": "tool/build_example.dart",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "build_test_parser.dart",
+            "type": "dart",
+            "request": "launch",
+            "program": "tool\\build_test_parser.dart"
+        },
+        {
+            "name": "test_example.dart",
+            "program": "example/test_example.dart",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "test.dart",
+            "program": "test/test.dart",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "test_parse_number.dart",
+            "type": "dart",
+            "request": "launch",
+            "program": "test/test_parse_number.dart"
+        },
+        {
+            "name": "test_json_number_parser.dart",
+            "type": "dart",
+            "request": "launch",
+            "program": "test/test_json_number_parser.dart"
+        },
+        {
+            "name": "test/test_chars_parser.dart",
+            "type": "dart",
+            "request": "launch",
+            "program": "test/test_chars_parser.dart"
+        }
+    ]
+}

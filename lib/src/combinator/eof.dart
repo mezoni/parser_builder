@@ -1,0 +1,23 @@
+part of '../../combinator.dart';
+
+class Eof<I> extends ParserBuilder<I, bool> {
+  static const _template = '''
+state.ok = state.source.atEnd(state.pos);
+if (state.ok) {
+  {{res}} = true;
+} else {
+  state.error = ErrExpected.eof(state.pos);
+}''';
+
+  const Eof();
+
+  @override
+  String getTemplate(Context context) {
+    return _template;
+  }
+
+  @override
+  String toString() {
+    return printName(const []);
+  }
+}

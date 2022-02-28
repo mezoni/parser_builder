@@ -1,0 +1,11 @@
+name: parser_builder
+version: 0.7.0
+description: Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
+environment:
+  sdk: '>=2.16.0 <3.0.0'
+dependencies:
+  lints: ^1.0.1
+  tuple: ^2.0.0
+dev_dependencies:
+  source_span: ^1.8.2
+  test: ^1.20.1
