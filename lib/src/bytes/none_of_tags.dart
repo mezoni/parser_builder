@@ -21,12 +21,16 @@ case {{cc}}:
   {{body}}
   break;''';
 
-  static const _templateTest = '''
+  static const _templateTestLong = '''
 if (source.startsWith({{tag}}, state.pos)) {
   state.ok = false;
   state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
   break;
 }''';
+
+  static const _templateTestShort = '''
+state.ok = false;
+state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));''';
 
   final List<String> tags;
 
@@ -54,13 +58,17 @@ if (source.startsWith({{tag}}, state.pos)) {
     final cases = <String>[];
     for (final c in map.keys) {
       final tags = map[c]!;
+      tags.sort((x, y) => y.length.compareTo(x.length));
       final tests = <String>[];
       for (final tag in tags) {
         final values = {
           'tag': helper.escapeString(tag),
         };
 
-        final test = render(_templateTest, values);
+        final runes = tag.runes;
+        final template =
+            runes.length > 1 ? _templateTestLong : _templateTestShort;
+        final test = render(template, values);
         tests.add(test);
       }
 

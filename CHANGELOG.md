@@ -1,11 +1,12 @@
 ## 0.7.2
 
 - Minor changes in the parser builders
+- Slightly improved generated code (for short tags) by parser builders `NoneOfTags`, `Tags`. Now tags can be specified in any order, the parsing will be done correctly in every case
 
 ## 0.7.1
 
 - Fixed bugs in parser builders that generate parsers use other parsers and, at the same time, restore the parsing state. Generated parsers did not restore the value of the newly introduced field of the current character `state.ch`. These builders include `Not`, `Peek`
-- Slightly improved generated code for parser builders `NoneOf`, `OneOf`. The generated parser code has become a little faster and a little smaller in size
+- Slightly improved generated code by parser builders `NoneOf`, `OneOf`. The generated parser code has become a little faster and a little smaller in size
 
 ## 0.7.0
 

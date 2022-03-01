@@ -1214,7 +1214,7 @@ void _testNoneOfEx() {
 
 void _testNoneOfTags() {
   test('NoneOfTags', () {
-    final parser = noneOfTagsAbcAbdDefDegX;
+    final parser = noneOfTagsAbcAbdDefDegXXY;
     {
       final state = State('abc');
       final r = parser(state);
@@ -1256,17 +1256,25 @@ void _testNoneOfTags() {
       expect(state.error, ErrUnexpected.tag(0, Tag('x')));
     }
     {
+      final state = State('xy');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.tag(0, Tag('xy')));
+    }
+    {
       final state = State('');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (true));
+      _expectResult(r, true);
       expect(state.pos, 0);
     }
     {
       final state = State('abx');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (true));
+      _expectResult(r, true);
       expect(state.pos, 0);
     }
   });
@@ -1964,41 +1972,48 @@ void _testTagNoCase() {
 
 void _testTags() {
   test('Tags', () {
-    final parser = tagsAbcAbdDefDegX;
+    final parser = tagsAbcAbdDefDegXXY;
     {
       final state = State('abc');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, ('abc'));
+      _expectResult(r, 'abc');
       expect(state.pos, 3);
     }
     {
       final state = State('abd');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, ('abd'));
+      _expectResult(r, 'abd');
       expect(state.pos, 3);
     }
     {
       final state = State('def');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, ('def'));
+      _expectResult(r, 'def');
       expect(state.pos, 3);
     }
     {
       final state = State('deg');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, ('deg'));
+      _expectResult(r, 'deg');
       expect(state.pos, 3);
     }
     {
       final state = State('x');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, ('x'));
+      _expectResult(r, 'x');
       expect(state.pos, 1);
+    }
+    {
+      final state = State('xy');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 'xy');
+      expect(state.pos, 2);
     }
     {
       final state = State('');
@@ -2014,6 +2029,7 @@ void _testTags() {
             ErrExpected.tag(0, Tag('def')),
             ErrExpected.tag(0, Tag('deg')),
             ErrExpected.tag(0, Tag('x')),
+            ErrExpected.tag(0, Tag('xy')),
           ]));
     }
     {
@@ -2030,6 +2046,7 @@ void _testTags() {
             ErrExpected.tag(0, Tag('def')),
             ErrExpected.tag(0, Tag('deg')),
             ErrExpected.tag(0, Tag('x')),
+            ErrExpected.tag(0, Tag('xy')),
           ]));
     }
   });

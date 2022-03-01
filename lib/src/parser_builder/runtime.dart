@@ -18,7 +18,7 @@ class Char {
 
   @override
   String toString() {
-    final s = String.fromCharCode(charCode);
+    final s = String.fromCharCode(charCode)._escape();
     return '\'$s\'';
   }
 }''';
@@ -607,7 +607,7 @@ class State<T> {
   }
 }''';
 
-  static const _classTag = '''
+  static const _classTag = r'''
 /// Represents the `tag` (symbol) used in parsing errors.
 class Tag {
   final String name;
@@ -624,7 +624,8 @@ class Tag {
 
   @override
   String toString() {
-    return name;
+    final s = name._escape();
+    return '\'$s\'';
   }
 }''';
 
@@ -682,7 +683,7 @@ extension on State<String> {
   }
 }''';
 
-  static const _extensionString = '''
+  static const _extensionString = r'''
 extension on String {
   /// Returns `true` if [pos] points to the end of the string (or beyond).
   @pragma('vm:prefer-inline')
@@ -696,6 +697,24 @@ extension on String {
   // ignore: unused_element
   String slice(int start, int end) {
     return substring(start, end);
+  }
+
+  String _escape() {
+    final map = {
+      '\b': '\\b',
+      '\f': '\\f',
+      '\n': '\\n',
+      '\r': '\\t',
+      '\t': '\\t',
+      '\v': '\\v',
+    };
+
+    var s = this;
+    for (final key in map.keys) {
+      s = s.replaceAll(key, map[key]!);
+    }
+
+    return '\'$s\'';
   }
 }''';
 

@@ -564,7 +564,7 @@ int? noneOfC16OrC32Ex(State<String> state) {
   return $0;
 }
 
-bool? noneOfTagsAbcAbdDefDegX(State<String> state) {
+bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
   final source = state.source;
   bool? $0;
   state.ok = true;
@@ -594,11 +594,13 @@ bool? noneOfTagsAbcAbdDefDegX(State<String> state) {
       }
       break;
     case 120:
-      if (source.startsWith('x', state.pos)) {
+      if (source.startsWith('xy', state.pos)) {
         state.ok = false;
-        state.error = ErrUnexpected.tag(state.pos, const Tag('x'));
+        state.error = ErrUnexpected.tag(state.pos, const Tag('xy'));
         break;
       }
+      state.ok = false;
+      state.error = ErrUnexpected.tag(state.pos, const Tag('x'));
       break;
   }
   if (state.ok) {
@@ -1217,7 +1219,7 @@ String? tagNoCaseAbc(State<String> state) {
   return $0;
 }
 
-String? tagsAbcAbdDefDegX(State<String> state) {
+String? tagsAbcAbdDefDegXXY(State<String> state) {
   final source = state.source;
   String? $0;
   switch (state.ch) {
@@ -1246,11 +1248,13 @@ String? tagsAbcAbdDefDegX(State<String> state) {
       }
       break;
     case 120:
-      if (source.startsWith('x', state.pos)) {
-        state.readChar(state.pos + 1);
-        $0 = 'x';
+      if (source.startsWith('xy', state.pos)) {
+        state.readChar(state.pos + 2);
+        $0 = 'xy';
         break;
       }
+      state.readChar(state.pos + 1);
+      $0 = 'x';
       break;
   }
   state.ok = $0 != null;
@@ -1260,7 +1264,8 @@ String? tagsAbcAbdDefDegX(State<String> state) {
       ErrExpected.tag(state.pos, Tag('abd')),
       ErrExpected.tag(state.pos, Tag('def')),
       ErrExpected.tag(state.pos, Tag('deg')),
-      ErrExpected.tag(state.pos, Tag('x'))
+      ErrExpected.tag(state.pos, Tag('x')),
+      ErrExpected.tag(state.pos, Tag('xy'))
     ]);
   }
   return $0;
@@ -1389,7 +1394,7 @@ class Char {
 
   @override
   String toString() {
-    final s = String.fromCharCode(charCode);
+    final s = String.fromCharCode(charCode)._escape();
     return '\'$s\'';
   }
 }
@@ -1807,7 +1812,8 @@ class Tag {
 
   @override
   String toString() {
-    return name;
+    final s = name._escape();
+    return '\'$s\'';
   }
 }
 
@@ -1877,5 +1883,23 @@ extension on String {
   // ignore: unused_element
   String slice(int start, int end) {
     return substring(start, end);
+  }
+
+  String _escape() {
+    final map = {
+      '\b': '\\b',
+      '\f': '\\f',
+      '\n': '\\n',
+      '\r': '\\t',
+      '\t': '\\t',
+      '\v': '\\v',
+    };
+
+    var s = this;
+    for (final key in map.keys) {
+      s = s.replaceAll(key, map[key]!);
+    }
+
+    return '\'$s\'';
   }
 }

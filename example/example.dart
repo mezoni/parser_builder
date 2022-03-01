@@ -997,7 +997,7 @@ class Char {
 
   @override
   String toString() {
-    final s = String.fromCharCode(charCode);
+    final s = String.fromCharCode(charCode)._escape();
     return '\'$s\'';
   }
 }
@@ -1329,7 +1329,8 @@ class Tag {
 
   @override
   String toString() {
-    return name;
+    final s = name._escape();
+    return '\'$s\'';
   }
 }
 
@@ -1399,6 +1400,24 @@ extension on String {
   // ignore: unused_element
   String slice(int start, int end) {
     return substring(start, end);
+  }
+
+  String _escape() {
+    final map = {
+      '\b': '\\b',
+      '\f': '\\f',
+      '\n': '\\n',
+      '\r': '\\t',
+      '\t': '\\t',
+      '\v': '\\v',
+    };
+
+    var s = this;
+    for (final key in map.keys) {
+      s = s.replaceAll(key, map[key]!);
+    }
+
+    return '\'$s\'';
   }
 }
 

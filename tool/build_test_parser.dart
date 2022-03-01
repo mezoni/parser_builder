@@ -37,7 +37,7 @@ Future<void> main(List<String> args) async {
     _mapC32ToStr,
     _noneOfC16OrC32,
     _noneOfC16OrC32Ex,
-    _noneOfTagsAbcAbdDefDegX,
+    _noneOfTagsAbcAbdDefDegXXY,
     _notC32OrC16,
     _oneOfC16OrC32,
     _optAbc,
@@ -65,7 +65,7 @@ Future<void> main(List<String> args) async {
     _tagAbc,
     _tagExFoo,
     _tagNoCaseAbc,
-    _tagsAbcAbdDefDegX,
+    _tagsAbcAbdDefDegXXY,
     _tagC16,
     _terminatedC16C32,
     _testRef_,
@@ -159,8 +159,8 @@ const _noneOfC16OrC32 = Named('noneOfC16OrC32', NoneOf([c16, c32]));
 const _noneOfC16OrC32Ex = Named('noneOfC16OrC32Ex',
     NoneOfEx(TX('=> state.context.listOfC16AndC32 as List<int>;')));
 
-const _noneOfTagsAbcAbdDefDegX = Named(
-    'noneOfTagsAbcAbdDefDegX', NoneOfTags(['abc', 'abd', 'def', 'deg', 'x']));
+const _noneOfTagsAbcAbdDefDegXXY = Named('noneOfTagsAbcAbdDefDegXXY',
+    NoneOfTags(['abc', 'abd', 'def', 'deg', 'x', 'xy']));
 
 const _notC32OrC16 = Named('notC32OrC16', Not(Alt([_char16, _char32])));
 
@@ -213,8 +213,8 @@ const _tagExFoo =
 const _tagNoCaseAbc = Named('tagNoCaseAbc',
     TagNoCase(abc, Transformer<String, String>('s', '=> s.toLowerCase();')));
 
-const _tagsAbcAbdDefDegX =
-    Named('tagsAbcAbdDefDegX', Tags(['abc', 'abd', 'def', 'deg', 'x']));
+const _tagsAbcAbdDefDegXXY =
+    Named('tagsAbcAbdDefDegXXY', Tags(['abc', 'abd', 'def', 'deg', 'x', 'xy']));
 
 const _takeUntil1Abc = Named('takeUntil1Abc', TakeUntil1(abc));
 
