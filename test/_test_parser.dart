@@ -512,22 +512,16 @@ String? mapC32ToStr(State<String> state) {
   return $0;
 }
 
-int? noneOfC16(State<String> state) {
+int? noneOfC16OrC32(State<String> state) {
   int? $0;
-  state.ok = true;
   if (state.ch != State.eof) {
-    const list = [0x50];
-    for (var i = 0; i < 1; i++) {
-      final c = list[i];
-      if (state.ch == c) {
-        state.ok = false;
-        state.error = ErrUnexpected.char(state.pos, Char(state.ch));
-        break;
-      }
-    }
+    final c = state.ch;
+    state.ok = c != 0x50 && c != 0x1D200;
     if (state.ok) {
       $0 = state.ch;
       state.nextChar();
+    } else {
+      state.error = ErrUnexpected.char(state.pos, Char(state.ch));
     }
   } else {
     state.ok = false;
@@ -543,30 +537,6 @@ int? noneOfC16OrC32Ex(State<String> state) {
     List<int> get(dynamic x) => state.context.listOfC16AndC32 as List<int>;
     final list = get(null);
     for (var i = 0; i < list.length; i++) {
-      final c = list[i];
-      if (state.ch == c) {
-        state.ok = false;
-        state.error = ErrUnexpected.char(state.pos, Char(state.ch));
-        break;
-      }
-    }
-    if (state.ok) {
-      $0 = state.ch;
-      state.nextChar();
-    }
-  } else {
-    state.ok = false;
-    state.error = ErrUnexpected.eof(state.pos);
-  }
-  return $0;
-}
-
-int? noneOfC32(State<String> state) {
-  int? $0;
-  state.ok = true;
-  if (state.ch != State.eof) {
-    const list = [0x1D200];
-    for (var i = 0; i < 1; i++) {
       final c = list[i];
       if (state.ch == c) {
         state.ok = false;
@@ -663,24 +633,19 @@ bool? notC32OrC16(State<String> state) {
   return $0;
 }
 
-int? oneOfC16C32(State<String> state) {
+int? oneOfC16OrC32(State<String> state) {
   int? $0;
-  state.ok = false;
   if (state.ch != State.eof) {
-    const list = [0x50, 0x1D200];
-    for (var i = 0; i < 2; i++) {
-      final c = list[i];
-      if (state.ch == c) {
-        state.ok = true;
-        $0 = c;
-        state.nextChar();
-        break;
-      }
-    }
-    if (!state.ok) {
+    final c = state.ch;
+    state.ok = c == 0x50 || c == 0x1D200;
+    if (state.ok) {
+      $0 = state.ch;
+      state.nextChar();
+    } else {
       state.error = ErrUnexpected.char(state.pos, Char(state.ch));
     }
   } else {
+    state.ok = false;
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -728,10 +693,12 @@ Tuple2<int, int>? pairC16C32(State<String> state) {
 int? peekC32(State<String> state) {
   int? $0;
   final $pos = state.pos;
+  final $ch = state.ch;
   int? $1;
   $1 = char32(state);
   if (state.ok) {
     state.pos = $pos;
+    state.ch = $ch;
     $0 = $1;
   }
   return $0;

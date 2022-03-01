@@ -1,6 +1,7 @@
 ## 0.7.1
 
-- Fixed bug in parser builder `Not`. The generated parser did not restore the value of `state.ch`
+- Fixed bugs in parser builders that generate parsers use other parsers and, at the same time, restore the parsing state. Generated parsers did not restore the value of the newly introduced field of the current character `state.ch`. These builders include `Not`, `Peek`
+- Slightly improved generated code for parser builders `NoneOf`, `OneOf`. The generated parser code has become a little faster and a little smaller in size
 
 ## 0.7.0
 

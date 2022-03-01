@@ -9,22 +9,17 @@ part of '../../character.dart';
 /// ```
 class OneOf extends ParserBuilder<String, int> {
   static const _template = '''
-state.ok = false;
 if (state.ch != State.eof) {
-  const list = [{{values}}];
-  for (var i = 0; i < {{len}}; i++) {
-    final c = list[i];
-    if (state.ch == c) {
-      state.ok = true;
-      {{res}} = c;
-      state.nextChar();
-      break;
-    }
-  }
-  if (!state.ok) {
+  final c =  state.ch;
+  state.ok = {{test}};
+  if (state.ok) {
+    {{res}} = state.ch;
+    state.nextChar();
+  } else {
     state.error = ErrUnexpected.char(state.pos, Char(state.ch));
   }
 } else {
+  state.ok = false;
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 
@@ -39,8 +34,7 @@ if (state.ch != State.eof) {
     }
 
     return {
-      'len': characters.length.toString(),
-      'values': characters.map(helper.toHex).join(', '),
+      'test': characters.map((e) => 'c == ' + helper.toHex(e)).join(' || '),
     };
   }
 

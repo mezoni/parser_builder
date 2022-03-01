@@ -9,20 +9,14 @@ part of '../../character.dart';
 /// ```
 class NoneOf extends ParserBuilder<String, int> {
   static const _template = '''
-state.ok = true;
 if (state.ch != State.eof) {
-  const list = [{{values}}];
-  for (var i = 0; i < {{len}}; i++) {
-    final c = list[i];
-    if (state.ch == c) {
-      state.ok = false;
-      state.error = ErrUnexpected.char(state.pos, Char(state.ch));
-      break;
-    }
-  }
+  final c =  state.ch;
+  state.ok = {{test}};
   if (state.ok) {
     {{res}} = state.ch;
     state.nextChar();
+  } else {
+    state.error = ErrUnexpected.char(state.pos, Char(state.ch));
   }
 } else {
   state.ok = false;
@@ -39,11 +33,9 @@ if (state.ch != State.eof) {
       throw StateError('List of characters must not be empty');
     }
 
-    final locals = context.allocateLocals(['pos']);
     return {
-      'len': characters.length.toString(),
-      'values': characters.map(helper.toHex).join(', '),
-    }..addAll(locals);
+      'test': characters.map((e) => 'c != ' + helper.toHex(e)).join(' && '),
+    };
   }
 
   @override

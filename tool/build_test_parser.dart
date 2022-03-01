@@ -35,12 +35,11 @@ Future<void> main(List<String> args) async {
     _manyMNC32_2_3,
     _manyTillAOrBTillAbc,
     _mapC32ToStr,
-    _noneOfC16,
+    _noneOfC16OrC32,
     _noneOfC16OrC32Ex,
-    _noneOfC32,
     _noneOfTagsAbcAbdDefDegX,
     _notC32OrC16,
-    _oneOfC16C32,
+    _oneOfC16OrC32,
     _optAbc,
     _pairC16C32,
     _peekC32,
@@ -155,19 +154,17 @@ const _mapC32ToStr = Named(
     Map$(Char(c32),
         Transformer<int, String>('c', '=> String.fromCharCode(c);')));
 
-const _noneOfC16 = Named('noneOfC16', NoneOf([c16]));
+const _noneOfC16OrC32 = Named('noneOfC16OrC32', NoneOf([c16, c32]));
 
 const _noneOfC16OrC32Ex = Named('noneOfC16OrC32Ex',
     NoneOfEx(TX('=> state.context.listOfC16AndC32 as List<int>;')));
-
-const _noneOfC32 = Named('noneOfC32', NoneOf([c32]));
 
 const _noneOfTagsAbcAbdDefDegX = Named(
     'noneOfTagsAbcAbdDefDegX', NoneOfTags(['abc', 'abd', 'def', 'deg', 'x']));
 
 const _notC32OrC16 = Named('notC32OrC16', Not(Alt([_char16, _char32])));
 
-const _oneOfC16C32 = Named('oneOfC16C32', OneOf([c16, c32]));
+const _oneOfC16OrC32 = Named('oneOfC16OrC32', OneOf([c16, c32]));
 
 const _optAbc = Named('optAbc', Opt(Tag(abc)));
 
