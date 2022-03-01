@@ -2,10 +2,10 @@ part of '../../combinator.dart';
 
 class Consumed<I, O> extends ParserBuilder<I, _t.Tuple2<I, O>> {
   static const _template = '''
-final {{start}} = state.pos;
+final {{pos}} = state.pos;
 {{p1}}
 if (state.ok) {
-  final v = state.source.slice({{start}}, state.pos);
+  final v = state.source.slice({{pos}}, state.pos);
   {{res}} = Tuple2(v, {{p1_val}});
 }''';
 
@@ -22,7 +22,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['start']);
+    return context.allocateLocals(['pos']);
   }
 
   @override

@@ -1,7 +1,7 @@
 part of '../../bytes.dart';
 
-/// Parses until the first occurrence of a [tag] is found, and returns a slice
-/// up to the found [tag] if the slice is not empty.
+/// Parses until the first occurrence of a [tag] is found, and returns a
+/// substring up to the found [tag] if the substring is not empty.
 ///
 /// Example
 /// ```dart
@@ -9,15 +9,14 @@ part of '../../bytes.dart';
 /// ```
 class TakeUntil1 extends StringParserBuilder<String> {
   static const _template = '''
-final {{start}} = state.pos;
-final {{index}} = source.indexOf({{tag}}, {{start}});
-if ({{index}} > {{start}}) {
-  state.ok = true;
+final {{pos}} = state.pos;
+final {{index}} = source.indexOf({{tag}}, {{pos}});
+state.ok = {{index}} > {{pos}};
+if (state.ok) {
   state.readChar({{index}});
-  {{res}} = source.slice({{start}}, {{index}});
+  {{res}} = source.substring({{pos}}, {{index}});
 } else {
-  state.ok = false;
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+  state.error = ErrExpected.tag({{pos}}, const Tag({{tag}}));
 }''';
 
   final String tag;
@@ -26,7 +25,7 @@ if ({{index}} > {{start}}) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['start', 'index']);
+    final locals = context.allocateLocals(['pos', 'index']);
     return {
       'tag': helper.escapeString(tag),
     }..addAll(locals);

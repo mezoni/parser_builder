@@ -9,13 +9,14 @@ part of '../../character.dart';
 /// ```
 class Satisfy extends ParserBuilder<String, int> {
   static const _template = '''
+final {{c}} = state.ch;
 {{transform}}
-state.ok = state.ch != State.eof && {{test}}(state.ch);
+state.ok = {{c}} != State.eof && {{test}}({{c}});
 if (state.ok) {
-  {{res}} = state.ch;
+  {{res}} = {{c}};
   state.nextChar();
 } else {
-  state.error = state.ch == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char(state.ch));
+  state.error = {{c}} == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char({{c}}));
 }''';
 
   final Transformer<int, bool> predictate;
@@ -24,7 +25,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['test']);
+    final locals = context.allocateLocals(['c', 'test']);
     return {
       'transform': predictate.transform(locals['test']!),
     }..addAll(locals);

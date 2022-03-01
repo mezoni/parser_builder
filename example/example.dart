@@ -18,9 +18,10 @@ dynamic parse(String source) {
 @pragma('vm:prefer-inline')
 bool? _ws(State<String> state) {
   bool? $0;
+  var $c = state.ch;
   bool $test(int x) => x >= 0x9 && x <= 0xA || x == 0xD || x == 0x20;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -126,25 +127,26 @@ int? _escapeHex(State<String> state) {
     String? $3;
     final $pos1 = state.pos;
     final $ch1 = state.ch;
+    var $c = $ch1;
     var $cnt = 0;
     bool $test(int x) =>
         x >= 0x30 && x <= 0x39 ||
         x >= 0x41 && x <= 0x46 ||
         x >= 0x61 && x <= 0x66;
     while ($cnt < 4) {
-      if (state.ch == State.eof || !$test(state.ch)) {
+      if ($c == State.eof || !$test($c)) {
         break;
       }
-      state.nextChar();
+      $c = state.nextChar();
       $cnt++;
     }
     state.ok = $cnt >= 4;
     if (state.ok) {
       $3 = state.source.substring($pos1, state.pos);
     } else {
-      state.error = state.ch == State.eof
+      state.error = $c == State.eof
           ? ErrUnexpected.eof(state.pos)
-          : ErrUnexpected.char(state.pos, Char(state.ch));
+          : ErrUnexpected.char(state.pos, Char($c));
       state.pos = $pos1;
       state.ch = $ch1;
     }

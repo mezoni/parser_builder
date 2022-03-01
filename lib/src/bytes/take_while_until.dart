@@ -15,18 +15,19 @@ final {{index}} = source.indexOf({{tag}}, state.pos);
 if ({{index}} != -1) {
   final pos = state.pos;
   final ch = state.ch;
+  var c = ch;
   {{transform}}
   while (state.pos < {{index}}) {
-    if (state.ch == State.eof || !test(state.ch)) {
+    if (c == State.eof || !test(c)) {
       break;
     }
-    state.nextChar();
+    c = state.nextChar();
   }
   state.ok = state.pos == {{index}};
   if (state.ok) {
     {{res}} = source.substring(pos, state.pos);
   } else {
-    state.error = ErrUnexpected.char(state.pos, Char(state.ch));
+    state.error = ErrUnexpected.char(state.pos, Char(c));
     state.pos = pos;
     state.ch = ch;
   }

@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.7.0
+Version: 0.7.2
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -99,7 +99,7 @@ built-in:
 [`combinator`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator):
 - [`Consumed`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/consumed.dart)
 - [`Eof`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/eof.dart)
-- [`MapRes`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/map_res.dart)
+- [`Map$`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/map.dart)
 - [`Not`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/not.dart)
 - [`Opt`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/opt.dart)
 - [`Peek`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/peek.dart)

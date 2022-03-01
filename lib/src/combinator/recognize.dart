@@ -2,10 +2,10 @@ part of '../../combinator.dart';
 
 class Recognize<I> extends ParserBuilder<I, I> {
   static const _template = '''
-final {{start}} = state.pos;
+final {{pos}} = state.pos;
 {{p1}}
 if (state.ok) {
-  {{res}} = state.source.slice({{start}}, state.pos);
+  {{res}} = state.source.slice({{pos}}, state.pos);
 }''';
 
   final ParserBuilder<I, dynamic> parser;
@@ -21,7 +21,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['start']);
+    return context.allocateLocals(['pos']);
   }
 
   @override

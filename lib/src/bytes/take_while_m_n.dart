@@ -11,20 +11,21 @@ class TakeWhileMN extends ParserBuilder<String, String> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{ch}} = state.ch;
+var {{c}} = {{ch}};
 var {{cnt}} = 0;
 {{transform}}
 while ({{cnt}} < {{n}}) {
-  if (state.ch == State.eof || !{{test}}(state.ch)) {
+  if ({{c}} == State.eof || !{{test}}({{c}})) {
     break;
   }
-  state.nextChar();
+  {{c}} = state.nextChar();
   {{cnt}}++;
 }
 state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
   {{res}} = state.source.substring({{pos}}, state.pos);
 } else {
-  state.error = state.ch == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char(state.ch));
+  state.error = {{c}} == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char({{c}}));
   state.pos = {{pos}};
   state.ch = {{ch}};
 }''';
@@ -39,7 +40,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'ch', 'cnt', 'test']);
+    final locals = context.allocateLocals(['pos', 'ch', 'c', 'cnt', 'test']);
     return {
       'm': m.toString(),
       'n': n.toString(),

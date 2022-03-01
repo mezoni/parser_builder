@@ -11,19 +11,20 @@ part of '../../character.dart';
 class NoneOfEx extends ParserBuilder<String, int> {
   static const _template = '''
 state.ok = true;
-if (state.ch != State.eof) {
+final {{c}} = state.ch;
+if ({{c}} != State.eof) {
   {{transform}}
   final list = get(null);
   for (var i = 0; i < list.length; i++) {
     final c = list[i];
-    if (state.ch == c) {
+    if ({{c}} == c) {
       state.ok = false;
-      state.error = ErrUnexpected.char(state.pos, Char(state.ch));
+      state.error = ErrUnexpected.char(state.pos, Char({{c}}));
       break;
     }
   }
   if (state.ok) {
-    {{res}} = state.ch;
+    {{res}} = {{c}};
     state.nextChar();
   }
 } else {
@@ -37,9 +38,10 @@ if (state.ch != State.eof) {
 
   @override
   Map<String, String> getTags(Context context) {
+    final locals = context.allocateLocals(['c']);
     return {
       'transform': characters.transform('get'),
-    };
+    }..addAll(locals);
   }
 
   @override

@@ -8,13 +8,12 @@ part of '../../bytes.dart';
 /// ```
 class Tags extends StringParserBuilder<String> {
   static const _template = '''
-state.ok = true;
 switch (state.ch) {
   {{cases}}
 }
-if ({{res}} == null) {
-  state.ok = false;
-  state.error =  ErrCombined(state.pos, [{{errors}}]);
+state.ok = {{res}} != null;
+if (!state.ok) {
+  state.error = ErrCombined(state.pos, [{{errors}}]);
 }''';
 
   static const _templateCase = '''

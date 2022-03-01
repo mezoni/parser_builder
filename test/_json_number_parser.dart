@@ -23,9 +23,10 @@ num? parse(String s) {
 
 bool? _ws(State<String> state) {
   bool? $0;
+  var $c = state.ch;
   bool $test(int x) => x == 0x9 || x == 0xa || x == 0xd || x == 0x20;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {

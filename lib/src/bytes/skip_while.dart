@@ -8,9 +8,10 @@ part of '../../bytes.dart';
 /// ```
 class SkipWhile extends ParserBuilder<String, bool> {
   static const _template = '''
+var {{c}} = state.ch;
 {{transform}}
-while (state.ch != State.eof && {{test}}(state.ch)) {
-  state.nextChar();
+while ({{c}} != State.eof && {{test}}({{c}})) {
+  {{c}} = state.nextChar();
 }
 state.ok = true;
 if (state.ok) {
@@ -23,7 +24,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['test']);
+    final locals = context.allocateLocals(['c', 'test']);
     return {
       'transform': predicate.transform(locals['test']!),
     }..addAll(locals);

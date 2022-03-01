@@ -5,13 +5,12 @@ class Not<I> extends ParserBuilder<I, bool> {
 final {{pos}} = state.pos;
 final {{ch}} = state.ch;
 {{p1}}
-if (!state.ok) {
-  state.ok = true;
+state.ok = !state.ok;
+if (state.ok) {
   {{res}} = true;
 } else {
   state.pos = {{pos}};
   state.ch = {{ch}};
-  state.ok = false;
   state.error = ErrUnknown(state.pos);
 }''';
 

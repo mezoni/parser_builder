@@ -1933,14 +1933,14 @@ void _testTagNoCase() {
       final state = State('Abc');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (abc));
+      _expectResult(r, 'Abc');
       expect(state.pos, 3);
     }
     {
       final state = State('$abc ');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (abc));
+      _expectResult(r, abc);
       expect(state.pos, 3);
     }
     {

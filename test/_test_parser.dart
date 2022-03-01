@@ -5,9 +5,10 @@ import 'package:tuple/tuple.dart';
 String? alpha0(State<String> state) {
   String? $0;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c >= 0x41 && c <= 0x5a || c >= 0x61 && c <= 0x7a;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -20,17 +21,18 @@ String? alpha1(State<String> state) {
   String? $0;
   state.ok = false;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c >= 0x41 && c <= 0x5a || c >= 0x61 && c <= 0x7a;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     state.ok = true;
   }
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+    state.error = $c == State.eof
+        ? ErrUnexpected.eof($pos)
+        : ErrUnexpected.char($pos, Char($c));
   }
   return $0;
 }
@@ -38,12 +40,13 @@ String? alpha1(State<String> state) {
 String? alphanumeric0(State<String> state) {
   String? $0;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) =>
       c >= 0x30 && c <= 0x39 ||
       c >= 0x41 && c <= 0x5a ||
       c >= 0x61 && c <= 0x7a;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -56,20 +59,21 @@ String? alphanumeric1(State<String> state) {
   String? $0;
   state.ok = false;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) =>
       c >= 0x30 && c <= 0x39 ||
       c >= 0x41 && c <= 0x5a ||
       c >= 0x61 && c <= 0x7a;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     state.ok = true;
   }
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+    state.error = $c == State.eof
+        ? ErrUnexpected.eof($pos)
+        : ErrUnexpected.char($pos, Char($c));
   }
   return $0;
 }
@@ -147,21 +151,21 @@ String? tagAbc(State<String> state) {
 
 Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   Tuple2<String, List<String>>? $0;
-  final $start = state.pos;
+  final $pos = state.pos;
   List<String>? $1;
-  var $pos = state.pos;
+  var $pos1 = state.pos;
   var $ch = state.ch;
   final $list = <String>[];
   for (;;) {
     String? $2;
     $2 = tagAbc(state);
     if (!state.ok) {
-      state.pos = $pos;
+      state.pos = $pos1;
       state.ch = $ch;
       break;
     }
     $list.add($2!);
-    $pos = state.pos;
+    $pos1 = state.pos;
     $ch = state.ch;
     int? $3;
     $3 = char32(state);
@@ -174,7 +178,7 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
     $1 = $list;
   }
   if (state.ok) {
-    final v = state.source.slice($start, state.pos);
+    final v = state.source.slice($pos, state.pos);
     $0 = Tuple2(v, $1!);
   }
   return $0;
@@ -228,9 +232,10 @@ int? delimited(State<String> state) {
 String? digit0(State<String> state) {
   String? $0;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c >= 0x30 && c <= 0x39;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -243,17 +248,18 @@ String? digit1(State<String> state) {
   String? $0;
   state.ok = false;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c >= 0x30 && c <= 0x39;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     state.ok = true;
   }
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+    state.error = $c == State.eof
+        ? ErrUnexpected.eof($pos)
+        : ErrUnexpected.char($pos, Char($c));
   }
   return $0;
 }
@@ -272,12 +278,13 @@ bool? eof(State<String> state) {
 String? hexDigit0(State<String> state) {
   String? $0;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) =>
       c >= 0x30 && c <= 0x39 ||
       c >= 0x41 && c <= 0x46 ||
       c >= 0x61 && c <= 0x66;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -290,20 +297,21 @@ String? hexDigit1(State<String> state) {
   String? $0;
   state.ok = false;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) =>
       c >= 0x30 && c <= 0x39 ||
       c >= 0x41 && c <= 0x46 ||
       c >= 0x61 && c <= 0x66;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     state.ok = true;
   }
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+    state.error = $c == State.eof
+        ? ErrUnexpected.eof($pos)
+        : ErrUnexpected.char($pos, Char($c));
   }
   return $0;
 }
@@ -361,16 +369,16 @@ List<int>? many0C32(State<String> state) {
 
 int? many0CountC32(State<String> state) {
   int? $0;
-  var $c = 0;
+  var $cnt = 0;
   while (true) {
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
       state.ok = true;
-      $0 = $c;
+      $0 = $cnt;
       break;
     }
-    $c++;
+    $cnt++;
   }
   return $0;
 }
@@ -514,14 +522,14 @@ String? mapC32ToStr(State<String> state) {
 
 int? noneOfC16OrC32(State<String> state) {
   int? $0;
-  if (state.ch != State.eof) {
-    final c = state.ch;
-    state.ok = c != 0x50 && c != 0x1D200;
+  final $c = state.ch;
+  if ($c != State.eof) {
+    state.ok = $c != 0x50 && $c != 0x1D200;
     if (state.ok) {
-      $0 = state.ch;
+      $0 = $c;
       state.nextChar();
     } else {
-      state.error = ErrUnexpected.char(state.pos, Char(state.ch));
+      state.error = ErrUnexpected.char(state.pos, Char($c));
     }
   } else {
     state.ok = false;
@@ -533,19 +541,20 @@ int? noneOfC16OrC32(State<String> state) {
 int? noneOfC16OrC32Ex(State<String> state) {
   int? $0;
   state.ok = true;
-  if (state.ch != State.eof) {
+  final $c = state.ch;
+  if ($c != State.eof) {
     List<int> get(dynamic x) => state.context.listOfC16AndC32 as List<int>;
     final list = get(null);
     for (var i = 0; i < list.length; i++) {
       final c = list[i];
-      if (state.ch == c) {
+      if ($c == c) {
         state.ok = false;
-        state.error = ErrUnexpected.char(state.pos, Char(state.ch));
+        state.error = ErrUnexpected.char(state.pos, Char($c));
         break;
       }
     }
     if (state.ok) {
-      $0 = state.ch;
+      $0 = $c;
       state.nextChar();
     }
   } else {
@@ -621,13 +630,12 @@ bool? notC32OrC16(State<String> state) {
     state.error = ErrCombined(state.pos, [$3, $5]);
     break;
   }
-  if (!state.ok) {
-    state.ok = true;
+  state.ok = !state.ok;
+  if (state.ok) {
     $0 = true;
   } else {
     state.pos = $pos;
     state.ch = $ch;
-    state.ok = false;
     state.error = ErrUnknown(state.pos);
   }
   return $0;
@@ -635,14 +643,14 @@ bool? notC32OrC16(State<String> state) {
 
 int? oneOfC16OrC32(State<String> state) {
   int? $0;
-  if (state.ch != State.eof) {
-    final c = state.ch;
-    state.ok = c == 0x50 || c == 0x1D200;
+  final $c = state.ch;
+  if ($c != State.eof) {
+    state.ok = $c == 0x50 || $c == 0x1D200;
     if (state.ok) {
-      $0 = state.ch;
+      $0 = $c;
       state.nextChar();
     } else {
-      state.error = ErrUnexpected.char(state.pos, Char(state.ch));
+      state.error = ErrUnexpected.char(state.pos, Char($c));
     }
   } else {
     state.ok = false;
@@ -726,9 +734,9 @@ int? precededC16C32(State<String> state) {
 
 String? recognize3C32AbcC16(State<String> state) {
   String? $0;
-  final $start = state.pos;
-  Tuple3<int, String, int>? $1;
   final $pos = state.pos;
+  Tuple3<int, String, int>? $1;
+  final $pos1 = state.pos;
   final $ch = state.ch;
   int? $2;
   $2 = char32(state);
@@ -744,26 +752,27 @@ String? recognize3C32AbcC16(State<String> state) {
     }
   }
   if (!state.ok) {
-    state.pos = $pos;
+    state.pos = $pos1;
     state.ch = $ch;
   }
   if (state.ok) {
-    $0 = state.source.slice($start, state.pos);
+    $0 = state.source.slice($pos, state.pos);
   }
   return $0;
 }
 
 int? satisfyIsC32(State<String> state) {
   int? $0;
+  final $c = state.ch;
   bool $test(int c) => c == 0x1d200;
-  state.ok = state.ch != State.eof && $test(state.ch);
+  state.ok = $c != State.eof && $test($c);
   if (state.ok) {
-    $0 = state.ch;
+    $0 = $c;
     state.nextChar();
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
   }
   return $0;
 }
@@ -961,27 +970,27 @@ bool? skipMany0C16OrC32AndAbc(State<String> state) {
 
 bool? skipWhile1IsC32(State<String> state) {
   bool? $0;
+  var $c = state.ch;
   bool $test(int c) => c == 0x1d200;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     $0 = true;
   }
-  if ($0 != null) {
-    state.ok = true;
-  } else {
-    state.ok = false;
-    state.error = state.ch == State.eof
+  state.ok = $0 != null;
+  if (!state.ok) {
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
   }
   return $0;
 }
 
 bool? skipWhileIsC32(State<String> state) {
   bool? $0;
+  var $c = state.ch;
   bool $test(int c) => c == 0x1d200;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -993,15 +1002,14 @@ bool? skipWhileIsC32(State<String> state) {
 String? takeUntilAbc(State<String> state) {
   final source = state.source;
   String? $0;
-  final $start = state.pos;
-  final $index = source.indexOf('abc', $start);
-  if ($index != -1) {
-    state.ok = true;
+  final $pos = state.pos;
+  final $index = source.indexOf('abc', $pos);
+  state.ok = $index != -1;
+  if (state.ok) {
     state.readChar($index);
-    $0 = source.slice($start, $index);
+    $0 = source.substring($pos, $index);
   } else {
-    state.ok = false;
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    state.error = ErrExpected.tag($pos, const Tag('abc'));
   }
   return $0;
 }
@@ -1009,15 +1017,14 @@ String? takeUntilAbc(State<String> state) {
 String? takeUntil1Abc(State<String> state) {
   final source = state.source;
   String? $0;
-  final $start = state.pos;
-  final $index = source.indexOf('abc', $start);
-  if ($index > $start) {
-    state.ok = true;
+  final $pos = state.pos;
+  final $index = source.indexOf('abc', $pos);
+  state.ok = $index > $pos;
+  if (state.ok) {
     state.readChar($index);
-    $0 = source.slice($start, $index);
+    $0 = source.substring($pos, $index);
   } else {
-    state.ok = false;
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    state.error = ErrExpected.tag($pos, const Tag('abc'));
   }
   return $0;
 }
@@ -1026,17 +1033,18 @@ String? takeWhile1C16(State<String> state) {
   String? $0;
   state.ok = false;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c == 80;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     state.ok = true;
   }
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
   }
   return $0;
 }
@@ -1045,17 +1053,18 @@ String? takeWhile1C32(State<String> state) {
   String? $0;
   state.ok = false;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c == 119296;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     state.ok = true;
   }
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
   }
   return $0;
 }
@@ -1063,9 +1072,10 @@ String? takeWhile1C32(State<String> state) {
 String? takeWhileC16(State<String> state) {
   String? $0;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c == 80;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -1081,18 +1091,19 @@ String? takeWhileC16OrC32UntilAbc(State<String> state) {
   if ($index != -1) {
     final pos = state.pos;
     final ch = state.ch;
+    var c = ch;
     bool test(int c) => c == 80 || c == 119296;
     while (state.pos < $index) {
-      if (state.ch == State.eof || !test(state.ch)) {
+      if (c == State.eof || !test(c)) {
         break;
       }
-      state.nextChar();
+      c = state.nextChar();
     }
     state.ok = state.pos == $index;
     if (state.ok) {
       $0 = source.substring(pos, state.pos);
     } else {
-      state.error = ErrUnexpected.char(state.pos, Char(state.ch));
+      state.error = ErrUnexpected.char(state.pos, Char(c));
       state.pos = pos;
       state.ch = ch;
     }
@@ -1106,9 +1117,10 @@ String? takeWhileC16OrC32UntilAbc(State<String> state) {
 String? takeWhileC32(State<String> state) {
   String? $0;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int c) => c == 119296;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -1121,22 +1133,23 @@ String? takeWhileMN_2_4C16(State<String> state) {
   String? $0;
   final $pos = state.pos;
   final $ch = state.ch;
+  var $c = $ch;
   var $cnt = 0;
   bool $test(int c) => c == 80;
   while ($cnt < 4) {
-    if (state.ch == State.eof || !$test(state.ch)) {
+    if ($c == State.eof || !$test($c)) {
       break;
     }
-    state.nextChar();
+    $c = state.nextChar();
     $cnt++;
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
     state.pos = $pos;
     state.ch = $ch;
   }
@@ -1147,22 +1160,23 @@ String? takeWhileMN_2_4C32(State<String> state) {
   String? $0;
   final $pos = state.pos;
   final $ch = state.ch;
+  var $c = $ch;
   var $cnt = 0;
   bool $test(int c) => c == 119296;
   while ($cnt < 4) {
-    if (state.ch == State.eof || !$test(state.ch)) {
+    if ($c == State.eof || !$test($c)) {
       break;
     }
-    state.nextChar();
+    $c = state.nextChar();
     $cnt++;
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
     $0 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
     state.pos = $pos;
     state.ch = $ch;
   }
@@ -1194,7 +1208,7 @@ String? tagNoCaseAbc(State<String> state) {
     if (v2 == 'abc') {
       state.ok = true;
       state.readChar(state.pos + 3);
-      $0 = v2;
+      $0 = v1;
     }
   }
   if (!state.ok) {
@@ -1206,7 +1220,6 @@ String? tagNoCaseAbc(State<String> state) {
 String? tagsAbcAbdDefDegX(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = true;
   switch (state.ch) {
     case 97:
       if (source.startsWith('abc', state.pos)) {
@@ -1240,8 +1253,8 @@ String? tagsAbcAbdDefDegX(State<String> state) {
       }
       break;
   }
-  if ($0 == null) {
-    state.ok = false;
+  state.ok = $0 != null;
+  if (!state.ok) {
     state.error = ErrCombined(state.pos, [
       ErrExpected.tag(state.pos, Tag('abc')),
       ErrExpected.tag(state.pos, Tag('abd')),

@@ -5,22 +5,23 @@ int? _hexPrimary(State<String> state) {
   String? $1;
   final $pos = state.pos;
   final $ch = state.ch;
+  var $c = $ch;
   var $cnt = 0;
   bool $test(int x) => isHexDigit(x);
   while ($cnt < 2) {
-    if (state.ch == State.eof || !$test(state.ch)) {
+    if ($c == State.eof || !$test($c)) {
       break;
     }
-    state.nextChar();
+    $c = state.nextChar();
     $cnt++;
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
     $1 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
     state.pos = $pos;
     state.ch = $ch;
   }

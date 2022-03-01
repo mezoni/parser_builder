@@ -17,9 +17,10 @@ List<Tuple2<int, int>> parseString(String source) {
 
 bool? _ws(State<String> state) {
   bool? $0;
+  var $c = state.ch;
   bool $test(int x) => x == 0x09 || x == 0xA || x == 0xD || x == 0x20;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
   }
   state.ok = true;
   if (state.ok) {
@@ -33,20 +34,21 @@ int? _hexVal(State<String> state) {
   String? $1;
   state.ok = false;
   final $pos = state.pos;
+  var $c = state.ch;
   bool $test(int x) =>
       x >= 0x30 && x <= 0x39 ||
       x >= 0x41 && x <= 0x46 ||
       x >= 0x61 && x <= 0x66;
-  while (state.ch != State.eof && $test(state.ch)) {
-    state.nextChar();
+  while ($c != State.eof && $test($c)) {
+    $c = state.nextChar();
     state.ok = true;
   }
   if (state.ok) {
     $1 = state.source.substring($pos, state.pos);
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
   }
   if (state.ok) {
     int map(String x) => _toHexValue(x);
@@ -90,7 +92,6 @@ int? _rangeChar(State<String> state) {
   final $pos1 = state.pos;
   final $ch1 = state.ch;
   String? $2;
-  state.ok = true;
   switch (state.ch) {
     case 91:
       if (source.startsWith('[', state.pos)) {
@@ -107,33 +108,33 @@ int? _rangeChar(State<String> state) {
       }
       break;
   }
-  if ($2 == null) {
-    state.ok = false;
+  state.ok = $2 != null;
+  if (!state.ok) {
     state.error = ErrCombined(state.pos, [
       ErrExpected.tag(state.pos, Tag('[')),
       ErrExpected.tag(state.pos, Tag(']'))
     ]);
   }
-  if (!state.ok) {
-    state.ok = true;
+  state.ok = !state.ok;
+  if (state.ok) {
     $1 = true;
   } else {
     state.pos = $pos1;
     state.ch = $ch1;
-    state.ok = false;
     state.error = ErrUnknown(state.pos);
   }
   if (state.ok) {
     int? $3;
+    final $c = state.ch;
     bool $test(int x) => x > 0x20 && x < 0x7f;
-    state.ok = state.ch != State.eof && $test(state.ch);
+    state.ok = $c != State.eof && $test($c);
     if (state.ok) {
-      $3 = state.ch;
+      $3 = $c;
       state.nextChar();
     } else {
-      state.error = state.ch == State.eof
+      state.error = $c == State.eof
           ? ErrUnexpected.eof(state.pos)
-          : ErrUnexpected.char(state.pos, Char(state.ch));
+          : ErrUnexpected.char(state.pos, Char($c));
     }
     if (state.ok) {
       $0 = $3!;
@@ -235,15 +236,16 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
 
 int? _charCode(State<String> state) {
   int? $0;
+  final $c = state.ch;
   bool $test(int x) => x > 0x20 && x < 0x7f;
-  state.ok = state.ch != State.eof && $test(state.ch);
+  state.ok = $c != State.eof && $test($c);
   if (state.ok) {
-    $0 = state.ch;
+    $0 = $c;
     state.nextChar();
   } else {
-    state.error = state.ch == State.eof
+    state.error = $c == State.eof
         ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char(state.ch));
+        : ErrUnexpected.char(state.pos, Char($c));
   }
   return $0;
 }
