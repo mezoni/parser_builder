@@ -16,13 +16,18 @@ List<Tuple2<int, int>> parseString(String source) {
 }
 
 bool? _ws(State<String> state) {
+  final source = state.source;
   bool? $0;
-  var $c = state.ch;
-  bool $test(int x) => x == 0x09 || x == 0xA || x == 0xD || x == 0x20;
-  while ($c != State.eof && $test($c)) {
-    $c = state.nextChar();
-  }
   state.ok = true;
+  bool $test(int x) => x == 0x09 || x == 0xA || x == 0xD || x == 0x20;
+  while (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (!$test(c)) {
+      break;
+    }
+    state.pos += c > 0xffff ? 2 : 1;
+  }
   if (state.ok) {
     $0 = true;
   }
@@ -30,25 +35,30 @@ bool? _ws(State<String> state) {
 }
 
 int? _hexVal(State<String> state) {
+  final source = state.source;
   int? $0;
   String? $1;
-  state.ok = false;
   final $pos = state.pos;
-  var $c = state.ch;
+  var $c = 0;
   bool $test(int x) =>
       x >= 0x30 && x <= 0x39 ||
       x >= 0x41 && x <= 0x46 ||
       x >= 0x61 && x <= 0x66;
-  while ($c != State.eof && $test($c)) {
-    $c = state.nextChar();
+  while (state.pos < source.length) {
+    $c = source.codeUnitAt(state.pos);
+    $c = $c <= 0xD7FF || $c >= 0xE000 ? $c : source.runeAt(state.pos);
+    if (!$test($c)) {
+      break;
+    }
+    state.pos += $c > 0xffff ? 2 : 1;
     state.ok = true;
   }
   if (state.ok) {
-    $1 = state.source.substring($pos, state.pos);
+    $1 = source.substring($pos, state.pos);
   } else {
-    state.error = $c == State.eof
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char($c));
+    state.error = state.pos < source.length
+        ? ErrUnexpected.char(state.pos, Char($c))
+        : ErrUnexpected.eof(state.pos);
   }
   if (state.ok) {
     int map(String x) => _toHexValue(x);
@@ -58,15 +68,21 @@ int? _hexVal(State<String> state) {
 }
 
 int? _hex(State<String> state) {
+  final source = state.source;
   int? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 0x23 && state.source.startsWith('#x', state.pos);
-  if (state.ok) {
-    state.readChar(state.pos + 2);
-    $1 = '#x';
-  } else {
+  state.ok = false;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (c == 0x23 && source.startsWith('#x', state.pos)) {
+      state.ok = true;
+      state.pos += 2;
+      $1 = '#x';
+    }
+  }
+  if (!state.ok) {
     state.error = ErrExpected.tag(state.pos, const Tag('#x'));
   }
   if (state.ok) {
@@ -78,7 +94,6 @@ int? _hex(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
@@ -87,24 +102,27 @@ int? _rangeChar(State<String> state) {
   final source = state.source;
   int? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   bool? $1;
   final $pos1 = state.pos;
-  final $ch1 = state.ch;
   String? $2;
-  switch (state.ch) {
-    case 91:
-      state.readChar(state.pos + 1);
-      $2 = '[';
-      break;
-    case 93:
-      state.readChar(state.pos + 1);
-      $2 = ']';
-      break;
+  final $pos2 = state.pos;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt($pos2);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt($pos2);
+    switch (c) {
+      case 91:
+        state.pos++;
+        $2 = '[';
+        break;
+      case 93:
+        state.pos++;
+        $2 = ']';
+        break;
+    }
   }
   state.ok = $2 != null;
   if (!state.ok) {
-    state.error = ErrCombined(state.pos, [
+    state.error = ErrCombined($pos2, [
       ErrExpected.tag(state.pos, Tag('[')),
       ErrExpected.tag(state.pos, Tag(']'))
     ]);
@@ -114,21 +132,24 @@ int? _rangeChar(State<String> state) {
     $1 = true;
   } else {
     state.pos = $pos1;
-    state.ch = $ch1;
     state.error = ErrUnknown(state.pos);
   }
   if (state.ok) {
     int? $3;
-    final $c = state.ch;
-    bool $test(int x) => x > 0x20 && x < 0x7f;
-    state.ok = $c != State.eof && $test($c);
-    if (state.ok) {
-      $3 = $c;
-      state.nextChar();
+    state.ok = false;
+    if (state.pos < source.length) {
+      var c = source.codeUnitAt(state.pos);
+      c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+      bool test(int x) => x > 0x20 && x < 0x7f;
+      if (test(c)) {
+        state.ok = true;
+        state.pos += c > 0xffff ? 2 : 1;
+        $3 = c;
+      } else {
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      }
     } else {
-      state.error = $c == State.eof
-          ? ErrUnexpected.eof(state.pos)
-          : ErrUnexpected.char(state.pos, Char($c));
+      state.error = ErrUnexpected.eof(state.pos);
     }
     if (state.ok) {
       $0 = $3!;
@@ -136,7 +157,6 @@ int? _rangeChar(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
@@ -165,20 +185,26 @@ int? _hexOrRangeChar(State<String> state) {
 }
 
 Tuple2<int, int>? _rangeBody(State<String> state) {
+  final source = state.source;
   Tuple2<int, int>? $0;
   for (;;) {
     Tuple2<int, int>? $1;
     final $pos = state.pos;
-    final $ch = state.ch;
     int? $3;
     $3 = _hexOrRangeChar(state);
     if (state.ok) {
       String? $4;
-      state.ok = state.ch == 0x2D;
-      if (state.ok) {
-        state.nextChar();
-        $4 = '-';
-      } else {
+      state.ok = false;
+      if (state.pos < source.length) {
+        var c = source.codeUnitAt(state.pos);
+        c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+        if (c == 0x2D) {
+          state.ok = true;
+          state.pos++;
+          $4 = '-';
+        }
+      }
+      if (!state.ok) {
         state.error = ErrExpected.tag(state.pos, const Tag('-'));
       }
       if (state.ok) {
@@ -191,7 +217,6 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
     }
     if (!state.ok) {
       state.pos = $pos;
-      state.ch = $ch;
     }
     if (state.ok) {
       $0 = $1;
@@ -229,31 +254,42 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
 }
 
 int? _charCode(State<String> state) {
+  final source = state.source;
   int? $0;
-  final $c = state.ch;
-  bool $test(int x) => x > 0x20 && x < 0x7f;
-  state.ok = $c != State.eof && $test($c);
-  if (state.ok) {
-    $0 = $c;
-    state.nextChar();
+  state.ok = false;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    bool test(int x) => x > 0x20 && x < 0x7f;
+    if (test(c)) {
+      state.ok = true;
+      state.pos += c > 0xffff ? 2 : 1;
+      $0 = c;
+    } else {
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
   } else {
-    state.error = $c == State.eof
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char($c));
+    state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
 }
 
 int? _char(State<String> state) {
+  final source = state.source;
   int? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 0x22;
-  if (state.ok) {
-    state.nextChar();
-    $1 = '"';
-  } else {
+  state.ok = false;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (c == 0x22) {
+      state.ok = true;
+      state.pos++;
+      $1 = '"';
+    }
+  }
+  if (!state.ok) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -261,11 +297,17 @@ int? _char(State<String> state) {
     $2 = _charCode(state);
     if (state.ok) {
       String? $3;
-      state.ok = state.ch == 0x22;
-      if (state.ok) {
-        state.nextChar();
-        $3 = '"';
-      } else {
+      state.ok = false;
+      if (state.pos < source.length) {
+        var c = source.codeUnitAt(state.pos);
+        c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+        if (c == 0x22) {
+          state.ok = true;
+          state.pos++;
+          $3 = '"';
+        }
+      }
+      if (!state.ok) {
         state.error = ErrExpected.tag(state.pos, const Tag('"'));
       }
       if (state.ok) {
@@ -275,23 +317,28 @@ int? _char(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
 
 List<Tuple2<int, int>>? _range(State<String> state) {
+  final source = state.source;
   List<Tuple2<int, int>>? $0;
   for (;;) {
     List<Tuple2<int, int>>? $1;
     final $pos = state.pos;
-    final $ch = state.ch;
     String? $3;
-    state.ok = state.ch == 0x5B;
-    if (state.ok) {
-      state.nextChar();
-      $3 = '[';
-    } else {
+    state.ok = false;
+    if (state.pos < source.length) {
+      var c = source.codeUnitAt(state.pos);
+      c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+      if (c == 0x5B) {
+        state.ok = true;
+        state.pos++;
+        $3 = '[';
+      }
+    }
+    if (!state.ok) {
       state.error = ErrExpected.tag(state.pos, const Tag('['));
     }
     if (state.ok) {
@@ -311,11 +358,17 @@ List<Tuple2<int, int>>? _range(State<String> state) {
       }
       if (state.ok) {
         String? $6;
-        state.ok = state.ch == 0x5D;
-        if (state.ok) {
-          state.nextChar();
-          $6 = ']';
-        } else {
+        state.ok = false;
+        if (state.pos < source.length) {
+          var c = source.codeUnitAt(state.pos);
+          c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+          if (c == 0x5D) {
+            state.ok = true;
+            state.pos++;
+            $6 = ']';
+          }
+        }
+        if (!state.ok) {
           state.error = ErrExpected.tag(state.pos, const Tag(']'));
         }
         if (state.ok) {
@@ -325,7 +378,6 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     }
     if (!state.ok) {
       state.pos = $pos;
-      state.ch = $ch;
     }
     if (state.ok) {
       $0 = $1;
@@ -368,15 +420,21 @@ List<Tuple2<int, int>>? _range(State<String> state) {
 }
 
 String? _verbar(State<String> state) {
+  final source = state.source;
   String? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 0x7C;
-  if (state.ok) {
-    state.nextChar();
-    $1 = '|';
-  } else {
+  state.ok = false;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (c == 0x7C) {
+      state.ok = true;
+      state.pos++;
+      $1 = '|';
+    }
+  }
+  if (!state.ok) {
     state.error = ErrExpected.tag(state.pos, const Tag('|'));
   }
   if (state.ok) {
@@ -388,7 +446,6 @@ String? _verbar(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
@@ -397,12 +454,10 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   List<Tuple2<int, int>>? $0;
   List<List<Tuple2<int, int>>>? $1;
   var $pos = state.pos;
-  var $ch = state.ch;
   final $list = <List<Tuple2<int, int>>>[];
   for (;;) {
     List<Tuple2<int, int>>? $2;
     final $pos1 = state.pos;
-    final $ch1 = state.ch;
     List<Tuple2<int, int>>? $3;
     $3 = _range(state);
     if (state.ok) {
@@ -414,16 +469,13 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
     }
     if (!state.ok) {
       state.pos = $pos1;
-      state.ch = $ch1;
     }
     if (!state.ok) {
       state.pos = $pos;
-      state.ch = $ch;
       break;
     }
     $list.add($2!);
     $pos = state.pos;
-    $ch = state.ch;
     String? $5;
     $5 = _verbar(state);
     if (!state.ok) {
@@ -445,7 +497,6 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
 List<Tuple2<int, int>>? parse(State<String> state) {
   List<Tuple2<int, int>>? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   bool? $1;
   $1 = _ws(state);
   if (state.ok) {
@@ -466,7 +517,6 @@ List<Tuple2<int, int>>? parse(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
@@ -794,11 +844,7 @@ abstract class ErrWithTagAndErrors extends ErrWithErrors {
 }
 
 class State<T> {
-  static const eof = 0x110000;
-
   dynamic context;
-
-  int ch = eof;
 
   Err error = ErrUnknown(0);
 
@@ -808,12 +854,7 @@ class State<T> {
 
   final T source;
 
-  State(this.source) {
-    if (this is State<String>) {
-      final this_ = this as State<String>;
-      ch = this_.readChar(0);
-    }
-  }
+  State(this.source);
 
   @override
   String toString() {
@@ -854,65 +895,26 @@ class Tag {
   }
 }
 
-extension on State<String> {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int getChar(int index) {
-    if (index < source.length) {
-      final c = source.codeUnitAt(index);
-      return c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      return State.eof;
-    }
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int nextChar() {
-    final index = pos + (ch > 0xffff ? 2 : 1);
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readChar(int index) {
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  int _getChar32(int c, int index) {
-    if (index < source.length) {
-      final c2 = source.codeUnitAt(index);
-      if ((c2 & 0xfc00) == 0xdc00) {
-        return 0x10000 + ((c & 0x3ff) << 10) + (c2 & 0x3ff);
-      }
-    }
-    return State.eof;
-  }
-}
-
 extension on String {
   /// Returns `true` if [pos] points to the end of the string (or beyond).
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   bool atEnd(int pos) {
     return pos >= length;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final c1 = codeUnitAt(index);
+    index++;
+    if ((c1 & 0xfc00) == 0xd800 && index < length) {
+      final c2 = codeUnitAt(index);
+      if ((c2 & 0xfc00) == 0xdc00) {
+        return 0x10000 + ((c1 & 0x3ff) << 10) + (c2 & 0x3ff);
+      }
+    }
+    return c1;
   }
 
   /// Returns a slice (substring) of the string from [start] to [end].

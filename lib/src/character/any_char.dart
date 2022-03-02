@@ -6,12 +6,14 @@ part of '../../character.dart';
 /// ```dart
 /// AnyChar()
 /// ```
-class AnyChar extends ParserBuilder<String, int> {
+class AnyChar extends StringParserBuilder<int> {
   static const _template = '''
-state.ok = state.ch != State.eof;
+state.ok = state.pos < source.length;
 if (state.ok) {
-  {{res}} = state.ch;
-  state.nextChar();
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  state.pos += c > 0xffff ? 2 : 1;
+  {{res}} = c;
 } else {
   state.error = ErrUnexpected.eof(state.pos);
 }''';

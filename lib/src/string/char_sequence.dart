@@ -1,29 +1,29 @@
 part of '../../string.dart';
 
-class CharSequence extends ParserBuilder<String, List<int>> {
+class CharSequence extends StringParserBuilder<List<int>> {
   static const _template = '''
 final {{list}} = <int>[];
 state.ok = true;
 {{transform}}
 while (true) {
-  if (state.ch == State.eof) {
+  if (state.pos >= source.length) {
     break;
   }
-  if ({{test}}(state.ch)) {
-    {{list}}.add(state.ch);
-    state.nextChar();
+  var {{c}} = source.codeUnitAt(state.pos);
+  {{c}} = {{c}} <= 0xD7FF || {{c}} >= 0xE000 ? {{c}} : source.runeAt(state.pos);
+  if ({{test}}({{c}})) {
+    {{list}}.add({{c}});
+    state.pos += {{c}} > 0xffff ? 2 : 1;
     continue;
   }
-  if (state.ch != {{controlChar}}) {
+  if ({{c}} != {{controlChar}}) {
     break;
   }
   final pos = state.pos;
-  final ch = state.ch;
-  state.nextChar();
+  state.pos += {{c}} > 0xffff ? 2 : 1;
   {{p1}}
   if (!state.ok) {
     state.pos = pos;
-    state.ch = ch;
     break;
   }
   {{list}}.add({{p1_val}});
@@ -49,7 +49,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['list', 'test']);
+    final locals = context.allocateLocals(['list', 'test', 'c']);
     return {
       'controlChar': controlChar.toString(),
       'transform': normal.transform(locals['test']!),

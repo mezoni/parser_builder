@@ -78,23 +78,19 @@ class Number extends StringParserBuilder<num> {
         1e22,
       ];
       state.ok = true;
-      final ch = state.ch;
       final length = source.length;
       final start = state.pos;
       var pos = state.pos;
       var c = eof;
       void error(int pos) {
         state.ok = false;
-        state.ch = ch;
         if (pos < length) {
-          final c = state.getChar(pos);
           state.error = ErrUnexpected.char(pos, Char(c));
         } else {
           state.error = ErrUnexpected.eof(pos);
         }
       }
       num parse() {
-        state.ch = state.getChar(pos);
         return double.parse(source.substring(start, pos));
       }
       c = pos < length ? source.codeUnitAt(pos) : eof;
@@ -208,7 +204,6 @@ class Number extends StringParserBuilder<num> {
         }
       }
       state.pos = pos;
-      state.ch = state.getChar(pos);
       final singlePart = !hasDot && !hasExp;
       if (singlePart && intPartLen <= 18) {
         {{res}} = hasSign ? -intValue : intValue;
@@ -261,7 +256,6 @@ class Number extends StringParserBuilder<num> {
         doubleValue += value;
       }
       {{res}} = hasSign ? -doubleValue : doubleValue;
-      state.ch = state.getChar(pos);
       break;
     }''';
 

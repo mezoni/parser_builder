@@ -32,7 +32,6 @@ void _test() {
   _testAnyChar();
   _testChar();
   _testConsumed();
-  _testCrlf();
   _testDelimited();
   _testDigit0();
   _testDigit1();
@@ -40,7 +39,6 @@ void _test() {
   // EscapedTransform
   _testHexDigit0();
   _testHexDigit1();
-  _testLineEnding();
   _testMany0();
   _testMany0Count();
   _testMany1();
@@ -522,59 +520,6 @@ void _testTagEx() {
   });
 }
 
-void _testCrlf() {
-  test('Crlf', () {
-    final parser = crlf;
-    {
-      final state = State('\r\n');
-      final r = parser(state);
-      expect(state.ok, true);
-      _expectResult(r, '\r\n');
-      expect(state.pos, 2);
-    }
-    {
-      final state = State('\r ');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.char(1, Char(0xA)));
-    }
-    {
-      final state = State('\r');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.char(1, Char(0xA)));
-    }
-    {
-      final state = State('');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.char(0, Char(0xD)));
-    }
-    {
-      final state = State('  ');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.char(0, Char(0xD)));
-    }
-    {
-      final state = State(' ');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.char(0, Char(0xD)));
-    }
-  });
-}
-
 void _testDelimited() {
   test('Delimited', () {
     final parser = delimited;
@@ -783,66 +728,6 @@ void _testHexDigit1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnexpected.char(0, Char(c32)));
-    }
-  });
-}
-
-void _testLineEnding() {
-  test('LineEnding', () {
-    final parser = lineEnding;
-    {
-      final state = State('\n');
-      final r = parser(state);
-      expect(state.ok, true);
-      _expectResult(r, '\n');
-      expect(state.pos, 1);
-    }
-    {
-      final state = State('\r\n');
-      final r = parser(state);
-      expect(state.ok, true);
-      _expectResult(r, '\r\n');
-      expect(state.pos, 2);
-    }
-    {
-      final state = State('\r ');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.char(1, Char(0xA)));
-    }
-    {
-      final state = State('\r');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.char(1, Char(0xA)));
-    }
-    {
-      final state = State('');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrUnexpected.eof(0));
-    }
-    {
-      final state = State('  ');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrUnexpected.char(0, Char(0x20)));
-    }
-    {
-      final state = State(' ');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrUnexpected.char(0, Char(0x20)));
     }
   });
 }
@@ -1299,23 +1184,19 @@ void _testNot() {
     }
     {
       final state = State('$s16');
-      final ch = state.ch;
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnknown(0));
-      expect(state.ch, ch);
     }
     {
       final state = State('$s32');
-      final ch = state.ch;
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnknown(0));
-      expect(state.ch, ch);
     }
   });
 }
@@ -1409,12 +1290,10 @@ void _testPeek() {
     final parser = peekC32;
     {
       final state = State('$s32');
-      final ch = state.ch;
       final r = parser(state);
       expect(state.ok, true);
       _expectResult(r, c32);
       expect(state.pos, 0);
-      expect(state.ch, ch);
     }
     {
       final state = State('');

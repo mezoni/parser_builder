@@ -150,18 +150,16 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
 abstract class _Tuple<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{ch}} = state.ch;
 {{body}}
 if (!state.ok) {
   state.pos = {{pos}};
-  state.ch = {{ch}};
 }''';
 
   const _Tuple();
 
   @override
   String getTemplate(Context context) {
-    final locals = context.allocateLocals(['pos', 'ch']);
+    final locals = context.allocateLocals(['pos']);
     final count = getBuilders().length;
     String plunge(int i) {
       const template1 = '''

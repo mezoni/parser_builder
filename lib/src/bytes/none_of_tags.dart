@@ -9,8 +9,12 @@ part of '../../bytes.dart';
 class NoneOfTags extends StringParserBuilder<bool> {
   static const _template = '''
 state.ok = true;
-switch (state.ch) {
-  {{cases}}
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  switch (c) {
+    {{cases}}
+  }
 }
 if (state.ok) {
   {{res}} = true;

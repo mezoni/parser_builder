@@ -6,22 +6,34 @@ part of '../../bytes.dart';
 /// ```dart
 /// Tag('{')
 /// ```
-class Tag extends ParserBuilder<String, String> {
+class Tag extends StringParserBuilder<String> {
   static const _templateLong = '''
-state.ok = state.ch == {{cc}} && state.source.startsWith({{tag}}, state.pos);
-if (state.ok) {
-  state.readChar(state.pos + {{len}});
-  {{res}}= {{tag}};
-} else {
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if (c == {{cc}} && source.startsWith({{tag}}, state.pos)) {
+    state.ok = true;
+    state.pos += {{len}};
+    {{res}}= {{tag}};
+  }
+}
+if (!state.ok) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
   static const _templateShort = '''
-state.ok = state.ch == {{cc}};
-if (state.ok) {
-  state.nextChar();
-  {{res}}= {{tag}};
-} else {
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if (c == {{cc}}) {
+    state.ok = true;
+    state.pos++;
+    {{res}}= {{tag}};
+  }
+}
+if (!state.ok) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 

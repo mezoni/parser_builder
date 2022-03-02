@@ -3,14 +3,12 @@ part of '../../combinator.dart';
 class Not<I> extends ParserBuilder<I, bool> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{ch}} = state.ch;
 {{p1}}
 state.ok = !state.ok;
 if (state.ok) {
   {{res}} = true;
 } else {
   state.pos = {{pos}};
-  state.ch = {{ch}};
   state.error = ErrUnknown(state.pos);
 }''';
 
@@ -27,7 +25,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['pos', 'ch']);
+    return context.allocateLocals(['pos']);
   }
 
   @override

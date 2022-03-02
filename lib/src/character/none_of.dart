@@ -7,19 +7,20 @@ part of '../../character.dart';
 /// ```dart
 /// NoneOf([0x22, 0x27])
 /// ```
-class NoneOf extends ParserBuilder<String, int> {
+class NoneOf extends StringParserBuilder<int> {
   static const _template = '''
-final {{c}} = state.ch;
-if ({{c}} != State.eof) {
-  state.ok = {{test}};
-  if (state.ok) {
-    {{res}} = {{c}};
-    state.nextChar();
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if ({{test}}) {
+    state.pos += c > 0xffff ? 2 : 1;
+    state.ok = true;
+    {{res}} = c;
   } else {
-    state.error = ErrUnexpected.char(state.pos, Char({{c}}));
+    state.error = ErrUnexpected.char(state.pos, Char(c));
   }
 } else {
-  state.ok = false;
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 
@@ -33,11 +34,9 @@ if ({{c}} != State.eof) {
       throw StateError('List of characters must not be empty');
     }
 
-    final locals = context.allocateLocals(['c']);
-    final c = locals['c'];
     return {
-      'test': characters.map((e) => '$c != ' + helper.toHex(e)).join(' && '),
-    }..addAll(locals);
+      'test': characters.map((e) => 'c != ' + helper.toHex(e)).join(' && '),
+    };
   }
 
   @override

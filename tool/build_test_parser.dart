@@ -20,14 +20,12 @@ Future<void> main(List<String> args) async {
     _char16,
     _char32,
     _consumedSeparatedAbcC32,
-    _crlf,
     _delimited,
     _digit0,
     _digit1,
     _eof,
     _hexDigit0,
     _hexDigit1,
-    _lineEnding,
     _many0C32,
     _many0CountC32,
     _many1C32,
@@ -118,8 +116,6 @@ const _char32 = Named('char32', Char(c32));
 const _consumedSeparatedAbcC32 = Named(
     'consumedSeparatedAbcC32', Consumed(SeparatedList1(_tagAbc, _char32)));
 
-const _crlf = Named('crlf', Crlf());
-
 const _delimited = Named('delimited', Delimited(_char16, _char32, _char16));
 
 const _digit0 = Named('digit0', Digit0());
@@ -133,8 +129,6 @@ const _hexDigit0 = Named('hexDigit0', HexDigit0());
 const _hexDigit1 = Named('hexDigit1', HexDigit1());
 
 const _isC32 = Transformer<int, bool>('c', '=> c == 0x1d200;');
-
-const _lineEnding = Named('lineEnding', LineEnding());
 
 const _many0C32 = Named('many0C32', Many0(_char32));
 

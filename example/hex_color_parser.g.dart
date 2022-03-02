@@ -1,29 +1,30 @@
 part of 'hex_color_parser.dart';
 
 int? _hexPrimary(State<String> state) {
+  final source = state.source;
   int? $0;
   String? $1;
   final $pos = state.pos;
-  final $ch = state.ch;
-  var $c = $ch;
+  var $c = 0;
   var $cnt = 0;
   bool $test(int x) => isHexDigit(x);
-  while ($cnt < 2) {
-    if ($c == State.eof || !$test($c)) {
+  while ($cnt < 2 && state.pos < source.length) {
+    $c = source.codeUnitAt(state.pos);
+    $c = $c <= 0xD7FF || $c >= 0xE000 ? $c : source.runeAt(state.pos);
+    if (!$test($c)) {
       break;
     }
-    $c = state.nextChar();
+    state.pos += $c > 0xffff ? 2 : 1;
     $cnt++;
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
-    $1 = state.source.substring($pos, state.pos);
+    $1 = source.substring($pos, state.pos);
   } else {
-    state.error = $c == State.eof
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char($c));
+    state.error = state.pos < source.length
+        ? ErrUnexpected.char(state.pos, Char($c))
+        : ErrUnexpected.eof(state.pos);
     state.pos = $pos;
-    state.ch = $ch;
   }
   if (state.ok) {
     int map(String x) => fromHex(x);
@@ -33,21 +34,26 @@ int? _hexPrimary(State<String> state) {
 }
 
 Tuple3<int, int, int>? _hexColor(State<String> state) {
+  final source = state.source;
   Tuple3<int, int, int>? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 0x23;
-  if (state.ok) {
-    state.nextChar();
-    $1 = '#';
-  } else {
+  state.ok = false;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (c == 0x23) {
+      state.ok = true;
+      state.pos++;
+      $1 = '#';
+    }
+  }
+  if (!state.ok) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
     Tuple3<int, int, int>? $2;
     final $pos1 = state.pos;
-    final $ch1 = state.ch;
     int? $3;
     $3 = _hexPrimary(state);
     if (state.ok) {
@@ -63,7 +69,6 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
     }
     if (!state.ok) {
       state.pos = $pos1;
-      state.ch = $ch1;
     }
     if (state.ok) {
       $0 = $2!;
@@ -71,7 +76,6 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
@@ -410,11 +414,7 @@ abstract class ErrWithTagAndErrors extends ErrWithErrors {
 }
 
 class State<T> {
-  static const eof = 0x110000;
-
   dynamic context;
-
-  int ch = eof;
 
   Err error = ErrUnknown(0);
 
@@ -424,12 +424,7 @@ class State<T> {
 
   final T source;
 
-  State(this.source) {
-    if (this is State<String>) {
-      final this_ = this as State<String>;
-      ch = this_.readChar(0);
-    }
-  }
+  State(this.source);
 
   @override
   String toString() {
@@ -470,65 +465,26 @@ class Tag {
   }
 }
 
-extension on State<String> {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int getChar(int index) {
-    if (index < source.length) {
-      final c = source.codeUnitAt(index);
-      return c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      return State.eof;
-    }
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int nextChar() {
-    final index = pos + (ch > 0xffff ? 2 : 1);
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readChar(int index) {
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  int _getChar32(int c, int index) {
-    if (index < source.length) {
-      final c2 = source.codeUnitAt(index);
-      if ((c2 & 0xfc00) == 0xdc00) {
-        return 0x10000 + ((c & 0x3ff) << 10) + (c2 & 0x3ff);
-      }
-    }
-    return State.eof;
-  }
-}
-
 extension on String {
   /// Returns `true` if [pos] points to the end of the string (or beyond).
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   bool atEnd(int pos) {
     return pos >= length;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final c1 = codeUnitAt(index);
+    index++;
+    if ((c1 & 0xfc00) == 0xd800 && index < length) {
+      final c2 = codeUnitAt(index);
+      if ((c2 & 0xfc00) == 0xdc00) {
+        return 0x10000 + ((c1 & 0x3ff) << 10) + (c2 & 0x3ff);
+      }
+    }
+    return c1;
   }
 
   /// Returns a slice (substring) of the string from [start] to [end].

@@ -4,7 +4,9 @@ class TokenizeTags<O> extends StringParserBuilder<O> {
   static const _template = '''
 state.ok = true;
 final {{pos}} = state.pos;
-if ({state.ch != State.eof) {
+if ({state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
   switch (state.ch) {
     {{cases}}
   }
@@ -26,7 +28,7 @@ if (source.startsWith({{tag}}, {{pos}})) {
   final end = state.pos;
   final v = Tuple3(start, end, source.substring(start, end));
   {{res}} = map(v);
-  state.readChar(state.pos + {{len}});
+  state.pos += {{len}};
   break;
 }''';
 

@@ -16,7 +16,7 @@ if (state.pos + {{len}} <= source.length) {
   final v2 = convert(v1);
   if (v2 == {{tag}}) {
     state.ok = true;
-    state.readChar(state.pos + {{len}});
+    state.pos += {{len}};
     {{res}} = v1;
   }
 }

@@ -8,24 +8,25 @@ part of '../../character.dart';
 /// ```dart
 /// NoneOfEx(ContextGet('delimiters))
 /// ```
-class NoneOfEx extends ParserBuilder<String, int> {
+class NoneOfEx extends StringParserBuilder<int> {
   static const _template = '''
 state.ok = true;
-final {{c}} = state.ch;
-if ({{c}} != State.eof) {
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
   {{transform}}
   final list = get(null);
   for (var i = 0; i < list.length; i++) {
-    final c = list[i];
-    if ({{c}} == c) {
+    final ch = list[i];
+    if (c == ch) {
       state.ok = false;
-      state.error = ErrUnexpected.char(state.pos, Char({{c}}));
+      state.error = ErrUnexpected.char(state.pos, Char(c));
       break;
     }
   }
   if (state.ok) {
-    {{res}} = {{c}};
-    state.nextChar();
+    state.pos += c > 0xffff ? 2 : 1;
+    {{res}} = c;
   }
 } else {
   state.ok = false;
@@ -38,10 +39,9 @@ if ({{c}} != State.eof) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['c']);
     return {
       'transform': characters.transform('get'),
-    }..addAll(locals);
+    };
   }
 
   @override

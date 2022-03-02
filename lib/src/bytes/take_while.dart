@@ -7,17 +7,21 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhile(CharClass('[#x21-#x7e]'))
 /// ```
-class TakeWhile extends ParserBuilder<String, String> {
+class TakeWhile extends StringParserBuilder<String> {
   static const _template = '''
 final {{pos}} = state.pos;
-var {{c}} = state.ch;
 {{transform}}
-while ({{c}} != State.eof && {{test}}({{c}})) {
-  {{c}} = state.nextChar();
+while (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if (!{{test}}(c)) {
+    break;
+  }
+  state.pos += c > 0xffff ? 2 : 1;
 }
 state.ok = true;
 if (state.ok) {
-  {{res}} = state.source.substring({{pos}}, state.pos);
+  {{res}} = source.substring({{pos}}, state.pos);
 }''';
 
   final Transformer<int, bool> predicate;
@@ -26,7 +30,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'c', 'test']);
+    final locals = context.allocateLocals(['pos', 'test']);
     return {
       'transform': predicate.transform(locals['test']!),
     }..addAll(locals);

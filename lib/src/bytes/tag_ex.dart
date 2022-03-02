@@ -7,13 +7,13 @@ part of '../../bytes.dart';
 /// ```dart
 /// TagEx(TX('state.context.separator as String'))
 /// ```
-class TagEx extends ParserBuilder<String, String> {
+class TagEx extends StringParserBuilder<String> {
   static const _template = '''
 {{transform}}
 final {{tag}} = {{get}}(null);
-state.ok = state.source.startsWith({{tag}}, state.pos);
+state.ok = source.startsWith({{tag}}, state.pos);
 if (state.ok) {
-  state.readChar(state.pos + {{tag}}.length);
+  state.pos += {{tag}}.length;
   {{res}}= {{tag}};
 } else {
   state.error = ErrExpected.tag(state.pos, Tag({{tag}}));

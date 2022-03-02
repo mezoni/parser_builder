@@ -14,14 +14,15 @@ class TakeWhileUntil extends StringParserBuilder<String> {
 final {{index}} = source.indexOf({{tag}}, state.pos);
 if ({{index}} != -1) {
   final pos = state.pos;
-  final ch = state.ch;
-  var c = ch;
+  var c = 0;
   {{transform}}
   while (state.pos < {{index}}) {
-    if (c == State.eof || !test(c)) {
+    c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (!test(c)) {
       break;
     }
-    c = state.nextChar();
+    state.pos += c > 0xffff ? 2 : 1;
   }
   state.ok = state.pos == {{index}};
   if (state.ok) {
@@ -29,7 +30,6 @@ if ({{index}} != -1) {
   } else {
     state.error = ErrUnexpected.char(state.pos, Char(c));
     state.pos = pos;
-    state.ch = ch;
   }
 } else {
   state.ok = false;

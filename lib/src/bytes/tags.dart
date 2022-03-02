@@ -8,12 +8,17 @@ part of '../../bytes.dart';
 /// ```
 class Tags extends StringParserBuilder<String> {
   static const _template = '''
-switch (state.ch) {
-  {{cases}}
+final {{pos}} = state.pos;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt({{pos}});
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt({{pos}});
+  switch (c) {
+    {{cases}}
+  }
 }
 state.ok = {{res}} != null;
 if (!state.ok) {
-  state.error = ErrCombined(state.pos, [{{errors}}]);
+  state.error = ErrCombined({{pos}}, [{{errors}}]);
 }''';
 
   static const _templateCase = '''
@@ -22,14 +27,14 @@ case {{cc}}:
   break;''';
 
   static const _templateTestLong = '''
-if (source.startsWith({{tag}}, state.pos)) {
-  state.readChar(state.pos + {{len}});
+if (source.startsWith({{tag}}, {{pos}})) {
+  state.pos += {{len}};
   {{res}} = {{tag}};
   break;
 }''';
 
   static const _templateTestShort = '''
-state.readChar(state.pos + 1);
+state.pos++;
 {{res}} = {{tag}};''';
 
   final List<String> tags;
@@ -38,6 +43,7 @@ state.readChar(state.pos + 1);
 
   @override
   String getTemplate(Context context) {
+    final locals = context.allocateLocals(['pos', 'c']);
     final map = <int, List<String>>{};
     final errors = <String>[];
     for (final tag in tags) {
@@ -67,7 +73,7 @@ state.readChar(state.pos + 1);
         final values = {
           'len': tag.length.toString(),
           'tag': helper.escapeString(tag),
-        };
+        }..addAll(locals);
 
         final runes = tag.runes;
         final template =
@@ -88,7 +94,7 @@ state.readChar(state.pos + 1);
     final values = {
       'cases': cases.join('\n'),
       'errors': errors.join(','),
-    };
+    }..addAll(locals);
 
     final result = render(_template, values);
     return result;

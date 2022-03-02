@@ -3,7 +3,6 @@ part of '../../multi.dart';
 class ManyTill<I, O> extends ParserBuilder<I, _t.Tuple2<List<O>, O>> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{ch}} = state.ch;
 final {{list}} = <{{O}}>[];
 for (;;) {
   {{p1}}
@@ -14,7 +13,6 @@ for (;;) {
   {{p2}}
   if (!state.ok) {
     state.pos = {{pos}};
-    state.ch = {{ch}};
     break;
   }
   {{list}}.add({{p2_val}});
@@ -36,7 +34,7 @@ for (;;) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'ch', 'list']);
+    final locals = context.allocateLocals(['pos', 'list']);
     return {
       'O': O.toString(),
     }..addAll(locals);

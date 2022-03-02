@@ -6,14 +6,18 @@ part of '../../bytes.dart';
 /// ```dart
 /// SkipWhile(CharClass('#x9 | #xA | #xD | #x20'), unicode: false)
 /// ```
-class SkipWhile extends ParserBuilder<String, bool> {
+class SkipWhile extends StringParserBuilder<bool> {
   static const _template = '''
-var {{c}} = state.ch;
-{{transform}}
-while ({{c}} != State.eof && {{test}}({{c}})) {
-  {{c}} = state.nextChar();
-}
 state.ok = true;
+{{transform}}
+while (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if (!{{test}}(c)) {
+    break;
+  }
+  state.pos += c > 0xffff ? 2 : 1;
+}
 if (state.ok) {
   {{res}} = true;
 }''';
@@ -24,7 +28,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['c', 'test']);
+    final locals = context.allocateLocals(['test']);
     return {
       'transform': predicate.transform(locals['test']!),
     }..addAll(locals);

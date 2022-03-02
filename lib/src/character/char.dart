@@ -6,13 +6,19 @@ part of '../../character.dart';
 /// ```dart
 /// Char(0x30)
 /// ```
-class Char extends ParserBuilder<String, int> {
+class Char extends StringParserBuilder<int> {
   static const _template = '''
-state.ok = state.ch == {{cc}};
-if (state.ok) {
-  {{res}} = {{cc}};
-  state.nextChar();
-} else {
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if (c == {{cc}}) {
+    state.pos += c > 0xffff ? 2 : 1;
+    state.ok = true;
+    {{res}} = {{cc}};
+  }
+}
+if (!state.ok) {
   state.error = ErrExpected.char(state.pos, const Char({{cc}}));
 }''';
 

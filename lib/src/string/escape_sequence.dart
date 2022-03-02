@@ -1,19 +1,21 @@
 part of '../../string.dart';
 
-class EscapeSequence extends ParserBuilder<String, int> {
+class EscapeSequence extends StringParserBuilder<int> {
   static const _template = '''
 state.ok = false;
-if (state.ch != State.eof) {
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
   int? v;
-  switch (state.ch) {
+  switch (c) {
     {{cases}}
   }
   if (v != null) {
     state.ok = true;
-    state.nextChar();
+    state.pos += c > 0xffff ? 2 : 1;
     {{res}} = v;
   } else {
-    state.error = ErrUnexpected.char(state.pos, Char(state.ch));
+    state.error = ErrUnexpected.char(state.pos, Char(c));
   }
 } else {
   state.error = ErrUnexpected.eof(state.pos);

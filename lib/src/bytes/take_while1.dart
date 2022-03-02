@@ -7,20 +7,24 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhile1(CharClass('[A-Z] | [a-z] |  "_"'))
 /// ```
-class TakeWhile1 extends ParserBuilder<String, String> {
+class TakeWhile1 extends StringParserBuilder<String> {
   static const _template = '''
-state.ok = false;
 final {{pos}} = state.pos;
-var {{c}} = state.ch;
+var {{c}} = 0;
 {{transform}}
-while ({{c}} != State.eof && {{test}}({{c}})) {
-  {{c}} = state.nextChar();
+while (state.pos < source.length) {
+  {{c}} = source.codeUnitAt(state.pos);
+  {{c}} = {{c}} <= 0xD7FF || {{c}} >= 0xE000 ? {{c}} : source.runeAt(state.pos);
+  if (!{{test}}({{c}})) {
+    break;
+  }
+  state.pos += {{c}} > 0xffff ? 2 : 1;
   state.ok = true;
 }
 if (state.ok) {
-  {{res}} = state.source.substring({{pos}}, state.pos);
+  {{res}} = source.substring({{pos}}, state.pos);
 } else  {
-  state.error = {{c}} == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char({{c}}));
+  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
 }''';
 
   final Transformer<int, bool> predicate;

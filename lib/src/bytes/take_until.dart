@@ -13,7 +13,7 @@ final {{pos}} = state.pos;
 final {{index}} = source.indexOf({{tag}}, {{pos}});
 state.ok = {{index}} != -1;
 if (state.ok) {
-  state.readChar({{index}});
+  state.pos = {{index}};
   {{res}} = source.substring({{pos}}, {{index}});
 } else {
   state.error = ErrExpected.tag({{pos}}, const Tag({{tag}}));

@@ -7,27 +7,27 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhileMN(4, 4, CharClass('[0-9] | [a-f] | [A-F]'))
 /// ```
-class TakeWhileMN extends ParserBuilder<String, String> {
+class TakeWhileMN extends StringParserBuilder<String> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{ch}} = state.ch;
-var {{c}} = {{ch}};
+var {{c}} = 0;
 var {{cnt}} = 0;
 {{transform}}
-while ({{cnt}} < {{n}}) {
-  if ({{c}} == State.eof || !{{test}}({{c}})) {
+while ({{cnt}} < {{n}} && state.pos < source.length) {
+  {{c}} = source.codeUnitAt(state.pos);
+  {{c}} = {{c}} <= 0xD7FF || {{c}} >= 0xE000 ? {{c}} : source.runeAt(state.pos);
+  if (!{{test}}({{c}})) {
     break;
   }
-  {{c}} = state.nextChar();
+  state.pos += {{c}} > 0xffff ? 2 : 1;
   {{cnt}}++;
 }
 state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
-  {{res}} = state.source.substring({{pos}}, state.pos);
+  {{res}} = source.substring({{pos}}, state.pos);
 } else {
-  state.error = {{c}} == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char({{c}}));
+  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
   state.pos = {{pos}};
-  state.ch = {{ch}};
 }''';
 
   final Transformer<int, bool> predicate;
@@ -40,7 +40,16 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'ch', 'c', 'cnt', 'test']);
+    if (m < 0) {
+      throw RangeError.value(m, 'm', 'Must be equal to or greater than 0');
+    }
+
+    if (n < m) {
+      throw RangeError.value(
+          n, 'n', 'Must be equal to or greater than \'m\' ($m)');
+    }
+
+    final locals = context.allocateLocals(['pos', 'c', 'cnt', 'test']);
     return {
       'm': m.toString(),
       'n': n.toString(),

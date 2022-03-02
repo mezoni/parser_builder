@@ -568,11 +568,7 @@ abstract class ErrWithTagAndErrors extends ErrWithErrors {
 
   static const _classState = r'''
 class State<T> {
-  static const eof = 0x110000;
-
   dynamic context;
-
-  int ch = eof;
 
   Err error = ErrUnknown(0);
 
@@ -582,12 +578,7 @@ class State<T> {
 
   final T source;
 
-  State(this.source) {
-    if (this is State<String>) {
-      final this_ = this as State<String>;
-      ch = this_.readChar(0);
-    }
-  }
+  State(this.source);
 
   @override
   String toString() {
@@ -629,60 +620,6 @@ class Tag {
   }
 }''';
 
-  static const _extensionState = '''
-extension on State<String> {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int getChar(int index) {
-    if (index < source.length) {
-      final c = source.codeUnitAt(index);
-      return c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      return State.eof;
-    }
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int nextChar() {
-    final index = pos + (ch > 0xffff ? 2 : 1);
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readChar(int index) {
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  int _getChar32(int c, int index) {
-    if (index < source.length) {
-      final c2 = source.codeUnitAt(index);
-      if ((c2 & 0xfc00) == 0xdc00) {
-        return 0x10000 + ((c & 0x3ff) << 10) + (c2 & 0x3ff);
-      }
-    }
-    return State.eof;
-  }
-}''';
-
   static const _extensionString = r'''
 extension on String {
   /// Returns `true` if [pos] points to the end of the string (or beyond).
@@ -690,6 +627,20 @@ extension on String {
   // ignore: unused_element
   bool atEnd(int pos) {
     return pos >= length;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final c1 = codeUnitAt(index);
+    index++;
+    if ((c1 & 0xfc00) == 0xd800 && index < length) {
+      final c2 = codeUnitAt(index);
+      if ((c2 & 0xfc00) == 0xdc00) {
+        return 0x10000 + ((c1 & 0x3ff) << 10) + (c2 & 0x3ff);
+      }
+    }
+    return c1;
   }
 
   /// Returns a slice (substring) of the string from [start] to [end].
@@ -766,7 +717,6 @@ String {{name}}(String source, List<Err> errors,
         _classErrWithTagAndErrorsLite,
         _classState,
         _classTag,
-        _extensionState,
         _extensionString
       ];
     } else {
@@ -784,7 +734,6 @@ String {{name}}(String source, List<Err> errors,
         _classErrWithTagAndErrors,
         _classState,
         _classTag,
-        _extensionState,
         _extensionString
       ];
     }

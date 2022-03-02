@@ -4,10 +4,8 @@ class SkipMany0<I> extends ParserBuilder<I, bool> {
   static const _template = '''
 for (;;) {
   final {{pos}} = state.pos;
-  final {{ch}} = state.ch;
   {{body}}
   state.pos = {{pos}};
-  state.ch = {{ch}};
   state.ok = true;
   {{res}} = true;
   break;
@@ -29,7 +27,7 @@ for (;;) {
 
   @override
   String getTemplate(Context context) {
-    final locals = context.allocateLocals(['pos', 'ch']);
+    final locals = context.allocateLocals(['pos']);
     final count = getBuilders().length;
     String plunge(int i) {
       const templateBody = '''

@@ -7,16 +7,22 @@ part of '../../character.dart';
 /// ```dart
 /// Satisfy(isSomeChar)
 /// ```
-class Satisfy extends ParserBuilder<String, int> {
+class Satisfy extends StringParserBuilder<int> {
   static const _template = '''
-final {{c}} = state.ch;
-{{transform}}
-state.ok = {{c}} != State.eof && {{test}}({{c}});
-if (state.ok) {
-  {{res}} = {{c}};
-  state.nextChar();
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  {{transform}}
+  if (test(c)) {
+    state.ok = true;
+    state.pos += c > 0xffff ? 2 : 1;
+    {{res}} = c;
+  } else {
+    state.error = ErrUnexpected.char(state.pos, Char(c));
+  }
 } else {
-  state.error = {{c}} == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char({{c}}));
+  state.error = ErrUnexpected.eof(state.pos);
 }''';
 
   final Transformer<int, bool> predictate;
@@ -25,10 +31,9 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['c', 'test']);
     return {
-      'transform': predictate.transform(locals['test']!),
-    }..addAll(locals);
+      'transform': predictate.transform('test'),
+    };
   }
 
   @override

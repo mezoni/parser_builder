@@ -3,7 +3,6 @@ part of '../../sequence.dart';
 class SeparatedPair<I, O1, O2> extends ParserBuilder<I, _t.Tuple2<O1, O2>> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{ch}} = state.ch;
 {{p1}}
 if (state.ok) {
   {{p2}}
@@ -16,7 +15,6 @@ if (state.ok) {
 }
 if (!state.ok) {
   state.pos = {{pos}};
-  state.ch = {{ch}};
 }''';
 
   final ParserBuilder<I, O1> parser1;
@@ -38,7 +36,7 @@ if (!state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['pos', 'ch']);
+    return context.allocateLocals(['pos']);
   }
 
   @override

@@ -7,17 +7,22 @@ part of '../../bytes.dart';
 /// ```dart
 /// SkipWhile1(CharClass('[#x30-#x39]'), unicode: false)
 /// ```
-class SkipWhile1 extends ParserBuilder<String, bool> {
+class SkipWhile1 extends StringParserBuilder<bool> {
   static const _template = '''
-var {{c}} = state.ch;
+var {{c}} = 0;
 {{transform}}
-while ({{c}} != State.eof && {{test}}({{c}})) {
-  {{c}} = state.nextChar();
+while (state.pos < source.length) {
+  {{c}} = source.codeUnitAt(state.pos);
+  {{c}} = {{c}} <= 0xD7FF || {{c}} >= 0xE000 ? {{c}} : source.runeAt(state.pos);
+  if (!{{test}}({{c}})) {
+    break;
+  }
+  state.pos += {{c}} > 0xffff ? 2 : 1;
   {{res}} = true;
 }
 state.ok = {{res}} != null;
 if (!state.ok) {
-  state.error = {{c}} == State.eof ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char({{c}}));
+  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
 }''';
 
   final Transformer<int, bool> predicate;

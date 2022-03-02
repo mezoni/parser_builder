@@ -22,13 +22,18 @@ num? parse(String s) {
 }
 
 bool? _ws(State<String> state) {
+  final source = state.source;
   bool? $0;
-  var $c = state.ch;
-  bool $test(int x) => x == 0x9 || x == 0xa || x == 0xd || x == 0x20;
-  while ($c != State.eof && $test($c)) {
-    $c = state.nextChar();
-  }
   state.ok = true;
+  bool $test(int x) => x == 0x9 || x == 0xa || x == 0xd || x == 0x20;
+  while (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (!$test(c)) {
+      break;
+    }
+    state.pos += c > 0xffff ? 2 : 1;
+  }
   if (state.ok) {
     $0 = true;
   }
@@ -39,13 +44,11 @@ num? number(State<String> state) {
   final source = state.source;
   num? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   bool? $1;
   $1 = _ws(state);
   if (state.ok) {
     num? $2;
     final $pos1 = state.pos;
-    final $ch1 = state.ch;
     num? $3;
     num? $4;
     for (;;) {
@@ -78,16 +81,13 @@ num? number(State<String> state) {
         1e22,
       ];
       state.ok = true;
-      final ch = state.ch;
       final length = source.length;
       final start = state.pos;
       var pos = state.pos;
       var c = eof;
       void error(int pos) {
         state.ok = false;
-        state.ch = ch;
         if (pos < length) {
-          final c = state.getChar(pos);
           state.error = ErrUnexpected.char(pos, Char(c));
         } else {
           state.error = ErrUnexpected.eof(pos);
@@ -95,7 +95,6 @@ num? number(State<String> state) {
       }
 
       num parse() {
-        state.ch = state.getChar(pos);
         return double.parse(source.substring(start, pos));
       }
 
@@ -210,7 +209,6 @@ num? number(State<String> state) {
         }
       }
       state.pos = pos;
-      state.ch = state.getChar(pos);
       final singlePart = !hasDot && !hasExp;
       if (singlePart && intPartLen <= 18) {
         $4 = hasSign ? -intValue : intValue;
@@ -263,7 +261,6 @@ num? number(State<String> state) {
         doubleValue += value;
       }
       $4 = hasSign ? -doubleValue : doubleValue;
-      state.ch = state.getChar(pos);
       break;
     }
     if (state.ok) {
@@ -281,7 +278,6 @@ num? number(State<String> state) {
     }
     if (!state.ok) {
       state.pos = $pos1;
-      state.ch = $ch1;
     }
     if (state.ok) {
       bool? $6;
@@ -298,7 +294,6 @@ num? number(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
@@ -626,11 +621,7 @@ abstract class ErrWithTagAndErrors extends ErrWithErrors {
 }
 
 class State<T> {
-  static const eof = 0x110000;
-
   dynamic context;
-
-  int ch = eof;
 
   Err error = ErrUnknown(0);
 
@@ -640,12 +631,7 @@ class State<T> {
 
   final T source;
 
-  State(this.source) {
-    if (this is State<String>) {
-      final this_ = this as State<String>;
-      ch = this_.readChar(0);
-    }
-  }
+  State(this.source);
 
   @override
   String toString() {
@@ -686,65 +672,26 @@ class Tag {
   }
 }
 
-extension on State<String> {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int getChar(int index) {
-    if (index < source.length) {
-      final c = source.codeUnitAt(index);
-      return c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      return State.eof;
-    }
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int nextChar() {
-    final index = pos + (ch > 0xffff ? 2 : 1);
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readChar(int index) {
-    if (index < source.length) {
-      pos = index;
-      final c = source.codeUnitAt(index);
-      ch = c <= 0xD7FF || c >= 0xE000 ? c : _getChar32(c, index + 1);
-    } else {
-      pos = source.length;
-      ch = State.eof;
-    }
-    return ch;
-  }
-
-  @pragma('vm:prefer-inline')
-  int _getChar32(int c, int index) {
-    if (index < source.length) {
-      final c2 = source.codeUnitAt(index);
-      if ((c2 & 0xfc00) == 0xdc00) {
-        return 0x10000 + ((c & 0x3ff) << 10) + (c2 & 0x3ff);
-      }
-    }
-    return State.eof;
-  }
-}
-
 extension on String {
   /// Returns `true` if [pos] points to the end of the string (or beyond).
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   bool atEnd(int pos) {
     return pos >= length;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final c1 = codeUnitAt(index);
+    index++;
+    if ((c1 & 0xfc00) == 0xd800 && index < length) {
+      final c2 = codeUnitAt(index);
+      if ((c2 & 0xfc00) == 0xdc00) {
+        return 0x10000 + ((c1 & 0x3ff) << 10) + (c2 & 0x3ff);
+      }
+    }
+    return c1;
   }
 
   /// Returns a slice (substring) of the string from [start] to [end].

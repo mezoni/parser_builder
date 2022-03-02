@@ -3,18 +3,15 @@ part of '../../multi.dart';
 class SeparatedList1<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
 var {{pos}} = state.pos;
-var {{ch}} = state.ch;
 final {{list}} = <{{O}}>[];
 for (;;) {
   {{p1}}
   if (!state.ok) {
     state.pos = {{pos}};
-    state.ch = {{ch}};
     break;
   }
   {{list}}.add({{p1_val}});
   {{pos}} = state.pos;
-  {{ch}} = state.ch;
   {{p2}}
   if (!state.ok) {
     break;
@@ -41,7 +38,7 @@ if ({{list}}.isNotEmpty) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'ch', 'list']);
+    final locals = context.allocateLocals(['pos', 'list']);
     return {
       'O': O.toString(),
     }..addAll(locals);
