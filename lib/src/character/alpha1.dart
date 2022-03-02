@@ -12,7 +12,6 @@ class Alpha1 extends _Chars1 {
 
   @override
   Transformer<int, bool> _getCharacterPredicate() {
-    return Transformer(
-        'c', '=> c >= 0x41 && c <= 0x5a || c >= 0x61 && c <= 0x7a;');
+    return CharClass('[#x41-#x5a] | [#x61-#x7a]');
   }
 }

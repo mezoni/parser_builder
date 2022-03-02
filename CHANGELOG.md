@@ -1,6 +1,7 @@
 ## 0.8.1
 
 - Improved most string parser builders. The generated code is fast again
+- Minor improvements in parser builders `Alpha0`, `Alpha1`, `Alphanumeric0`, `Alphanumeric1`, `Digit0`, `Digit1`, `HexDigit0`, `HexDigit1`
 
 ## 0.8.0
 

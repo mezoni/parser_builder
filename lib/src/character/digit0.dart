@@ -12,6 +12,6 @@ class Digit0 extends _Chars0 {
 
   @override
   Transformer<int, bool> _getCharacterPredicate() {
-    return Transformer('c', '=> c >= 0x30 && c <= 0x39;');
+    return CharClass('[#x30-#x39]');
   }
 }

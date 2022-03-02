@@ -12,7 +12,6 @@ class HexDigit0 extends _Chars0 {
 
   @override
   Transformer<int, bool> _getCharacterPredicate() {
-    return Transformer('c',
-        '=> c >= 0x30 && c <= 0x39 || c >= 0x41 && c <= 0x46 || c >= 0x61 && c <= 0x66;');
+    return CharClass('[#x30-#x39] | [#x41-#x46] | [#x61-#x66]');
   }
 }

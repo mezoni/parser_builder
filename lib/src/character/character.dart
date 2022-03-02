@@ -71,7 +71,7 @@ while (state.pos < source.length) {
   if (!{{test}}({{c}})) {
     break;
   }
-  state.pos += {{size}};
+  state.pos++;
   state.ok = true;
 }
 if (state.ok) {
