@@ -1,5 +1,9 @@
 part of '../../parser_builder.dart';
 
+abstract class CharPredicate {
+  bool get has32BitChars;
+}
+
 class Transformer<I, O> {
   final String parameter;
 

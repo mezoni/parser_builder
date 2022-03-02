@@ -7,7 +7,19 @@ part of '../../bytes.dart';
 /// NoneOfTags(['true', 'false'])
 /// ```
 class NoneOfTags extends StringParserBuilder<bool> {
-  static const _template = '''
+  static const _template16 = '''
+state.ok = true;
+if (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
+  switch (c) {
+    {{cases}}
+  }
+}
+if (state.ok) {
+  {{res}} = true;
+}''';
+
+  static const _template32 = '''
 state.ok = true;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
@@ -89,7 +101,9 @@ state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));''';
       'cases': cases.join('\n'),
     };
 
-    final result = render(_template, values);
+    final has32BitChars = tags.map((e) => e.runes.first).any((e) => e > 0xffff);
+    final template = has32BitChars ? _template32 : _template16;
+    final result = render(template, values);
     return result;
   }
 

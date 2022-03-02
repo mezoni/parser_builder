@@ -7,11 +7,24 @@ part of '../../bytes.dart';
 /// Tags(['true', 'false'])
 /// ```
 class Tags extends StringParserBuilder<String> {
-  static const _template = '''
+  static const _template16 = '''
+final {{pos}} = state.pos;
+if (state.pos < source.length) {
+  final c = source.codeUnitAt({{pos}});
+  switch (c) {
+    {{cases}}
+  }
+}
+state.ok = {{res}} != null;
+if (!state.ok) {
+  state.error = ErrCombined({{pos}}, [{{errors}}]);
+}''';
+
+  static const _template32 = '''
 final {{pos}} = state.pos;
 if (state.pos < source.length) {
   var c = source.codeUnitAt({{pos}});
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt({{pos}});
+  c = c & 0xfc00 != 0xd800 ? c : source.runeAt({{pos}});
   switch (c) {
     {{cases}}
   }
@@ -76,9 +89,9 @@ state.pos++;
         }..addAll(locals);
 
         final runes = tag.runes;
-        final template =
+        final templateTest =
             runes.length > 1 ? _templateTestLong : _templateTestShort;
-        final test = render(template, values);
+        final test = render(templateTest, values);
         tests.add(test);
       }
 
@@ -96,7 +109,9 @@ state.pos++;
       'errors': errors.join(','),
     }..addAll(locals);
 
-    final result = render(_template, values);
+    final has32BitChars = tags.map((e) => e.runes.first).any((e) => e > 0xffff);
+    final template = has32BitChars ? _template32 : _template16;
+    final result = render(template, values);
     return result;
   }
 }

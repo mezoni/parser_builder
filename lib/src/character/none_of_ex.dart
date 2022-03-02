@@ -13,7 +13,7 @@ class NoneOfEx extends StringParserBuilder<int> {
 state.ok = true;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
   {{transform}}
   final list = get(null);
   for (var i = 0; i < list.length; i++) {

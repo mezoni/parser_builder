@@ -7,11 +7,10 @@ part of '../../bytes.dart';
 /// Tag('{')
 /// ```
 class Tag extends StringParserBuilder<String> {
-  static const _templateLong = '''
+  static const _templateLong16 = '''
 state.ok = false;
 if (state.pos < source.length) {
-  var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  final c = source.codeUnitAt(state.pos);
   if (c == {{cc}} && source.startsWith({{tag}}, state.pos)) {
     state.ok = true;
     state.pos += {{len}};
@@ -22,14 +21,41 @@ if (!state.ok) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
-  static const _templateShort = '''
+  static const _templateLong32 = '''
 state.ok = false;
 if (state.pos < source.length) {
-  var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  final c = source.runeAt(state.pos);
+  if (c == {{cc}} && source.startsWith({{tag}}, state.pos)) {
+    state.ok = true;
+    state.pos += {{len}};
+    {{res}}= {{tag}};
+  }
+}
+if (!state.ok) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
+  static const _templateShort16 = '''
+state.ok = false;
+if (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
   if (c == {{cc}}) {
     state.ok = true;
     state.pos++;
+    {{res}}= {{tag}};
+  }
+}
+if (!state.ok) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
+  static const _templateShort32 = '''
+state.ok = false;
+if (state.pos < source.length) {
+  final c = source.runeAt(state.pos);
+  if (c == {{cc}}) {
+    state.ok = true;
+    state.pos += 2;
     {{res}}= {{tag}};
   }
 }
@@ -48,20 +74,30 @@ if (!state.ok) {
     }
 
     final runes = tag.runes;
-    final short = runes.length == 1;
+    final isShort = runes.length == 1;
     return {
       'cc': helper.toHex(runes.first),
-      if (!short) 'len': tag.length.toString(),
+      if (!isShort) 'len': tag.length.toString(),
       'tag': helper.escapeString(tag),
     };
   }
 
   @override
   String getTemplate(Context context) {
-    if (tag.runes.length == 1) {
-      return _templateShort;
+    final runes = tag.runes;
+    final has32BitChars = runes.first > 0xffff;
+    if (runes.length == 1) {
+      if (has32BitChars) {
+        return _templateShort32;
+      } else {
+        return _templateShort16;
+      }
+    } else {
+      if (has32BitChars) {
+        return _templateLong32;
+      } else {
+        return _templateLong16;
+      }
     }
-
-    return _templateLong;
   }
 }

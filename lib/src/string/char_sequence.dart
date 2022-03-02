@@ -10,7 +10,7 @@ while (true) {
     break;
   }
   var {{c}} = source.codeUnitAt(state.pos);
-  {{c}} = {{c}} <= 0xD7FF || {{c}} >= 0xE000 ? {{c}} : source.runeAt(state.pos);
+  {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
   if ({{test}}({{c}})) {
     {{list}}.add({{c}});
     state.pos += {{c}} > 0xffff ? 2 : 1;

@@ -10,7 +10,7 @@ int? _hexPrimary(State<String> state) {
   bool $test(int x) => isHexDigit(x);
   while ($cnt < 2 && state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
-    $c = $c <= 0xD7FF || $c >= 0xE000 ? $c : source.runeAt(state.pos);
+    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     if (!$test($c)) {
       break;
     }
@@ -40,8 +40,7 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x23) {
       state.ok = true;
       state.pos++;
@@ -476,8 +475,7 @@ extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {
-    final c1 = codeUnitAt(index);
-    index++;
+    final c1 = codeUnitAt(index++);
     if ((c1 & 0xfc00) == 0xd800 && index < length) {
       final c2 = codeUnitAt(index);
       if ((c2 & 0xfc00) == 0xdc00) {

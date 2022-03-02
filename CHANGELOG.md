@@ -1,3 +1,7 @@
+## 0.8.1
+
+- Improved most string parser builders. The generated code is fast again
+
 ## 0.8.0
 
 - Breaking change: String parser builders have been revert back. The reason is that Dart is completely unpredictable in terms of predicting performance when writing code. Performance can be reduced by 20% with just a few changes to the source code. Dart is not C/C++, what should be fast in C/C++ will not necessarily be fast in Dart

@@ -6,6 +6,7 @@ import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
+import 'package:parser_builder/transformers.dart';
 
 Future<void> main(List<String> args) async {
   final context = Context();
@@ -33,30 +34,40 @@ Future<void> main(List<String> args) async {
     _manyMNC32_2_3,
     _manyTillAOrBTillAbc,
     _mapC32ToStr,
-    _noneOfC16OrC32,
+    _noneOfC16,
     _noneOfC16OrC32Ex,
+    _noneOfC32,
     _noneOfTagsAbcAbdDefDegXXY,
     _notC32OrC16,
-    _oneOfC16OrC32,
+    _oneOfC16,
+    _oneOfC32,
     _optAbc,
     _pairC16C32,
     _peekC32,
     _precededC16C32,
     _recognize3C32AbcC16,
-    _satisfyIsC32,
+    _satisfyC16,
+    _satisfyC32,
     _separatedList0C32Abc,
     _separatedList1C32Abc,
     _separatedPairC16AbcC32,
     _skipC16C32,
     _skipMany0C16OrC32AndAbc,
-    _skipWhile1IsC32,
-    _skipWhileIsC32,
+    _skipWhile1C16,
+    _skipWhile1C32,
+    _skipWhileC16,
+    _skipWhileC32,
+    _tagAbc,
+    _tagC16,
+    _tagC32,
+    _tagC32C16,
     _takeUntilAbc,
     _takeUntil1Abc,
     _takeWhile1C16,
     _takeWhile1C32,
     _takeWhileC16,
-    _takeWhileC16OrC32UntilAbc,
+    _takeWhileC16UntilAbc,
+    _takeWhileC32UntilAbc,
     _takeWhileC32,
     _takeWhileMN_2_4C16,
     _takeWhileMN_2_4C32,
@@ -128,7 +139,9 @@ const _hexDigit0 = Named('hexDigit0', HexDigit0());
 
 const _hexDigit1 = Named('hexDigit1', HexDigit1());
 
-const _isC32 = Transformer<int, bool>('c', '=> c == 0x1d200;');
+const _isC16 = CharClass('#x50');
+
+const _isC32 = CharClass('#x1d200');
 
 const _many0C32 = Named('many0C32', Many0(_char32));
 
@@ -148,17 +161,21 @@ const _mapC32ToStr = Named(
     Map$(Char(c32),
         Transformer<int, String>('c', '=> String.fromCharCode(c);')));
 
-const _noneOfC16OrC32 = Named('noneOfC16OrC32', NoneOf([c16, c32]));
+const _noneOfC16 = Named('noneOfC16', NoneOf([c16]));
 
 const _noneOfC16OrC32Ex = Named('noneOfC16OrC32Ex',
     NoneOfEx(TX('=> state.context.listOfC16AndC32 as List<int>;')));
+
+const _noneOfC32 = Named('noneOfC32', NoneOf([c32]));
 
 const _noneOfTagsAbcAbdDefDegXXY = Named('noneOfTagsAbcAbdDefDegXXY',
     NoneOfTags(['abc', 'abd', 'def', 'deg', 'x', 'xy']));
 
 const _notC32OrC16 = Named('notC32OrC16', Not(Alt([_char16, _char32])));
 
-const _oneOfC16OrC32 = Named('oneOfC16OrC32', OneOf([c16, c32]));
+const _oneOfC16 = Named('oneOfC16', OneOf([c16]));
+
+const _oneOfC32 = Named('oneOfC32', OneOf([c32]));
 
 const _optAbc = Named('optAbc', Opt(Tag(abc)));
 
@@ -173,7 +190,9 @@ const _recognize3C32AbcC16 =
 
 const _ref = Ref<String, int>('char16');
 
-const _satisfyIsC32 = Named('satisfyIsC32', Satisfy(_isC32));
+const _satisfyC16 = Named('satisfyC16', Satisfy(_isC16));
+
+const _satisfyC32 = Named('satisfyC32', Satisfy(_isC32));
 
 const _separatedList0C32Abc =
     Named('separatedList0C32Abc', SeparatedList0(Char(c32), Tag(abc)));
@@ -193,13 +212,21 @@ const _skipMany0C16OrC32AndAbc = Named(
       Tag(abc)
     ]));
 
-const _skipWhile1IsC32 = Named('skipWhile1IsC32', SkipWhile1(_isC32));
+const _skipWhile1C16 = Named('skipWhile1C16', SkipWhile1(_isC16));
 
-const _skipWhileIsC32 = Named('skipWhileIsC32', SkipWhile(_isC32));
+const _skipWhile1C32 = Named('skipWhile1C32', SkipWhile1(_isC32));
+
+const _skipWhileC16 = Named('skipWhileC16', SkipWhile(_isC16));
+
+const _skipWhileC32 = Named('skipWhileC32', SkipWhile(_isC32));
 
 const _tagAbc = Named('tagAbc', Tag(abc));
 
 const _tagC16 = Named('tagC16', Tag(s16));
+
+const _tagC32 = Named('tagC32', Tag(s32));
+
+const _tagC32C16 = Named('tagC32C16', Tag(s32 + s16));
 
 const _tagExFoo =
     Named('tagExFoo', TagEx(TX('=> state.context.foo as String;')));
@@ -214,26 +241,25 @@ const _takeUntil1Abc = Named('takeUntil1Abc', TakeUntil1(abc));
 
 const _takeUntilAbc = Named('takeUntilAbc', TakeUntil(abc));
 
-const _takeWhile1C16 =
-    Named('takeWhile1C16', TakeWhile1(Transformer('c', '=> c == $c16;')));
+const _takeWhile1C16 = Named('takeWhile1C16', TakeWhile1(_isC16));
 
-const _takeWhile1C32 =
-    Named('takeWhile1C32', TakeWhile1(Transformer('c', '=> c == $c32;')));
+const _takeWhile1C32 = Named('takeWhile1C32', TakeWhile1(_isC32));
 
-const _takeWhileC16 =
-    Named('takeWhileC16', TakeWhile(Transformer('c', '=> c == $c16;')));
+const _takeWhileC16 = Named('takeWhileC16', TakeWhile(_isC16));
 
-const _takeWhileC16OrC32UntilAbc = Named('takeWhileC16OrC32UntilAbc',
-    TakeWhileUntil(Transformer('c', '=> c == $c16 || c == $c32;'), 'abc'));
+const _takeWhileC16UntilAbc =
+    Named('takeWhileC16UntilAbc', TakeWhileUntil(_isC16, 'abc'));
 
-const _takeWhileC32 =
-    Named('takeWhileC32', TakeWhile(Transformer('c', '=> c == $c32;')));
+const _takeWhileC32 = Named('takeWhileC32', TakeWhile(_isC32));
 
-const _takeWhileMN_2_4C16 = Named(
-    'takeWhileMN_2_4C16', TakeWhileMN(2, 4, Transformer('c', '=> c == $c16;')));
+const _takeWhileC32UntilAbc =
+    Named('takeWhileC32UntilAbc', TakeWhileUntil(_isC32, 'abc'));
 
-const _takeWhileMN_2_4C32 = Named(
-    'takeWhileMN_2_4C32', TakeWhileMN(2, 4, Transformer('c', '=> c == $c32;')));
+const _takeWhileMN_2_4C16 =
+    Named('takeWhileMN_2_4C16', TakeWhileMN(2, 4, _isC16));
+
+const _takeWhileMN_2_4C32 =
+    Named('takeWhileMN_2_4C32', TakeWhileMN(2, 4, _isC32));
 
 const _terminatedC16C32 = Named('terminated', Terminated(_char16, _char32));
 

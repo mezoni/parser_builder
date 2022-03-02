@@ -1,6 +1,6 @@
 part of '../../transformers.dart';
 
-abstract class _CharClass extends TX<int, bool> {
+abstract class _CharClass extends TX<int, bool> implements CharPredicate {
   static const _templateBinarySearch = '''
 {
   const list = [{{values}}];
@@ -25,6 +25,14 @@ abstract class _CharClass extends TX<int, bool> {
   final RangeProcessing processing;
 
   const _CharClass({this.processing = RangeProcessing.test}) : super('c');
+
+  @override
+  bool get has32BitChars {
+    final chars = getChars();
+    final parser = RangesParser();
+    final list = parser.parse(chars);
+    return list.any((e) => e > 0xffff);
+  }
 
   String getChars();
 

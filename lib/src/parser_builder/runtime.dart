@@ -632,8 +632,7 @@ extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {
-    final c1 = codeUnitAt(index);
-    index++;
+    final c1 = codeUnitAt(index++);
     if ((c1 & 0xfc00) == 0xd800 && index < length) {
       final c2 = codeUnitAt(index);
       if ((c2 & 0xfc00) == 0xdc00) {

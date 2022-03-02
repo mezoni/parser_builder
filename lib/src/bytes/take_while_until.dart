@@ -10,7 +10,7 @@ part of '../../bytes.dart';
 /// TakeWhileUntil(_CData, ']]>')
 /// ```
 class TakeWhileUntil extends StringParserBuilder<String> {
-  static const _template = '''
+  static const _template16 = '''
 final {{index}} = source.indexOf({{tag}}, state.pos);
 if ({{index}} != -1) {
   final pos = state.pos;
@@ -18,7 +18,33 @@ if ({{index}} != -1) {
   {{transform}}
   while (state.pos < {{index}}) {
     c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    if (!test(c)) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = state.pos == {{index}};
+  if (state.ok) {
+    {{res}} = source.substring(pos, state.pos);
+  } else {
+    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+    state.error = ErrUnexpected.char(state.pos, Char(c));
+    state.pos = pos;
+  }
+} else {
+  state.ok = false;
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
+  static const _template32 = '''
+final {{index}} = source.indexOf({{tag}}, state.pos);
+if ({{index}} != -1) {
+  final pos = state.pos;
+  var c = 0;
+  {{transform}}
+  while (state.pos < {{index}}) {
+    c = source.codeUnitAt(state.pos);
+    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
     if (!test(c)) {
       break;
     }
@@ -53,6 +79,9 @@ if ({{index}} != -1) {
 
   @override
   String getTemplate(Context context) {
-    return _template;
+    final has32BitChars = predicate is CharPredicate
+        ? (predicate as CharPredicate).has32BitChars
+        : true;
+    return has32BitChars ? _template32 : _template16;
   }
 }

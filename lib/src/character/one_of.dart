@@ -8,11 +8,27 @@ part of '../../character.dart';
 /// OneOf([0x22, 0x27])
 /// ```
 class OneOf extends StringParserBuilder<int> {
-  static const _template = '''
+  static const _template16 = '''
 state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if ({{test}}) {
+    state.pos++;
+    state.ok = true;
+    {{res}} = c;
+  } else {
+    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+    state.error = ErrUnexpected.char(state.pos, Char(c));
+  }
+} else {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
+  static const _template32 = '''
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
   if ({{test}}) {
     state.pos += c > 0xffff ? 2 : 1;
     state.ok = true;
@@ -41,7 +57,8 @@ if (state.pos < source.length) {
 
   @override
   String getTemplate(Context context) {
-    return _template;
+    final has32BitChars = characters.any((e) => e > 0xffff);
+    return has32BitChars ? _template32 : _template16;
   }
 
   @override

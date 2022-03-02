@@ -22,12 +22,11 @@ bool? _ws(State<String> state) {
   state.ok = true;
   bool $test(int x) => x >= 0x9 && x <= 0xA || x == 0xD || x == 0x20;
   while (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (!$test(c)) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos++;
   }
   if (state.ok) {
     $0 = true;
@@ -73,18 +72,13 @@ int? _escapeSeq(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     int? v;
     switch (c) {
       case 34:
-        v = 34;
-        break;
       case 47:
-        v = 47;
-        break;
       case 92:
-        v = 92;
+        v = c;
         break;
       case 98:
         v = 8;
@@ -104,7 +98,7 @@ int? _escapeSeq(State<String> state) {
     }
     if (v != null) {
       state.ok = true;
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += 1;
       $0 = v;
     } else {
       state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -124,10 +118,9 @@ int? _escapeHex(State<String> state) {
   int? $2;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x75) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos++;
       state.ok = true;
       $2 = 0x75;
     }
@@ -146,17 +139,17 @@ int? _escapeHex(State<String> state) {
         x >= 0x61 && x <= 0x66;
     while ($cnt < 4 && state.pos < source.length) {
       $c = source.codeUnitAt(state.pos);
-      $c = $c <= 0xD7FF || $c >= 0xE000 ? $c : source.runeAt(state.pos);
       if (!$test($c)) {
         break;
       }
-      state.pos += $c > 0xffff ? 2 : 1;
+      state.pos++;
       $cnt++;
     }
     state.ok = $cnt >= 4;
     if (state.ok) {
       $3 = source.substring($pos1, state.pos);
     } else {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
       state.error = state.pos < source.length
           ? ErrUnexpected.char(state.pos, Char($c))
           : ErrUnexpected.eof(state.pos);
@@ -210,7 +203,7 @@ List<int>? _chars(State<String> state) {
       break;
     }
     var $c = source.codeUnitAt(state.pos);
-    $c = $c <= 0xD7FF || $c >= 0xE000 ? $c : source.runeAt(state.pos);
+    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     if ($test($c)) {
       $list.add($c);
       state.pos += $c > 0xffff ? 2 : 1;
@@ -243,8 +236,7 @@ String? _quote(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x22) {
       state.ok = true;
       state.pos++;
@@ -276,8 +268,7 @@ String? _string(State<String> state) {
   String? $3;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x22) {
       state.ok = true;
       state.pos++;
@@ -546,8 +537,7 @@ bool? _false(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x66 && source.startsWith('false', state.pos)) {
       state.ok = true;
       state.pos += 5;
@@ -570,8 +560,7 @@ dynamic _null(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x6E && source.startsWith('null', state.pos)) {
       state.ok = true;
       state.pos += 4;
@@ -594,8 +583,7 @@ bool? _true(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x74 && source.startsWith('true', state.pos)) {
       state.ok = true;
       state.pos += 4;
@@ -619,8 +607,7 @@ String? _openBracket(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x5B) {
       state.ok = true;
       state.pos++;
@@ -651,8 +638,7 @@ String? _comma(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x2C) {
       state.ok = true;
       state.pos++;
@@ -709,8 +695,7 @@ String? _closeBracket(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x5D) {
       state.ok = true;
       state.pos++;
@@ -763,8 +748,7 @@ String? _openBrace(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x7B) {
       state.ok = true;
       state.pos++;
@@ -795,8 +779,7 @@ String? _colon(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x3A) {
       state.ok = true;
       state.pos++;
@@ -881,8 +864,7 @@ String? _closeBrace(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x7D) {
       state.ok = true;
       state.pos++;
@@ -1389,8 +1371,7 @@ extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {
-    final c1 = codeUnitAt(index);
-    index++;
+    final c1 = codeUnitAt(index++);
     if ((c1 & 0xfc00) == 0xd800 && index < length) {
       final c2 = codeUnitAt(index);
       if ((c2 & 0xfc00) == 0xdc00) {

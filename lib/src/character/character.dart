@@ -1,12 +1,27 @@
 part of '../../character.dart';
 
 abstract class _Chars0 extends StringParserBuilder<String> {
-  static const _template = '''
+  static const _template16 = '''
+final {{pos}} = state.pos;
+{{transform}}
+while (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
+  if (!{{test}}(c)) {
+    break;
+  }
+  state.pos++;
+}
+state.ok = true;
+if (state.ok) {
+  {{res}} = source.substring({{pos}}, state.pos);
+}''';
+
+  static const _template32 = '''
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
   if (!{{test}}(c)) {
     break;
   }
@@ -30,7 +45,11 @@ if (state.ok) {
 
   @override
   String getTemplate(Context context) {
-    return _template;
+    final predicate = _getCharacterPredicate();
+    final has32BitChars = predicate is CharPredicate
+        ? (predicate as CharPredicate).has32BitChars
+        : true;
+    return has32BitChars ? _template32 : _template16;
   }
 
   @override
@@ -42,14 +61,34 @@ if (state.ok) {
 }
 
 abstract class _Chars1 extends StringParserBuilder<String> {
-  static const _template = '''
+  static const _template16 = '''
 state.ok = false;
 final {{pos}} = state.pos;
 var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
-  {{c}} = {{c}} <= 0xD7FF || {{c}} >= 0xE000 ? {{c}} : source.runeAt(state.pos);
+  if (!{{test}}({{c}})) {
+    break;
+  }
+  state.pos += {{size}};
+  state.ok = true;
+}
+if (state.ok) {
+  {{res}} = source.substring({{pos}}, state.pos);
+} else  {
+  {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
+  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+}''';
+
+  static const _template32 = '''
+state.ok = false;
+final {{pos}} = state.pos;
+var {{c}} = 0;
+{{transform}}
+while (state.pos < source.length) {
+  {{c}} = source.codeUnitAt(state.pos);
+  {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
   if (!{{test}}({{c}})) {
     break;
   }
@@ -75,7 +114,11 @@ if (state.ok) {
 
   @override
   String getTemplate(Context context) {
-    return _template;
+    final predicate = _getCharacterPredicate();
+    final has32BitChars = predicate is CharPredicate
+        ? (predicate as CharPredicate).has32BitChars
+        : true;
+    return has32BitChars ? _template32 : _template16;
   }
 
   @override

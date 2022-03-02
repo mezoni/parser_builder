@@ -8,12 +8,27 @@ part of '../../bytes.dart';
 /// TakeWhile(CharClass('[#x21-#x7e]'))
 /// ```
 class TakeWhile extends StringParserBuilder<String> {
-  static const _template = '''
+  static const _template16 = '''
+final {{pos}} = state.pos;
+{{transform}}
+while (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
+  if (!{{test}}(c)) {
+    break;
+  }
+  state.pos++;
+}
+state.ok = true;
+if (state.ok) {
+  {{res}} = source.substring({{pos}}, state.pos);
+}''';
+
+  static const _template32 = '''
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
   if (!{{test}}(c)) {
     break;
   }
@@ -38,6 +53,9 @@ if (state.ok) {
 
   @override
   String getTemplate(Context context) {
-    return _template;
+    final has32BitChars = predicate is CharPredicate
+        ? (predicate as CharPredicate).has32BitChars
+        : true;
+    return has32BitChars ? _template32 : _template16;
   }
 }
