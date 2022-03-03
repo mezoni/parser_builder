@@ -20,7 +20,7 @@ while (true) {
     break;
   }
   final pos = state.pos;
-  state.pos += {{c}} > 0xffff ? 2 : 1;
+  state.pos += {{size}};
   {{p1}}
   if (!state.ok) {
     state.pos = pos;
@@ -52,6 +52,7 @@ if (state.ok) {
     final locals = context.allocateLocals(['list', 'test', 'c']);
     return {
       'controlChar': controlChar.toString(),
+      'size': (controlChar > 0xffff ? 2 : 1).toString(),
       'transform': normal.transform(locals['test']!),
     }..addAll(locals);
   }

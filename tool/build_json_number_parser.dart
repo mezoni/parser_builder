@@ -48,9 +48,11 @@ const _ws = Named('_ws', SkipWhile(_isWhitespace));
 
 class Number extends StringParserBuilder<num> {
   static const _template = '''
+    state.ok = true;
+    final {{pos}} = state.pos;
     for (;;) {
       //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
-      const eof = 0x10ffff + 1;
+      const eof = 0x110000;
       const mask = 0x30;
       const powersOfTen = [
         1.0,
@@ -77,22 +79,9 @@ class Number extends StringParserBuilder<num> {
         1e21,
         1e22,
       ];
-      state.ok = true;
       final length = source.length;
-      final start = state.pos;
       var pos = state.pos;
       var c = eof;
-      void error(int pos) {
-        state.ok = false;
-        if (pos < length) {
-          state.error = ErrUnexpected.char(pos, Char(c));
-        } else {
-          state.error = ErrUnexpected.eof(pos);
-        }
-      }
-      num parse() {
-        return double.parse(source.substring(start, pos));
-      }
       c = pos < length ? source.codeUnitAt(pos) : eof;
       var hasSign = false;
       if (c == 0x2d) {
@@ -102,7 +91,8 @@ class Number extends StringParserBuilder<num> {
       }
       var digit = c ^ mask;
       if (digit > 9) {
-        error(pos);
+        state.ok = false;
+        state.pos = pos;
         break;
       }
       final intPartPos = pos;
@@ -137,7 +127,8 @@ class Number extends StringParserBuilder<num> {
         hasDot = true;
         digit = c ^ mask;
         if (digit > 9) {
-          error(pos);
+          state.ok = false;
+          state.pos = pos;
           break;
         }
         pos++;
@@ -177,7 +168,8 @@ class Number extends StringParserBuilder<num> {
         }
         digit = c ^ mask;
         if (digit > 9) {
-          error(pos);
+          state.ok = false;
+          state.pos = pos;
           break;
         }
         pos++;
@@ -196,7 +188,8 @@ class Number extends StringParserBuilder<num> {
           }
         }
         if (expPartLen > 18) {
-          {{res}} = parse();
+          state.pos = pos;
+          {{res}} = double.parse(source.substring({{pos}}, pos));
           break;
         }
         if (hasExpSign) {
@@ -225,7 +218,8 @@ class Number extends StringParserBuilder<num> {
       exp = expRest + exp;
       final modExp = exp < 0 ? -exp : exp;
       if (modExp > 22) {
-        {{res}} = parse();
+        state.pos = pos;
+        {{res}} = double.parse(source.substring({{pos}}, pos));
         break;
       }
       final k = powersOfTen[modExp];
@@ -257,9 +251,24 @@ class Number extends StringParserBuilder<num> {
       }
       {{res}} = hasSign ? -doubleValue : doubleValue;
       break;
+    }
+    if (!state.ok) {
+      if (state.pos < source.length) {
+        var c = source.codeUnitAt(state.pos);
+        c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      } else {
+        state.error = ErrUnexpected.eof(state.pos);
+      }
+      state.pos = {{pos}};
     }''';
 
   const Number();
+
+  @override
+  Map<String, String> getTags(Context context) {
+    return context.allocateLocals(['pos']);
+  }
 
   @override
   String getTemplate(Context context) {

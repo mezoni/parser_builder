@@ -214,7 +214,7 @@ List<int>? _chars(State<String> state) {
       break;
     }
     final pos = state.pos;
-    state.pos += $c > 0xffff ? 2 : 1;
+    state.pos += 1;
     int? $1;
     $1 = _escaped(state);
     if (!state.ok) {
@@ -239,8 +239,8 @@ String? _quote(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x22) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = '"';
     }
   }
@@ -271,8 +271,8 @@ String? _string(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x22) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $3 = '"';
     }
   }
@@ -310,9 +310,11 @@ num? _number(State<String> state) {
   final source = state.source;
   num? $0;
   num? $1;
+  state.ok = true;
+  final $pos = state.pos;
   for (;;) {
     //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
-    const eof = 0x10ffff + 1;
+    const eof = 0x110000;
     const mask = 0x30;
     const powersOfTen = [
       1.0,
@@ -339,24 +341,9 @@ num? _number(State<String> state) {
       1e21,
       1e22,
     ];
-    state.ok = true;
     final length = source.length;
-    final start = state.pos;
     var pos = state.pos;
     var c = eof;
-    void error(int pos) {
-      state.ok = false;
-      if (pos < length) {
-        state.error = ErrUnexpected.char(pos, Char(c));
-      } else {
-        state.error = ErrUnexpected.eof(pos);
-      }
-    }
-
-    num parse() {
-      return double.parse(source.substring(start, pos));
-    }
-
     c = pos < length ? source.codeUnitAt(pos) : eof;
     var hasSign = false;
     if (c == 0x2d) {
@@ -366,7 +353,8 @@ num? _number(State<String> state) {
     }
     var digit = c ^ mask;
     if (digit > 9) {
-      error(pos);
+      state.ok = false;
+      state.pos = pos;
       break;
     }
     final intPartPos = pos;
@@ -401,7 +389,8 @@ num? _number(State<String> state) {
       hasDot = true;
       digit = c ^ mask;
       if (digit > 9) {
-        error(pos);
+        state.ok = false;
+        state.pos = pos;
         break;
       }
       pos++;
@@ -441,7 +430,8 @@ num? _number(State<String> state) {
       }
       digit = c ^ mask;
       if (digit > 9) {
-        error(pos);
+        state.ok = false;
+        state.pos = pos;
         break;
       }
       pos++;
@@ -460,7 +450,8 @@ num? _number(State<String> state) {
         }
       }
       if (expPartLen > 18) {
-        $1 = parse();
+        state.pos = pos;
+        $1 = double.parse(source.substring($pos, pos));
         break;
       }
       if (hasExpSign) {
@@ -489,7 +480,8 @@ num? _number(State<String> state) {
     exp = expRest + exp;
     final modExp = exp < 0 ? -exp : exp;
     if (modExp > 22) {
-      $1 = parse();
+      state.pos = pos;
+      $1 = double.parse(source.substring($pos, pos));
       break;
     }
     final k = powersOfTen[modExp];
@@ -522,6 +514,16 @@ num? _number(State<String> state) {
     $1 = hasSign ? -doubleValue : doubleValue;
     break;
   }
+  if (!state.ok) {
+    if (state.pos < source.length) {
+      var c = source.codeUnitAt(state.pos);
+      c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
+    state.pos = $pos;
+  }
   if (state.ok) {
     $0 = $1;
   } else {
@@ -540,8 +542,8 @@ bool? _false(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x66 && source.startsWith('false', state.pos)) {
-      state.ok = true;
       state.pos += 5;
+      state.ok = true;
       $1 = 'false';
     }
   }
@@ -563,8 +565,8 @@ dynamic _null(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x6E && source.startsWith('null', state.pos)) {
-      state.ok = true;
       state.pos += 4;
+      state.ok = true;
       $1 = 'null';
     }
   }
@@ -586,8 +588,8 @@ bool? _true(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x74 && source.startsWith('true', state.pos)) {
-      state.ok = true;
       state.pos += 4;
+      state.ok = true;
       $1 = 'true';
     }
   }
@@ -610,8 +612,8 @@ String? _openBracket(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x5B) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = '[';
     }
   }
@@ -641,8 +643,8 @@ String? _comma(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x2C) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = ',';
     }
   }
@@ -698,8 +700,8 @@ String? _closeBracket(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x5D) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = ']';
     }
   }
@@ -751,8 +753,8 @@ String? _openBrace(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x7B) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = '{';
     }
   }
@@ -782,8 +784,8 @@ String? _colon(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x3A) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = ':';
     }
   }
@@ -867,8 +869,8 @@ String? _closeBrace(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x7D) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = '}';
     }
   }

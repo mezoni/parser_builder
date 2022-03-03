@@ -12,8 +12,8 @@ state.ok = false;
 if (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   if (c == {{cc}} && source.startsWith({{tag}}, state.pos)) {
-    state.ok = true;
     state.pos += {{len}};
+    state.ok = true;
     {{res}}= {{tag}};
   }
 }
@@ -26,8 +26,8 @@ state.ok = false;
 if (state.pos < source.length) {
   final c = source.runeAt(state.pos);
   if (c == {{cc}} && source.startsWith({{tag}}, state.pos)) {
-    state.ok = true;
     state.pos += {{len}};
+    state.ok = true;
     {{res}}= {{tag}};
   }
 }
@@ -40,8 +40,8 @@ state.ok = false;
 if (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   if (c == {{cc}}) {
-    state.ok = true;
     state.pos++;
+    state.ok = true;
     {{res}}= {{tag}};
   }
 }
@@ -54,8 +54,8 @@ state.ok = false;
 if (state.pos < source.length) {
   final c = source.runeAt(state.pos);
   if (c == {{cc}}) {
-    state.ok = true;
     state.pos += 2;
+    state.ok = true;
     {{res}}= {{tag}};
   }
 }

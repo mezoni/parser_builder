@@ -51,9 +51,11 @@ num? number(State<String> state) {
     final $pos1 = state.pos;
     num? $3;
     num? $4;
+    state.ok = true;
+    final $pos2 = state.pos;
     for (;;) {
       //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
-      const eof = 0x10ffff + 1;
+      const eof = 0x110000;
       const mask = 0x30;
       const powersOfTen = [
         1.0,
@@ -80,24 +82,9 @@ num? number(State<String> state) {
         1e21,
         1e22,
       ];
-      state.ok = true;
       final length = source.length;
-      final start = state.pos;
       var pos = state.pos;
       var c = eof;
-      void error(int pos) {
-        state.ok = false;
-        if (pos < length) {
-          state.error = ErrUnexpected.char(pos, Char(c));
-        } else {
-          state.error = ErrUnexpected.eof(pos);
-        }
-      }
-
-      num parse() {
-        return double.parse(source.substring(start, pos));
-      }
-
       c = pos < length ? source.codeUnitAt(pos) : eof;
       var hasSign = false;
       if (c == 0x2d) {
@@ -107,7 +94,8 @@ num? number(State<String> state) {
       }
       var digit = c ^ mask;
       if (digit > 9) {
-        error(pos);
+        state.ok = false;
+        state.pos = pos;
         break;
       }
       final intPartPos = pos;
@@ -142,7 +130,8 @@ num? number(State<String> state) {
         hasDot = true;
         digit = c ^ mask;
         if (digit > 9) {
-          error(pos);
+          state.ok = false;
+          state.pos = pos;
           break;
         }
         pos++;
@@ -182,7 +171,8 @@ num? number(State<String> state) {
         }
         digit = c ^ mask;
         if (digit > 9) {
-          error(pos);
+          state.ok = false;
+          state.pos = pos;
           break;
         }
         pos++;
@@ -201,7 +191,8 @@ num? number(State<String> state) {
           }
         }
         if (expPartLen > 18) {
-          $4 = parse();
+          state.pos = pos;
+          $4 = double.parse(source.substring($pos2, pos));
           break;
         }
         if (hasExpSign) {
@@ -230,7 +221,8 @@ num? number(State<String> state) {
       exp = expRest + exp;
       final modExp = exp < 0 ? -exp : exp;
       if (modExp > 22) {
-        $4 = parse();
+        state.pos = pos;
+        $4 = double.parse(source.substring($pos2, pos));
         break;
       }
       final k = powersOfTen[modExp];
@@ -262,6 +254,16 @@ num? number(State<String> state) {
       }
       $4 = hasSign ? -doubleValue : doubleValue;
       break;
+    }
+    if (!state.ok) {
+      if (state.pos < source.length) {
+        var c = source.codeUnitAt(state.pos);
+        c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      } else {
+        state.error = ErrUnexpected.eof(state.pos);
+      }
+      state.pos = $pos2;
     }
     if (state.ok) {
       $3 = $4;

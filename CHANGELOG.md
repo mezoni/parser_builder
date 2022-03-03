@@ -1,6 +1,7 @@
 ## 0.8.2
 
 - Documented and tested parser builder `EscapeSequence`
+- Minor improvements in the `Number` parser. Now the generated parser parses even a little faster. The parser is currently only used internally, when generating a `JSON` parser example
 
 ## 0.8.1
 
