@@ -72,7 +72,7 @@ int? _escapeSeq(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
+    var c = source.codeUnitAt(state.pos);
     int? v;
     switch (c) {
       case 34:
@@ -98,9 +98,10 @@ int? _escapeSeq(State<String> state) {
     }
     if (v != null) {
       state.ok = true;
-      state.pos += 1;
+      state.pos++;
       $0 = v;
     } else {
+      c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
   } else {

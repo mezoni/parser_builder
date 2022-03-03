@@ -1,17 +1,53 @@
 part of '../../string.dart';
 
+/// Parses the escape sequence and translates the found escaped character into
+/// another character and returns the escaped value.
+///
+/// Example:
+/// ```dart
+/// EscapeSequence({0x22: 0x22,
+///   0x2f: 0x2f,
+///   0x5c: 0x5c,
+///   0x62: 0x08,
+///   0x66: 0x0c,
+///   0x6e: 0x0a,
+///   0x72: 0x0d,
+///   0x74: 0x09
+/// }));
+/// ```
 class EscapeSequence extends StringParserBuilder<int> {
-  static const _template = '''
+  static const _template16 = '''
 state.ok = false;
 if (state.pos < source.length) {
-  final c = source.{{read}}(state.pos);
+  var c = source.codeUnitAt(state.pos);
   int? v;
   switch (c) {
     {{cases}}
   }
   if (v != null) {
     state.ok = true;
-    state.pos += {{size}};
+    state.pos++;
+    {{res}} = v;
+  } else {
+    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+    state.error = ErrUnexpected.char(state.pos, Char(c));
+  }
+} else {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
+  static const _template32 = '''
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+  int? v;
+  switch (c) {
+    {{cases}}
+  }
+  if (v != null) {
+    state.ok = true;
+    state.pos += c > 0xffff ? 2 : 1;
     {{res}} = v;
   } else {
     state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -62,17 +98,15 @@ case {{key}}:
       cases.add(case_);
     }
 
-    final isUnicode = table.keys.any((e) => e > 0xffff);
     return {
       'cases': cases.join('\n'),
-      'read': isUnicode ? 'runeAt' : 'codeUnitAt',
-      'size': isUnicode ? 'c > 0xffff ? 2 : 1' : '1',
     };
   }
 
   @override
   String getTemplate(Context context) {
-    return _template;
+    final has32BitChars = table.keys.any((e) => e > 0xffff);
+    return has32BitChars ? _template32 : _template16;
   }
 
   @override

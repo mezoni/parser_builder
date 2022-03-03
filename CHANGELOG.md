@@ -1,4 +1,6 @@
+## 0.8.2
 
+- Documented and tested parser builder `EscapeSequence`
 
 ## 0.8.1
 

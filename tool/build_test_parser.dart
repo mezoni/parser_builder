@@ -6,6 +6,7 @@ import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
+import 'package:parser_builder/string.dart';
 import 'package:parser_builder/transformers.dart';
 
 Future<void> main(List<String> args) async {
@@ -25,6 +26,8 @@ Future<void> main(List<String> args) async {
     _digit0,
     _digit1,
     _eof,
+    _escapeSequence16,
+    _escapeSequence32,
     _hexDigit0,
     _hexDigit1,
     _many0C32,
@@ -133,6 +136,12 @@ const _digit0 = Named('digit0', Digit0());
 const _digit1 = Named('digit1', Digit1());
 
 const _eof = Named('eof', Eof<String>());
+
+const _escapeSequence16 =
+    Named('escapeSequence16', EscapeSequence({0x6e: 0xa, 0x72: 0xd, c16: c16}));
+
+const _escapeSequence32 = Named('escapeSequence32',
+    EscapeSequence({0x6e: 0xa, 0x72: 0xd, c16: c16, c32: c32}));
 
 const _hexDigit0 = Named('hexDigit0', HexDigit0());
 

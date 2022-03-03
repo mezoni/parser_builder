@@ -36,6 +36,7 @@ void _test() {
   _testDigit0();
   _testDigit1();
   _testEof();
+  _testEscapeSequence();
   // EscapedTransform
   _testHexDigit0();
   _testHexDigit1();
@@ -617,6 +618,102 @@ void _testEof() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.eof(0));
+    }
+  });
+}
+
+void _testEscapeSequence() {
+  test('EscapeSequence', () {
+    final parser16 = escapeSequence16;
+    {
+      final state = State('n');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, 0xa);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('r');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, 0xd);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('$s16');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, c16);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('');
+      final r = parser16(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(0));
+    }
+    {
+      final state = State(' ');
+      final r = parser16(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(0x20)));
+    }
+    {
+      final state = State('$s32');
+      final r = parser16(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(c32)));
+    }
+    final parser32 = escapeSequence32;
+    {
+      final state = State('n');
+      final r = parser32(state);
+      expect(state.ok, true);
+      _expectResult(r, 0xa);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('r');
+      final r = parser32(state);
+      expect(state.ok, true);
+      _expectResult(r, 0xd);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('$s16');
+      final r = parser32(state);
+      expect(state.ok, true);
+      _expectResult(r, c16);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('$s32');
+      final r = parser32(state);
+      expect(state.ok, true);
+      _expectResult(r, c32);
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('');
+      final r = parser32(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(0));
+    }
+    {
+      final state = State(' ');
+      final r = parser32(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(0x20)));
     }
   });
 }

@@ -301,6 +301,71 @@ bool? eof(State<String> state) {
   return $0;
 }
 
+int? escapeSequence16(State<String> state) {
+  final source = state.source;
+  int? $0;
+  state.ok = false;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    int? v;
+    switch (c) {
+      case 80:
+        v = c;
+        break;
+      case 110:
+        v = 10;
+        break;
+      case 114:
+        v = 13;
+        break;
+    }
+    if (v != null) {
+      state.ok = true;
+      state.pos++;
+      $0 = v;
+    } else {
+      c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
+  } else {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
+  return $0;
+}
+
+int? escapeSequence32(State<String> state) {
+  final source = state.source;
+  int? $0;
+  state.ok = false;
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+    int? v;
+    switch (c) {
+      case 80:
+      case 119296:
+        v = c;
+        break;
+      case 110:
+        v = 10;
+        break;
+      case 114:
+        v = 13;
+        break;
+    }
+    if (v != null) {
+      state.ok = true;
+      state.pos += c > 0xffff ? 2 : 1;
+      $0 = v;
+    } else {
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
+  } else {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
+  return $0;
+}
+
 String? hexDigit0(State<String> state) {
   final source = state.source;
   String? $0;

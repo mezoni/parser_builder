@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.8.1
+Version: 0.8.2
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -132,6 +132,9 @@ built-in:
 - [`SkipMany0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/skip_many0.dart)
 - [`Terminated`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/terminated.dart)
 - [`Tuple`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/tuple.dart)
+
+[`string`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string):
+- [`EscapeSequence`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/escape_sequence.dart)
 
 ## Included transformers
 
