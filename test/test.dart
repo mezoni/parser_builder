@@ -1894,36 +1894,129 @@ void _testSkipWhile1() {
 
 void _testTag() {
   test('Tag', () {
-    final parser = tagAbc;
+    final parser16 = tagC16;
     {
-      final state = State(abc);
-      final r = parser(state);
+      final state = State('$s16');
+      final r = parser16(state);
       expect(state.ok, true);
-      _expectResult(r, (abc));
+      _expectResult(r, '$s16');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('$s16 ');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, '$s16');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('');
+      final r = parser16(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(s16)));
+    }
+    {
+      final state = State(' ');
+      final r = parser16(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(s16)));
+    }
+    final parserC16C32 = tagC16C32;
+    {
+      final state = State('$s16$s32');
+      final r = parserC16C32(state);
+      expect(state.ok, true);
+      _expectResult(r, '$s16$s32');
       expect(state.pos, 3);
     }
     {
-      final state = State('$abc ');
-      final r = parser(state);
+      final state = State('$s16$s32 ');
+      final r = parserC16C32(state);
       expect(state.ok, true);
-      _expectResult(r, (abc));
+      _expectResult(r, '$s16$s32');
       expect(state.pos, 3);
     }
     {
       final state = State('');
-      final r = parser(state);
+      final r = parserC16C32(state);
       expect(state.ok, false);
-      expect(r, null);
+      _expectResult(r, null);
       expect(state.pos, 0);
-      expect(state.error, ErrExpected.tag(0, Tag(abc)));
+      expect(state.error, ErrExpected.tag(0, Tag(s16 + s32)));
     }
     {
-      final state = State(' $abc');
-      final r = parser(state);
+      final state = State(' ');
+      final r = parserC16C32(state);
       expect(state.ok, false);
-      expect(r, null);
+      _expectResult(r, null);
       expect(state.pos, 0);
-      expect(state.error, ErrExpected.tag(0, Tag(abc)));
+      expect(state.error, ErrExpected.tag(0, Tag(s16 + s32)));
+    }
+    final parser32 = tagC32;
+    {
+      final state = State('$s32');
+      final r = parser32(state);
+      expect(state.ok, true);
+      _expectResult(r, '$s32');
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('$s32 ');
+      final r = parser32(state);
+      expect(state.ok, true);
+      _expectResult(r, '$s32');
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('');
+      final r = parser32(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(s32)));
+    }
+    {
+      final state = State(' ');
+      final r = parser32(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(s32)));
+    }
+    final parserC32C16 = tagC32C16;
+    {
+      final state = State('$s32$s16');
+      final r = parserC32C16(state);
+      expect(state.ok, true);
+      _expectResult(r, '$s32$s16');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('$s32$s16 ');
+      final r = parserC32C16(state);
+      expect(state.ok, true);
+      _expectResult(r, '$s32$s16');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      final r = parserC32C16(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(s32 + s16)));
+    }
+    {
+      final state = State(' ');
+      final r = parserC32C16(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(s32 + s16)));
     }
   });
 }

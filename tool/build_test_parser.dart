@@ -59,8 +59,12 @@ Future<void> main(List<String> args) async {
     _skipWhileC32,
     _tagAbc,
     _tagC16,
+    _tagC16C32,
     _tagC32,
     _tagC32C16,
+    _tagExFoo,
+    _tagNoCaseAbc,
+    _tagsAbcAbdDefDegXXY,
     _takeUntilAbc,
     _takeUntil1Abc,
     _takeWhile1C16,
@@ -71,11 +75,6 @@ Future<void> main(List<String> args) async {
     _takeWhileC32,
     _takeWhileMN_2_4C16,
     _takeWhileMN_2_4C32,
-    _tagAbc,
-    _tagExFoo,
-    _tagNoCaseAbc,
-    _tagsAbcAbdDefDegXXY,
-    _tagC16,
     _terminatedC16C32,
     _testRef_,
     _tuple2C32Abc,
@@ -223,6 +222,8 @@ const _skipWhileC32 = Named('skipWhileC32', SkipWhile(_isC32));
 const _tagAbc = Named('tagAbc', Tag(abc));
 
 const _tagC16 = Named('tagC16', Tag(s16));
+
+const _tagC16C32 = Named('tagC16C32', Tag(s16 + s32));
 
 const _tagC32 = Named('tagC32', Tag(s32));
 

@@ -1199,6 +1199,24 @@ String? tagC16(State<String> state) {
   return $0;
 }
 
+String? tagC16C32(State<String> state) {
+  final source = state.source;
+  String? $0;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    if (c == 0x50 && source.startsWith('P𝈀', state.pos)) {
+      state.ok = true;
+      state.pos += 3;
+      $0 = 'P𝈀';
+    }
+  }
+  if (!state.ok) {
+    state.error = ErrExpected.tag(state.pos, const Tag('P𝈀'));
+  }
+  return $0;
+}
+
 String? tagC32(State<String> state) {
   final source = state.source;
   String? $0;
@@ -1231,6 +1249,97 @@ String? tagC32C16(State<String> state) {
   }
   if (!state.ok) {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀P'));
+  }
+  return $0;
+}
+
+String? tagExFoo(State<String> state) {
+  final source = state.source;
+  String? $0;
+  String $get(dynamic x) => state.context.foo as String;
+  final $tag = $get(null);
+  state.ok = source.startsWith($tag, state.pos);
+  if (state.ok) {
+    state.pos += $tag.length;
+    $0 = $tag;
+  } else {
+    state.error = ErrExpected.tag(state.pos, Tag($tag));
+  }
+  return $0;
+}
+
+String? tagNoCaseAbc(State<String> state) {
+  final source = state.source;
+  String? $0;
+  state.ok = false;
+  if (state.pos + 3 <= source.length) {
+    String convert(String s) => s.toLowerCase();
+    final v1 = source.substring(state.pos, state.pos + 3);
+    final v2 = convert(v1);
+    if (v2 == 'abc') {
+      state.ok = true;
+      state.pos += 3;
+      $0 = v1;
+    }
+  }
+  if (!state.ok) {
+    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+  }
+  return $0;
+}
+
+String? tagsAbcAbdDefDegXXY(State<String> state) {
+  final source = state.source;
+  String? $0;
+  final $pos = state.pos;
+  if (state.pos < source.length) {
+    final c = source.codeUnitAt($pos);
+    switch (c) {
+      case 97:
+        if (source.startsWith('abc', $pos)) {
+          state.pos += 3;
+          $0 = 'abc';
+          break;
+        }
+        if (source.startsWith('abd', $pos)) {
+          state.pos += 3;
+          $0 = 'abd';
+          break;
+        }
+        break;
+      case 100:
+        if (source.startsWith('def', $pos)) {
+          state.pos += 3;
+          $0 = 'def';
+          break;
+        }
+        if (source.startsWith('deg', $pos)) {
+          state.pos += 3;
+          $0 = 'deg';
+          break;
+        }
+        break;
+      case 120:
+        if (source.startsWith('xy', $pos)) {
+          state.pos += 2;
+          $0 = 'xy';
+          break;
+        }
+        state.pos++;
+        $0 = 'x';
+        break;
+    }
+  }
+  state.ok = $0 != null;
+  if (!state.ok) {
+    state.error = ErrCombined($pos, [
+      ErrExpected.tag(state.pos, Tag('abc')),
+      ErrExpected.tag(state.pos, Tag('abd')),
+      ErrExpected.tag(state.pos, Tag('def')),
+      ErrExpected.tag(state.pos, Tag('deg')),
+      ErrExpected.tag(state.pos, Tag('x')),
+      ErrExpected.tag(state.pos, Tag('xy'))
+    ]);
   }
   return $0;
 }
@@ -1466,97 +1575,6 @@ String? takeWhileMN_2_4C32(State<String> state) {
         ? ErrUnexpected.char(state.pos, Char($c))
         : ErrUnexpected.eof(state.pos);
     state.pos = $pos;
-  }
-  return $0;
-}
-
-String? tagExFoo(State<String> state) {
-  final source = state.source;
-  String? $0;
-  String $get(dynamic x) => state.context.foo as String;
-  final $tag = $get(null);
-  state.ok = source.startsWith($tag, state.pos);
-  if (state.ok) {
-    state.pos += $tag.length;
-    $0 = $tag;
-  } else {
-    state.error = ErrExpected.tag(state.pos, Tag($tag));
-  }
-  return $0;
-}
-
-String? tagNoCaseAbc(State<String> state) {
-  final source = state.source;
-  String? $0;
-  state.ok = false;
-  if (state.pos + 3 <= source.length) {
-    String convert(String s) => s.toLowerCase();
-    final v1 = source.substring(state.pos, state.pos + 3);
-    final v2 = convert(v1);
-    if (v2 == 'abc') {
-      state.ok = true;
-      state.pos += 3;
-      $0 = v1;
-    }
-  }
-  if (!state.ok) {
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
-  }
-  return $0;
-}
-
-String? tagsAbcAbdDefDegXXY(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt($pos);
-    switch (c) {
-      case 97:
-        if (source.startsWith('abc', $pos)) {
-          state.pos += 3;
-          $0 = 'abc';
-          break;
-        }
-        if (source.startsWith('abd', $pos)) {
-          state.pos += 3;
-          $0 = 'abd';
-          break;
-        }
-        break;
-      case 100:
-        if (source.startsWith('def', $pos)) {
-          state.pos += 3;
-          $0 = 'def';
-          break;
-        }
-        if (source.startsWith('deg', $pos)) {
-          state.pos += 3;
-          $0 = 'deg';
-          break;
-        }
-        break;
-      case 120:
-        if (source.startsWith('xy', $pos)) {
-          state.pos += 2;
-          $0 = 'xy';
-          break;
-        }
-        state.pos++;
-        $0 = 'x';
-        break;
-    }
-  }
-  state.ok = $0 != null;
-  if (!state.ok) {
-    state.error = ErrCombined($pos, [
-      ErrExpected.tag(state.pos, Tag('abc')),
-      ErrExpected.tag(state.pos, Tag('abd')),
-      ErrExpected.tag(state.pos, Tag('def')),
-      ErrExpected.tag(state.pos, Tag('deg')),
-      ErrExpected.tag(state.pos, Tag('x')),
-      ErrExpected.tag(state.pos, Tag('xy'))
-    ]);
   }
   return $0;
 }
