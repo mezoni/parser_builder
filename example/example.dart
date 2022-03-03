@@ -39,7 +39,7 @@ bool? _eof(State<String> state) {
   state.ok = state.source.atEnd(state.pos);
   if (state.ok) {
     $0 = true;
-  } else {
+  } else if (!state.opt) {
     state.error = ErrExpected.eof(state.pos);
   }
   return $0;
@@ -126,7 +126,7 @@ int? _escapeHex(State<String> state) {
       $2 = 0x75;
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.char(state.pos, const Char(0x75));
   }
   if (state.ok) {
@@ -150,10 +150,12 @@ int? _escapeHex(State<String> state) {
     if (state.ok) {
       $3 = source.substring($pos1, state.pos);
     } else {
-      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-      state.error = state.pos < source.length
-          ? ErrUnexpected.char(state.pos, Char($c))
-          : ErrUnexpected.eof(state.pos);
+      if (!state.opt) {
+        $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+        state.error = state.pos < source.length
+            ? ErrUnexpected.char(state.pos, Char($c))
+            : ErrUnexpected.eof(state.pos);
+      }
       state.pos = $pos1;
     }
     if (state.ok) {
@@ -187,7 +189,9 @@ int? _escaped(State<String> state) {
       break;
     }
     final $4 = state.error;
-    state.error = ErrCombined(state.pos, [$2, $4]);
+    if (!state.opt) {
+      state.error = ErrCombined(state.pos, [$2, $4]);
+    }
     break;
   }
   return $0;
@@ -244,7 +248,7 @@ String? _quote(State<String> state) {
       $1 = '"';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -276,7 +280,7 @@ String? _string(State<String> state) {
       $3 = '"';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -547,7 +551,7 @@ bool? _false(State<String> state) {
       $1 = 'false';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('false'));
   }
   if (state.ok) {
@@ -570,7 +574,7 @@ dynamic _null(State<String> state) {
       $1 = 'null';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('null'));
   }
   if (state.ok) {
@@ -593,7 +597,7 @@ bool? _true(State<String> state) {
       $1 = 'true';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('true'));
   }
   if (state.ok) {
@@ -617,7 +621,7 @@ String? _openBracket(State<String> state) {
       $1 = '[';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('['));
   }
   if (state.ok) {
@@ -648,7 +652,7 @@ String? _comma(State<String> state) {
       $1 = ',';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag(','));
   }
   if (state.ok) {
@@ -666,6 +670,8 @@ String? _comma(State<String> state) {
 
 List<dynamic>? _values(State<String> state) {
   List<dynamic>? $0;
+  final $opt = state.opt;
+  state.opt = true;
   var $pos = state.pos;
   final $list = <dynamic>[];
   for (;;) {
@@ -687,6 +693,7 @@ List<dynamic>? _values(State<String> state) {
   if (state.ok) {
     $0 = $list;
   }
+  state.opt = $opt;
   return $0;
 }
 
@@ -705,7 +712,7 @@ String? _closeBracket(State<String> state) {
       $1 = ']';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag(']'));
   }
   if (state.ok) {
@@ -758,7 +765,7 @@ String? _openBrace(State<String> state) {
       $1 = '{';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('{'));
   }
   if (state.ok) {
@@ -789,7 +796,7 @@ String? _colon(State<String> state) {
       $1 = ':';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag(':'));
   }
   if (state.ok) {
@@ -835,6 +842,8 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
 
 List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
   List<MapEntry<String, dynamic>>? $0;
+  final $opt = state.opt;
+  state.opt = true;
   var $pos = state.pos;
   final $list = <MapEntry<String, dynamic>>[];
   for (;;) {
@@ -856,6 +865,7 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
   if (state.ok) {
     $0 = $list;
   }
+  state.opt = $opt;
   return $0;
 }
 
@@ -874,7 +884,7 @@ String? _closeBrace(State<String> state) {
       $1 = '}';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('}'));
   }
   if (state.ok) {
@@ -973,7 +983,9 @@ dynamic _value(State<String> state) {
       break;
     }
     final $15 = state.error;
-    state.error = ErrCombined(state.pos, [$3, $5, $7, $9, $11, $13, $15]);
+    if (!state.opt) {
+      state.error = ErrCombined(state.pos, [$3, $5, $7, $9, $11, $13, $15]);
+    }
     break;
   }
   if (state.ok) {
@@ -1317,6 +1329,8 @@ class State<T> {
   Err error = ErrUnknown(0);
 
   bool ok = false;
+
+  bool opt = false;
 
   int pos = 0;
 

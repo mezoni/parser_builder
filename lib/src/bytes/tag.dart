@@ -17,7 +17,7 @@ if (state.pos < source.length) {
     {{res}}= {{tag}};
   }
 }
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
@@ -31,7 +31,7 @@ if (state.pos < source.length) {
     {{res}}= {{tag}};
   }
 }
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
@@ -45,7 +45,7 @@ if (state.pos < source.length) {
     {{res}}= {{tag}};
   }
 }
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
@@ -59,7 +59,7 @@ if (state.pos < source.length) {
     {{res}}= {{tag}};
   }
 }
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 

@@ -40,14 +40,17 @@ case {{cc}}:
   static const _templateTestLong = '''
 if (source.startsWith({{tag}}, state.pos)) {
   state.ok = false;
-  state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
+  if (!state.opt) {
+    state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
+  }
   break;
 }''';
 
   static const _templateTestShort = '''
 state.ok = false;
-state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));''';
-
+if (!state.opt) {
+  state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
+}''';
   final List<String> tags;
 
   const NoneOfTags(this.tags);

@@ -27,13 +27,17 @@ if ({{index}} != -1) {
   if (state.ok) {
     {{res}} = source.substring(pos, state.pos);
   } else {
-    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-    state.error = ErrUnexpected.char(state.pos, Char(c));
+    if (!state.opt) {
+      c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
     state.pos = pos;
   }
 } else {
   state.ok = false;
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+  if (!state.opt) {
+    state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+  }
 }''';
 
   static const _template32 = '''
@@ -54,12 +58,16 @@ if ({{index}} != -1) {
   if (state.ok) {
     {{res}} = source.substring(pos, state.pos);
   } else {
-    state.error = ErrUnexpected.char(state.pos, Char(c));
+    if (!state.opt) {
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
     state.pos = pos;
   }
 } else {
   state.ok = false;
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+  if (!state.opt) {
+    state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+  }
 }''';
 
   final Transformer<int, bool> predicate;

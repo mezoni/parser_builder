@@ -2,6 +2,8 @@ part of '../../multi.dart';
 
 class Many0<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
+final {{opt}} = state.opt;
+state.opt = true;
 final {{list}} = <{{O}}>[];
 for (;;) {
   {{p1}}
@@ -13,7 +15,8 @@ for (;;) {
     break;
   }
   {{list}}.add({{p1_val}});
-}''';
+}
+state.opt = {{opt}};''';
 
   final ParserBuilder<I, O> parser;
 
@@ -28,7 +31,7 @@ for (;;) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['list']);
+    final locals = context.allocateLocals(['opt', 'list']);
     return {
       'O': O.toString(),
     }..addAll(locals);

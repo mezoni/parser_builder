@@ -2,6 +2,8 @@ part of '../../sequence.dart';
 
 class SkipMany0<I> extends ParserBuilder<I, bool> {
   static const _template = '''
+final {{opt}} = state.opt;
+state.opt = true;
 for (;;) {
   final {{pos}} = state.pos;
   {{body}}
@@ -9,7 +11,8 @@ for (;;) {
   state.ok = true;
   {{res}} = true;
   break;
-}''';
+}
+state.opt = {{opt}};''';
 
   final List<ParserBuilder<I, dynamic>> parsers;
 
@@ -27,7 +30,7 @@ for (;;) {
 
   @override
   String getTemplate(Context context) {
-    final locals = context.allocateLocals(['pos']);
+    final locals = context.allocateLocals(['opt', 'pos']);
     final count = getBuilders().length;
     String plunge(int i) {
       const templateBody = '''

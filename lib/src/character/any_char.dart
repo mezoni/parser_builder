@@ -14,7 +14,7 @@ if (state.ok) {
   c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
   state.pos += c > 0xffff ? 2 : 1;
   {{res}} = c;
-} else {
+} else if (!state.opt) {
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 

@@ -574,6 +574,8 @@ class State<T> {
 
   bool ok = false;
 
+  bool opt = false;
+
   int pos = 0;
 
   final T source;

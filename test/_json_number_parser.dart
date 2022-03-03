@@ -286,7 +286,7 @@ num? number(State<String> state) {
       state.ok = state.source.atEnd(state.pos);
       if (state.ok) {
         $6 = true;
-      } else {
+      } else if (!state.opt) {
         state.error = ErrExpected.eof(state.pos);
       }
       if (state.ok) {
@@ -628,6 +628,8 @@ class State<T> {
   Err error = ErrUnknown(0);
 
   bool ok = false;
+
+  bool opt = false;
 
   int pos = 0;
 

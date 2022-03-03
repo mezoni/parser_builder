@@ -16,7 +16,7 @@ if (state.pos < source.length) {
   }
 }
 state.ok = {{res}} != null;
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrCombined({{pos}}, [{{errors}}]);
 }''';
 
@@ -30,7 +30,7 @@ if (state.pos < source.length) {
   }
 }
 state.ok = {{res}} != null;
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrCombined({{pos}}, [{{errors}}]);
 }''';
 

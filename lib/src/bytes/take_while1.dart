@@ -23,7 +23,7 @@ while (state.pos < source.length) {
 }
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
-} else  {
+} else if (!state.opt) {
   {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
   state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
 }''';
@@ -44,7 +44,7 @@ while (state.pos < source.length) {
 }
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
-} else  {
+} else if (!state.opt) {
   state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
 }''';
 

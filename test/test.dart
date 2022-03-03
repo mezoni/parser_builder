@@ -1038,7 +1038,6 @@ void _testManyTill() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error.offset, 1);
-
       expect(
           state.error,
           ErrCombined(
@@ -1739,14 +1738,14 @@ void _testSkip() {
       final state = State('$s16$s32$s16');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (true));
+      _expectResult(r, true);
       expect(state.pos, 3);
     }
     {
       final state = State('');
       final r = parser(state);
       expect(state.ok, false);
-      _expectResult(r, (null));
+      _expectResult(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.char(0, Char(c16)));
     }
@@ -1754,7 +1753,7 @@ void _testSkip() {
       final state = State(' ');
       final r = parser(state);
       expect(state.ok, false);
-      _expectResult(r, (null));
+      _expectResult(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.char(0, Char(c16)));
     }
@@ -1762,7 +1761,7 @@ void _testSkip() {
       final state = State('$s16');
       final r = parser(state);
       expect(state.ok, false);
-      _expectResult(r, (null));
+      _expectResult(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.char(1, Char(c32)));
     }

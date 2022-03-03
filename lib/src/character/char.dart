@@ -17,7 +17,7 @@ if (state.pos < source.length) {
     {{res}} = {{cc}};
   }
 }
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrExpected.char(state.pos, const Char({{cc}}));
 }''';
 
@@ -32,7 +32,7 @@ if (state.pos < source.length) {
     {{res}} = {{cc}};
   }
 }
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrExpected.char(state.pos, const Char({{cc}}));
 }''';
 

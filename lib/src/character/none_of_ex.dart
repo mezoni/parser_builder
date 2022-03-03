@@ -20,7 +20,9 @@ if (state.pos < source.length) {
     final ch = list[i];
     if (c == ch) {
       state.ok = false;
-      state.error = ErrUnexpected.char(state.pos, Char(c));
+      if (!state.opt) {
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      }
       break;
     }
   }
@@ -29,8 +31,10 @@ if (state.pos < source.length) {
     {{res}} = c;
   }
 } else {
+  if (!state.opt) {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
   state.ok = false;
-  state.error = ErrUnexpected.eof(state.pos);
 }''';
 
   final Transformer<dynamic, List<int>> characters;

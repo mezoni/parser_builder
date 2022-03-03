@@ -2,6 +2,8 @@ part of '../../combinator.dart';
 
 class Not<I> extends ParserBuilder<I, bool> {
   static const _template = '''
+final {{opt}} = state.opt;
+state.opt = true;
 final {{pos}} = state.pos;
 {{p1}}
 state.ok = !state.ok;
@@ -9,8 +11,11 @@ if (state.ok) {
   {{res}} = true;
 } else {
   state.pos = {{pos}};
-  state.error = ErrUnknown(state.pos);
-}''';
+  if (!{{opt}}) {
+    state.error = ErrUnknown(state.pos);
+  }
+}
+state.opt = {{opt}};''';
 
   final ParserBuilder<I, dynamic> parser;
 
@@ -25,7 +30,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['pos']);
+    return context.allocateLocals(['opt', 'pos']);
   }
 
   @override

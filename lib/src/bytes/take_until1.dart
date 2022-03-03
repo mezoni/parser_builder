@@ -15,7 +15,7 @@ state.ok = {{index}} > {{pos}};
 if (state.ok) {
   state.pos = {{index}};
   {{res}} = source.substring({{pos}}, {{index}});
-} else {
+} else if (!state.opt) {
   state.error = ErrExpected.tag({{pos}}, const Tag({{tag}}));
 }''';
 

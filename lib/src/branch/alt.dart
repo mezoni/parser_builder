@@ -5,7 +5,9 @@ class Alt<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 for (;;) {
   {{body}}
-  state.error = ErrCombined(state.pos, [{{errors}}]);
+  if (!state.opt) {
+    state.error = ErrCombined(state.pos, [{{errors}}]);
+  }
   break;
 }''';
 

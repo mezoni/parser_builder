@@ -2,8 +2,10 @@ part of '../../multi.dart';
 
 class Many1Count<I> extends ParserBuilder<I, int> {
   static const _template = '''
+final {{opt}} = state.opt;
 var {{cnt}} = 0;
 while (true) {
+  state.opt = {{cnt}} != 0;
   {{p1}}
   if (!state.ok) {
     if ({{cnt}} > 0) {
@@ -13,7 +15,8 @@ while (true) {
     break;
   }
   {{cnt}}++;
-}''';
+}
+state.opt = {{opt}};''';
 
   final ParserBuilder<I, dynamic> parser;
 
@@ -28,7 +31,7 @@ while (true) {
 
   @override
   Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['cnt']);
+    return context.allocateLocals(['opt', 'cnt']);
   }
 
   @override

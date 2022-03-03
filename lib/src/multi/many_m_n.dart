@@ -2,10 +2,12 @@ part of '../../multi.dart';
 
 class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
+final {{opt}} = state.opt;
 final {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
 var {{cnt}} = 0;
 while ({{cnt}} < {{n}}) {
+  state.opt = {{cnt}} > {{m}};
   {{p1}}
   if (!state.ok) {
     break;
@@ -18,7 +20,8 @@ if ({{cnt}} >= {{m}}) {
   {{res}} = {{list}};
 } else {
   state.pos = {{pos}};
-}''';
+}
+state.opt = {{opt}};''';
 
   final int m;
 
@@ -50,7 +53,7 @@ if ({{cnt}} >= {{m}}) {
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
-    final locals = context.allocateLocals(['pos', 'list', 'cnt']);
+    final locals = context.allocateLocals(['opt', 'pos', 'list', 'cnt']);
     return {
       'm': m.toString(),
       'n': n.toString(),

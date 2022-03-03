@@ -1,3 +1,7 @@
+## 0.9.0
+
+- Introduced a new feature called `optional` mode. Does not make breaking changes. Operates automatically. Principle of operation (briefly): tells parsers not to generate errors in `optional` mode because errors are not used (ignored) in this mode. Benefits: significant reduction in memory usage, 5-10% increase in performance
+
 ## 0.8.2
 
 - Documented and tested parser builder `EscapeSequence`

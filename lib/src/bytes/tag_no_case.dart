@@ -20,7 +20,7 @@ if (state.pos + {{len}} <= source.length) {
     {{res}} = v1;
   }
 }
-if (!state.ok) {
+if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 

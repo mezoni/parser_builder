@@ -38,7 +38,7 @@ String? alpha1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else {
+  } else if (!state.opt) {
     $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
@@ -89,7 +89,7 @@ String? alphanumeric1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else {
+  } else if (!state.opt) {
     $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
@@ -110,7 +110,7 @@ int? char16(State<String> state) {
       $0 = 0x50;
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.char(state.pos, const Char(0x50));
   }
   return $0;
@@ -129,7 +129,7 @@ int? char32(State<String> state) {
       $0 = 0x1D200;
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.char(state.pos, const Char(0x1D200));
   }
   return $0;
@@ -152,7 +152,9 @@ int? altC16OrC32(State<String> state) {
       break;
     }
     final $4 = state.error;
-    state.error = ErrCombined(state.pos, [$2, $4]);
+    if (!state.opt) {
+      state.error = ErrCombined(state.pos, [$2, $4]);
+    }
     break;
   }
   return $0;
@@ -167,7 +169,7 @@ int? anyChar(State<String> state) {
     c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
     state.pos += c > 0xffff ? 2 : 1;
     $0 = c;
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -185,7 +187,7 @@ String? tagAbc(State<String> state) {
       $0 = 'abc';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   return $0;
@@ -195,9 +197,11 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   Tuple2<String, List<String>>? $0;
   final $pos = state.pos;
   List<String>? $1;
+  final $opt = state.opt;
   var $pos1 = state.pos;
   final $list = <String>[];
   for (;;) {
+    state.opt = $list.isNotEmpty;
     String? $2;
     $2 = tagAbc(state);
     if (!state.ok) {
@@ -216,6 +220,7 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
     state.ok = true;
     $1 = $list;
   }
+  state.opt = $opt;
   if (state.ok) {
     final v = state.source.slice($pos, state.pos);
     $0 = Tuple2(v, $1!);
@@ -281,7 +286,7 @@ String? digit1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else {
+  } else if (!state.opt) {
     $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
@@ -295,7 +300,7 @@ bool? eof(State<String> state) {
   state.ok = state.source.atEnd(state.pos);
   if (state.ok) {
     $0 = true;
-  } else {
+  } else if (!state.opt) {
     state.error = ErrExpected.eof(state.pos);
   }
   return $0;
@@ -408,7 +413,7 @@ String? hexDigit1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else {
+  } else if (!state.opt) {
     $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
@@ -419,6 +424,8 @@ String? hexDigit1(State<String> state) {
 
 List<int>? many0C32(State<String> state) {
   List<int>? $0;
+  final $opt = state.opt;
+  state.opt = true;
   final $list = <int>[];
   for (;;) {
     int? $1;
@@ -432,11 +439,14 @@ List<int>? many0C32(State<String> state) {
     }
     $list.add($1!);
   }
+  state.opt = $opt;
   return $0;
 }
 
 int? many0CountC32(State<String> state) {
   int? $0;
+  final $opt = state.opt;
+  state.opt = true;
   var $cnt = 0;
   while (true) {
     int? $1;
@@ -448,13 +458,16 @@ int? many0CountC32(State<String> state) {
     }
     $cnt++;
   }
+  state.opt = $opt;
   return $0;
 }
 
 List<int>? many1C32(State<String> state) {
   List<int>? $0;
+  final $opt = state.opt;
   final $list = <int>[];
   for (;;) {
+    state.opt = $list.isNotEmpty;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -466,13 +479,16 @@ List<int>? many1C32(State<String> state) {
     }
     $list.add($1!);
   }
+  state.opt = $opt;
   return $0;
 }
 
 int? many1CountC32(State<String> state) {
   int? $0;
+  final $opt = state.opt;
   var $cnt = 0;
   while (true) {
+    state.opt = $cnt != 0;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -484,15 +500,18 @@ int? many1CountC32(State<String> state) {
     }
     $cnt++;
   }
+  state.opt = $opt;
   return $0;
 }
 
 List<int>? manyMNC32_2_3(State<String> state) {
   List<int>? $0;
+  final $opt = state.opt;
   final $pos = state.pos;
   final $list = <int>[];
   var $cnt = 0;
   while ($cnt < 3) {
+    state.opt = $cnt > 2;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -507,6 +526,7 @@ List<int>? manyMNC32_2_3(State<String> state) {
   } else {
     state.pos = $pos;
   }
+  state.opt = $opt;
   return $0;
 }
 
@@ -526,7 +546,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
         $1 = 'abc';
       }
     }
-    if (!state.ok) {
+    if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (state.ok) {
@@ -545,7 +565,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
           $3 = 'a';
         }
       }
-      if (!state.ok) {
+      if (!state.ok && !state.opt) {
         state.error = ErrExpected.tag(state.pos, const Tag('a'));
       }
       if (state.ok) {
@@ -563,7 +583,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
           $5 = 'b';
         }
       }
-      if (!state.ok) {
+      if (!state.ok && !state.opt) {
         state.error = ErrExpected.tag(state.pos, const Tag('b'));
       }
       if (state.ok) {
@@ -571,7 +591,9 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
         break;
       }
       final $6 = state.error;
-      state.error = ErrCombined(state.pos, [$4, $6]);
+      if (!state.opt) {
+        state.error = ErrCombined(state.pos, [$4, $6]);
+      }
       break;
     }
     if (!state.ok) {
@@ -597,7 +619,7 @@ String? mapC32ToStr(State<String> state) {
       $1 = 0x1D200;
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.char(state.pos, const Char(0x1D200));
   }
   if (state.ok) {
@@ -618,10 +640,10 @@ int? noneOfC16(State<String> state) {
       state.pos += c > 0xffff ? 2 : 1;
       state.ok = true;
       $0 = c;
-    } else {
+    } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -640,7 +662,9 @@ int? noneOfC16OrC32Ex(State<String> state) {
       final ch = list[i];
       if (c == ch) {
         state.ok = false;
-        state.error = ErrUnexpected.char(state.pos, Char(c));
+        if (!state.opt) {
+          state.error = ErrUnexpected.char(state.pos, Char(c));
+        }
         break;
       }
     }
@@ -649,8 +673,10 @@ int? noneOfC16OrC32Ex(State<String> state) {
       $0 = c;
     }
   } else {
+    if (!state.opt) {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
     state.ok = false;
-    state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
 }
@@ -666,10 +692,10 @@ int? noneOfC32(State<String> state) {
       state.pos += c > 0xffff ? 2 : 1;
       state.ok = true;
       $0 = c;
-    } else {
+    } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -685,35 +711,47 @@ bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
       case 97:
         if (source.startsWith('abc', state.pos)) {
           state.ok = false;
-          state.error = ErrUnexpected.tag(state.pos, const Tag('abc'));
+          if (!state.opt) {
+            state.error = ErrUnexpected.tag(state.pos, const Tag('abc'));
+          }
           break;
         }
         if (source.startsWith('abd', state.pos)) {
           state.ok = false;
-          state.error = ErrUnexpected.tag(state.pos, const Tag('abd'));
+          if (!state.opt) {
+            state.error = ErrUnexpected.tag(state.pos, const Tag('abd'));
+          }
           break;
         }
         break;
       case 100:
         if (source.startsWith('def', state.pos)) {
           state.ok = false;
-          state.error = ErrUnexpected.tag(state.pos, const Tag('def'));
+          if (!state.opt) {
+            state.error = ErrUnexpected.tag(state.pos, const Tag('def'));
+          }
           break;
         }
         if (source.startsWith('deg', state.pos)) {
           state.ok = false;
-          state.error = ErrUnexpected.tag(state.pos, const Tag('deg'));
+          if (!state.opt) {
+            state.error = ErrUnexpected.tag(state.pos, const Tag('deg'));
+          }
           break;
         }
         break;
       case 120:
         if (source.startsWith('xy', state.pos)) {
           state.ok = false;
-          state.error = ErrUnexpected.tag(state.pos, const Tag('xy'));
+          if (!state.opt) {
+            state.error = ErrUnexpected.tag(state.pos, const Tag('xy'));
+          }
           break;
         }
         state.ok = false;
-        state.error = ErrUnexpected.tag(state.pos, const Tag('x'));
+        if (!state.opt) {
+          state.error = ErrUnexpected.tag(state.pos, const Tag('x'));
+        }
         break;
     }
   }
@@ -725,6 +763,8 @@ bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
 
 bool? notC32OrC16(State<String> state) {
   bool? $0;
+  final $opt = state.opt;
+  state.opt = true;
   final $pos = state.pos;
   dynamic $1;
   for (;;) {
@@ -742,7 +782,9 @@ bool? notC32OrC16(State<String> state) {
       break;
     }
     final $5 = state.error;
-    state.error = ErrCombined(state.pos, [$3, $5]);
+    if (!state.opt) {
+      state.error = ErrCombined(state.pos, [$3, $5]);
+    }
     break;
   }
   state.ok = !state.ok;
@@ -750,8 +792,11 @@ bool? notC32OrC16(State<String> state) {
     $0 = true;
   } else {
     state.pos = $pos;
-    state.error = ErrUnknown(state.pos);
+    if (!$opt) {
+      state.error = ErrUnknown(state.pos);
+    }
   }
+  state.opt = $opt;
   return $0;
 }
 
@@ -765,11 +810,11 @@ int? oneOfC16(State<String> state) {
       state.pos++;
       state.ok = true;
       $0 = c;
-    } else {
+    } else if (!state.opt) {
       c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -786,10 +831,10 @@ int? oneOfC32(State<String> state) {
       state.pos += c > 0xffff ? 2 : 1;
       state.ok = true;
       $0 = c;
-    } else {
+    } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -798,6 +843,8 @@ int? oneOfC32(State<String> state) {
 String? optAbc(State<String> state) {
   final source = state.source;
   String? $0;
+  final $opt = state.opt;
+  state.opt = true;
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
@@ -808,7 +855,7 @@ String? optAbc(State<String> state) {
       $1 = 'abc';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   if (state.ok) {
@@ -817,6 +864,7 @@ String? optAbc(State<String> state) {
     state.ok = true;
     $0 = null;
   }
+  state.opt = $opt;
   return $0;
 }
 
@@ -906,11 +954,11 @@ int? satisfyC16(State<String> state) {
       state.pos++;
       state.ok = true;
       $0 = c;
-    } else {
+    } else if (!state.opt) {
       c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -928,10 +976,10 @@ int? satisfyC32(State<String> state) {
       state.pos += c > 0xffff ? 2 : 1;
       state.ok = true;
       $0 = c;
-    } else {
+    } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -940,6 +988,8 @@ int? satisfyC32(State<String> state) {
 List<int>? separatedList0C32Abc(State<String> state) {
   final source = state.source;
   List<int>? $0;
+  final $opt = state.opt;
+  state.opt = true;
   var $pos = state.pos;
   final $list = <int>[];
   for (;;) {
@@ -954,7 +1004,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
         $1 = 0x1D200;
       }
     }
-    if (!state.ok) {
+    if (!state.ok && !state.opt) {
       state.error = ErrExpected.char(state.pos, const Char(0x1D200));
     }
     if (!state.ok) {
@@ -973,7 +1023,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
         $2 = 'abc';
       }
     }
-    if (!state.ok) {
+    if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (!state.ok) {
@@ -984,15 +1034,18 @@ List<int>? separatedList0C32Abc(State<String> state) {
   if (state.ok) {
     $0 = $list;
   }
+  state.opt = $opt;
   return $0;
 }
 
 List<int>? separatedList1C32Abc(State<String> state) {
   final source = state.source;
   List<int>? $0;
+  final $opt = state.opt;
   var $pos = state.pos;
   final $list = <int>[];
   for (;;) {
+    state.opt = $list.isNotEmpty;
     int? $1;
     state.ok = false;
     if (state.pos < source.length) {
@@ -1004,7 +1057,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
         $1 = 0x1D200;
       }
     }
-    if (!state.ok) {
+    if (!state.ok && !state.opt) {
       state.error = ErrExpected.char(state.pos, const Char(0x1D200));
     }
     if (!state.ok) {
@@ -1023,7 +1076,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
         $2 = 'abc';
       }
     }
-    if (!state.ok) {
+    if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (!state.ok) {
@@ -1034,6 +1087,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
     state.ok = true;
     $0 = $list;
   }
+  state.opt = $opt;
   return $0;
 }
 
@@ -1051,7 +1105,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
       $1 = 0x50;
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.char(state.pos, const Char(0x50));
   }
   if (state.ok) {
@@ -1065,7 +1119,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
         $2 = 'abc';
       }
     }
-    if (!state.ok) {
+    if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (state.ok) {
@@ -1080,7 +1134,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
           $3 = 0x1D200;
         }
       }
-      if (!state.ok) {
+      if (!state.ok && !state.opt) {
         state.error = ErrExpected.char(state.pos, const Char(0x1D200));
       }
       if (state.ok) {
@@ -1115,6 +1169,8 @@ bool? skipC16C32(State<String> state) {
 bool? skipMany0C16OrC32AndAbc(State<String> state) {
   final source = state.source;
   bool? $0;
+  final $opt = state.opt;
+  state.opt = true;
   for (;;) {
     final $pos = state.pos;
     dynamic $1;
@@ -1133,7 +1189,9 @@ bool? skipMany0C16OrC32AndAbc(State<String> state) {
         break;
       }
       final $5 = state.error;
-      state.error = ErrCombined(state.pos, [$3, $5]);
+      if (!state.opt) {
+        state.error = ErrCombined(state.pos, [$3, $5]);
+      }
       break;
     }
     if (state.ok) {
@@ -1147,7 +1205,7 @@ bool? skipMany0C16OrC32AndAbc(State<String> state) {
           $6 = 'abc';
         }
       }
-      if (!state.ok) {
+      if (!state.ok && !state.opt) {
         state.error = ErrExpected.tag(state.pos, const Tag('abc'));
       }
       if (state.ok) {
@@ -1160,6 +1218,7 @@ bool? skipMany0C16OrC32AndAbc(State<String> state) {
     $0 = true;
     break;
   }
+  state.opt = $opt;
   return $0;
 }
 
@@ -1258,7 +1317,7 @@ String? tagC16(State<String> state) {
       $0 = 'P';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('P'));
   }
   return $0;
@@ -1276,7 +1335,7 @@ String? tagC16C32(State<String> state) {
       $0 = 'P𝈀';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('P𝈀'));
   }
   return $0;
@@ -1294,7 +1353,7 @@ String? tagC32(State<String> state) {
       $0 = '𝈀';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀'));
   }
   return $0;
@@ -1312,7 +1371,7 @@ String? tagC32C16(State<String> state) {
       $0 = '𝈀P';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀P'));
   }
   return $0;
@@ -1327,7 +1386,7 @@ String? tagExFoo(State<String> state) {
   if (state.ok) {
     state.pos += $tag.length;
     $0 = $tag;
-  } else {
+  } else if (!state.opt) {
     state.error = ErrExpected.tag(state.pos, Tag($tag));
   }
   return $0;
@@ -1347,7 +1406,7 @@ String? tagNoCaseAbc(State<String> state) {
       $0 = v1;
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   return $0;
@@ -1396,7 +1455,7 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
     }
   }
   state.ok = $0 != null;
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrCombined($pos, [
       ErrExpected.tag(state.pos, Tag('abc')),
       ErrExpected.tag(state.pos, Tag('abd')),
@@ -1418,7 +1477,7 @@ String? takeUntilAbc(State<String> state) {
   if (state.ok) {
     state.pos = $index;
     $0 = source.substring($pos, $index);
-  } else {
+  } else if (!state.opt) {
     state.error = ErrExpected.tag($pos, const Tag('abc'));
   }
   return $0;
@@ -1433,7 +1492,7 @@ String? takeUntil1Abc(State<String> state) {
   if (state.ok) {
     state.pos = $index;
     $0 = source.substring($pos, $index);
-  } else {
+  } else if (!state.opt) {
     state.error = ErrExpected.tag($pos, const Tag('abc'));
   }
   return $0;
@@ -1456,7 +1515,7 @@ String? takeWhile1C16(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else {
+  } else if (!state.opt) {
     $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
@@ -1483,7 +1542,7 @@ String? takeWhile1C32(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else {
+  } else if (!state.opt) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
         : ErrUnexpected.eof(state.pos);
@@ -1529,13 +1588,17 @@ String? takeWhileC16UntilAbc(State<String> state) {
     if (state.ok) {
       $0 = source.substring(pos, state.pos);
     } else {
-      c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-      state.error = ErrUnexpected.char(state.pos, Char(c));
+      if (!state.opt) {
+        c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      }
       state.pos = pos;
     }
   } else {
     state.ok = false;
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    if (!state.opt) {
+      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    }
   }
   return $0;
 }
@@ -1560,12 +1623,16 @@ String? takeWhileC32UntilAbc(State<String> state) {
     if (state.ok) {
       $0 = source.substring(pos, state.pos);
     } else {
-      state.error = ErrUnexpected.char(state.pos, Char(c));
+      if (!state.opt) {
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      }
       state.pos = pos;
     }
   } else {
     state.ok = false;
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    if (!state.opt) {
+      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    }
   }
   return $0;
 }
@@ -1609,10 +1676,12 @@ String? takeWhileMN_2_4C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (!state.opt) {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      state.error = state.pos < source.length
+          ? ErrUnexpected.char(state.pos, Char($c))
+          : ErrUnexpected.eof(state.pos);
+    }
     state.pos = $pos;
   }
   return $0;
@@ -1638,9 +1707,11 @@ String? takeWhileMN_2_4C32(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (!state.opt) {
+      state.error = state.pos < source.length
+          ? ErrUnexpected.char(state.pos, Char($c))
+          : ErrUnexpected.eof(state.pos);
+    }
     state.pos = $pos;
   }
   return $0;
@@ -1723,7 +1794,7 @@ bool? valueAbcToTrueValue(State<String> state) {
       $1 = 'abc';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   if (state.ok) {
@@ -2125,6 +2196,8 @@ class State<T> {
   Err error = ErrUnknown(0);
 
   bool ok = false;
+
+  bool opt = false;
 
   int pos = 0;
 

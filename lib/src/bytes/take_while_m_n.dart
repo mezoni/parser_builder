@@ -25,8 +25,10 @@ state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else {
-  {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+  if (!state.opt) {
+    {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
+    state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+  }
   state.pos = {{pos}};
 }''';
 
@@ -48,7 +50,9 @@ state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else {
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+  if (!state.opt) {
+    state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+  }
   state.pos = {{pos}};
 }''';
 

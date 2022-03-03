@@ -21,9 +21,11 @@ int? _hexPrimary(State<String> state) {
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
   } else {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (!state.opt) {
+      state.error = state.pos < source.length
+          ? ErrUnexpected.char(state.pos, Char($c))
+          : ErrUnexpected.eof(state.pos);
+    }
     state.pos = $pos;
   }
   if (state.ok) {
@@ -42,12 +44,12 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x23) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = '#';
     }
   }
-  if (!state.ok) {
+  if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
@@ -418,6 +420,8 @@ class State<T> {
   Err error = ErrUnknown(0);
 
   bool ok = false;
+
+  bool opt = false;
 
   int pos = 0;
 
