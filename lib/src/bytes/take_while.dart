@@ -9,6 +9,7 @@ part of '../../bytes.dart';
 /// ```
 class TakeWhile extends StringParserBuilder<String> {
   static const _template16 = '''
+state.ok = true;
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
@@ -18,7 +19,6 @@ while (state.pos < source.length) {
   }
   state.pos++;
 }
-state.ok = true;
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 }''';

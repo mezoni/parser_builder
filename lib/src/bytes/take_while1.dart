@@ -9,6 +9,7 @@ part of '../../bytes.dart';
 /// ```
 class TakeWhile1 extends StringParserBuilder<String> {
   static const _template16 = '''
+state.ok = false;
 final {{pos}} = state.pos;
 var {{c}} = 0;
 {{transform}}
@@ -28,6 +29,7 @@ if (state.ok) {
 }''';
 
   static const _template32 = '''
+state.ok = false;
 final {{pos}} = state.pos;
 var {{c}} = 0;
 {{transform}}

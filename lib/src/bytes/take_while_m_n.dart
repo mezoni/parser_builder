@@ -71,6 +71,10 @@ if (state.ok) {
           n, 'n', 'Must be equal to or greater than \'m\' ($m)');
     }
 
+    if (n == 0) {
+      throw RangeError.value(n, 'n', 'Must be greater than 0');
+    }
+
     final locals = context.allocateLocals(['pos', 'c', 'cnt', 'test']);
     return {
       'm': m.toString(),

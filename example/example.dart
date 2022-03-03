@@ -97,8 +97,8 @@ int? _escapeSeq(State<String> state) {
         break;
     }
     if (v != null) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $0 = v;
     } else {
       c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);

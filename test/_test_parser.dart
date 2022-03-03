@@ -5,6 +5,7 @@ import 'package:tuple/tuple.dart';
 String? alpha0(State<String> state) {
   final source = state.source;
   String? $0;
+  state.ok = true;
   final $pos = state.pos;
   bool $test(int x) => x >= 0x41 && x <= 0x5A || x >= 0x61 && x <= 0x7A;
   while (state.pos < source.length) {
@@ -14,7 +15,6 @@ String? alpha0(State<String> state) {
     }
     state.pos++;
   }
-  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -50,6 +50,7 @@ String? alpha1(State<String> state) {
 String? alphanumeric0(State<String> state) {
   final source = state.source;
   String? $0;
+  state.ok = true;
   final $pos = state.pos;
   bool $test(int x) =>
       x >= 0x30 && x <= 0x39 ||
@@ -62,7 +63,6 @@ String? alphanumeric0(State<String> state) {
     }
     state.pos++;
   }
-  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -180,8 +180,8 @@ String? tagAbc(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x61 && source.startsWith('abc', state.pos)) {
-      state.ok = true;
       state.pos += 3;
+      state.ok = true;
       $0 = 'abc';
     }
   }
@@ -248,6 +248,7 @@ int? delimited(State<String> state) {
 String? digit0(State<String> state) {
   final source = state.source;
   String? $0;
+  state.ok = true;
   final $pos = state.pos;
   bool $test(int x) => x >= 0x30 && x <= 0x39;
   while (state.pos < source.length) {
@@ -257,7 +258,6 @@ String? digit0(State<String> state) {
     }
     state.pos++;
   }
-  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -320,8 +320,8 @@ int? escapeSequence16(State<String> state) {
         break;
     }
     if (v != null) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $0 = v;
     } else {
       c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
@@ -354,8 +354,8 @@ int? escapeSequence32(State<String> state) {
         break;
     }
     if (v != null) {
-      state.ok = true;
       state.pos += c > 0xffff ? 2 : 1;
+      state.ok = true;
       $0 = v;
     } else {
       state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -369,6 +369,7 @@ int? escapeSequence32(State<String> state) {
 String? hexDigit0(State<String> state) {
   final source = state.source;
   String? $0;
+  state.ok = true;
   final $pos = state.pos;
   bool $test(int x) =>
       x >= 0x30 && x <= 0x39 ||
@@ -381,7 +382,6 @@ String? hexDigit0(State<String> state) {
     }
     state.pos++;
   }
-  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -521,8 +521,8 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     if (state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
       if (c == 0x61 && source.startsWith('abc', state.pos)) {
-        state.ok = true;
         state.pos += 3;
+        state.ok = true;
         $1 = 'abc';
       }
     }
@@ -540,8 +540,8 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       if (state.pos < source.length) {
         final c = source.codeUnitAt(state.pos);
         if (c == 0x61) {
-          state.ok = true;
           state.pos++;
+          state.ok = true;
           $3 = 'a';
         }
       }
@@ -558,8 +558,8 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       if (state.pos < source.length) {
         final c = source.codeUnitAt(state.pos);
         if (c == 0x62) {
-          state.ok = true;
           state.pos++;
+          state.ok = true;
           $5 = 'b';
         }
       }
@@ -803,8 +803,8 @@ String? optAbc(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x61 && source.startsWith('abc', state.pos)) {
-      state.ok = true;
       state.pos += 3;
+      state.ok = true;
       $1 = 'abc';
     }
   }
@@ -968,8 +968,8 @@ List<int>? separatedList0C32Abc(State<String> state) {
     if (state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
       if (c == 0x61 && source.startsWith('abc', state.pos)) {
-        state.ok = true;
         state.pos += 3;
+        state.ok = true;
         $2 = 'abc';
       }
     }
@@ -1018,8 +1018,8 @@ List<int>? separatedList1C32Abc(State<String> state) {
     if (state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
       if (c == 0x61 && source.startsWith('abc', state.pos)) {
-        state.ok = true;
         state.pos += 3;
+        state.ok = true;
         $2 = 'abc';
       }
     }
@@ -1060,8 +1060,8 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
     if (state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
       if (c == 0x61 && source.startsWith('abc', state.pos)) {
-        state.ok = true;
         state.pos += 3;
+        state.ok = true;
         $2 = 'abc';
       }
     }
@@ -1142,8 +1142,8 @@ bool? skipMany0C16OrC32AndAbc(State<String> state) {
       if (state.pos < source.length) {
         final c = source.codeUnitAt(state.pos);
         if (c == 0x61 && source.startsWith('abc', state.pos)) {
-          state.ok = true;
           state.pos += 3;
+          state.ok = true;
           $6 = 'abc';
         }
       }
@@ -1253,8 +1253,8 @@ String? tagC16(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x50) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $0 = 'P';
     }
   }
@@ -1271,8 +1271,8 @@ String? tagC16C32(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x50 && source.startsWith('P𝈀', state.pos)) {
-      state.ok = true;
       state.pos += 3;
+      state.ok = true;
       $0 = 'P𝈀';
     }
   }
@@ -1289,8 +1289,8 @@ String? tagC32(State<String> state) {
   if (state.pos < source.length) {
     final c = source.runeAt(state.pos);
     if (c == 0x1D200) {
-      state.ok = true;
       state.pos += 2;
+      state.ok = true;
       $0 = '𝈀';
     }
   }
@@ -1307,8 +1307,8 @@ String? tagC32C16(State<String> state) {
   if (state.pos < source.length) {
     final c = source.runeAt(state.pos);
     if (c == 0x1D200 && source.startsWith('𝈀P', state.pos)) {
-      state.ok = true;
       state.pos += 3;
+      state.ok = true;
       $0 = '𝈀P';
     }
   }
@@ -1442,6 +1442,7 @@ String? takeUntil1Abc(State<String> state) {
 String? takeWhile1C16(State<String> state) {
   final source = state.source;
   String? $0;
+  state.ok = false;
   final $pos = state.pos;
   var $c = 0;
   bool $test(int x) => x == 0x50;
@@ -1467,6 +1468,7 @@ String? takeWhile1C16(State<String> state) {
 String? takeWhile1C32(State<String> state) {
   final source = state.source;
   String? $0;
+  state.ok = false;
   final $pos = state.pos;
   var $c = 0;
   bool $test(int x) => x == 0x1D200;
@@ -1492,6 +1494,7 @@ String? takeWhile1C32(State<String> state) {
 String? takeWhileC16(State<String> state) {
   final source = state.source;
   String? $0;
+  state.ok = true;
   final $pos = state.pos;
   bool $test(int x) => x == 0x50;
   while (state.pos < source.length) {
@@ -1501,7 +1504,6 @@ String? takeWhileC16(State<String> state) {
     }
     state.pos++;
   }
-  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -1716,8 +1718,8 @@ bool? valueAbcToTrueValue(State<String> state) {
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x61 && source.startsWith('abc', state.pos)) {
-      state.ok = true;
       state.pos += 3;
+      state.ok = true;
       $1 = 'abc';
     }
   }

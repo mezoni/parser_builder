@@ -21,7 +21,8 @@ bool? _ws(State<String> state) {
   state.ok = true;
   bool $test(int x) => x == 0x09 || x == 0xA || x == 0xD || x == 0x20;
   while (state.pos < source.length) {
-    final c = source.runeAt(state.pos);
+    var c = source.codeUnitAt(state.pos);
+    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
     if (!$test(c)) {
       break;
     }
@@ -37,6 +38,7 @@ int? _hexVal(State<String> state) {
   final source = state.source;
   int? $0;
   String? $1;
+  state.ok = false;
   final $pos = state.pos;
   var $c = 0;
   bool $test(int x) =>
@@ -45,7 +47,7 @@ int? _hexVal(State<String> state) {
       x >= 0x61 && x <= 0x66;
   while (state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
-    $c = $c <= 0xD7FF || $c >= 0xE000 ? $c : source.runeAt(state.pos);
+    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
     if (!$test($c)) {
       break;
     }
@@ -73,11 +75,10 @@ int? _hex(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x23 && source.startsWith('#x', state.pos)) {
-      state.ok = true;
       state.pos += 2;
+      state.ok = true;
       $1 = '#x';
     }
   }
@@ -106,8 +107,7 @@ int? _rangeChar(State<String> state) {
   String? $2;
   final $pos2 = state.pos;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt($pos2);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt($pos2);
+    final c = source.codeUnitAt($pos2);
     switch (c) {
       case 91:
         state.pos++;
@@ -138,11 +138,11 @@ int? _rangeChar(State<String> state) {
     state.ok = false;
     if (state.pos < source.length) {
       var c = source.codeUnitAt(state.pos);
-      c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+      c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
       bool test(int x) => x > 0x20 && x < 0x7f;
       if (test(c)) {
-        state.ok = true;
         state.pos += c > 0xffff ? 2 : 1;
+        state.ok = true;
         $3 = c;
       } else {
         state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -195,11 +195,10 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
       String? $4;
       state.ok = false;
       if (state.pos < source.length) {
-        var c = source.codeUnitAt(state.pos);
-        c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+        final c = source.codeUnitAt(state.pos);
         if (c == 0x2D) {
-          state.ok = true;
           state.pos++;
+          state.ok = true;
           $4 = '-';
         }
       }
@@ -258,11 +257,11 @@ int? _charCode(State<String> state) {
   state.ok = false;
   if (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
     bool test(int x) => x > 0x20 && x < 0x7f;
     if (test(c)) {
-      state.ok = true;
       state.pos += c > 0xffff ? 2 : 1;
+      state.ok = true;
       $0 = c;
     } else {
       state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -280,11 +279,10 @@ int? _char(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x22) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = '"';
     }
   }
@@ -298,11 +296,10 @@ int? _char(State<String> state) {
       String? $3;
       state.ok = false;
       if (state.pos < source.length) {
-        var c = source.codeUnitAt(state.pos);
-        c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+        final c = source.codeUnitAt(state.pos);
         if (c == 0x22) {
-          state.ok = true;
           state.pos++;
+          state.ok = true;
           $3 = '"';
         }
       }
@@ -329,11 +326,10 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     String? $3;
     state.ok = false;
     if (state.pos < source.length) {
-      var c = source.codeUnitAt(state.pos);
-      c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+      final c = source.codeUnitAt(state.pos);
       if (c == 0x5B) {
-        state.ok = true;
         state.pos++;
+        state.ok = true;
         $3 = '[';
       }
     }
@@ -359,11 +355,10 @@ List<Tuple2<int, int>>? _range(State<String> state) {
         String? $6;
         state.ok = false;
         if (state.pos < source.length) {
-          var c = source.codeUnitAt(state.pos);
-          c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+          final c = source.codeUnitAt(state.pos);
           if (c == 0x5D) {
-            state.ok = true;
             state.pos++;
+            state.ok = true;
             $6 = ']';
           }
         }
@@ -425,11 +420,10 @@ String? _verbar(State<String> state) {
   String? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     if (c == 0x7C) {
-      state.ok = true;
       state.pos++;
+      state.ok = true;
       $1 = '|';
     }
   }

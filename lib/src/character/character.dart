@@ -2,6 +2,7 @@ part of '../../character.dart';
 
 abstract class _Chars0 extends StringParserBuilder<String> {
   static const _template16 = '''
+state.ok = true;
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
@@ -11,12 +12,12 @@ while (state.pos < source.length) {
   }
   state.pos++;
 }
-state.ok = true;
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 }''';
 
   static const _template32 = '''
+state.ok = true;
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
@@ -27,7 +28,6 @@ while (state.pos < source.length) {
   }
   state.pos += c > 0xffff ? 2 : 1;
 }
-state.ok = true;
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 }''';
