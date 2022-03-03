@@ -67,49 +67,6 @@ dynamic _json(State<String> state) {
   return $0;
 }
 
-int? _escapeSeq(State<String> state) {
-  final source = state.source;
-  int? $0;
-  state.ok = false;
-  if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    int? v;
-    switch (c) {
-      case 34:
-      case 47:
-      case 92:
-        v = c;
-        break;
-      case 98:
-        v = 8;
-        break;
-      case 102:
-        v = 12;
-        break;
-      case 110:
-        v = 10;
-        break;
-      case 114:
-        v = 13;
-        break;
-      case 116:
-        v = 9;
-        break;
-    }
-    if (v != null) {
-      state.pos++;
-      state.ok = true;
-      $0 = v;
-    } else {
-      c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    }
-  } else {
-    state.error = ErrUnexpected.eof(state.pos);
-  }
-  return $0;
-}
-
 @pragma('vm:prefer-inline')
 int? _escapeHex(State<String> state) {
   final source = state.source;
@@ -173,10 +130,47 @@ int? _escapeHex(State<String> state) {
 }
 
 int? _escaped(State<String> state) {
+  final source = state.source;
   int? $0;
   for (;;) {
     int? $1;
-    $1 = _escapeSeq(state);
+    state.ok = false;
+    if (state.pos < source.length) {
+      var c = source.codeUnitAt(state.pos);
+      int? v;
+      switch (c) {
+        case 34:
+        case 47:
+        case 92:
+          v = c;
+          break;
+        case 98:
+          v = 8;
+          break;
+        case 102:
+          v = 12;
+          break;
+        case 110:
+          v = 10;
+          break;
+        case 114:
+          v = 13;
+          break;
+        case 116:
+          v = 9;
+          break;
+      }
+      if (v != null) {
+        state.pos++;
+        state.ok = true;
+        $1 = v;
+      } else {
+        c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      }
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
     if (state.ok) {
       $0 = $1;
       break;
@@ -197,38 +191,42 @@ int? _escaped(State<String> state) {
   return $0;
 }
 
-List<int>? _chars(State<String> state) {
+String? _stringValue(State<String> state) {
   final source = state.source;
-  List<int>? $0;
-  final $list = <int>[];
+  String? $0;
+  final $buffer = StringBuffer();
   state.ok = true;
   bool $test(int x) => x >= 0x20 && x != 0x22 && x != 0x5c;
-  while (true) {
-    if (state.pos >= source.length) {
-      break;
-    }
-    var $c = source.codeUnitAt(state.pos);
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    if ($test($c)) {
-      $list.add($c);
+  while (state.pos < source.length) {
+    var $pos = state.pos;
+    var $c = 0;
+    while (state.pos < source.length) {
+      $c = source.codeUnitAt(state.pos);
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      if (!$test($c)) {
+        break;
+      }
       state.pos += $c > 0xffff ? 2 : 1;
-      continue;
+    }
+    if ($pos != state.pos) {
+      $buffer.write(source.substring($pos, state.pos));
     }
     if ($c != 92) {
       break;
     }
-    final pos = state.pos;
+    $pos = state.pos;
     state.pos += 1;
     int? $1;
     $1 = _escaped(state);
     if (!state.ok) {
-      state.pos = pos;
+      state.pos = $pos;
       break;
     }
-    $list.add($1!);
+    $buffer.writeCharCode($1!);
   }
   if (state.ok) {
-    $0 = $list;
+    $0 = $buffer.toString();
+    ;
   }
   return $0;
 }
@@ -268,38 +266,33 @@ String? _string(State<String> state) {
   final source = state.source;
   String? $0;
   String? $1;
-  List<int>? $2;
   final $pos = state.pos;
-  String? $3;
+  String? $2;
   state.ok = false;
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     if (c == 0x22) {
       state.pos++;
       state.ok = true;
-      $3 = '"';
+      $2 = '"';
     }
   }
   if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
-    List<int>? $4;
-    $4 = _chars(state);
+    String? $3;
+    $3 = _stringValue(state);
     if (state.ok) {
-      String? $5;
-      $5 = _quote(state);
+      String? $4;
+      $4 = _quote(state);
       if (state.ok) {
-        $2 = $4!;
+        $1 = $3!;
       }
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-  }
-  if (state.ok) {
-    String map(List<int> x) => String.fromCharCodes(x);
-    $1 = map($2!);
   }
   if (state.ok) {
     $0 = $1;

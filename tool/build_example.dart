@@ -25,8 +25,6 @@ Future<void> main(List<String> args) async {
 
 const _array = Named('_array', Delimited(_openBracket, _values, _closeBracket));
 
-const _chars = Named('_chars', CharSequence(_isNormalChar, 0x5c, _escaped));
-
 const _closeBrace = Named('_closeBrace', Terminated(Tag('}'), _ws), [_inline]);
 
 const _closeBracket =
@@ -45,18 +43,16 @@ const _escapeHex = Named(
     Map$(Preceded(Char(0x75), TakeWhileMN(4, 4, _isHexDigit)), _toHexValue),
     [_inline]);
 
-const _escapeSeq = Named(
-    '_escapeSeq',
-    EscapeSequence({
-      0x22: 0x22,
-      0x2f: 0x2f,
-      0x5c: 0x5c,
-      0x62: 0x08,
-      0x66: 0x0c,
-      0x6e: 0x0a,
-      0x72: 0x0d,
-      0x74: 0x09
-    }));
+const _escapeSeq = EscapeSequence({
+  0x22: 0x22,
+  0x2f: 0x2f,
+  0x5c: 0x5c,
+  0x62: 0x08,
+  0x66: 0x0c,
+  0x6e: 0x0a,
+  0x72: 0x0d,
+  0x74: 0x09
+});
 
 const _false = Named('_false', Value(false, Tag('false')), [_inline]);
 
@@ -89,8 +85,11 @@ const _openBracket =
 
 const _quote = Named('_quote', Terminated(Tag('"'), _ws), [_inline]);
 
-const _string = Named('_string',
-    Malformed('string', Map$(Delimited(Tag('"'), _chars, _quote), _toStr)));
+const _string = Named(
+    '_string', Malformed('string', Delimited(Tag('"'), _stringValue, _quote)));
+
+const _stringValue =
+    Named('_stringValue', StringValue(_isNormalChar, 0x5c, _escaped));
 
 const _toHexValue = TX<String, int>('=> _toHexValue(x);');
 
