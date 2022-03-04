@@ -5,8 +5,7 @@ class Labeled<I, O> extends ParserBuilder<I, O> {
 {{p1}}
 if (state.ok) {
   {{res}} = {{p1_res}};
-} else {
-  state.ok = false;
+} else if (!state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{label}}));
 }''';
 

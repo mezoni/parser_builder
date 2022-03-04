@@ -25,7 +25,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['tag', 'get']);
+    final locals = context.allocateLocals(['get', 'tag']);
     return {
       'transform': tag.transform(locals['get']!),
     }..addAll(locals);

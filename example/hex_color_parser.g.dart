@@ -19,7 +19,7 @@ int? _hexPrimary(State<String> state) {
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
-    $1 = source.substring($pos, state.pos);
+    $1 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   } else {
     if (!state.opt) {
       state.error = state.pos < source.length

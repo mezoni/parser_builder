@@ -13,7 +13,7 @@ while (state.pos < source.length) {
   state.pos++;
 }
 if (state.ok) {
-  {{res}} = source.substring({{pos}}, state.pos);
+  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
 }''';
 
   static const _template32 = '''
@@ -29,7 +29,7 @@ while (state.pos < source.length) {
   state.pos += c > 0xffff ? 2 : 1;
 }
 if (state.ok) {
-  {{res}} = source.substring({{pos}}, state.pos);
+  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
 }''';
 
   const _Chars0();
@@ -77,8 +77,12 @@ while (state.pos < source.length) {
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (!state.opt) {
-  {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+  if (state.pos < source.length) {
+    {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
+    state.error = ErrUnexpected.char(state.pos, Char({{c}}));
+  } else {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
 }''';
 
   static const _template32 = '''
@@ -105,7 +109,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'c', 'test']);
+    final locals = context.allocateLocals(['c', 'pos', 'test']);
     final predicate = _getCharacterPredicate();
     return {
       'transform': predicate.transform(locals['test']!),

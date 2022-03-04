@@ -25,7 +25,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'index']);
+    final locals = context.allocateLocals(['index', 'pos']);
     return {
       'tag': helper.escapeString(tag),
     }..addAll(locals);

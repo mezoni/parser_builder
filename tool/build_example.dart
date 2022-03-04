@@ -99,8 +99,6 @@ const _toMap = TX<List<MapEntry<String, dynamic>>, Map<String, dynamic>>(
 const _toMapEntry = TX<_t.Tuple2<String, dynamic>, MapEntry<String, dynamic>>(
     '=> MapEntry(x.item1, x.item2);');
 
-const _toStr = TX<List<int>, String>('=> String.fromCharCodes(x);');
-
 const _true = Named('_true', Value(true, Tag('true')), [_inline]);
 
 const _value = Ref<String, dynamic>('_value');

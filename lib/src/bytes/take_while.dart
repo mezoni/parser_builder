@@ -20,7 +20,7 @@ while (state.pos < source.length) {
   state.pos++;
 }
 if (state.ok) {
-  {{res}} = source.substring({{pos}}, state.pos);
+  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
 }''';
 
   static const _template32 = '''
@@ -36,7 +36,7 @@ while (state.pos < source.length) {
 }
 state.ok = true;
 if (state.ok) {
-  {{res}} = source.substring({{pos}}, state.pos);
+  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
 }''';
 
   final Transformer<int, bool> predicate;

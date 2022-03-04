@@ -267,8 +267,7 @@ num? number(State<String> state) {
     }
     if (state.ok) {
       $3 = $4;
-    } else {
-      state.ok = false;
+    } else if (!state.opt) {
       state.error = ErrMalformed(state.pos, const Tag('number'), [state.error]);
     }
     if (state.ok) {

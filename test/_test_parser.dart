@@ -16,7 +16,7 @@ String? alpha0(State<String> state) {
     state.pos++;
   }
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }
   return $0;
 }
@@ -39,10 +39,12 @@ String? alpha1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (!state.opt) {
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (state.pos < source.length) {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char($c));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
   }
   return $0;
 }
@@ -64,7 +66,7 @@ String? alphanumeric0(State<String> state) {
     state.pos++;
   }
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }
   return $0;
 }
@@ -90,10 +92,12 @@ String? alphanumeric1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (!state.opt) {
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (state.pos < source.length) {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char($c));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
   }
   return $0;
 }
@@ -264,7 +268,7 @@ String? digit0(State<String> state) {
     state.pos++;
   }
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }
   return $0;
 }
@@ -287,10 +291,12 @@ String? digit1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (!state.opt) {
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (state.pos < source.length) {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char($c));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
   }
   return $0;
 }
@@ -388,7 +394,7 @@ String? hexDigit0(State<String> state) {
     state.pos++;
   }
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }
   return $0;
 }
@@ -414,10 +420,12 @@ String? hexDigit1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (!state.opt) {
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (state.pos < source.length) {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char($c));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
   }
   return $0;
 }
@@ -1237,10 +1245,12 @@ bool? skipWhile1C16(State<String> state) {
   }
   state.ok = $0 != null;
   if (!state.ok) {
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (state.pos < source.length) {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char($c));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
   }
   return $0;
 }
@@ -1476,7 +1486,7 @@ String? takeUntilAbc(State<String> state) {
   state.ok = $index != -1;
   if (state.ok) {
     state.pos = $index;
-    $0 = source.substring($pos, $index);
+    $0 = $pos == $index ? '' : source.substring($pos, $index);
   } else if (!state.opt) {
     state.error = ErrExpected.tag($pos, const Tag('abc'));
   }
@@ -1516,10 +1526,12 @@ String? takeWhile1C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (!state.opt) {
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    if (state.pos < source.length) {
+      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char($c));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
   }
   return $0;
 }
@@ -1564,7 +1576,7 @@ String? takeWhileC16(State<String> state) {
     state.pos++;
   }
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }
   return $0;
 }
@@ -1586,7 +1598,7 @@ String? takeWhileC16UntilAbc(State<String> state) {
     }
     state.ok = state.pos == $index;
     if (state.ok) {
-      $0 = source.substring(pos, state.pos);
+      $0 = pos == state.pos ? '' : source.substring(pos, state.pos);
     } else {
       if (!state.opt) {
         c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
@@ -1621,7 +1633,7 @@ String? takeWhileC32UntilAbc(State<String> state) {
     }
     state.ok = state.pos == $index;
     if (state.ok) {
-      $0 = source.substring(pos, state.pos);
+      $0 = pos == state.pos ? '' : source.substring(pos, state.pos);
     } else {
       if (!state.opt) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -1652,7 +1664,7 @@ String? takeWhileC32(State<String> state) {
   }
   state.ok = true;
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }
   return $0;
 }
@@ -1674,13 +1686,15 @@ String? takeWhileMN_2_4C16(State<String> state) {
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   } else {
     if (!state.opt) {
-      $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-      state.error = state.pos < source.length
-          ? ErrUnexpected.char(state.pos, Char($c))
-          : ErrUnexpected.eof(state.pos);
+      if (state.pos < source.length) {
+        $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+        state.error = ErrUnexpected.char(state.pos, Char($c));
+      } else {
+        state.error = ErrUnexpected.eof(state.pos);
+      }
     }
     state.pos = $pos;
   }
@@ -1705,7 +1719,7 @@ String? takeWhileMN_2_4C32(State<String> state) {
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
-    $0 = source.substring($pos, state.pos);
+    $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   } else {
     if (!state.opt) {
       state.error = state.pos < source.length

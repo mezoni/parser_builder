@@ -105,13 +105,15 @@ int? _escapeHex(State<String> state) {
     }
     state.ok = $cnt >= 4;
     if (state.ok) {
-      $3 = source.substring($pos1, state.pos);
+      $3 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
     } else {
       if (!state.opt) {
-        $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-        state.error = state.pos < source.length
-            ? ErrUnexpected.char(state.pos, Char($c))
-            : ErrUnexpected.eof(state.pos);
+        if (state.pos < source.length) {
+          $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
+          state.error = ErrUnexpected.char(state.pos, Char($c));
+        } else {
+          state.error = ErrUnexpected.eof(state.pos);
+        }
       }
       state.pos = $pos1;
     }
@@ -194,11 +196,12 @@ int? _escaped(State<String> state) {
 String? _stringValue(State<String> state) {
   final source = state.source;
   String? $0;
-  final $buffer = StringBuffer();
   state.ok = true;
+  final $buffer = StringBuffer();
+  final $pos = state.pos;
   bool $test(int x) => x >= 0x20 && x != 0x22 && x != 0x5c;
   while (state.pos < source.length) {
-    var $pos = state.pos;
+    var $start = state.pos;
     var $c = 0;
     while (state.pos < source.length) {
       $c = source.codeUnitAt(state.pos);
@@ -208,13 +211,12 @@ String? _stringValue(State<String> state) {
       }
       state.pos += $c > 0xffff ? 2 : 1;
     }
-    if ($pos != state.pos) {
-      $buffer.write(source.substring($pos, state.pos));
+    if ($start != state.pos) {
+      $buffer.write(source.substring($start, state.pos));
     }
     if ($c != 92) {
       break;
     }
-    $pos = state.pos;
     state.pos += 1;
     int? $1;
     $1 = _escaped(state);
@@ -225,8 +227,7 @@ String? _stringValue(State<String> state) {
     $buffer.writeCharCode($1!);
   }
   if (state.ok) {
-    $0 = $buffer.toString();
-    ;
+    $0 = $buffer.isEmpty ? '' : $buffer.toString();
   }
   return $0;
 }
@@ -296,8 +297,7 @@ String? _string(State<String> state) {
   }
   if (state.ok) {
     $0 = $1;
-  } else {
-    state.ok = false;
+  } else if (!state.opt) {
     state.error = ErrMalformed(state.pos, const Tag('string'), [state.error]);
   }
   return $0;
@@ -523,8 +523,7 @@ num? _number(State<String> state) {
   }
   if (state.ok) {
     $0 = $1;
-  } else {
-    state.ok = false;
+  } else if (!state.opt) {
     state.error = ErrMalformed(state.pos, const Tag('number'), [state.error]);
   }
   return $0;

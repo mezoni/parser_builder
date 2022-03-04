@@ -34,7 +34,7 @@ for (;;) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'list']);
+    final locals = context.allocateLocals(['list', 'pos']);
     return {
       'O': O.toString(),
     }..addAll(locals);

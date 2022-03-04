@@ -53,7 +53,7 @@ state.opt = {{opt}};''';
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
-    final locals = context.allocateLocals(['opt', 'pos', 'list', 'cnt']);
+    final locals = context.allocateLocals(['cnt', 'list', 'opt', 'pos']);
     return {
       'm': m.toString(),
       'n': n.toString(),

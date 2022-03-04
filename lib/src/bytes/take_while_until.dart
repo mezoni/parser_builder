@@ -25,7 +25,7 @@ if ({{index}} != -1) {
   }
   state.ok = state.pos == {{index}};
   if (state.ok) {
-    {{res}} = source.substring(pos, state.pos);
+    {{res}} = pos == state.pos ? '' : source.substring(pos, state.pos);
   } else {
     if (!state.opt) {
       c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
@@ -56,7 +56,7 @@ if ({{index}} != -1) {
   }
   state.ok = state.pos == {{index}};
   if (state.ok) {
-    {{res}} = source.substring(pos, state.pos);
+    {{res}} = pos == state.pos ? '' : source.substring(pos, state.pos);
   } else {
     if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));

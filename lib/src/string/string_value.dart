@@ -1,12 +1,14 @@
 part of '../../string.dart';
 
+@experimental
 class StringValue extends StringParserBuilder<String> {
   static const _template = '''
-final {{buffer}} = StringBuffer();
 state.ok = true;
+final {{buffer}} = StringBuffer();
+final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
-  var {{pos}} = state.pos;
+  var {{start}} = state.pos;
   var {{c}} = 0;
   while (state.pos < source.length) {
     {{c}} = source.codeUnitAt(state.pos);
@@ -16,13 +18,12 @@ while (state.pos < source.length) {
     }
     state.pos += {{c}} > 0xffff ? 2 : 1;
   }
-  if ({{pos}}!= state.pos) {
-    {{buffer}}.write(source.substring({{pos}}, state.pos));
+  if ({{start}} != state.pos) {
+    {{buffer}}.write(source.substring({{start}}, state.pos));
   }
   if ({{c}} != {{controlChar}}) {
     break;
   }
-  {{pos}} = state.pos;
   state.pos += {{size}};
   {{p1}}
   if (!state.ok) {
@@ -32,7 +33,7 @@ while (state.pos < source.length) {
   {{buffer}}.writeCharCode({{p1_val}});
 }
 if (state.ok) {
-  {{res}} = {{buffer}}.toString();;
+  {{res}} = {{buffer}}.isEmpty ? '' : {{buffer}}.toString();
 }''';
 
   final int controlChar;
@@ -52,7 +53,8 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['buffer', 'test', 'pos', 'c']);
+    final locals =
+        context.allocateLocals(['c', 'buffer', 'pos', 'start', 'test']);
     return {
       'controlChar': controlChar.toString(),
       'size': (controlChar > 0xffff ? 2 : 1).toString(),

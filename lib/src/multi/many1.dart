@@ -31,7 +31,7 @@ state.opt = {{opt}};''';
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['opt', 'list']);
+    final locals = context.allocateLocals(['list', 'opt']);
     return {
       'O': O.toString(),
     }..addAll(locals);

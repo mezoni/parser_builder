@@ -56,7 +56,7 @@ state.pos++;
 
   @override
   String getTemplate(Context context) {
-    final locals = context.allocateLocals(['pos', 'c']);
+    final locals = context.allocateLocals(['c', 'pos']);
     final map = <int, List<String>>{};
     final errors = <String>[];
     for (final tag in tags) {

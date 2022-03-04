@@ -21,8 +21,12 @@ while (state.pos < source.length) {
 }
 state.ok = {{res}} != null;
 if (!state.ok) {
-  {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+  if (state.pos < source.length) {
+    {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
+    state.error = ErrUnexpected.char(state.pos, Char({{c}}));
+  } else {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
 }''';
 
   static const _template32 = '''

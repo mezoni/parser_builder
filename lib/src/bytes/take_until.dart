@@ -14,7 +14,7 @@ final {{index}} = source.indexOf({{tag}}, {{pos}});
 state.ok = {{index}} != -1;
 if (state.ok) {
   state.pos = {{index}};
-  {{res}} = source.substring({{pos}}, {{index}});
+  {{res}} = {{pos}} == {{index}} ? '' : source.substring({{pos}}, {{index}});
 } else if (!state.opt) {
   state.error = ErrExpected.tag({{pos}}, const Tag({{tag}}));
 }''';
@@ -25,7 +25,7 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'index']);
+    final locals = context.allocateLocals(['index', 'pos']);
     return {
       'tag': helper.escapeString(tag),
     }..addAll(locals);

@@ -23,11 +23,15 @@ while ({{cnt}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
-  {{res}} = source.substring({{pos}}, state.pos);
+  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
 } else {
   if (!state.opt) {
-    {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-    state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+    if (state.pos < source.length) {
+      {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
+      state.error = ErrUnexpected.char(state.pos, Char({{c}}));
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
   }
   state.pos = {{pos}};
 }''';
@@ -48,7 +52,7 @@ while ({{cnt}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
-  {{res}} = source.substring({{pos}}, state.pos);
+  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
 } else {
   if (!state.opt) {
     state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
@@ -79,7 +83,7 @@ if (state.ok) {
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
-    final locals = context.allocateLocals(['pos', 'c', 'cnt', 'test']);
+    final locals = context.allocateLocals(['c', 'cnt', 'pos', 'test']);
     return {
       'm': m.toString(),
       'n': n.toString(),
