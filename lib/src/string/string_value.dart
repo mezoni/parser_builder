@@ -8,7 +8,7 @@ final {{buffer}} = StringBuffer();
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
-  var {{start}} = state.pos;
+  final {{start}} = state.pos;
   var {{c}} = 0;
   while (state.pos < source.length) {
     {{c}} = source.codeUnitAt(state.pos);

@@ -8,13 +8,13 @@ for (;;) {
   state.opt = {{list}}.isNotEmpty;
   {{p1}}
   if (!state.ok) {
-    if ({{list}}.isNotEmpty) {
-      state.ok = true;
-      {{res}} = {{list}};
-    }
     break;
   }
   {{list}}.add({{p1_val}});
+}
+if ({{list}}.isNotEmpty) {
+  state.ok = true;
+  {{res}} = {{list}};
 }
 state.opt = {{opt}};''';
 

@@ -303,7 +303,7 @@ String? digit1(State<String> state) {
 
 bool? eof(State<String> state) {
   bool? $0;
-  state.ok = state.source.atEnd(state.pos);
+  state.ok = state.pos >= state.source.length;
   if (state.ok) {
     $0 = true;
   } else if (!state.opt) {
@@ -439,13 +439,13 @@ List<int>? many0C32(State<String> state) {
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
-      state.ok = true;
-      if (state.ok) {
-        $0 = $list;
-      }
       break;
     }
     $list.add($1!);
+  }
+  state.ok = true;
+  if (state.ok) {
+    $0 = $list;
   }
   state.opt = $opt;
   return $0;
@@ -460,11 +460,13 @@ int? many0CountC32(State<String> state) {
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
-      state.ok = true;
-      $0 = $cnt;
       break;
     }
     $cnt++;
+  }
+  state.ok = true;
+  if (state.ok) {
+    $0 = $cnt;
   }
   state.opt = $opt;
   return $0;
@@ -479,13 +481,13 @@ List<int>? many1C32(State<String> state) {
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
-      if ($list.isNotEmpty) {
-        state.ok = true;
-        $0 = $list;
-      }
       break;
     }
     $list.add($1!);
+  }
+  if ($list.isNotEmpty) {
+    state.ok = true;
+    $0 = $list;
   }
   state.opt = $opt;
   return $0;
@@ -500,13 +502,13 @@ int? many1CountC32(State<String> state) {
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
-      if ($cnt > 0) {
-        state.ok = true;
-        $0 = $cnt;
-      }
       break;
     }
     $cnt++;
+  }
+  if ($cnt > 0) {
+    state.ok = true;
+    $0 = $cnt;
   }
   state.opt = $opt;
   return $0;
@@ -528,8 +530,8 @@ List<int>? manyMNC32_2_3(State<String> state) {
     $list.add($1!);
     $cnt++;
   }
-  if ($cnt >= 2) {
-    state.ok = true;
+  state.ok = $cnt >= 2;
+  if (state.ok) {
     $0 = $list;
   } else {
     state.pos = $pos;
@@ -1156,7 +1158,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
   return $0;
 }
 
-bool? skipC16C32(State<String> state) {
+bool? sequenceC16C32(State<String> state) {
   bool? $0;
   final $pos = state.pos;
   int? $1;
@@ -1171,62 +1173,6 @@ bool? skipC16C32(State<String> state) {
   if (!state.ok) {
     state.pos = $pos;
   }
-  return $0;
-}
-
-bool? skipMany0C16OrC32AndAbc(State<String> state) {
-  final source = state.source;
-  bool? $0;
-  final $opt = state.opt;
-  state.opt = true;
-  for (;;) {
-    final $pos = state.pos;
-    dynamic $1;
-    for (;;) {
-      int? $2;
-      $2 = char16(state);
-      if (state.ok) {
-        $1 = $2;
-        break;
-      }
-      final $3 = state.error;
-      int? $4;
-      $4 = char32(state);
-      if (state.ok) {
-        $1 = $4;
-        break;
-      }
-      final $5 = state.error;
-      if (!state.opt) {
-        state.error = ErrCombined(state.pos, [$3, $5]);
-      }
-      break;
-    }
-    if (state.ok) {
-      String? $6;
-      state.ok = false;
-      if (state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        if (c == 0x61 && source.startsWith('abc', state.pos)) {
-          state.pos += 3;
-          state.ok = true;
-          $6 = 'abc';
-        }
-      }
-      if (!state.ok && !state.opt) {
-        state.error = ErrExpected.tag(state.pos, const Tag('abc'));
-      }
-      if (state.ok) {
-        continue;
-      }
-    }
-
-    state.pos = $pos;
-    state.ok = true;
-    $0 = true;
-    break;
-  }
-  state.opt = $opt;
   return $0;
 }
 
@@ -2259,13 +2205,6 @@ class Tag {
 }
 
 extension on String {
-  /// Returns `true` if [pos] points to the end of the string (or beyond).
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool atEnd(int pos) {
-    return pos >= length;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

@@ -624,13 +624,6 @@ class Tag {
 
   static const _extensionString = r'''
 extension on String {
-  /// Returns `true` if [pos] points to the end of the string (or beyond).
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool atEnd(int pos) {
-    return pos >= length;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

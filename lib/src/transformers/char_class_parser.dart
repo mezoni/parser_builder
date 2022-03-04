@@ -354,13 +354,13 @@ List<Tuple2<int, int>>? _range(State<String> state) {
         Tuple2<int, int>? $5;
         $5 = _rangeBody(state);
         if (!state.ok) {
-          if ($list.isNotEmpty) {
-            state.ok = true;
-            $4 = $list;
-          }
           break;
         }
         $list.add($5!);
+      }
+      if ($list.isNotEmpty) {
+        state.ok = true;
+        $4 = $list;
       }
       state.opt = $opt;
       if (state.ok) {
@@ -516,7 +516,7 @@ List<Tuple2<int, int>>? parse(State<String> state) {
     $2 = _ranges(state);
     if (state.ok) {
       bool? $3;
-      state.ok = state.source.atEnd(state.pos);
+      state.ok = state.pos >= state.source.length;
       if (state.ok) {
         $3 = true;
       } else if (!state.opt) {
@@ -910,13 +910,6 @@ class Tag {
 }
 
 extension on String {
-  /// Returns `true` if [pos] points to the end of the string (or beyond).
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool atEnd(int pos) {
-    return pos >= length;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

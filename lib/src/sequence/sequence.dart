@@ -1,6 +1,6 @@
 part of '../../sequence.dart';
 
-class Skip<I> extends ParserBuilder<I, bool> {
+class Sequence<I> extends ParserBuilder<I, bool> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{body}}
@@ -10,7 +10,7 @@ if (!state.ok) {
 
   final List<ParserBuilder<I, dynamic>> parsers;
 
-  const Skip(this.parsers);
+  const Sequence(this.parsers);
 
   @override
   Map<String, ParserBuilder> getBuilders() {

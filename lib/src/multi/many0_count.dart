@@ -8,11 +8,13 @@ var {{cnt}} = 0;
 while (true) {
   {{p1}}
   if (!state.ok) {
-    state.ok = true;
-    {{res}} = {{cnt}};
     break;
   }
   {{cnt}}++;
+}
+state.ok = true;
+if (state.ok) {
+  {{res}} = {{cnt}};
 }
 state.opt = {{opt}};''';
 

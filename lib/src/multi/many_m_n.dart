@@ -15,8 +15,8 @@ while ({{cnt}} < {{n}}) {
   {{list}}.add({{p1_val}});
   {{cnt}}++;
 }
-if ({{cnt}} >= {{m}}) {
-  state.ok = true;
+state.ok = {{cnt}} >= {{m}};
+if (state.ok) {
   {{res}} = {{list}};
 } else {
   state.pos = {{pos}};

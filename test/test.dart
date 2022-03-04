@@ -62,8 +62,7 @@ void _test() {
   _testSeparatedPair();
   _testSeparatedList0();
   _testSeparatedList1();
-  _testSkip();
-  _testSkipMany0();
+  _testSequence();
   _testSkipWhile();
   _testSkipWhile1();
   _testTag();
@@ -487,7 +486,7 @@ void _testDelimited() {
       final state = State('$s16$s32$s16');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (c32));
+      _expectResult(r, c32);
       expect(state.pos, 4);
     }
     {
@@ -1731,9 +1730,9 @@ void _testSeparatedPair() {
   });
 }
 
-void _testSkip() {
-  test('Skip', () {
-    final parser = skipC16C32;
+void _testSequence() {
+  test('Sequence', () {
+    final parser = sequenceC16C32;
     {
       final state = State('$s16$s32$s16');
       final r = parser(state);
@@ -1764,68 +1763,6 @@ void _testSkip() {
       _expectResult(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.char(1, Char(c32)));
-    }
-  });
-}
-
-void _testSkipMany0() {
-  test('SkipMany0', () {
-    final parser = skipMany0C16OrC32AndAbc;
-    {
-      final state = State('$s16$abc');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 4);
-    }
-    {
-      final state = State('$s32$abc');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 5);
-    }
-    {
-      final state = State('$s32$abc$s16');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 5);
-    }
-    {
-      final state = State('$s32$abc$s16$abc');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 9);
-    }
-    {
-      final state = State('');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 0);
-    }
-    {
-      final state = State(' ');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 0);
-    }
-    {
-      final state = State('$s16');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 0);
-    }
-    {
-      final state = State('$s32');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, true);
-      expect(state.pos, 0);
     }
   });
 }

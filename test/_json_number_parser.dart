@@ -282,7 +282,7 @@ num? number(State<String> state) {
     }
     if (state.ok) {
       bool? $6;
-      state.ok = state.source.atEnd(state.pos);
+      state.ok = state.pos >= state.source.length;
       if (state.ok) {
         $6 = true;
       } else if (!state.opt) {
@@ -676,13 +676,6 @@ class Tag {
 }
 
 extension on String {
-  /// Returns `true` if [pos] points to the end of the string (or beyond).
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool atEnd(int pos) {
-    return pos >= length;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

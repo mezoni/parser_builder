@@ -54,8 +54,7 @@ Future<void> main(List<String> args) async {
     _separatedList0C32Abc,
     _separatedList1C32Abc,
     _separatedPairC16AbcC32,
-    _skipC16C32,
-    _skipMany0C16OrC32AndAbc,
+    _sequenceC16C32,
     _skipWhile1C16,
     _skipWhile1C32,
     _skipWhileC16,
@@ -211,14 +210,7 @@ const _separatedList1C32Abc =
 const _separatedPairC16AbcC32 = Named(
     'separatedPairC16AbcC32', SeparatedPair(Char(c16), Tag(abc), Char(c32)));
 
-const _skipC16C32 = Named('skipC16C32', Skip([_char16, _char32]));
-
-const _skipMany0C16OrC32AndAbc = Named(
-    'skipMany0C16OrC32AndAbc',
-    SkipMany0<String>([
-      Alt([_char16, _char32]),
-      Tag(abc)
-    ]));
+const _sequenceC16C32 = Named('sequenceC16C32', Sequence([_char16, _char32]));
 
 const _skipWhile1C16 = Named('skipWhile1C16', SkipWhile1(_isC16));
 

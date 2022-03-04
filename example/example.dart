@@ -36,7 +36,7 @@ bool? _ws(State<String> state) {
 
 bool? _eof(State<String> state) {
   bool? $0;
-  state.ok = state.source.atEnd(state.pos);
+  state.ok = state.pos >= state.source.length;
   if (state.ok) {
     $0 = true;
   } else if (!state.opt) {
@@ -1370,13 +1370,6 @@ class Tag {
 }
 
 extension on String {
-  /// Returns `true` if [pos] points to the end of the string (or beyond).
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool atEnd(int pos) {
-    return pos >= length;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

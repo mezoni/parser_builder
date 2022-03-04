@@ -2,7 +2,7 @@ part of '../../combinator.dart';
 
 class Eof<I> extends ParserBuilder<I, bool> {
   static const _template = '''
-state.ok = state.source.atEnd(state.pos);
+state.ok = state.pos >= state.source.length;
 if (state.ok) {
   {{res}} = true;
 } else if (!state.opt) {

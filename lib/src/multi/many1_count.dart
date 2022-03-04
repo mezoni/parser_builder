@@ -8,13 +8,13 @@ while (true) {
   state.opt = {{cnt}} != 0;
   {{p1}}
   if (!state.ok) {
-    if ({{cnt}} > 0) {
-      state.ok = true;
-      {{res}} = {{cnt}};
-    }
     break;
   }
   {{cnt}}++;
+}
+if ({{cnt}} > 0) {
+  state.ok = true;
+  {{res}} = {{cnt}};
 }
 state.opt = {{opt}};''';
 

@@ -8,13 +8,13 @@ final {{list}} = <{{O}}>[];
 for (;;) {
   {{p1}}
   if (!state.ok) {
-    state.ok = true;
-    if (state.ok) {
-      {{res}} = {{list}};
-    }
     break;
   }
   {{list}}.add({{p1_val}});
+}
+state.ok = true;
+if (state.ok) {
+  {{res}} = {{list}};
 }
 state.opt = {{opt}};''';
 

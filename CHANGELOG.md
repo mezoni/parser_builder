@@ -1,3 +1,8 @@
+## 0.9.2
+
+- Breaking change: The parser builder `Skip` has been renamed to `Sequence`
+- Breaking change: The parser builder `SkipMany0` has been removed so as not to make modifications with minor differences. Instead, it is recommended to use the following combination of parsers `Many0Count(Sequence(p1, p2, etc))`
+
 ## 0.9.1
 
 - Minor changes in the parser builders
