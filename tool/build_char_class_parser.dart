@@ -72,8 +72,9 @@ const _char = Named('_char', Delimited(Tag('"'), _charCode, Tag('"')));
 
 const _charCode = Named('_charCode', Satisfy(_isAscii));
 
-const _flatten = TX<List<List<_t.Tuple2<int, int>>>, List<_t.Tuple2<int, int>>>(
-    '=> _flatten(x, <Tuple2<int, int>>[]);');
+const _flatten =
+    ExprTransformer<List<List<_t.Tuple2<int, int>>>, List<_t.Tuple2<int, int>>>(
+        'x', '_flatten({{x}}, <Tuple2<int, int>>[])');
 
 const _hex = Named('_hex', Preceded(Tag('#x'), _hexVal));
 
@@ -81,15 +82,17 @@ const _hexOrRangeChar = Named('_hexOrRangeChar', Alt([_hex, _rangeChar]));
 
 const _hexVal = Named('_hexVal', Map$(TakeWhile1(_isHexDigit), _toHexValue));
 
-const _intToTuple2 = TX<int, _t.Tuple2<int, int>>('=> Tuple2(x, x);');
+const _intToTuple2 =
+    ExprTransformer<int, _t.Tuple2<int, int>>('x', 'Tuple2({{x}}, {{x}})');
 
-const _isAscii = TX<int, bool>('=> x > 0x20 && x < 0x7f;');
+const _isAscii =
+    ExprTransformer<int, bool>('x', '{{x}} > 0x20 && {{x}} < 0x7f');
 
-const _isHexDigit = TX<int, bool>(
-    '=> x >= 0x30 && x <= 0x39 || x >= 0x41 && x <= 0x46 || x >= 0x61 && x <= 0x66;');
+const _isHexDigit = ExprTransformer<int, bool>('x',
+    '{{x}} >= 0x30 && {{x}} <= 0x39 || {{x}} >= 0x41 && {{x}} <= 0x46 || {{x}} >= 0x61 && {{x}}<= 0x66');
 
-const _isWhiteSpace =
-    TX<int, bool>('=> x == 0x09 || x == 0xA || x == 0xD || x == 0x20;');
+const _isWhiteSpace = ExprTransformer<int, bool>(
+    'x', '{{x}} == 0x09 || {{x}} == 0xA || {{x}} == 0xD || {{x}} == 0x20');
 
 const _parser = Named('parse', parser);
 
@@ -97,7 +100,8 @@ const _range = Named(
     '_range',
     Alt<String, List<_t.Tuple2<int, int>>>([
       Delimited(Tag('['), Many1(_rangeBody), Tag(']')),
-      Map$(Alt([_char, _hex]), TX('=> [Tuple2(x, x)];')),
+      Map$(
+          Alt([_char, _hex]), ExprTransformer('x', ('[Tuple2({{x}}, {{x}})]'))),
     ]));
 
 const _rangeBody = Named(
@@ -114,7 +118,7 @@ const _rangeChar =
 const _ranges = Named('_ranges',
     Map$(SeparatedList1(Terminated(_range, _ws), _verbar), _flatten));
 
-const _toHexValue = TX<String, int>('=> _toHexValue(x);');
+const _toHexValue = ExprTransformer<String, int>('x', '_toHexValue({{x}})');
 
 const _verbar = Named('_verbar', Terminated(Tag('|'), _ws));
 

@@ -13,7 +13,7 @@ state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
   c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-  if ({{test}}) {
+  if ({{cond}}) {
     state.pos += c > 0xffff ? 2 : 1;
     state.ok = true;
     {{res}} = c;
@@ -29,7 +29,7 @@ state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
   c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-  if ({{test}}) {
+  if ({{cond}}) {
     state.pos += c > 0xffff ? 2 : 1;
     state.ok = true;
     {{res}} = c;
@@ -50,8 +50,10 @@ if (state.pos < source.length) {
       throw StateError('List of characters must not be empty');
     }
 
+    final cond = ExprTransformer(
+        'c', characters.map((e) => 'c != ' + helper.toHex(e)).join(' && '));
     return {
-      'test': characters.map((e) => 'c != ' + helper.toHex(e)).join(' && '),
+      'cond': cond.inline('c'),
     };
   }
 

@@ -28,7 +28,8 @@ if (state.ok) {
     final locals = context.allocateLocals(['index', 'pos']);
     return {
       'tag': helper.escapeString(tag),
-    }..addAll(locals);
+      ...locals,
+    };
   }
 
   @override

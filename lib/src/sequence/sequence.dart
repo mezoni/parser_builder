@@ -53,7 +53,8 @@ if (!state.ok) {
     final body = plunge(1);
     final values = {
       'body': body,
-    }..addAll(locals);
+      ...locals,
+    };
     final result = render(_template, values);
     return result;
   }

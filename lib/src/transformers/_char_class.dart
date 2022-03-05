@@ -1,8 +1,9 @@
 part of '../../transformers.dart';
 
-abstract class _CharClass extends TX<int, bool> implements CharPredicate {
+abstract class _CharClass extends Transformer<int, bool>
+    implements CharPredicate {
   static const _templateBinarySearch = '''
-{
+bool {{name}}(int c) {
   const list = [{{values}}];
   var l = 0;
   var r = {{r}};
@@ -11,7 +12,7 @@ abstract class _CharClass extends TX<int, bool> implements CharPredicate {
     final i = m << 1;
     final s = list[i];
     final e = list[i + 1];
-    if ({{c}} >= s && {{c}} <= e) {
+    if (c >= s && c <= e) {
       return true;
     } else if (c <= s) {
       r = m - 1;
@@ -22,52 +23,72 @@ abstract class _CharClass extends TX<int, bool> implements CharPredicate {
   return false;
 }''';
 
+  final bool negate;
+
   final RangeProcessing processing;
 
-  const _CharClass({this.processing = RangeProcessing.test}) : super('c');
+  const _CharClass(
+      {required this.negate, this.processing = RangeProcessing.test});
+
+  @override
+  bool get canInline => true;
 
   @override
   bool get has32BitChars {
+    final list = getCharList();
+    return list.any((e) => e > 0xffff);
+  }
+
+  @override
+  String declare(String name) {
+    switch (processing) {
+      case RangeProcessing.search:
+        final list = getCharList();
+        var result = _templateBinarySearch;
+        result = result.replaceAll('{{name}}', name);
+        result =
+            result.replaceAll('{{r}}', ((list.length >> 1) - 1).toString());
+        result = result.replaceAll('{{values}}', list.join(', '));
+        return result;
+      case RangeProcessing.test:
+        final expr = inline('c');
+        return 'bool $name(int c) => $expr;';
+    }
+  }
+
+  List<int> getCharList() {
     final chars = getChars();
     final parser = RangesParser();
-    final list = parser.parse(chars);
-    return list.any((e) => e > 0xffff);
+    final result = parser.parse(chars);
+    return result;
   }
 
   String getChars();
 
   @override
-  String getCode() {
-    final chars = getChars();
-    final parser = RangesParser();
-    final list = parser.parse(chars);
-    String toHex(int value) {
-      return '0x${value.toRadixString(16).toUpperCase()}';
+  String inline(String argument) {
+    final list = getCharList();
+    final tests = <String>[];
+    for (var i = 0; i < list.length; i += 2) {
+      final start = list[i];
+      final end = list[i + 1];
+      if (start == end) {
+        tests.add('$argument == $start');
+      } else {
+        tests.add('$argument >= $start && $argument <= $end');
+      }
     }
 
-    switch (processing) {
-      case RangeProcessing.test:
-        final tests = <String>[];
-        for (var i = 0; i < list.length; i += 2) {
-          final start = list[i];
-          final end = list[i + 1];
-          if (start == end) {
-            tests.add('$parameter == ${toHex(start)}');
-          } else {
-            tests.add(
-                '$parameter >= ${toHex(start)} && $parameter <= ${toHex(end)}');
-          }
-        }
-
-        final result = tests.join(' || ');
-        return '=> $result;';
-      case RangeProcessing.search:
-        var result = _templateBinarySearch;
-        result = result.replaceAll('{{c}}', parameter);
-        result =
-            result.replaceAll('{{r}}', ((list.length >> 1) - 1).toString());
-        result = result.replaceAll('{{values}}', list.join(', '));
-        return result;
+    var result = tests.join(' || ');
+    if (negate) {
+      return '!($result)';
     }
+
+    return '($result)';
+  }
+
+  @override
+  String invoke(String name, String argument) {
+    return '$name($argument)';
   }
 }

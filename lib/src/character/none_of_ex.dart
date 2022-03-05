@@ -15,7 +15,7 @@ if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
   c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
   {{transform}}
-  final list = get(null);
+  final list = {{chars}};
   for (var i = 0; i < list.length; i++) {
     final ch = list[i];
     if (c == ch) {
@@ -44,7 +44,7 @@ if (state.pos < source.length) {
   @override
   Map<String, String> getTags(Context context) {
     return {
-      'transform': characters.transform('get'),
+      ...helper.tfToTemplateValues(characters, key: 'chars', value: 'null'),
     };
   }
 

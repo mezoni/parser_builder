@@ -83,6 +83,11 @@ Future<void> main(List<String> args) async {
     _tuple3C32AbcC16,
     _valueAbcToTrueValue,
     _valueTrue,
+    _transformersClosureIsDigit,
+    _transformersExprIsDigit,
+    _transformersFuncExprIsDigit,
+    _transformersFuncIsDigit,
+    _transformersVarIsNotDigit
   ];
 
   final filename = 'test/_test_parser.dart';
@@ -166,12 +171,12 @@ const _manyTillAOrBTillAbc =
 const _mapC32ToStr = Named(
     'mapC32ToStr',
     Map$(Char(c32),
-        Transformer<int, String>('c', '=> String.fromCharCode(c);')));
+        ExprTransformer<int, String>('c', 'String.fromCharCode({{c}})')));
 
 const _noneOfC16 = Named('noneOfC16', NoneOf([c16]));
 
 const _noneOfC16OrC32Ex = Named('noneOfC16OrC32Ex',
-    NoneOfEx(TX('=> state.context.listOfC16AndC32 as List<int>;')));
+    NoneOfEx(VarTransformer('state.context.listOfC16AndC32 as List<int>')));
 
 const _noneOfC32 = Named('noneOfC32', NoneOf([c32]));
 
@@ -231,10 +236,12 @@ const _tagC32 = Named('tagC32', Tag(s32));
 const _tagC32C16 = Named('tagC32C16', Tag(s32 + s16));
 
 const _tagExFoo =
-    Named('tagExFoo', TagEx(TX('=> state.context.foo as String;')));
+    Named('tagExFoo', TagEx(VarTransformer('state.context.foo as String')));
 
-const _tagNoCaseAbc = Named('tagNoCaseAbc',
-    TagNoCase(abc, Transformer<String, String>('s', '=> s.toLowerCase();')));
+const _tagNoCaseAbc = Named(
+    'tagNoCaseAbc',
+    TagNoCase(
+        abc, ExprTransformer<String, String>('s', '{{s}}.toLowerCase()')));
 
 const _tagsAbcAbdDefDegXXY =
     Named('tagsAbcAbdDefDegXXY', Tags(['abc', 'abd', 'def', 'deg', 'x', 'xy']));
@@ -266,6 +273,23 @@ const _takeWhileMN_2_4C32 =
 const _terminatedC16C32 = Named('terminated', Terminated(_char16, _char32));
 
 const _testRef_ = Named('testRef', _ref);
+
+const _transformersClosureIsDigit = Named('transformersClosureIsDigit',
+    TakeWhile(ClosureTransformer('(int x) => x >= 0x30 && x <= 0x39')));
+
+const _transformersExprIsDigit = Named('transformersExprIsDigit',
+    TakeWhile(ExprTransformer('x', '{{x}} >= 0x30 && {{x}} <= 0x39')));
+
+const _transformersFuncExprIsDigit = Named('transformersFuncExprIsDigit',
+    TakeWhile(FuncExprTransformer('x', 'x >= 0x30 && x <= 0x39')));
+
+const _transformersFuncIsDigit = Named('transformersFuncIsDigit',
+    TakeWhile(FuncTransformer('x', 'return x >= 0x30 && x <= 0x39;')));
+
+const _transformersVarIsNotDigit = Named(
+    'transformersVarIsNotDigit',
+    NoneOfEx(VarTransformer(
+        '[0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]')));
 
 const _tuple2C32Abc = Named('tuple2C32Abc', Tuple2(_char32, _tagAbc));
 

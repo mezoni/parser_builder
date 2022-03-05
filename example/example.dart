@@ -20,10 +20,10 @@ bool? _ws(State<String> state) {
   final source = state.source;
   bool? $0;
   state.ok = true;
-  bool $test(int x) => x >= 0x9 && x <= 0xA || x == 0xD || x == 0x20;
+  //
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    if (!$test(c)) {
+    if (!(c >= 9 && c <= 10 || c == 13 || c == 32)) {
       break;
     }
     state.pos++;
@@ -91,13 +91,12 @@ int? _escapeHex(State<String> state) {
     final $pos1 = state.pos;
     var $c = 0;
     var $cnt = 0;
-    bool $test(int x) =>
-        x >= 0x30 && x <= 0x39 ||
-        x >= 0x41 && x <= 0x46 ||
-        x >= 0x61 && x <= 0x66;
+    //
     while ($cnt < 4 && state.pos < source.length) {
       $c = source.codeUnitAt(state.pos);
-      if (!$test($c)) {
+      if (!($c >= 48 && $c <= 57 ||
+          $c >= 65 && $c <= 70 ||
+          $c >= 97 && $c <= 102)) {
         break;
       }
       state.pos++;
@@ -125,8 +124,9 @@ int? _escapeHex(State<String> state) {
     state.pos = $pos;
   }
   if (state.ok) {
-    int map(String x) => _toHexValue(x);
-    $0 = map($1!);
+    //
+    final v = $1!;
+    $0 = (_toHexValue(v));
   }
   return $0;
 }
@@ -199,14 +199,14 @@ String? _stringValue(State<String> state) {
   state.ok = true;
   final $buffer = StringBuffer();
   final $pos = state.pos;
-  bool $test(int x) => x >= 0x20 && x != 0x22 && x != 0x5c;
+  //
   while (state.pos < source.length) {
-    var $start = state.pos;
+    final $start = state.pos;
     var $c = 0;
     while (state.pos < source.length) {
       $c = source.codeUnitAt(state.pos);
       $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-      if (!$test($c)) {
+      if (!($c >= 0x20 && $c != 0x22 && $c != 0x5c)) {
         break;
       }
       state.pos += $c > 0xffff ? 2 : 1;
@@ -825,9 +825,9 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
     state.pos = $pos;
   }
   if (state.ok) {
-    MapEntry<String, dynamic> map(Tuple2<String, dynamic> x) =>
-        MapEntry(x.item1, x.item2);
-    $0 = map($1!);
+    //
+    final v = $1!;
+    $0 = (MapEntry(v.item1, v.item2));
   }
   return $0;
 }
@@ -913,9 +913,9 @@ Map<String, dynamic>? _object(State<String> state) {
     state.pos = $pos;
   }
   if (state.ok) {
-    Map<String, dynamic> map(List<MapEntry<String, dynamic>> x) =>
-        Map.fromEntries(x);
-    $0 = map($1!);
+    //
+    final v = $1!;
+    $0 = (Map.fromEntries(v));
   }
   return $0;
 }

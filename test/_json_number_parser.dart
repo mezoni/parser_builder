@@ -25,11 +25,11 @@ bool? _ws(State<String> state) {
   final source = state.source;
   bool? $0;
   state.ok = true;
-  bool $test(int x) => x == 0x9 || x == 0xa || x == 0xd || x == 0x20;
+  //
   while (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
     c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-    if (!$test(c)) {
+    if (!(c == 0x9 || c == 0xa || c == 0xd || c == 0x20)) {
       break;
     }
     state.pos += c > 0xffff ? 2 : 1;

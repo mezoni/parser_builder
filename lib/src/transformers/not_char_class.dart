@@ -1,31 +1,14 @@
 part of '../../transformers.dart';
 
-class NotCharClass extends TX<int, bool> {
+class NotCharClass extends _CharClass {
   final String chars;
 
-  const NotCharClass(this.chars) : super('c');
+  const NotCharClass(this.chars,
+      {RangeProcessing processing = RangeProcessing.test})
+      : super(negate: true, processing: processing);
 
   @override
-  String getCode() {
-    final parser = RangesParser();
-    final list = parser.parse(chars);
-    String toHex(int value) {
-      return '0x${value.toRadixString(16).toUpperCase()}';
-    }
-
-    final tests = <String>[];
-    for (var i = 0; i < list.length; i += 2) {
-      final start = list[i];
-      final end = list[i + 1];
-      if (start == end) {
-        tests.add('$parameter == ${toHex(start)}');
-      } else {
-        tests.add(
-            '$parameter >= ${toHex(start)} && $parameter <= ${toHex(end)}');
-      }
-    }
-
-    var result = tests.join(' || ');
-    return '=> !($result);';
+  String getChars() {
+    return chars;
   }
 }

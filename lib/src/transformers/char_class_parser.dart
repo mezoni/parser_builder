@@ -19,11 +19,11 @@ bool? _ws(State<String> state) {
   final source = state.source;
   bool? $0;
   state.ok = true;
-  bool $test(int x) => x == 0x09 || x == 0xA || x == 0xD || x == 0x20;
+  //
   while (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
     c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-    if (!$test(c)) {
+    if (!(c == 0x09 || c == 0xA || c == 0xD || c == 0x20)) {
       break;
     }
     state.pos += c > 0xffff ? 2 : 1;
@@ -41,14 +41,13 @@ int? _hexVal(State<String> state) {
   state.ok = false;
   final $pos = state.pos;
   var $c = 0;
-  bool $test(int x) =>
-      x >= 0x30 && x <= 0x39 ||
-      x >= 0x41 && x <= 0x46 ||
-      x >= 0x61 && x <= 0x66;
+  //
   while (state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
     $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    if (!$test($c)) {
+    if (!($c >= 0x30 && $c <= 0x39 ||
+        $c >= 0x41 && $c <= 0x46 ||
+        $c >= 0x61 && $c <= 0x66)) {
       break;
     }
     state.pos += $c > 0xffff ? 2 : 1;
@@ -62,8 +61,9 @@ int? _hexVal(State<String> state) {
         : ErrUnexpected.eof(state.pos);
   }
   if (state.ok) {
-    int map(String x) => _toHexValue(x);
-    $0 = map($1!);
+    //
+    final v = $1!;
+    $0 = (_toHexValue(v));
   }
   return $0;
 }
@@ -144,8 +144,8 @@ int? _rangeChar(State<String> state) {
     if (state.pos < source.length) {
       var c = source.codeUnitAt(state.pos);
       c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-      bool test(int x) => x > 0x20 && x < 0x7f;
-      if (test(c)) {
+      //
+      if ((c > 0x20 && c < 0x7f)) {
         state.pos += c > 0xffff ? 2 : 1;
         state.ok = true;
         $3 = c;
@@ -232,8 +232,9 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
     int? $8;
     $8 = _hex(state);
     if (state.ok) {
-      Tuple2<int, int> map(int x) => Tuple2(x, x);
-      $6 = map($8!);
+      //
+      final v = $8!;
+      $6 = (Tuple2(v, v));
     }
     if (state.ok) {
       $0 = $6;
@@ -244,8 +245,9 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
     int? $11;
     $11 = _rangeChar(state);
     if (state.ok) {
-      Tuple2<int, int> map(int x) => Tuple2(x, x);
-      $9 = map($11!);
+      //
+      final v = $11!;
+      $9 = (Tuple2(v, v));
     }
     if (state.ok) {
       $0 = $9;
@@ -267,8 +269,8 @@ int? _charCode(State<String> state) {
   if (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
     c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-    bool test(int x) => x > 0x20 && x < 0x7f;
-    if (test(c)) {
+    //
+    if ((c > 0x20 && c < 0x7f)) {
       state.pos += c > 0xffff ? 2 : 1;
       state.ok = true;
       $0 = c;
@@ -413,8 +415,9 @@ List<Tuple2<int, int>>? _range(State<String> state) {
       break;
     }
     if (state.ok) {
-      List<Tuple2<int, int>> map(dynamic x) => [Tuple2(x, x)];
-      $7 = map($9!);
+      //
+      final v = $9!;
+      $7 = ([Tuple2(v, v)]);
     }
     if (state.ok) {
       $0 = $7;
@@ -499,9 +502,9 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   }
   state.opt = $opt;
   if (state.ok) {
-    List<Tuple2<int, int>> map(List<List<Tuple2<int, int>>> x) =>
-        _flatten(x, <Tuple2<int, int>>[]);
-    $0 = map($1!);
+    //
+    final v = $1!;
+    $0 = (_flatten(v, <Tuple2<int, int>>[]));
   }
   return $0;
 }

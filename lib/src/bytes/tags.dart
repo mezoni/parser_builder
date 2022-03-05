@@ -86,7 +86,8 @@ state.pos++;
         final values = {
           'len': tag.length.toString(),
           'tag': helper.escapeString(tag),
-        }..addAll(locals);
+          ...locals,
+        };
 
         final runes = tag.runes;
         final templateTest =
@@ -107,7 +108,8 @@ state.pos++;
     final values = {
       'cases': cases.join('\n'),
       'errors': errors.join(','),
-    }..addAll(locals);
+      ...locals,
+    };
 
     final has32BitChars = tags.map((e) => e.runes.first).any((e) => e > 0xffff);
     final template = has32BitChars ? _template32 : _template16;

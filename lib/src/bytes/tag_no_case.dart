@@ -13,7 +13,7 @@ state.ok = false;
 if (state.pos + {{len}} <= source.length) {
   {{transform}}
   final v1 = source.substring(state.pos, state.pos + {{len}});
-  final v2 = convert(v1);
+  final v2 = {{conv}};
   if (v2 == {{tag}}) {
     state.ok = true;
     state.pos += {{len}};
@@ -39,7 +39,7 @@ if (!state.ok && !state.opt) {
     return {
       'len': tag.length.toString(),
       'tag': helper.escapeString(tag),
-      'transform': convert.transform('convert'),
+      ...helper.tfToTemplateValues(convert, key: 'conv', value: 'v1'),
     };
   }
 

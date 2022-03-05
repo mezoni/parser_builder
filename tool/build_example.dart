@@ -60,7 +60,8 @@ const _inline = '@pragma(\'vm:prefer-inline\')';
 
 const _isHexDigit = CharClass('[0-9a-fA-F]');
 
-const _isNormalChar = TX<int, bool>('=> x >= 0x20 && x != 0x22 && x != 0x5c;');
+const _isNormalChar = ExprTransformer<int, bool>(
+    'x', '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 
@@ -91,13 +92,15 @@ const _string = Named(
 const _stringValue =
     Named('_stringValue', StringValue(_isNormalChar, 0x5c, _escaped));
 
-const _toHexValue = TX<String, int>('=> _toHexValue(x);');
+const _toHexValue = ExprTransformer<String, int>('x', '_toHexValue({{x}})');
 
-const _toMap = TX<List<MapEntry<String, dynamic>>, Map<String, dynamic>>(
-    '=> Map.fromEntries(x);');
+const _toMap =
+    ExprTransformer<List<MapEntry<String, dynamic>>, Map<String, dynamic>>(
+        'x', 'Map.fromEntries({{x}})');
 
-const _toMapEntry = TX<_t.Tuple2<String, dynamic>, MapEntry<String, dynamic>>(
-    '=> MapEntry(x.item1, x.item2);');
+const _toMapEntry =
+    ExprTransformer<_t.Tuple2<String, dynamic>, MapEntry<String, dynamic>>(
+        'x', 'MapEntry({{x}}.item1, {{x}}.item2)');
 
 const _true = Named('_true', Value(true, Tag('true')), [_inline]);
 

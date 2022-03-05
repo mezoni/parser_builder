@@ -18,7 +18,7 @@ if ({{index}} != -1) {
   {{transform}}
   while (state.pos < {{index}}) {
     c = source.codeUnitAt(state.pos);
-    if (!test(c)) {
+    if (!{{cond}}) {
       break;
     }
     state.pos++;
@@ -49,7 +49,7 @@ if ({{index}} != -1) {
   while (state.pos < {{index}}) {
     c = source.codeUnitAt(state.pos);
     c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-    if (!test(c)) {
+    if (!{{cond}}) {
       break;
     }
     state.pos += c > 0xffff ? 2 : 1;
@@ -81,8 +81,9 @@ if ({{index}} != -1) {
     final locals = context.allocateLocals(['index']);
     return {
       'tag': helper.escapeString(tag),
-      'transform': predicate.transform('test'),
-    }..addAll(locals);
+      ...locals,
+      ...helper.tfToTemplateValues(predicate, key: 'cond', value: 'c'),
+    };
   }
 
   @override

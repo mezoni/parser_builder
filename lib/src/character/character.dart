@@ -7,7 +7,7 @@ final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
-  if (!{{test}}(c)) {
+  if (!{{cond}}) {
     break;
   }
   state.pos++;
@@ -23,7 +23,7 @@ final {{pos}} = state.pos;
 while (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
   c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-  if (!{{test}}(c)) {
+  if (!{{cond}}) {
     break;
   }
   state.pos += c > 0xffff ? 2 : 1;
@@ -36,11 +36,14 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos', 'test']);
+    final locals = context.allocateLocals(['cond', 'pos']);
+    final cond = locals['cond']!;
     final predicate = _getCharacterPredicate();
     return {
-      'transform': predicate.transform(locals['test']!),
-    }..addAll(locals);
+      ...locals,
+      ...helper.tfToTemplateValues(predicate,
+          key: 'cond', name: cond, value: 'c'),
+    };
   }
 
   @override
@@ -68,7 +71,7 @@ var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
-  if (!{{test}}({{c}})) {
+  if (!{{cond}}) {
     break;
   }
   state.pos++;
@@ -93,7 +96,7 @@ var {{c}} = 0;
 while (state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
   {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-  if (!{{test}}({{c}})) {
+  if (!{{cond}}) {
     break;
   }
   state.pos += {{c}} > 0xffff ? 2 : 1;
@@ -109,11 +112,15 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['c', 'pos', 'test']);
+    final locals = context.allocateLocals(['c', 'cond', 'pos']);
+    final c = locals['c']!;
+    final cond = locals['cond']!;
     final predicate = _getCharacterPredicate();
     return {
-      'transform': predicate.transform(locals['test']!),
-    }..addAll(locals);
+      ...locals,
+      ...helper.tfToTemplateValues(predicate,
+          key: 'cond', name: cond, value: c),
+    };
   }
 
   @override

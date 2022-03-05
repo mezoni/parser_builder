@@ -18,8 +18,12 @@ const _hexColor = Named('_hexColor',
 
 const _hexPrimary = Named(
     '_hexPrimary',
-    Map$(TakeWhileMN(2, 2, TX('=> isHexDigit(x);')),
-        TX<String, int>('=> fromHex(x);')));
+    Map$(TakeWhileMN(2, 2, ExprTransformer('x', 'isHexDigit({{x}})')),
+        ExprTransformer<String, int>('x', 'fromHex({{x}})')));
 
-const _parse = Named('_parse',
-    Map$(_hexColor, TX<_t.Tuple3<int, int, int>, Color>('=> toColor(x);')));
+const _parse = Named(
+    '_parse',
+    Map$(
+        _hexColor,
+        ExprTransformer<_t.Tuple3<int, int, int>, Color>(
+            'x', 'toColor({{x}})')));

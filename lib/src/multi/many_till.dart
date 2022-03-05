@@ -37,7 +37,8 @@ for (;;) {
     final locals = context.allocateLocals(['list', 'pos']);
     return {
       'O': O.toString(),
-    }..addAll(locals);
+      ...locals,
+    };
   }
 
   @override

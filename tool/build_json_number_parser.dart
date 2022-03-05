@@ -37,8 +37,8 @@ num? parse(String s) {
   return r!;
 }''';
 
-const _isWhitespace =
-    TX<int, bool>('=> x == 0x9 || x == 0xa || x == 0xd || x == 0x20;');
+const _isWhitespace = ExprTransformer<int, bool>(
+    'x', '{{x}} == 0x9 || {{x}} == 0xa || {{x}} == 0xd || {{x}} == 0x20');
 
 const _number = Terminated(Malformed('number', parser), _ws);
 

@@ -5,7 +5,7 @@ class CharClasses extends _CharClass {
 
   const CharClasses(this.classes,
       {RangeProcessing processing = RangeProcessing.test})
-      : super(processing: processing);
+      : super(negate: false, processing: processing);
 
   @override
   String getChars() {

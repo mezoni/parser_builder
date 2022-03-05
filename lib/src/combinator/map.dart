@@ -5,7 +5,8 @@ class Map$<I, O1, O2> extends ParserBuilder<I, O2> {
 {{p1}}
 if (state.ok) {
   {{transform}}
-  {{res}} = map({{p1_val}});
+  final v = {{p1_val}};
+  {{res}} = {{map}};
 }''';
 
   final ParserBuilder<I, O1> parser;
@@ -24,7 +25,7 @@ if (state.ok) {
   @override
   Map<String, String> getTags(Context context) {
     return {
-      'transform': transformer.transform('map'),
+      ...helper.tfToTemplateValues(transformer, key: 'map', value: 'v'),
     };
   }
 

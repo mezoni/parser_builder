@@ -58,7 +58,8 @@ state.opt = {{opt}};''';
       'm': m.toString(),
       'n': n.toString(),
       'O': O.toString(),
-    }..addAll(locals);
+      ...locals,
+    };
   }
 
   @override

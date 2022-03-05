@@ -78,6 +78,7 @@ void _test() {
   _testTerminated();
   _testTuple();
   _testValue();
+  _testTransformers();
 }
 
 void _testAlpha0() {
@@ -2600,6 +2601,75 @@ void _testTerminated() {
   });
 }
 
+void _testTransformers() {
+  final parsers = {
+    'ClosureTransformer': transformersClosureIsDigit,
+    'ExprTransformer': transformersExprIsDigit,
+    'FuncExprTransformer': transformersFuncExprIsDigit,
+    'FuncTransformer': transformersFuncIsDigit,
+  };
+  for (final key in parsers.keys) {
+    test('$key', () {
+      final parser = parsers[key]!;
+      {
+        final state = State('123');
+        final r = parser(state);
+        expect(state.ok, true);
+        _expectResult(r, '123');
+        expect(state.pos, 3);
+      }
+      {
+        final state = State('123 ');
+        final r = parser(state);
+        expect(state.ok, true);
+        _expectResult(r, '123');
+        expect(state.pos, 3);
+      }
+      {
+        final state = State('');
+        final r = parser(state);
+        expect(state.ok, true);
+        _expectResult(r, '');
+        expect(state.pos, 0);
+      }
+      {
+        final state = State(' ');
+        final r = parser(state);
+        expect(state.ok, true);
+        _expectResult(r, '');
+        expect(state.pos, 0);
+      }
+    });
+
+    test('VarTransformer', () {
+      final parser = transformersVarIsNotDigit;
+      {
+        final state = State('a');
+        final r = parser(state);
+        expect(state.ok, true);
+        _expectResult(r, 0x61);
+        expect(state.pos, 1);
+      }
+      {
+        final state = State('');
+        final r = parser(state);
+        expect(state.ok, false);
+        _expectResult(r, null);
+        expect(state.pos, 0);
+        expect(state.error, ErrUnexpected.eof(0));
+      }
+      {
+        final state = State('1');
+        final r = parser(state);
+        expect(state.ok, false);
+        _expectResult(r, null);
+        expect(state.pos, 0);
+        expect(state.error, ErrUnexpected.char(0, Char(0x31)));
+      }
+    });
+  }
+}
+
 void _testTuple() {
   test('Tuple', () {
     final parser1 = tuple2C32Abc;
@@ -2718,4 +2788,6 @@ class _StateContext {
   final String foo = 'foo';
 
   final List<int> listOfC16AndC32 = [c16, c32];
+
+  bool isDigit(int c) => c >= 0x30 && c <= 0x39;
 }

@@ -44,7 +44,8 @@ state.opt = {{opt}};''';
     final locals = context.allocateLocals(['list', 'opt', 'pos']);
     return {
       'O': O.toString(),
-    }..addAll(locals);
+      ...locals,
+    };
   }
 
   @override

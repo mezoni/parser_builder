@@ -7,11 +7,11 @@ int? _hexPrimary(State<String> state) {
   final $pos = state.pos;
   var $c = 0;
   var $cnt = 0;
-  bool $test(int x) => isHexDigit(x);
+  //
   while ($cnt < 2 && state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
     $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    if (!$test($c)) {
+    if (!(isHexDigit($c))) {
       break;
     }
     state.pos += $c > 0xffff ? 2 : 1;
@@ -29,8 +29,9 @@ int? _hexPrimary(State<String> state) {
     state.pos = $pos;
   }
   if (state.ok) {
-    int map(String x) => fromHex(x);
-    $0 = map($1!);
+    //
+    final v = $1!;
+    $0 = (fromHex(v));
   }
   return $0;
 }
@@ -86,8 +87,9 @@ Color? _parse(State<String> state) {
   Tuple3<int, int, int>? $1;
   $1 = _hexColor(state);
   if (state.ok) {
-    Color map(Tuple3<int, int, int> x) => toColor(x);
-    $0 = map($1!);
+    //
+    final v = $1!;
+    $0 = (toColor(v));
   }
   return $0;
 }
@@ -469,13 +471,6 @@ class Tag {
 }
 
 extension on String {
-  /// Returns `true` if [pos] points to the end of the string (or beyond).
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool atEnd(int pos) {
-    return pos >= length;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

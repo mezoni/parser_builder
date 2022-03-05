@@ -15,7 +15,7 @@ var {{cnt}} = 0;
 {{transform}}
 while ({{cnt}} < {{n}} && state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
-  if (!{{test}}({{c}})) {
+  if (!{{cond}}) {
     break;
   }
   state.pos++;
@@ -44,7 +44,7 @@ var {{cnt}} = 0;
 while ({{cnt}} < {{n}} && state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
   {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-  if (!{{test}}({{c}})) {
+  if (!{{cond}}) {
     break;
   }
   state.pos += {{c}} > 0xffff ? 2 : 1;
@@ -83,12 +83,16 @@ if (state.ok) {
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
-    final locals = context.allocateLocals(['c', 'cnt', 'pos', 'test']);
+    final locals = context.allocateLocals(['c', 'cnt', 'cond', 'pos']);
+    final c = locals['c']!;
+    final cond = locals['cond']!;
     return {
       'm': m.toString(),
       'n': n.toString(),
-      'transform': predicate.transform(locals['test']!),
-    }..addAll(locals);
+      ...locals,
+      ...helper.tfToTemplateValues(predicate,
+          key: 'cond', name: cond, value: c),
+    };
   }
 
   @override

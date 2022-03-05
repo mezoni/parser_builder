@@ -4,29 +4,116 @@ abstract class CharPredicate {
   bool get has32BitChars;
 }
 
-class Transformer<I, O> {
-  final String parameter;
+class ClosureTransformer<I, O> extends Transformer<I, O> {
+  final String expression;
 
-  final String _code;
+  const ClosureTransformer(this.expression);
 
-  const Transformer(this.parameter,
-      [this._code = '=> throw UnimplementedError();']);
-
-  String getCode() {
-    return _code;
+  @override
+  String declare(String name) {
+    return 'final $name = $expression;';
   }
 
-  String transform(String name) {
-    var code = getCode().trim();
-    if (code.startsWith('=>') && code.endsWith(';') ||
-        code.startsWith('{') && code.endsWith('}')) {
-      return '$O $name($I $parameter) $code';
-    } else {
-      return 'final $name = $code;';
-    }
+  @override
+  String invoke(String name, String argument) {
+    return '$name($argument)';
   }
 }
 
-class TX<I, O> extends Transformer<I, O> {
-  const TX(String code) : super('x', code);
+class ExprTransformer<I, O> extends Transformer<I, O> {
+  final String expression;
+
+  final String parameter;
+
+  const ExprTransformer(this.parameter, this.expression);
+
+  @override
+  bool get canInline => true;
+
+  @override
+  String declare(String name) {
+    final expr = _transform(parameter);
+    return '$O ($I $parameter) => $expr;';
+  }
+
+  @override
+  String inline(String value) {
+    final expr = _transform(value);
+    return '($expr)';
+  }
+
+  @override
+  String invoke(String name, String argument) {
+    return '$name($argument)';
+  }
+
+  String _transform(String argument) {
+    return expression.replaceAll('{{$parameter}}', argument);
+  }
+}
+
+class FuncExprTransformer<I, O> extends Transformer<I, O> {
+  final String expression;
+
+  final String parameter;
+
+  const FuncExprTransformer(this.parameter, this.expression);
+
+  @override
+  String declare(String name) {
+    return '$O $name($I $parameter) => $expression;';
+  }
+
+  @override
+  String invoke(String name, String argument) {
+    return '$name($argument)';
+  }
+}
+
+class FuncTransformer<I, O> extends Transformer<I, O> {
+  final String body;
+
+  final String parameter;
+
+  const FuncTransformer(this.parameter, this.body);
+
+  @override
+  String declare(String name) {
+    return '$O $name($I $parameter) {$body }';
+  }
+
+  @override
+  String invoke(String name, String argument) {
+    return '$name($argument)';
+  }
+}
+
+abstract class Transformer<I, O> {
+  const Transformer();
+
+  bool get canInline => false;
+
+  String declare(String name);
+
+  String inline(String value) {
+    throw UnimplementedError('inline');
+  }
+
+  String invoke(String name, String argument);
+}
+
+class VarTransformer<I, O> extends Transformer<I, O> {
+  final String expression;
+
+  const VarTransformer(this.expression);
+
+  @override
+  String declare(String name) {
+    return 'final $name = $expression;';
+  }
+
+  @override
+  String invoke(String name, String argument) {
+    return name;
+  }
 }

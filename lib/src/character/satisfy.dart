@@ -13,7 +13,7 @@ state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
   {{transform}}
-  if (test(c)) {
+  if ({{cond}}) {
     state.pos++;
     state.ok = true;
     {{res}} = c;
@@ -31,7 +31,7 @@ if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
   c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
   {{transform}}
-  if (test(c)) {
+  if ({{cond}}) {
     state.pos += c > 0xffff ? 2 : 1;
     state.ok = true;
     {{res}} = c;
@@ -49,7 +49,7 @@ if (state.pos < source.length) {
   @override
   Map<String, String> getTags(Context context) {
     return {
-      'transform': predicate.transform('test'),
+      ...helper.tfToTemplateValues(predicate, key: 'cond', value: 'c'),
     };
   }
 

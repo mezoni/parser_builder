@@ -27,7 +27,7 @@ if (source.startsWith({{tag}}, {{pos}})) {
   final start = {{pos}};
   final end = state.pos;
   final v = Tuple3(start, end, source.substring(start, end));
-  {{res}} = map(v);
+  {{res}} = {{map}};
   state.pos += {{len}};
   break;
 }''';
@@ -64,11 +64,13 @@ if (source.startsWith({{tag}}, {{pos}})) {
       final tags = map[c]!;
       final tests = <String>[];
       for (final tag in tags) {
+        final transformer = transformers[tag]!;
         final values = {
           'len': tag.length.toString(),
           'tag': helper.escapeString(tag),
-          'transform': transformers[tag]!.transform('map'),
-        }..addAll(locals);
+          ...locals,
+          ...helper.tfToTemplateValues(transformer, key: 'map', value: 'v'),
+        };
 
         final test = render(_templateTest, values);
         tests.add(test);
@@ -77,7 +79,8 @@ if (source.startsWith({{tag}}, {{pos}})) {
       final values = {
         'body': tests.join('\n'),
         'cc': c.toString(),
-      }..addAll(locals);
+        ...locals,
+      };
 
       final case_ = render(_templateCase, values);
       cases.add(case_);
@@ -86,7 +89,8 @@ if (source.startsWith({{tag}}, {{pos}})) {
     final values = {
       'cases': cases.join('\n'),
       'errors': errors.join(','),
-    }..addAll(locals);
+      ...locals,
+    };
 
     final result = render(_template, values);
     return result;

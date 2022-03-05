@@ -1,7 +1,7 @@
 part of '../../bytes.dart';
 
 /// Parses the tag whose value is obtained as the result returned by the
-/// transformer [tag] and returns the tag.
+/// transformer [getTag] and returns the tag.
 ///
 /// Example:
 /// ```dart
@@ -10,7 +10,7 @@ part of '../../bytes.dart';
 class TagEx extends StringParserBuilder<String> {
   static const _template = '''
 {{transform}}
-final {{tag}} = {{get}}(null);
+final {{tag}} = {{get}};
 state.ok = source.startsWith({{tag}}, state.pos);
 if (state.ok) {
   state.pos += {{tag}}.length;
@@ -19,16 +19,19 @@ if (state.ok) {
   state.error = ErrExpected.tag(state.pos, Tag({{tag}}));
 }''';
 
-  final Transformer<dynamic, String> tag;
+  final Transformer<dynamic, String> getTag;
 
-  const TagEx(this.tag);
+  const TagEx(this.getTag);
 
   @override
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['get', 'tag']);
+    final get = locals['get']!;
     return {
-      'transform': tag.transform(locals['get']!),
-    }..addAll(locals);
+      ...locals,
+      ...helper.tfToTemplateValues(getTag,
+          key: 'get', name: get, value: 'null'),
+    };
   }
 
   @override

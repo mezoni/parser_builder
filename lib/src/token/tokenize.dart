@@ -5,9 +5,10 @@ class Tokenize<O> extends StringParserBuilder<O> {
 final {{pos}} = state.pos;
 {{p1}}
 if (state.ok) {
+  {{transform}}
   final v1 = state.source.slice({{pos}}, state.pos);
   final v2 = Tuple4({{pos}}, state.pos, v1, {{p1_val}});
-  {{res}} = map(v2);
+  {{res}} = {{map}};
 }''';
 
   final ParserBuilder<String, dynamic> parser;
@@ -27,8 +28,9 @@ if (state.ok) {
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['pos']);
     return {
-      'transform': transformer.transform('map'),
-    }..addAll(locals);
+      ...locals,
+      ...helper.tfToTemplateValues(transformer, key: 'map', value: 'v2'),
+    };
   }
 
   @override

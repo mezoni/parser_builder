@@ -13,7 +13,7 @@ var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
-  if (!{{test}}({{c}})) {
+  if (!{{cond}}) {
     break;
   }
   state.pos++;
@@ -35,7 +35,7 @@ var {{c}} = 0;
 while (state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
   {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-  if (!{{test}}({{c}})) {
+  if (!{{cond}}) {
     break;
   }
   state.pos += {{c}} > 0xffff ? 2 : 1;
@@ -52,10 +52,14 @@ if (!state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['c', 'test']);
+    final locals = context.allocateLocals(['c', 'cond']);
+    final c = locals['c']!;
+    final cond = locals['cond']!;
     return {
-      'transform': predicate.transform(locals['test']!),
-    }..addAll(locals);
+      ...locals,
+      ...helper.tfToTemplateValues(predicate,
+          key: 'cond', name: cond, value: c),
+    };
   }
 
   @override
