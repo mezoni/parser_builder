@@ -35,6 +35,9 @@ bool {{name}}(int c) {
 
   @override
   bool get has32BitChars {
+    if (negate) {
+      return true;
+    }
     final list = getCharList();
     return list.any((e) => e > 0xffff);
   }

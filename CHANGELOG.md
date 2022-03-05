@@ -1,3 +1,7 @@
+## 0.10.1
+
+- Fixed a bug in the transformer `NotCharClass` that could affect the work of parsers that are sensitive to parsing 32-bit characters, to which this transformer will be passed as a predicate. A rare case, but still a bug. The transformer `NotCharClass` now always returns `true` when calling its method `has32BitChars`
+
 ## 0.10.0
 
 - Breaking change: Another round of improvements. Now it's time to improve transformers. Transformers now allow you to solve different problems. Transformers now have three main features: `declare`, `inline` and `invoke`. Each transformer must support the `declare` and `invoke` capability. Support for `inline` is optional, but it's the support for this feature that makes them very performant (and parsers too). The most requested transformers are already available, but nothing prevents you from creating your own transformer with the necessary functionality. All parser builders have already been updated to use the new transformers, which increases performance by at least 10% and makes the source  code a little smaller
