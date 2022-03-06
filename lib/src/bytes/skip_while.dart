@@ -27,14 +27,16 @@ state.ok = true;
 {{transform}}
 while (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
+  var size = 1;
   if (c > 0xd7ff) {
     c = source.runeAt(state.pos);
+    size = c > 0xffff ? 2 : 1;
   }
   final ok = {{cond}};
   if (!ok) {
     break;
   }
-  state.pos += c > 0xffff ? 2 : 1;
+  state.pos += size;
 }
 if (state.ok) {
   {{res}} = true;

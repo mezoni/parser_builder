@@ -23,7 +23,9 @@ if (state.ok) {
 state.ok = true;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
   switch (c) {
     {{cases}}
   }

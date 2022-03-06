@@ -28,15 +28,17 @@ if (state.ok) {
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
+  var size = 1;
   var c = source.codeUnitAt(state.pos);
   if (c > 0xd7ff) {
     c = source.runeAt(state.pos);
+    size = c > 0xffff ? 2 : 1;
   }
   final ok = {{cond}};
   if (!ok) {
     break;
   }
-  state.pos += c > 0xffff ? 2 : 1;
+  state.pos += size;
 }
 state.ok = true;
 if (state.ok) {

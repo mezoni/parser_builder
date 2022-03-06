@@ -82,11 +82,19 @@ class Number extends StringParserBuilder<num> {
       final length = source.length;
       var pos = state.pos;
       var c = eof;
-      c = pos < length ? source.codeUnitAt(pos) : eof;
+      if (pos < length) {
+        c = source.codeUnitAt(pos);
+      } else {
+        c = eof;
+      }
       var hasSign = false;
       if (c == 0x2d) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         hasSign = true;
       }
       var digit = c ^ mask;
@@ -101,10 +109,18 @@ class Number extends StringParserBuilder<num> {
       var intValue = 0;
       if (digit == 0) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
       } else {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         intValue = digit;
         while (true) {
           digit = c ^ mask;
@@ -112,7 +128,11 @@ class Number extends StringParserBuilder<num> {
             break;
           }
           pos++;
-          c = pos < length ? source.codeUnitAt(pos) : eof;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
           if (intPartLen++ < 18) {
             intValue = intValue * 10 + digit;
           }
@@ -123,7 +143,11 @@ class Number extends StringParserBuilder<num> {
       var decValue = 0;
       if (c == 0x2e) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         hasDot = true;
         digit = c ^ mask;
         if (digit > 9) {
@@ -132,7 +156,11 @@ class Number extends StringParserBuilder<num> {
           break;
         }
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         decPartLen = 1;
         decValue = digit;
         while (true) {
@@ -141,7 +169,11 @@ class Number extends StringParserBuilder<num> {
             break;
           }
           pos++;
-          c = pos < length ? source.codeUnitAt(pos) : eof;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
           if (decPartLen++ < 18) {
             decValue = decValue * 10 + digit;
           }
@@ -153,16 +185,28 @@ class Number extends StringParserBuilder<num> {
       var exp = 0;
       if (c == 0x45 || c == 0x65) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         hasExp = true;
         switch (c) {
           case 0x2b:
             pos++;
-            c = pos < length ? source.codeUnitAt(pos) : eof;
+            if (pos < length) {
+              c = source.codeUnitAt(pos);
+            } else {
+              c = eof;
+            }
             break;
           case 0x2d:
             pos++;
-            c = pos < length ? source.codeUnitAt(pos) : eof;
+            if (pos < length) {
+              c = source.codeUnitAt(pos);
+            } else {
+              c = eof;
+            }
             hasExpSign = true;
             break;
         }
@@ -173,7 +217,11 @@ class Number extends StringParserBuilder<num> {
           break;
         }
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         expPartLen = 1;
         exp = digit;
         while (true) {
@@ -182,7 +230,11 @@ class Number extends StringParserBuilder<num> {
             break;
           }
           pos++;
-          c = pos < length ? source.codeUnitAt(pos) : eof;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
           if (expPartLen++ < 18) {
             exp = exp * 10 + digit;
           }
@@ -255,7 +307,9 @@ class Number extends StringParserBuilder<num> {
     if (!state.ok) {
       if (state.pos < source.length) {
         var c = source.codeUnitAt(state.pos);
-        c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+        if (c > 0xd7ff) {
+          c = source.runeAt(state.pos);
+        }
         state.error = ErrUnexpected.char(state.pos, Char(c));
       } else {
         state.error = ErrUnexpected.eof(state.pos);

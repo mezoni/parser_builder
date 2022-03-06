@@ -27,14 +27,16 @@ bool? _ws(State<String> state) {
   state.ok = true;
   while (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
+    var size = 1;
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = c == 0x9 || c == 0xa || c == 0xd || c == 0x20;
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   if (state.ok) {
     $0 = true;
@@ -87,11 +89,19 @@ num? number(State<String> state) {
       final length = source.length;
       var pos = state.pos;
       var c = eof;
-      c = pos < length ? source.codeUnitAt(pos) : eof;
+      if (pos < length) {
+        c = source.codeUnitAt(pos);
+      } else {
+        c = eof;
+      }
       var hasSign = false;
       if (c == 0x2d) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         hasSign = true;
       }
       var digit = c ^ mask;
@@ -106,10 +116,18 @@ num? number(State<String> state) {
       var intValue = 0;
       if (digit == 0) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
       } else {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         intValue = digit;
         while (true) {
           digit = c ^ mask;
@@ -117,7 +135,11 @@ num? number(State<String> state) {
             break;
           }
           pos++;
-          c = pos < length ? source.codeUnitAt(pos) : eof;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
           if (intPartLen++ < 18) {
             intValue = intValue * 10 + digit;
           }
@@ -128,7 +150,11 @@ num? number(State<String> state) {
       var decValue = 0;
       if (c == 0x2e) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         hasDot = true;
         digit = c ^ mask;
         if (digit > 9) {
@@ -137,7 +163,11 @@ num? number(State<String> state) {
           break;
         }
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         decPartLen = 1;
         decValue = digit;
         while (true) {
@@ -146,7 +176,11 @@ num? number(State<String> state) {
             break;
           }
           pos++;
-          c = pos < length ? source.codeUnitAt(pos) : eof;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
           if (decPartLen++ < 18) {
             decValue = decValue * 10 + digit;
           }
@@ -158,16 +192,28 @@ num? number(State<String> state) {
       var exp = 0;
       if (c == 0x45 || c == 0x65) {
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         hasExp = true;
         switch (c) {
           case 0x2b:
             pos++;
-            c = pos < length ? source.codeUnitAt(pos) : eof;
+            if (pos < length) {
+              c = source.codeUnitAt(pos);
+            } else {
+              c = eof;
+            }
             break;
           case 0x2d:
             pos++;
-            c = pos < length ? source.codeUnitAt(pos) : eof;
+            if (pos < length) {
+              c = source.codeUnitAt(pos);
+            } else {
+              c = eof;
+            }
             hasExpSign = true;
             break;
         }
@@ -178,7 +224,11 @@ num? number(State<String> state) {
           break;
         }
         pos++;
-        c = pos < length ? source.codeUnitAt(pos) : eof;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
         expPartLen = 1;
         exp = digit;
         while (true) {
@@ -187,7 +237,11 @@ num? number(State<String> state) {
             break;
           }
           pos++;
-          c = pos < length ? source.codeUnitAt(pos) : eof;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
           if (expPartLen++ < 18) {
             exp = exp * 10 + digit;
           }
@@ -260,7 +314,9 @@ num? number(State<String> state) {
     if (!state.ok) {
       if (state.pos < source.length) {
         var c = source.codeUnitAt(state.pos);
-        c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+        if (c > 0xd7ff) {
+          c = source.runeAt(state.pos);
+        }
         state.error = ErrUnexpected.char(state.pos, Char(c));
       } else {
         state.error = ErrUnexpected.eof(state.pos);

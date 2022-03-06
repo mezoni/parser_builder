@@ -21,14 +21,16 @@ bool? _ws(State<String> state) {
   state.ok = true;
   while (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
+    var size = 1;
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = c == 0x09 || c == 0xA || c == 0xD || c == 0x20;
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   if (state.ok) {
     $0 = true;
@@ -44,9 +46,11 @@ int? _hexVal(State<String> state) {
   final $pos = state.pos;
   var $c = 0;
   while (state.pos < source.length) {
+    var size = 1;
     $c = source.codeUnitAt(state.pos);
     if ($c > 0xd7ff) {
       $c = source.runeAt(state.pos);
+      size = $c > 0xffff ? 2 : 1;
     }
     final ok = $c >= 0x30 && $c <= 0x39 ||
         $c >= 0x41 && $c <= 0x46 ||
@@ -54,7 +58,7 @@ int? _hexVal(State<String> state) {
     if (!ok) {
       break;
     }
-    state.pos += $c > 0xffff ? 2 : 1;
+    state.pos += size;
     state.ok = true;
   }
   if (state.ok) {
@@ -145,13 +149,15 @@ int? _rangeChar(State<String> state) {
     int? $3;
     state.ok = false;
     if (state.pos < source.length) {
+      var size = 1;
       var c = source.codeUnitAt(state.pos);
       if (c > 0xd7ff) {
         c = source.runeAt(state.pos);
+        size = c > 0xffff ? 2 : 1;
       }
       state.ok = c > 0x20 && c < 0x7f;
       if (state.ok) {
-        state.pos += c > 0xffff ? 2 : 1;
+        state.pos += size;
         $3 = c;
       } else if (!state.opt) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -263,13 +269,15 @@ int? _charCode(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     state.ok = c > 0x20 && c < 0x7f;
     if (state.ok) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       $0 = c;
     } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));

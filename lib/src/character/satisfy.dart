@@ -30,14 +30,16 @@ if (state.pos < source.length) {
   static const _template32 = '''
 state.ok = false;
 if (state.pos < source.length) {
+  var size = 1;
   var c = source.codeUnitAt(state.pos);
   if (c > 0xd7ff) {
     c = source.runeAt(state.pos);
+    size = c > 0xffff ? 2 : 1;
   }
   {{transform}}
   state.ok = {{cond}};
   if (state.ok) {
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
     {{res}} = c;
   } else if (!state.opt) {
     state.error = ErrUnexpected.char(state.pos, Char(c));

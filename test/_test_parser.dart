@@ -9,7 +9,7 @@ String? alpha0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 65 && c <= 90 || c >= 97 && c <= 122;
+    final ok = c < 123 && (c >= 65 && c <= 90 || c >= 97 && c <= 122);
     if (!ok) {
       break;
     }
@@ -29,7 +29,7 @@ String? alpha1(State<String> state) {
   var $c = 0;
   while (state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
-    final ok = $c >= 65 && $c <= 90 || $c >= 97 && $c <= 122;
+    final ok = $c < 123 && ($c >= 65 && $c <= 90 || $c >= 97 && $c <= 122);
     if (!ok) {
       break;
     }
@@ -58,7 +58,8 @@ String? alphanumeric0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122;
+    final ok = c < 123 &&
+        (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
     if (!ok) {
       break;
     }
@@ -78,8 +79,8 @@ String? alphanumeric1(State<String> state) {
   var $c = 0;
   while (state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
-    final ok =
-        $c >= 48 && $c <= 57 || $c >= 65 && $c <= 90 || $c >= 97 && $c <= 122;
+    final ok = $c < 123 &&
+        ($c >= 48 && $c <= 57 || $c >= 65 && $c <= 90 || $c >= 97 && $c <= 122);
     if (!ok) {
       break;
     }
@@ -164,11 +165,13 @@ int? anyChar(State<String> state) {
   int? $0;
   state.ok = state.pos < source.length;
   if (state.ok) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
     $0 = c;
   } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
@@ -350,9 +353,11 @@ int? escapeSequence32(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     int? v;
     switch (c) {
@@ -368,7 +373,7 @@ int? escapeSequence32(State<String> state) {
         break;
     }
     if (v != null) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       state.ok = true;
       $0 = v;
     } else {
@@ -387,7 +392,8 @@ String? hexDigit0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102;
+    final ok = c < 103 &&
+        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
     if (!ok) {
       break;
     }
@@ -407,8 +413,8 @@ String? hexDigit1(State<String> state) {
   var $c = 0;
   while (state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
-    final ok =
-        $c >= 48 && $c <= 57 || $c >= 65 && $c <= 70 || $c >= 97 && $c <= 102;
+    final ok = $c < 103 &&
+        ($c >= 48 && $c <= 57 || $c >= 65 && $c <= 70 || $c >= 97 && $c <= 102);
     if (!ok) {
       break;
     }
@@ -640,13 +646,15 @@ int? noneOfC16(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     state.ok = c != 80;
     if (state.ok) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       $0 = c;
     } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -662,9 +670,11 @@ int? noneOfC16OrC32Ex(State<String> state) {
   int? $0;
   state.ok = true;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final chars = state.context.listOfC16AndC32 as List<int>;
     final list = chars;
@@ -679,7 +689,7 @@ int? noneOfC16OrC32Ex(State<String> state) {
       }
     }
     if (state.ok) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       $0 = c;
     }
   } else {
@@ -696,13 +706,15 @@ int? noneOfC32(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     state.ok = c != 119296;
     if (state.ok) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       $0 = c;
     } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -833,13 +845,15 @@ int? oneOfC32(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     state.ok = c == 119296;
     if (state.ok) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       $0 = c;
     } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -980,13 +994,15 @@ int? satisfyC32(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     state.ok = c == 119296;
     if (state.ok) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       $0 = c;
     } else if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -1216,15 +1232,17 @@ bool? skipWhile1C32(State<String> state) {
   bool? $0;
   var $c = 0;
   while (state.pos < source.length) {
+    var size = 1;
     $c = source.codeUnitAt(state.pos);
     if ($c > 0xd7ff) {
       $c = source.runeAt(state.pos);
+      size = $c > 0xffff ? 2 : 1;
     }
     final ok = $c == 119296;
     if (!ok) {
       break;
     }
-    state.pos += $c > 0xffff ? 2 : 1;
+    state.pos += size;
     $0 = true;
   }
   state.ok = $0 != null;
@@ -1260,14 +1278,16 @@ bool? skipWhileC32(State<String> state) {
   state.ok = true;
   while (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
+    var size = 1;
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = c == 119296;
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   if (state.ok) {
     $0 = true;
@@ -1504,15 +1524,17 @@ String? takeWhile1C32(State<String> state) {
   final $pos = state.pos;
   var $c = 0;
   while (state.pos < source.length) {
+    var size = 1;
     $c = source.codeUnitAt(state.pos);
     if ($c > 0xd7ff) {
       $c = source.runeAt(state.pos);
+      size = $c > 0xffff ? 2 : 1;
     }
     final ok = $c == 119296;
     if (!ok) {
       break;
     }
-    state.pos += $c > 0xffff ? 2 : 1;
+    state.pos += size;
     state.ok = true;
   }
   if (state.ok) {
@@ -1588,15 +1610,17 @@ String? takeWhileC32UntilAbc(State<String> state) {
     final pos = state.pos;
     var c = 0;
     while (state.pos < $index) {
+      var size = 1;
       c = source.codeUnitAt(state.pos);
       if (c > 0xd7ff) {
         c = source.runeAt(state.pos);
+        size = c > 0xffff ? 2 : 1;
       }
       final ok = c == 119296;
       if (!ok) {
         break;
       }
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
     }
     state.ok = state.pos == $index;
     if (state.ok) {
@@ -1621,15 +1645,17 @@ String? takeWhileC32(State<String> state) {
   String? $0;
   final $pos = state.pos;
   while (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = c == 119296;
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   state.ok = true;
   if (state.ok) {
@@ -1679,15 +1705,17 @@ String? takeWhileMN_2_4C32(State<String> state) {
   var $c = 0;
   var $cnt = 0;
   while ($cnt < 4 && state.pos < source.length) {
+    var size = 1;
     $c = source.codeUnitAt(state.pos);
     if ($c > 0xd7ff) {
       $c = source.runeAt(state.pos);
+      size = $c > 0xffff ? 2 : 1;
     }
     final ok = $c == 119296;
     if (!ok) {
       break;
     }
-    state.pos += $c > 0xffff ? 2 : 1;
+    state.pos += size;
     $cnt++;
   }
   state.ok = $cnt >= 2;
@@ -1824,15 +1852,17 @@ String? transformersClosureIsDigit(State<String> state) {
   final $pos = state.pos;
   final $cond = (int x) => x >= 0x30 && x <= 0x39;
   while (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = $cond(c);
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   state.ok = true;
   if (state.ok) {
@@ -1846,15 +1876,17 @@ String? transformersExprIsDigit(State<String> state) {
   String? $0;
   final $pos = state.pos;
   while (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = c >= 0x30 && c <= 0x39;
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   state.ok = true;
   if (state.ok) {
@@ -1869,15 +1901,17 @@ String? transformersFuncExprIsDigit(State<String> state) {
   final $pos = state.pos;
   bool $cond(int x) => x >= 0x30 && x <= 0x39;
   while (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = $cond(c);
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   state.ok = true;
   if (state.ok) {
@@ -1895,15 +1929,17 @@ String? transformersFuncIsDigit(State<String> state) {
   }
 
   while (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final ok = $cond(c);
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   state.ok = true;
   if (state.ok) {
@@ -1917,15 +1953,17 @@ String? transformersNotCharClassIsDigit(State<String> state) {
   String? $0;
   final $pos = state.pos;
   while (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
-    final ok = !(c >= 0 && c <= 47 || c >= 58 && c <= 1114111);
+    final ok = !(c < 1114112 && (c >= 0 && c <= 47 || c >= 58 && c <= 1114111));
     if (!ok) {
       break;
     }
-    state.pos += c > 0xffff ? 2 : 1;
+    state.pos += size;
   }
   state.ok = true;
   if (state.ok) {
@@ -1939,9 +1977,11 @@ int? transformersVarIsNotDigit(State<String> state) {
   int? $0;
   state.ok = true;
   if (state.pos < source.length) {
+    var size = 1;
     var c = source.codeUnitAt(state.pos);
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
+      size = c > 0xffff ? 2 : 1;
     }
     final chars = const [
       0x30,
@@ -1967,7 +2007,7 @@ int? transformersVarIsNotDigit(State<String> state) {
       }
     }
     if (state.ok) {
-      state.pos += c > 0xffff ? 2 : 1;
+      state.pos += size;
       $0 = c;
     }
   } else {
