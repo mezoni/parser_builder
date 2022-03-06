@@ -57,7 +57,7 @@ Map<String, String> tfToTemplateValues(Transformer transformer,
     required String value}) {
   name ??= key;
   return {
-    transform: transformer.canInline ? ' //' : transformer.declare(name),
+    transform: transformer.canInline ? '' : transformer.declare(name),
     key: tfToExpression(transformer, name, value),
   };
 }

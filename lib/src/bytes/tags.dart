@@ -24,7 +24,9 @@ if (!state.ok && !state.opt) {
 final {{pos}} = state.pos;
 if (state.pos < source.length) {
   var c = source.codeUnitAt({{pos}});
-  c = c & 0xfc00 != 0xd800 ? c : source.runeAt({{pos}});
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
   switch (c) {
     {{cases}}
   }

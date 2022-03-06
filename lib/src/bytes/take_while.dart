@@ -14,7 +14,8 @@ final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
-  if (!{{cond}}) {
+  final ok = {{cond}};
+  if (!ok) {
     break;
   }
   state.pos++;
@@ -28,8 +29,11 @@ final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-  if (!{{cond}}) {
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
+  final ok = {{cond}};
+  if (!ok) {
     break;
   }
   state.pos += c > 0xffff ? 2 : 1;

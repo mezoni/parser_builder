@@ -25,7 +25,9 @@ if (!state.ok && !state.opt) {
 state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
   if (c == {{cc}}) {
     state.pos += 2;
     state.ok = true;
@@ -42,7 +44,9 @@ if (!state.ok && !state.opt) {
 
   @override
   Map<String, String> getTags(Context context) {
-    return {'cc': helper.toHex(value)};
+    return {
+      'cc': value.toString(),
+    };
   }
 
   @override

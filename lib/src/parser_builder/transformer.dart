@@ -39,7 +39,7 @@ class ExprTransformer<I, O> extends Transformer<I, O> {
   @override
   String inline(String value) {
     final expr = _transform(value);
-    return '($expr)';
+    return expr;
   }
 
   @override

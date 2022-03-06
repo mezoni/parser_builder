@@ -83,10 +83,12 @@ Future<void> main(List<String> args) async {
     _tuple3C32AbcC16,
     _valueAbcToTrueValue,
     _valueTrue,
+    _transformersCharClassIsDigit,
     _transformersClosureIsDigit,
     _transformersExprIsDigit,
     _transformersFuncExprIsDigit,
     _transformersFuncIsDigit,
+    _transformersNotCharClassIsDigit,
     _transformersVarIsNotDigit
   ];
 
@@ -274,6 +276,9 @@ const _terminatedC16C32 = Named('terminated', Terminated(_char16, _char32));
 
 const _testRef_ = Named('testRef', _ref);
 
+const _transformersCharClassIsDigit =
+    Named('transformersCharClassIsDigit', TakeWhile(CharClass('[#x30-#x39]')));
+
 const _transformersClosureIsDigit = Named('transformersClosureIsDigit',
     TakeWhile(ClosureTransformer('(int x) => x >= 0x30 && x <= 0x39')));
 
@@ -286,10 +291,14 @@ const _transformersFuncExprIsDigit = Named('transformersFuncExprIsDigit',
 const _transformersFuncIsDigit = Named('transformersFuncIsDigit',
     TakeWhile(FuncTransformer('x', 'return x >= 0x30 && x <= 0x39;')));
 
+const _transformersNotCharClassIsDigit = Named(
+    'transformersNotCharClassIsDigit',
+    TakeWhile(NotCharClass('[#x0-#x2F] | [#x3A-#x10FFFF]')));
+
 const _transformersVarIsNotDigit = Named(
     'transformersVarIsNotDigit',
     NoneOfEx(VarTransformer(
-        '[0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]')));
+        'const [0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]')));
 
 const _tuple2C32Abc = Named('tuple2C32Abc', Tuple2(_char32, _tagAbc));
 

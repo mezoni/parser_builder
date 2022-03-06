@@ -1,3 +1,7 @@
+## 0.10.2
+
+- Improved character and string parser builders. Performance can be increased up to 5-7%
+
 ## 0.10.1
 
 - Fixed a bug in the transformer `NotCharClass` that could affect the work of parsers that are sensitive to parsing 32-bit characters, to which this transformer will be passed as a predicate. A rare case, but still a bug. The transformer `NotCharClass` now always returns `true` when calling its method `has32BitChars`

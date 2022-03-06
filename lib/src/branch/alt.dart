@@ -19,12 +19,40 @@ if (state.ok) {
 }
 final {{e}} = state.error;''';
 
+  static const _templateSimple = '''
+{{p1}}
+if (state.ok) {
+  {{res}} = {{p1_val}};
+} else {
+  final {{error}} = state.error;
+  {{p2}}
+  if (state.ok) {
+    {{res}} = {{p2_val}};
+  } else if (!state.opt) {
+    state.error = ErrCombined(state.pos, [{{error}}, state.error]);
+  }
+}''';
+
   final List<ParserBuilder<I, O>> parsers;
 
   const Alt(this.parsers);
 
   @override
+  Map<String, ParserBuilder> getBuilders() {
+    return _isSimpleAlt()
+        ? {
+            'p1': parsers[0],
+            'p2': parsers[1],
+          }
+        : const {};
+  }
+
+  @override
   Map<String, String> getTags(Context context) {
+    if (_isSimpleAlt()) {
+      return context.allocateLocals(['error']);
+    }
+
     final errors = <String>[];
     final body = StringBuffer();
     for (var i = 0; i < parsers.length; i++) {
@@ -49,6 +77,10 @@ final {{e}} = state.error;''';
 
   @override
   String getTemplate(Context context) {
-    return _template;
+    return _isSimpleAlt() ? _templateSimple : _template;
+  }
+
+  bool _isSimpleAlt() {
+    return parsers.length == 2;
   }
 }

@@ -7,11 +7,13 @@ int? _hexPrimary(State<String> state) {
   final $pos = state.pos;
   var $c = 0;
   var $cnt = 0;
-  //
   while ($cnt < 2 && state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
-    $c = $c & 0xfc00 != 0xd800 ? $c : source.runeAt(state.pos);
-    if (!(isHexDigit($c))) {
+    if ($c > 0xd7ff) {
+      $c = source.runeAt(state.pos);
+    }
+    final ok = isHexDigit($c);
+    if (!ok) {
       break;
     }
     state.pos += $c > 0xffff ? 2 : 1;
@@ -29,9 +31,8 @@ int? _hexPrimary(State<String> state) {
     state.pos = $pos;
   }
   if (state.ok) {
-    //
     final v = $1!;
-    $0 = (fromHex(v));
+    $0 = fromHex(v);
   }
   return $0;
 }
@@ -44,7 +45,7 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
   state.ok = false;
   if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    if (c == 0x23) {
+    if (c == 35) {
       state.pos++;
       state.ok = true;
       $1 = '#';
@@ -87,9 +88,8 @@ Color? _parse(State<String> state) {
   Tuple3<int, int, int>? $1;
   $1 = _hexColor(state);
   if (state.ok) {
-    //
     final v = $1!;
-    $0 = (toColor(v));
+    $0 = toColor(v);
   }
   return $0;
 }

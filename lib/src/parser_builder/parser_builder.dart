@@ -17,7 +17,11 @@ abstract class ParserBuilder<I, O> {
     sb.write(' ');
     sb.write(context.resultVariable);
     sb.writeln(';');
-    final code = buildBody(context);
+    var code = buildBody(context);
+    code = const LineSplitter()
+        .convert(code)
+        .where((e) => e.trim().isNotEmpty)
+        .join('\n');
     sb.writeln(code);
     if (context.onLeave != null) {
       final code = context.onLeave!(this, context.resultVariable);
@@ -48,8 +52,7 @@ abstract class ParserBuilder<I, O> {
 
   String buildBodyEx(Context context, Map<String, ParserBuilder> builders,
       Map<String, String> tags, String template) {
-    final values = <String, String>{};
-    values.addAll(tags);
+    final values = {...tags};
     final resultTag = 'res';
     final resultSuffix = '_res';
     final resultValueSuffix = '_val';

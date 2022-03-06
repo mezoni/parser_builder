@@ -7,13 +7,14 @@ final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
-  if (!{{cond}}) {
+  final ok = {{cond}};
+  if (!ok) {
     break;
   }
   state.pos++;
 }
 if (state.ok) {
-  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
+  {{res}} = source.substring({{pos}}, state.pos);
 }''';
 
   static const _template32 = '''
@@ -22,14 +23,17 @@ final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-  if (!{{cond}}) {
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
+  final ok = {{cond}};
+  if (!ok) {
     break;
   }
   state.pos += c > 0xffff ? 2 : 1;
 }
 if (state.ok) {
-  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
+  {{res}} = source.substring({{pos}}, state.pos);
 }''';
 
   const _Chars0();
@@ -71,7 +75,8 @@ var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
-  if (!{{cond}}) {
+  final ok = {{cond}};
+  if (!ok) {
     break;
   }
   state.pos++;
@@ -81,7 +86,9 @@ if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (!state.opt) {
   if (state.pos < source.length) {
-    {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
+    if ({{c}} > 0xd7ff) {
+      {{c}} = source.runeAt(state.pos);
+    }
     state.error = ErrUnexpected.char(state.pos, Char({{c}}));
   } else {
     state.error = ErrUnexpected.eof(state.pos);
@@ -95,8 +102,11 @@ var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   {{c}} = source.codeUnitAt(state.pos);
-  {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-  if (!{{cond}}) {
+  if ({{c}} > 0xd7ff) {
+    {{c}} = source.runeAt(state.pos);
+  }
+  final ok = {{cond}};
+  if (!ok) {
     break;
   }
   state.pos += {{c}} > 0xffff ? 2 : 1;

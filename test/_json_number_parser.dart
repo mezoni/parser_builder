@@ -25,11 +25,13 @@ bool? _ws(State<String> state) {
   final source = state.source;
   bool? $0;
   state.ok = true;
-  //
   while (state.pos < source.length) {
     var c = source.codeUnitAt(state.pos);
-    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
-    if (!(c == 0x9 || c == 0xa || c == 0xd || c == 0x20)) {
+    if (c > 0xd7ff) {
+      c = source.runeAt(state.pos);
+    }
+    final ok = c == 0x9 || c == 0xa || c == 0xd || c == 0x20;
+    if (!ok) {
       break;
     }
     state.pos += c > 0xffff ? 2 : 1;

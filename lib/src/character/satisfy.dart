@@ -13,12 +13,14 @@ state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
   {{transform}}
-  if ({{cond}}) {
+  state.ok = {{cond}};
+  if (state.ok) {
     state.pos++;
-    state.ok = true;
     {{res}} = c;
   } else if (!state.opt) {
-    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+    if (c > 0xd7ff) {
+      c = source.runeAt(state.pos);
+    }
     state.error = ErrUnexpected.char(state.pos, Char(c));
   }
 } else if (!state.opt) {
@@ -29,11 +31,13 @@ if (state.pos < source.length) {
 state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
   {{transform}}
-  if ({{cond}}) {
+  state.ok = {{cond}};
+  if (state.ok) {
     state.pos += c > 0xffff ? 2 : 1;
-    state.ok = true;
     {{res}} = c;
   } else if (!state.opt) {
     state.error = ErrUnexpected.char(state.pos, Char(c));

@@ -2603,13 +2603,15 @@ void _testTerminated() {
 
 void _testTransformers() {
   final parsers = {
+    'CharClasss': transformersCharClassIsDigit,
     'ClosureTransformer': transformersClosureIsDigit,
     'ExprTransformer': transformersExprIsDigit,
     'FuncExprTransformer': transformersFuncExprIsDigit,
     'FuncTransformer': transformersFuncIsDigit,
+    'NotCharClasss': transformersNotCharClassIsDigit,
   };
   for (final key in parsers.keys) {
-    test('$key', () {
+    test('Transformer $key', () {
       final parser = parsers[key]!;
       {
         final state = State('123');
@@ -2641,7 +2643,7 @@ void _testTransformers() {
       }
     });
 
-    test('VarTransformer', () {
+    test('Transformer VarTransformer', () {
       final parser = transformersVarIsNotDigit;
       {
         final state = State('a');

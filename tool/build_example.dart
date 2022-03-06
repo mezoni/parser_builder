@@ -89,8 +89,7 @@ const _quote = Named('_quote', Terminated(Tag('"'), _ws), [_inline]);
 const _string = Named(
     '_string', Malformed('string', Delimited(Tag('"'), _stringValue, _quote)));
 
-const _stringValue =
-    Named('_stringValue', StringValue(_isNormalChar, 0x5c, _escaped));
+const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
 
 const _toHexValue = ExprTransformer<String, int>('x', '_toHexValue({{x}})');
 
@@ -114,7 +113,7 @@ const _value_ = Named<String, dynamic>(
 
 const _values = Named('_values', SeparatedList0(_value, _comma));
 
-const _ws = Named('_ws', SkipWhile(_isWhitespace), [_inline]);
+const _ws = Named('_ws', SkipWhile(_isWhitespace));
 
 void _configure(Context context, {bool comment = false, bool trace = false}) {
   if (comment || trace) {

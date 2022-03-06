@@ -11,7 +11,9 @@ class AnyChar extends StringParserBuilder<int> {
 state.ok = state.pos < source.length;
 if (state.ok) {
   var c = source.codeUnitAt(state.pos);
-  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
   state.pos += c > 0xffff ? 2 : 1;
   {{res}} = c;
 } else if (!state.opt) {

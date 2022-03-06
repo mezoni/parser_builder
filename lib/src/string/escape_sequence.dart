@@ -29,7 +29,9 @@ if (state.pos < source.length) {
     state.ok = true;
     {{res}} = v;
   } else {
-    c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+    if (c > 0xd7ff) {
+      c = source.runeAt(state.pos);
+    }
     state.error = ErrUnexpected.char(state.pos, Char(c));
   }
 } else {
@@ -40,7 +42,9 @@ if (state.pos < source.length) {
 state.ok = false;
 if (state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c & 0xfc00 != 0xd800 ? c : source.runeAt(state.pos);
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
   int? v;
   switch (c) {
     {{cases}}

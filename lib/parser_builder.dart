@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'builder_helper.dart' as helper;
 
 part 'src/parser_builder/allocator.dart';

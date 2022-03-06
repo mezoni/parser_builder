@@ -76,7 +76,7 @@ if (!state.ok && !state.opt) {
     final runes = tag.runes;
     final isShort = runes.length == 1;
     return {
-      'cc': helper.toHex(runes.first),
+      'cc': runes.first.toString(),
       if (!isShort) 'len': tag.length.toString(),
       'tag': helper.escapeString(tag),
     };

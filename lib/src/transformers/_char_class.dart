@@ -83,11 +83,7 @@ bool {{name}}(int c) {
     }
 
     var result = tests.join(' || ');
-    if (negate) {
-      return '!($result)';
-    }
-
-    return '($result)';
+    return negate ? '!($result)' : result;
   }
 
   @override

@@ -12,8 +12,11 @@ while (state.pos < source.length) {
   var {{c}} = 0;
   while (state.pos < source.length) {
     {{c}} = source.codeUnitAt(state.pos);
-    {{c}} = {{c}} & 0xfc00 != 0xd800 ? {{c}} : source.runeAt(state.pos);
-    if (!{{cond}}) {
+    if ({{c}} > 0xd7ff) {
+      {{c}} = source.runeAt(state.pos);
+    }
+    final ok = {{cond}};
+    if (!ok) {
       break;
     }
     state.pos += {{c}} > 0xffff ? 2 : 1;
