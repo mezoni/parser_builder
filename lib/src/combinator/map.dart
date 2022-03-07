@@ -9,11 +9,11 @@ if (state.ok) {
   {{res}} = {{map}};
 }''';
 
+  final Transformer<O1, O2> map;
+
   final ParserBuilder<I, O1> parser;
 
-  final Transformer<O1, O2> transformer;
-
-  const Map$(this.parser, this.transformer);
+  const Map$(this.parser, this.map);
 
   @override
   Map<String, ParserBuilder> getBuilders() {
@@ -25,7 +25,8 @@ if (state.ok) {
   @override
   Map<String, String> getTags(Context context) {
     return {
-      ...helper.tfToTemplateValues(transformer, key: 'map', value: 'v'),
+      'map': map.invoke(context, 'map', 'v'),
+      'transform': map.declare(context, 'map'),
     };
   }
 
@@ -36,6 +37,6 @@ if (state.ok) {
 
   @override
   String toString() {
-    return printName([parser, transformer]);
+    return printName([parser, map]);
   }
 }

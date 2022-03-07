@@ -22,17 +22,16 @@ state.ok = true;
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
-  var size = 1;
-  var c = source.codeUnitAt(state.pos);
+  final pos = state.pos;
+  var c = source.codeUnitAt(state.pos++);
   if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-    size = c > 0xffff : 2 : 1;
+    c = source.decodeW2(state, c);
   }
   final ok = {{cond}};
   if (!ok) {
+    state.pos = pos;
     break;
   }
-  state.pos += size;
 }
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
@@ -47,8 +46,8 @@ if (state.ok) {
     final predicate = _getCharacterPredicate();
     return {
       ...locals,
-      ...helper.tfToTemplateValues(predicate,
-          key: 'cond', name: cond, value: 'c'),
+      'cond': predicate.invoke(context, cond, 'c'),
+      'transform': predicate.declare(context, cond),
     };
   }
 
@@ -103,17 +102,16 @@ final {{pos}} = state.pos;
 var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
-  var size = 1;
-  {{c}} = source.codeUnitAt(state.pos);
-  if ({{c}} > 0xd7ff) {
-    {{c}} = source.runeAt(state.pos);
-    size = {{c}} > 0xffff ? 2 : 1;
+  final pos = state.pos;
+  var c = source.codeUnitAt(state.pos++);
+  if (c > 0xd7ff) {
+    c = source.decodeW2(state, c);
   }
   final ok = {{cond}};
   if (!ok) {
+    state.pos = pos;
     break;
   }
-  state.pos += size;
   state.ok = true;
 }
 if (state.ok) {
@@ -132,8 +130,8 @@ if (state.ok) {
     final predicate = _getCharacterPredicate();
     return {
       ...locals,
-      ...helper.tfToTemplateValues(predicate,
-          key: 'cond', name: cond, value: c),
+      'cond': predicate.invoke(context, cond, c),
+      'transform': predicate.declare(context, cond),
     };
   }
 

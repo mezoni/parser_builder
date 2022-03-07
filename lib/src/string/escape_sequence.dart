@@ -28,37 +28,38 @@ if (state.pos < source.length) {
     state.pos++;
     state.ok = true;
     {{res}} = v;
-  } else {
+  } else if (!state.opt) {
     if (c > 0xd7ff) {
       c = source.runeAt(state.pos);
     }
     state.error = ErrUnexpected.char(state.pos, Char(c));
   }
-} else {
+} else if (!state.opt) {
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 
   static const _template32 = '''
 state.ok = false;
 if (state.pos < source.length) {
-  var size = 1;
-  var c = source.codeUnitAt(state.pos);
+  final pos = state.pos;
+  var c = source.codeUnitAt(state.pos++);
   if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-    size = c > 0xffff ? 2 : 1;
+    c = source.decodeW2(state, c);
   }
   int? v;
   switch (c) {
     {{cases}}
   }
   if (v != null) {
-    state.pos += size;
     state.ok = true;
     {{res}} = v;
   } else {
-    state.error = ErrUnexpected.char(state.pos, Char(c));
+    state.pos = pos;
+    if (!state.opt) {
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
   }
-} else {
+} else if (!state.opt) {
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 

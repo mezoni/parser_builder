@@ -395,14 +395,14 @@ void _testAnyChar() {
       final state = State('$s16');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (c16));
+      _expectResult(r, c16);
       expect(state.pos, 1);
     }
     {
       final state = State('$s32');
       final r = parser(state);
       expect(state.ok, true);
-      _expectResult(r, (c32));
+      _expectResult(r, c32);
       expect(state.pos, 2);
     }
     {
@@ -1171,6 +1171,15 @@ void _testNoneOfEx() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnexpected.char(0, Char(c16)));
+    }
+    {
+      final state = State('$s32');
+      state.context = _StateContext();
+      final r = parser1(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(c32)));
     }
   });
 }

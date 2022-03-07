@@ -88,9 +88,10 @@ if ({{index}} != -1) {
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['index']);
     return {
-      'tag': helper.escapeString(tag),
       ...locals,
-      ...helper.tfToTemplateValues(predicate, key: 'cond', value: 'c'),
+      'tag': helper.escapeString(tag),
+      'cond': predicate.invoke(context, 'cond', 'c'),
+      'transform': predicate.declare(context, 'cond'),
     };
   }
 

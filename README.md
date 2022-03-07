@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.10.2
+Version: 0.11.0
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -605,16 +605,16 @@ The performance is about 1.2-1.5 times lower than that of a hand-written high-qu
 
 ```
 Parse 10 times: E:\prj\test_json\bin\data\canada.json
-Dart SDK JSON    : k: 1.03, 45.87 MB/s, 468.00 ms (100.00%),
-Simple JSON NEW 1: k: 1.00, 47.45 MB/s, 452.40 ms (96.67%),
+Dart SDK JSON    : k: 2.31, 45.87 MB/s, 468.00 ms (100.00%),
+Simple JSON NEW 2: k: 1.00, 105.86 MB/s, 202.80 ms (43.33%),
 
 Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json
-Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (70.59%),
-Simple JSON NEW 1: k: 1.42, 62.10 MB/s, 265.20 ms (100.00%),
+Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (75.00%),
+Simple JSON NEW 2: k: 1.33, 65.99 MB/s, 249.60 ms (100.00%),
 
 Parse 10 times: E:\prj\test_json\bin\data\twitter.json
 Dart SDK JSON    : k: 1.00, 57.87 MB/s, 93.60 ms (85.71%),
-Simple JSON NEW 1: k: 1.17, 49.60 MB/s, 109.20 ms (100.00%),
+Simple JSON NEW 2: k: 1.17, 49.60 MB/s, 109.20 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601

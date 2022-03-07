@@ -26,17 +26,16 @@ bool? _ws(State<String> state) {
   bool? $0;
   state.ok = true;
   while (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    var size = 1;
+    final pos = state.pos;
+    var c = source.codeUnitAt(state.pos++);
     if (c > 0xd7ff) {
-      c = source.runeAt(state.pos);
-      size = c > 0xffff ? 2 : 1;
+      c = source.decodeW2(state, c);
     }
     final ok = c == 0x9 || c == 0xa || c == 0xd || c == 0x20;
     if (!ok) {
+      state.pos = pos;
       break;
     }
-    state.pos += size;
   }
   if (state.ok) {
     $0 = true;
@@ -734,6 +733,24 @@ class Tag {
 }
 
 extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int decodeW2(State<String> state, int w1) {
+    if (w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+    return w1;
+  }
+
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

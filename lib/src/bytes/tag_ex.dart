@@ -1,7 +1,7 @@
 part of '../../bytes.dart';
 
 /// Parses the tag whose value is obtained as the result returned by the
-/// transformer [getTag] and returns the tag.
+/// transformer [tag] and returns the tag.
 ///
 /// Example:
 /// ```dart
@@ -19,9 +19,9 @@ if (state.ok) {
   state.error = ErrExpected.tag(state.pos, Tag({{tag}}));
 }''';
 
-  final Transformer<dynamic, String> getTag;
+  final Transformer<dynamic, String> tag;
 
-  const TagEx(this.getTag);
+  const TagEx(this.tag);
 
   @override
   Map<String, String> getTags(Context context) {
@@ -29,8 +29,8 @@ if (state.ok) {
     final get = locals['get']!;
     return {
       ...locals,
-      ...helper.tfToTemplateValues(getTag,
-          key: 'get', name: get, value: 'null'),
+      'cond': tag.invoke(context, get, 'null'),
+      'transform': tag.declare(context, get),
     };
   }
 

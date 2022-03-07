@@ -8,15 +8,16 @@ int? _hexPrimary(State<String> state) {
   var $c = 0;
   var $cnt = 0;
   while ($cnt < 2 && state.pos < source.length) {
-    $c = source.codeUnitAt(state.pos);
+    final pos = state.pos;
+    $c = source.codeUnitAt(state.pos++);
     if ($c > 0xd7ff) {
-      $c = source.runeAt(state.pos);
+      $c = source.decodeW2(state, $c);
     }
     final ok = isHexDigit($c);
     if (!ok) {
+      state.pos = pos;
       break;
     }
-    state.pos += $c > 0xffff ? 2 : 1;
     $cnt++;
   }
   state.ok = $cnt >= 2;
@@ -471,6 +472,24 @@ class Tag {
 }
 
 extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int decodeW2(State<String> state, int w1) {
+    if (w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+    return w1;
+  }
+
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

@@ -26,17 +26,16 @@ if (state.ok) {
 state.ok = true;
 {{transform}}
 while (state.pos < source.length) {
-  var c = source.codeUnitAt(state.pos);
-  var size = 1;
+  final pos = state.pos;
+  var c = source.codeUnitAt(state.pos++);
   if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-    size = c > 0xffff ? 2 : 1;
+    c = source.decodeW2(state, c);
   }
   final ok = {{cond}};
   if (!ok) {
+    state.pos = pos;
     break;
   }
-  state.pos += size;
 }
 if (state.ok) {
   {{res}} = true;
@@ -52,8 +51,8 @@ if (state.ok) {
     final cond = locals['cond']!;
     return {
       ...locals,
-      ...helper.tfToTemplateValues(predicate,
-          key: 'cond', name: cond, value: 'c'),
+      'cond': predicate.invoke(context, cond, 'c'),
+      'transform': predicate.declare(context, cond),
     };
   }
 

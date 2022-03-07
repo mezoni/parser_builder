@@ -42,26 +42,6 @@ bool isNullableType<T>() {
   return true;
 }
 
-String tfToExpression(Transformer transformer, String name, String argument) {
-  if (transformer.canInline) {
-    return transformer.inline(argument);
-  } else {
-    return transformer.invoke(name, argument);
-  }
-}
-
-Map<String, String> tfToTemplateValues(Transformer transformer,
-    {required String key,
-    String? name,
-    String transform = 'transform',
-    required String value}) {
-  name ??= key;
-  return {
-    transform: transformer.canInline ? '' : transformer.declare(name),
-    key: tfToExpression(transformer, name, value),
-  };
-}
-
 String toHex(int value) {
   if (value < 0) {
     throw ArgumentError.value(

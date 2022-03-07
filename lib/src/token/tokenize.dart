@@ -11,11 +11,11 @@ if (state.ok) {
   {{res}} = {{map}};
 }''';
 
+  final Transformer<Tuple3<int, int, String>, O> map;
+
   final ParserBuilder<String, dynamic> parser;
 
-  final Transformer<Tuple3<int, int, String>, O> transformer;
-
-  const Tokenize(this.parser, this.transformer);
+  const Tokenize(this.parser, this.map);
 
   @override
   Map<String, ParserBuilder> getBuilders() {
@@ -29,7 +29,8 @@ if (state.ok) {
     final locals = context.allocateLocals(['pos']);
     return {
       ...locals,
-      ...helper.tfToTemplateValues(transformer, key: 'map', value: 'v2'),
+      'cond': map.invoke(context, 'map', 'v2'),
+      'transform': map.declare(context, 'map'),
     };
   }
 
@@ -40,6 +41,6 @@ if (state.ok) {
 
   @override
   String toString() {
-    return printName([parser, transformer]);
+    return printName([parser, map]);
   }
 }

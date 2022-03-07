@@ -31,9 +31,6 @@ bool {{name}}(int c) {
       {required this.negate, this.processing = RangeProcessing.test});
 
   @override
-  bool get canInline => true;
-
-  @override
   bool get has32BitChars {
     if (negate) {
       return true;
@@ -43,7 +40,7 @@ bool {{name}}(int c) {
   }
 
   @override
-  String declare(String name) {
+  String declare(Context context, String name) {
     switch (processing) {
       case RangeProcessing.search:
         final list = getCharList();
@@ -54,8 +51,7 @@ bool {{name}}(int c) {
         result = result.replaceAll('{{values}}', list.join(', '));
         return result;
       case RangeProcessing.test:
-        final expr = inline('c');
-        return 'bool $name(int c) => $expr;';
+        return '';
     }
   }
 
@@ -69,32 +65,33 @@ bool {{name}}(int c) {
   String getChars();
 
   @override
-  String inline(String argument) {
-    final list = getCharList();
-    final tests = <String>[];
-    var count = 0;
-    for (var i = 0; i < list.length; i += 2) {
-      final start = list[i];
-      final end = list[i + 1];
-      if (start == end) {
-        tests.add('$argument == $start');
-        count++;
-      } else {
-        tests.add('$argument >= $start && $argument <= $end');
-        count += 2;
-      }
-    }
+  String invoke(Context context, String name, String value) {
+    switch (processing) {
+      case RangeProcessing.search:
+        return '$name($value)';
+      case RangeProcessing.test:
+        final list = getCharList();
+        final tests = <String>[];
+        var count = 0;
+        for (var i = 0; i < list.length; i += 2) {
+          final start = list[i];
+          final end = list[i + 1];
+          if (start == end) {
+            tests.add('$value == $start');
+            count++;
+          } else {
+            tests.add('$value >= $start && $value <= $end');
+            count += 2;
+          }
+        }
 
-    var result = tests.join(' || ');
-    if (count > 3) {
-      final max = list.last + 1;
-      result = '$argument < $max && ($result)';
-    }
-    return negate ? '!($result)' : result;
-  }
+        var result = tests.join(' || ');
+        if (count > 3) {
+          final max = list.last + 1;
+          result = '$value < $max && ($result)';
+        }
 
-  @override
-  String invoke(String name, String argument) {
-    return '$name($argument)';
+        return negate ? '!($result)' : result;
+    }
   }
 }

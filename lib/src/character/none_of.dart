@@ -8,41 +8,23 @@ part of '../../character.dart';
 /// NoneOf([0x22, 0x27])
 /// ```
 class NoneOf extends StringParserBuilder<int> {
-  static const _template16 = '''
+  static const _template = '''
 state.ok = false;
+{{transform}}
 if (state.pos < source.length) {
-  var size = 1;
-  var c = source.codeUnitAt(state.pos);
+  final pos = state.pos;
+  var c = source.codeUnitAt(state.pos++);
   if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-    size = c > 0xffff ? 2 : 1;
+    c = source.decodeW2(state, c);
   }
   state.ok = {{cond}};
   if (state.ok) {
-    state.pos += size;
     {{res}} = c;
-  } else if (!state.opt) {
-    state.error = ErrUnexpected.char(state.pos, Char(c));
-  }
-} else if (!state.opt) {
-  state.error = ErrUnexpected.eof(state.pos);
-}''';
-
-  static const _template32 = '''
-state.ok = false;
-if (state.pos < source.length) {
-  var size = 1;
-  var c = source.codeUnitAt(state.pos);
-  if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-    size = c > 0xffff ? 2 : 1;
-  }
-  state.ok = {{cond}};
-  if (state.ok) {
-    state.pos += size;
-    {{res}} = c;
-  } else if (!state.opt) {
-    state.error = ErrUnexpected.char(state.pos, Char(c));
+  } else {
+    state.pos = pos;
+    if (!state.opt) {
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
   }
 } else if (!state.opt) {
   state.error = ErrUnexpected.eof(state.pos);
@@ -58,17 +40,17 @@ if (state.pos < source.length) {
       throw StateError('List of characters must not be empty');
     }
 
-    final cond = ExprTransformer(
+    final predicate = ExprTransformer(
         'c', characters.map((e) => 'c != ' + e.toString()).join(' && '));
     return {
-      'cond': cond.inline('c'),
+      'cond': predicate.invoke(context, 'cond', 'c'),
+      'transform': predicate.declare(context, 'cond'),
     };
   }
 
   @override
   String getTemplate(Context context) {
-    final has32BitChars = characters.any((e) => e > 0xffff);
-    return has32BitChars ? _template32 : _template16;
+    return _template;
   }
 
   @override

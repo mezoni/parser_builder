@@ -166,13 +166,13 @@ int? _escaped(State<String> state) {
       state.pos++;
       state.ok = true;
       $1 = v;
-    } else {
+    } else if (!state.opt) {
       if (c > 0xd7ff) {
         c = source.runeAt(state.pos);
       }
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
-  } else {
+  } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   if (state.ok) {
@@ -248,17 +248,16 @@ String? _string(State<String> state) {
       final $start = state.pos;
       var $c = 0;
       while (state.pos < source.length) {
-        var size = 1;
-        $c = source.codeUnitAt(state.pos);
+        final pos = state.pos;
+        $c = source.codeUnitAt(state.pos++);
         if ($c > 0xd7ff) {
-          $c = source.runeAt(state.pos);
-          size = $c > 0xffff ? 2 : 1;
+          $c = source.decodeW2(state, $c);
         }
         final ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
         if (!ok) {
+          state.pos = pos;
           break;
         }
-        state.pos += size;
       }
       if ($start != state.pos) {
         $buffer.write(source.substring($start, state.pos));
@@ -1416,6 +1415,24 @@ class Tag {
 }
 
 extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int decodeW2(State<String> state, int w1) {
+    if (w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+    return w1;
+  }
+
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {

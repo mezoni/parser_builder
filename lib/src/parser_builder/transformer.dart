@@ -10,13 +10,13 @@ class ClosureTransformer<I, O> extends Transformer<I, O> {
   const ClosureTransformer(this.expression);
 
   @override
-  String declare(String name) {
+  String declare(Context context, String name) {
     return 'final $name = $expression;';
   }
 
   @override
-  String invoke(String name, String argument) {
-    return '$name($argument)';
+  String invoke(Context context, String name, String value) {
+    return '$name($value)';
   }
 }
 
@@ -28,27 +28,8 @@ class ExprTransformer<I, O> extends Transformer<I, O> {
   const ExprTransformer(this.parameter, this.expression);
 
   @override
-  bool get canInline => true;
-
-  @override
-  String declare(String name) {
-    final expr = _transform(parameter);
-    return '$O ($I $parameter) => $expr;';
-  }
-
-  @override
-  String inline(String value) {
-    final expr = _transform(value);
-    return expr;
-  }
-
-  @override
-  String invoke(String name, String argument) {
-    return '$name($argument)';
-  }
-
-  String _transform(String argument) {
-    return expression.replaceAll('{{$parameter}}', argument);
+  String invoke(Context context, String name, String value) {
+    return expression.replaceAll('{{$parameter}}', value);
   }
 }
 
@@ -60,13 +41,13 @@ class FuncExprTransformer<I, O> extends Transformer<I, O> {
   const FuncExprTransformer(this.parameter, this.expression);
 
   @override
-  String declare(String name) {
+  String declare(Context context, String name) {
     return '$O $name($I $parameter) => $expression;';
   }
 
   @override
-  String invoke(String name, String argument) {
-    return '$name($argument)';
+  String invoke(Context context, String name, String value) {
+    return '$name($value)';
   }
 }
 
@@ -78,28 +59,24 @@ class FuncTransformer<I, O> extends Transformer<I, O> {
   const FuncTransformer(this.parameter, this.body);
 
   @override
-  String declare(String name) {
-    return '$O $name($I $parameter) {$body }';
+  String declare(Context context, String name) {
+    return '$O $name($I $parameter) { $body }';
   }
 
   @override
-  String invoke(String name, String argument) {
-    return '$name($argument)';
+  String invoke(Context context, String name, String value) {
+    return '$name($value)';
   }
 }
 
 abstract class Transformer<I, O> {
   const Transformer();
 
-  bool get canInline => false;
-
-  String declare(String name);
-
-  String inline(String value) {
-    throw UnimplementedError('inline');
+  String declare(Context context, String name) {
+    return '';
   }
 
-  String invoke(String name, String argument);
+  String invoke(Context context, String name, String value);
 }
 
 class VarTransformer<I, O> extends Transformer<I, O> {
@@ -108,12 +85,12 @@ class VarTransformer<I, O> extends Transformer<I, O> {
   const VarTransformer(this.expression);
 
   @override
-  String declare(String name) {
+  String declare(Context context, String name) {
     return 'final $name = $expression;';
   }
 
   @override
-  String invoke(String name, String argument) {
+  String invoke(Context context, String name, String value) {
     return name;
   }
 }

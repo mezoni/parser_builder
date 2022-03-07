@@ -39,7 +39,8 @@ if (!state.ok && !state.opt) {
     return {
       'len': tag.length.toString(),
       'tag': helper.escapeString(tag),
-      ...helper.tfToTemplateValues(convert, key: 'conv', value: 'v1'),
+      'conv': convert.invoke(context, 'conv', 'v1'),
+      'transform': convert.declare(context, 'cond'),
     };
   }
 

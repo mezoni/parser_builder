@@ -6,7 +6,9 @@ state.ok = true;
 final {{pos}} = state.pos;
 if ({state.pos < source.length) {
   var c = source.codeUnitAt(state.pos);
-  c = c <= 0xD7FF || c >= 0xE000 ? c : source.runeAt(state.pos);
+  if (c > 0xd7ff) {
+    c = source.runeAt(state.pos);
+  }
   switch (state.ch) {
     {{cases}}
   }
@@ -69,7 +71,8 @@ if (source.startsWith({{tag}}, {{pos}})) {
           'len': tag.length.toString(),
           'tag': helper.escapeString(tag),
           ...locals,
-          ...helper.tfToTemplateValues(transformer, key: 'map', value: 'v'),
+          'cond': transformer.invoke(context, 'map', 'v'),
+          'transform': transformer.declare(context, 'map'),
         };
 
         final test = render(_templateTest, values);

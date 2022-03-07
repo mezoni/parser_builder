@@ -11,17 +11,16 @@ while (state.pos < source.length) {
   final {{start}} = state.pos;
   var {{c}} = 0;
   while (state.pos < source.length) {
-    var size = 1;
-    {{c}} = source.codeUnitAt(state.pos);
+    final pos = state.pos;
+    {{c}} = source.codeUnitAt(state.pos++);
     if ({{c}} > 0xd7ff) {
-      {{c}} = source.runeAt(state.pos);
-      size = {{c}} > 0xffff ? 2 : 1;
+      {{c}} = source.decodeW2(state, {{c}});
     }
     final ok = {{cond}};
     if (!ok) {
+      state.pos = pos;
       break;
     }
-    state.pos += size;
   }
   if ({{start}} != state.pos) {
     {{buffer}}.write(source.substring({{start}}, state.pos));
@@ -45,9 +44,9 @@ if (state.ok) {
 
   final ParserBuilder<String, int> escape;
 
-  final Transformer<int, bool> isNormalChar;
+  final Transformer<int, bool> normalChar;
 
-  const StringValue(this.isNormalChar, this.controlChar, this.escape);
+  const StringValue(this.normalChar, this.controlChar, this.escape);
 
   @override
   Map<String, ParserBuilder> getBuilders() {
@@ -66,8 +65,8 @@ if (state.ok) {
       'controlChar': controlChar.toString(),
       'size': (controlChar > 0xffff ? 2 : 1).toString(),
       ...locals,
-      ...helper.tfToTemplateValues(isNormalChar,
-          key: 'cond', name: cond, value: c),
+      'cond': normalChar.invoke(context, cond, c),
+      'transform': normalChar.declare(context, cond),
     };
   }
 
@@ -78,6 +77,6 @@ if (state.ok) {
 
   @override
   String toString() {
-    return printName([isNormalChar, controlChar, escape]);
+    return printName([normalChar, controlChar, escape]);
   }
 }

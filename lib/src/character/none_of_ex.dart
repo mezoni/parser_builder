@@ -12,17 +12,17 @@ class NoneOfEx extends StringParserBuilder<int> {
   static const _template = '''
 state.ok = true;
 if (state.pos < source.length) {
-  var size = 1;
-  var c = source.codeUnitAt(state.pos);
+  final pos = state.pos;
+  var c = source.codeUnitAt(state.pos++);
   if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-    size = c > 0xffff ? 2 : 1;
+    c = source.decodeW2(state, c);
   }
   {{transform}}
   final list = {{chars}};
   for (var i = 0; i < list.length; i++) {
     final ch = list[i];
     if (c == ch) {
+      state.pos = pos;
       state.ok = false;
       if (!state.opt) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
@@ -31,7 +31,6 @@ if (state.pos < source.length) {
     }
   }
   if (state.ok) {
-    state.pos += size;
     {{res}} = c;
   }
 } else {
@@ -48,7 +47,8 @@ if (state.pos < source.length) {
   @override
   Map<String, String> getTags(Context context) {
     return {
-      ...helper.tfToTemplateValues(characters, key: 'chars', value: 'null'),
+      'chars': characters.invoke(context, 'chars', 'null'),
+      'transform': characters.declare(context, 'chars'),
     };
   }
 

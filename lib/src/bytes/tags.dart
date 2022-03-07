@@ -7,26 +7,10 @@ part of '../../bytes.dart';
 /// Tags(['true', 'false'])
 /// ```
 class Tags extends StringParserBuilder<String> {
-  static const _template16 = '''
+  static const _template = '''
 final {{pos}} = state.pos;
 if (state.pos < source.length) {
   final c = source.codeUnitAt({{pos}});
-  switch (c) {
-    {{cases}}
-  }
-}
-state.ok = {{res}} != null;
-if (!state.ok && !state.opt) {
-  state.error = ErrCombined({{pos}}, [{{errors}}]);
-}''';
-
-  static const _template32 = '''
-final {{pos}} = state.pos;
-if (state.pos < source.length) {
-  var c = source.codeUnitAt({{pos}});
-  if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-  }
   switch (c) {
     {{cases}}
   }
@@ -58,16 +42,21 @@ state.pos++;
 
   @override
   String getTemplate(Context context) {
+    if (tags.isEmpty) {
+      throw ArgumentError.value(
+          tags, 'tags', 'The list of tags must not be empty: $this');
+    }
+
     final locals = context.allocateLocals(['c', 'pos']);
     final map = <int, List<String>>{};
     final errors = <String>[];
     for (final tag in tags) {
       if (tag.isEmpty) {
-        throw ArgumentError.value(
-            tags, 'tags', 'The list of tags must not contain empty tags');
+        throw ArgumentError.value(tags, 'tags',
+            'The list of tags must not contain empty tags: $this');
       }
 
-      final c = tag.runes.first;
+      final c = tag.codeUnitAt(0);
       var list = map[c];
       if (list == null) {
         list = [];
@@ -86,14 +75,13 @@ state.pos++;
       final tests = <String>[];
       for (final tag in tags) {
         final values = {
+          ...locals,
           'len': tag.length.toString(),
           'tag': helper.escapeString(tag),
-          ...locals,
         };
 
-        final runes = tag.runes;
         final templateTest =
-            runes.length > 1 ? _templateTestLong : _templateTestShort;
+            tag.length > 1 ? _templateTestLong : _templateTestShort;
         final test = render(templateTest, values);
         tests.add(test);
       }
@@ -108,14 +96,17 @@ state.pos++;
     }
 
     final values = {
+      ...locals,
       'cases': cases.join('\n'),
       'errors': errors.join(','),
-      ...locals,
     };
 
-    final has32BitChars = tags.map((e) => e.runes.first).any((e) => e > 0xffff);
-    final template = has32BitChars ? _template32 : _template16;
-    final result = render(template, values);
+    final result = render(_template, values);
     return result;
+  }
+
+  @override
+  String toString() {
+    return printName([tags]);
   }
 }
