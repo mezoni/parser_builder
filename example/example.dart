@@ -70,13 +70,13 @@ int? _escapeHex(State<String> state) {
   final source = state.source;
   int? $0;
   final $pos = state.pos;
-  int? $1;
+  String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 117;
   if (state.ok) {
     state.pos++;
-    $1 = 117;
-  } else if (!state.opt) {
-    state.error = ErrExpected.char(state.pos, const Char(117));
+    $1 = 'u';
+  } else if (!state.ok && !state.opt) {
+    state.error = ErrExpected.tag(state.pos, const Tag('u'));
   }
   if (state.ok) {
     String? $2;
@@ -181,16 +181,11 @@ String? _quote(State<String> state) {
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 34) {
-      state.pos++;
-      state.ok = true;
-      $1 = '"';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
+  if (state.ok) {
+    state.pos++;
+    $1 = '"';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -212,16 +207,11 @@ String? _string(State<String> state) {
   String? $1;
   final $pos = state.pos;
   String? $2;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 34) {
-      state.pos++;
-      state.ok = true;
-      $2 = '"';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
+  if (state.ok) {
+    state.pos++;
+    $2 = '"';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -559,90 +549,16 @@ num? _number(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-bool? _false(State<String> state) {
-  final source = state.source;
-  bool? $0;
-  String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 102 && source.startsWith('false', state.pos)) {
-      state.pos += 5;
-      state.ok = true;
-      $1 = 'false';
-    }
-  }
-  if (!state.ok && !state.opt) {
-    state.error = ErrExpected.tag(state.pos, const Tag('false'));
-  }
-  if (state.ok) {
-    $0 = false;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-dynamic _null(State<String> state) {
-  final source = state.source;
-  dynamic $0;
-  String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 110 && source.startsWith('null', state.pos)) {
-      state.pos += 4;
-      state.ok = true;
-      $1 = 'null';
-    }
-  }
-  if (!state.ok && !state.opt) {
-    state.error = ErrExpected.tag(state.pos, const Tag('null'));
-  }
-  if (state.ok) {
-    $0 = null;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-bool? _true(State<String> state) {
-  final source = state.source;
-  bool? $0;
-  String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 116 && source.startsWith('true', state.pos)) {
-      state.pos += 4;
-      state.ok = true;
-      $1 = 'true';
-    }
-  }
-  if (!state.ok && !state.opt) {
-    state.error = ErrExpected.tag(state.pos, const Tag('true'));
-  }
-  if (state.ok) {
-    $0 = true;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
 String? _openBracket(State<String> state) {
   final source = state.source;
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 91) {
-      state.pos++;
-      state.ok = true;
-      $1 = '[';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
+  if (state.ok) {
+    state.pos++;
+    $1 = '[';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('['));
   }
   if (state.ok) {
@@ -664,16 +580,11 @@ String? _comma(State<String> state) {
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 44) {
-      state.pos++;
-      state.ok = true;
-      $1 = ',';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
+  if (state.ok) {
+    state.pos++;
+    $1 = ',';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag(','));
   }
   if (state.ok) {
@@ -724,16 +635,11 @@ String? _closeBracket(State<String> state) {
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 93) {
-      state.pos++;
-      state.ok = true;
-      $1 = ']';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
+  if (state.ok) {
+    state.pos++;
+    $1 = ']';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag(']'));
   }
   if (state.ok) {
@@ -777,16 +683,11 @@ String? _openBrace(State<String> state) {
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 123) {
-      state.pos++;
-      state.ok = true;
-      $1 = '{';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
+  if (state.ok) {
+    state.pos++;
+    $1 = '{';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('{'));
   }
   if (state.ok) {
@@ -808,16 +709,11 @@ String? _colon(State<String> state) {
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 58) {
-      state.pos++;
-      state.ok = true;
-      $1 = ':';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
+  if (state.ok) {
+    state.pos++;
+    $1 = ':';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag(':'));
   }
   if (state.ok) {
@@ -890,16 +786,11 @@ String? _closeBrace(State<String> state) {
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 125) {
-      state.pos++;
-      state.ok = true;
-      $1 = '}';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
+  if (state.ok) {
+    state.pos++;
+    $1 = '}';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('}'));
   }
   if (state.ok) {
@@ -938,6 +829,66 @@ dynamic _object(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
+bool? _false(State<String> state) {
+  final source = state.source;
+  bool? $0;
+  String? $1;
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 102 &&
+      source.startsWith('false', state.pos);
+  if (state.ok) {
+    state.pos += 5;
+    $1 = 'false';
+  } else if (!state.ok && !state.opt) {
+    state.error = ErrExpected.tag(state.pos, const Tag('false'));
+  }
+  if (state.ok) {
+    $0 = false;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+dynamic _null(State<String> state) {
+  final source = state.source;
+  dynamic $0;
+  String? $1;
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 110 &&
+      source.startsWith('null', state.pos);
+  if (state.ok) {
+    state.pos += 4;
+    $1 = 'null';
+  } else if (!state.ok && !state.opt) {
+    state.error = ErrExpected.tag(state.pos, const Tag('null'));
+  }
+  if (state.ok) {
+    $0 = null;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+bool? _true(State<String> state) {
+  final source = state.source;
+  bool? $0;
+  String? $1;
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 116 &&
+      source.startsWith('true', state.pos);
+  if (state.ok) {
+    state.pos += 4;
+    $1 = 'true';
+  } else if (!state.ok && !state.opt) {
+    state.error = ErrExpected.tag(state.pos, const Tag('true'));
+  }
+  if (state.ok) {
+    $0 = true;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
 dynamic _value(State<String> state) {
   dynamic $0;
   final $pos = state.pos;
@@ -957,36 +908,36 @@ dynamic _value(State<String> state) {
       break;
     }
     final $5 = state.error;
-    bool? $6;
-    $6 = _false(state);
+    List<dynamic>? $6;
+    $6 = _array(state);
     if (state.ok) {
       $1 = $6;
       break;
     }
     final $7 = state.error;
     dynamic $8;
-    $8 = _null(state);
+    $8 = _object(state);
     if (state.ok) {
       $1 = $8;
       break;
     }
     final $9 = state.error;
     bool? $10;
-    $10 = _true(state);
+    $10 = _false(state);
     if (state.ok) {
       $1 = $10;
       break;
     }
     final $11 = state.error;
-    List<dynamic>? $12;
-    $12 = _array(state);
+    dynamic $12;
+    $12 = _null(state);
     if (state.ok) {
       $1 = $12;
       break;
     }
     final $13 = state.error;
-    dynamic $14;
-    $14 = _object(state);
+    bool? $14;
+    $14 = _true(state);
     if (state.ok) {
       $1 = $14;
       break;

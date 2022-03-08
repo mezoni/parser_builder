@@ -158,16 +158,13 @@ int? anyChar(State<String> state) {
 String? tagAbc(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 97 && source.startsWith('abc', state.pos)) {
-      state.pos += 3;
-      state.ok = true;
-      $0 = 'abc';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 97 &&
+      source.startsWith('abc', state.pos);
+  if (state.ok) {
+    state.pos += 3;
+    $0 = 'abc';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   return $0;
@@ -557,16 +554,13 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
   final $list = <String>[];
   for (;;) {
     String? $1;
-    state.ok = false;
-    if (state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      if (c == 97 && source.startsWith('abc', state.pos)) {
-        state.pos += 3;
-        state.ok = true;
-        $1 = 'abc';
-      }
-    }
-    if (!state.ok && !state.opt) {
+    state.ok = state.pos < source.length &&
+        source.codeUnitAt(state.pos) == 97 &&
+        source.startsWith('abc', state.pos);
+    if (state.ok) {
+      state.pos += 3;
+      $1 = 'abc';
+    } else if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (state.ok) {
@@ -575,16 +569,11 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     }
     String? $2;
     String? $3;
-    state.ok = false;
-    if (state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      if (c == 97) {
-        state.pos++;
-        state.ok = true;
-        $3 = 'a';
-      }
-    }
-    if (!state.ok && !state.opt) {
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 97;
+    if (state.ok) {
+      state.pos++;
+      $3 = 'a';
+    } else if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('a'));
     }
     if (state.ok) {
@@ -592,16 +581,12 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     } else {
       final $error = state.error;
       String? $4;
-      state.ok = false;
-      if (state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        if (c == 98) {
-          state.pos++;
-          state.ok = true;
-          $4 = 'b';
-        }
-      }
-      if (!state.ok && !state.opt) {
+      state.ok =
+          state.pos < source.length && source.codeUnitAt(state.pos) == 98;
+      if (state.ok) {
+        state.pos++;
+        $4 = 'b';
+      } else if (!state.ok && !state.opt) {
         state.error = ErrExpected.tag(state.pos, const Tag('b'));
       }
       if (state.ok) {
@@ -937,16 +922,13 @@ String? optAbc(State<String> state) {
   final $opt = state.opt;
   state.opt = true;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 97 && source.startsWith('abc', state.pos)) {
-      state.pos += 3;
-      state.ok = true;
-      $1 = 'abc';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 97 &&
+      source.startsWith('abc', state.pos);
+  if (state.ok) {
+    state.pos += 3;
+    $1 = 'abc';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   if (state.ok) {
@@ -1099,16 +1081,13 @@ List<int>? separatedList0C32Abc(State<String> state) {
     $list.add($1!);
     $pos = state.pos;
     String? $2;
-    state.ok = false;
-    if (state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      if (c == 97 && source.startsWith('abc', state.pos)) {
-        state.pos += 3;
-        state.ok = true;
-        $2 = 'abc';
-      }
-    }
-    if (!state.ok && !state.opt) {
+    state.ok = state.pos < source.length &&
+        source.codeUnitAt(state.pos) == 97 &&
+        source.startsWith('abc', state.pos);
+    if (state.ok) {
+      state.pos += 3;
+      $2 = 'abc';
+    } else if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (!state.ok) {
@@ -1146,16 +1125,13 @@ List<int>? separatedList1C32Abc(State<String> state) {
     $list.add($1!);
     $pos = state.pos;
     String? $2;
-    state.ok = false;
-    if (state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      if (c == 97 && source.startsWith('abc', state.pos)) {
-        state.pos += 3;
-        state.ok = true;
-        $2 = 'abc';
-      }
-    }
-    if (!state.ok && !state.opt) {
+    state.ok = state.pos < source.length &&
+        source.codeUnitAt(state.pos) == 97 &&
+        source.startsWith('abc', state.pos);
+    if (state.ok) {
+      state.pos += 3;
+      $2 = 'abc';
+    } else if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (!state.ok) {
@@ -1184,16 +1160,13 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
   }
   if (state.ok) {
     String? $2;
-    state.ok = false;
-    if (state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      if (c == 97 && source.startsWith('abc', state.pos)) {
-        state.pos += 3;
-        state.ok = true;
-        $2 = 'abc';
-      }
-    }
-    if (!state.ok && !state.opt) {
+    state.ok = state.pos < source.length &&
+        source.codeUnitAt(state.pos) == 97 &&
+        source.startsWith('abc', state.pos);
+    if (state.ok) {
+      state.pos += 3;
+      $2 = 'abc';
+    } else if (!state.ok && !state.opt) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (state.ok) {
@@ -1323,16 +1296,11 @@ bool? skipWhileC32(State<String> state) {
 String? tagC16(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 80) {
-      state.pos++;
-      state.ok = true;
-      $0 = 'P';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
+  if (state.ok) {
+    state.pos++;
+    $0 = 'P';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('P'));
   }
   return $0;
@@ -1341,16 +1309,13 @@ String? tagC16(State<String> state) {
 String? tagC16C32(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 80 && source.startsWith('P𝈀', state.pos)) {
-      state.pos += 3;
-      state.ok = true;
-      $0 = 'P𝈀';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 80 &&
+      source.startsWith('P𝈀', state.pos);
+  if (state.ok) {
+    state.pos += 3;
+    $0 = 'P𝈀';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('P𝈀'));
   }
   return $0;
@@ -1359,16 +1324,13 @@ String? tagC16C32(State<String> state) {
 String? tagC32(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 55348 && source.startsWith('𝈀', state.pos)) {
-      state.pos += 2;
-      state.ok = true;
-      $0 = '𝈀';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 55348 &&
+      source.startsWith('𝈀', state.pos);
+  if (state.ok) {
+    state.pos += 2;
+    $0 = '𝈀';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀'));
   }
   return $0;
@@ -1377,16 +1339,13 @@ String? tagC32(State<String> state) {
 String? tagC32C16(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 55348 && source.startsWith('𝈀P', state.pos)) {
-      state.pos += 3;
-      state.ok = true;
-      $0 = '𝈀P';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 55348 &&
+      source.startsWith('𝈀P', state.pos);
+  if (state.ok) {
+    state.pos += 3;
+    $0 = '𝈀P';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀P'));
   }
   return $0;
@@ -1803,16 +1762,13 @@ bool? valueAbcToTrueValue(State<String> state) {
   final source = state.source;
   bool? $0;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 97 && source.startsWith('abc', state.pos)) {
-      state.pos += 3;
-      state.ok = true;
-      $1 = 'abc';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 97 &&
+      source.startsWith('abc', state.pos);
+  if (state.ok) {
+    state.pos += 3;
+    $1 = 'abc';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   if (state.ok) {

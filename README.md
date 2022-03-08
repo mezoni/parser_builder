@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.12.0
+Version: 0.12.1
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -169,7 +169,7 @@ import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
-import 'package:tuple/tuple.dart' as _t;
+import 'package:parser_builder/transformers.dart';
 
 import 'hex_color_parser_helper.dart';
 
@@ -179,16 +179,23 @@ Future<void> main(List<String> args) async {
   await fastBuild(context, [_parse], filename, partOf: 'hex_color_parser.dart');
 }
 
-const _hexColor = Named('_hexColor',
-    Preceded(Tag('#'), Tuple3(_hexPrimary, _hexPrimary, _hexPrimary)));
+const _hexColor = Named(
+    '_hexColor',
+    Preceded(
+        Tag('#'),
+        Map3(
+            _hexPrimary,
+            _hexPrimary,
+            _hexPrimary,
+            ExprTransformer<Color>(
+                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
 
 const _hexPrimary = Named(
     '_hexPrimary',
-    Map$(TakeWhileMN(2, 2, TX('=> isHexDigit(x);')),
-        TX<String, int>('=> fromHex(x);')));
+    Map1(TakeWhileMN(2, 2, CharClass('[0-9A-Fa-f]')),
+        ExprTransformer<int>(['x'], 'int.parse({{x}}, radix: 16)')));
 
-const _parse = Named('_parse',
-    Map$(_hexColor, TX<_t.Tuple3<int, int, int>, Color>('=> toColor(x);')));
+const _parse = Named('_parse', _hexColor);
 
 ```
 
@@ -229,18 +236,30 @@ Well, of course, you will have to write a small macro for building (with code li
 ```dart
 const _comma = Named('_comma', Terminated(Tag(','), _ws), [_inline]);
 
-const _eof = Eof();
+const _eof = Named('_eof', Eof<String>());
+
+const _escaped = Named('_escaped', Alt([_escapeSeq, _escapeHex]));
 
 const _escapeHex = Named(
     '_escapeHex',
-    MapRes(Preceded(Char(0x75), TakeWhileMN(4, 4, _isHexDigit)), _toHexValue),
+    Map2(Tag('u'), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
+        ExprTransformer<int>(['_', 's'], '_toHexValue({{s}})')),
     [_inline]);
 
-const _isHexDigit = CharClass('[0-9a-fA-F]');
+const _escapeSeq = EscapeSequence({
+  0x22: 0x22,
+  0x2f: 0x2f,
+  0x5c: 0x5c,
+  0x62: 0x08,
+  0x66: 0x0c,
+  0x6e: 0x0a,
+  0x72: 0x0d,
+  0x74: 0x09
+});
+
+const _false = Named('_false', Value(false, Tag('false')), [_inline]);
 
 const _inline = '@pragma(\'vm:prefer-inline\')';
-
-const _toHexValue = Transformer<List<int>, int>('v', '=> _toHexValue(v);');
 ```
 
 ## Example of generated code

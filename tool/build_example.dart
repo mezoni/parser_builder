@@ -1,6 +1,5 @@
 import 'package:parser_builder/branch.dart';
 import 'package:parser_builder/bytes.dart';
-import 'package:parser_builder/character.dart';
 import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
@@ -19,7 +18,7 @@ Future<void> main(List<String> args) async {
   context.optimizeForSize = false;
   _configure(context, comment: false, trace: false);
   await fastBuild(context, [_json, _value_], 'example/example.dart',
-      footer: [footer].join('\n'), header: header);
+      footer: [footer].join('\n'), header: header, publish: {'parse': _json});
 }
 
 const _array = Named('_array', Delimited(_openBracket, _values, _closeBracket));
@@ -39,7 +38,7 @@ const _escaped = Named('_escaped', Alt([_escapeSeq, _escapeHex]));
 
 const _escapeHex = Named(
     '_escapeHex',
-    Map2(Char(0x75), TakeWhileMN(4, 4, _isHexDigit),
+    Map2(Tag('u'), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
         ExprTransformer<int>(['_', 's'], '_toHexValue({{s}})')),
     [_inline]);
 
@@ -57,8 +56,6 @@ const _escapeSeq = EscapeSequence({
 const _false = Named('_false', Value(false, Tag('false')), [_inline]);
 
 const _inline = '@pragma(\'vm:prefer-inline\')';
-
-const _isHexDigit = CharClass('[0-9a-fA-F]');
 
 const _isNormalChar = ExprTransformer<bool>(
     ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
@@ -106,7 +103,7 @@ const _value = Ref<String, dynamic>('_value');
 const _value_ = Named<String, dynamic>(
     '_value',
     Terminated(
-        Alt([_string, _number, _false, _null, _true, _array, _object]), _ws),
+        Alt([_string, _number, _array, _object, _false, _null, _true]), _ws),
     [_inline]);
 
 const _values = Named('_values', SeparatedList0(_value, _comma));

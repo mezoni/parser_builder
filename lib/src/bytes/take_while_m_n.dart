@@ -54,7 +54,7 @@ while ({{cnt}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
-  {{res}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
+  {{res}} = {{pos}} == source.substring({{pos}}, state.pos);
 } else {
   if (!state.opt) {
     state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);

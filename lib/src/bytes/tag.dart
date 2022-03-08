@@ -8,30 +8,20 @@ part of '../../bytes.dart';
 /// ```
 class Tag extends StringParserBuilder<String> {
   static const _templateLong = '''
-state.ok = false;
-if (state.pos < source.length) {
-  final c = source.codeUnitAt(state.pos);
-  if (c == {{cc}} && source.startsWith({{tag}}, state.pos)) {
-    state.pos += {{len}};
-    state.ok = true;
-    {{res}}= {{tag}};
-  }
-}
-if (!state.ok && !state.opt) {
+state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}} && source.startsWith({{tag}}, state.pos);
+if (state.ok) {
+  state.pos += {{len}};
+  {{res}} = {{tag}};
+} else if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
   static const _templateShort = '''
-state.ok = false;
-if (state.pos < source.length) {
-  final c = source.codeUnitAt(state.pos);
-  if (c == {{cc}}) {
-    state.pos++;
-    state.ok = true;
-    {{res}}= {{tag}};
-  }
-}
-if (!state.ok && !state.opt) {
+state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
+if (state.ok) {
+  state.pos++;
+  {{res}} = {{tag}};
+} else if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 

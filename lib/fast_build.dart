@@ -10,12 +10,18 @@ Future<void> fastBuild(
     bool format = true,
     String? header,
     bool lightweightRuntime = true,
-    String? partOf}) async {
+    String? partOf,
+    Map<String, Named> publish = const {}}) async {
   for (final builder in builders) {
     builder.build(context);
   }
 
   final declarations = context.declarations;
+  for (final entry in publish.entries) {
+    final code = _publish(entry.key, entry.value);
+    declarations.insert(0, code);
+  }
+
   if (addErrorMessageProcessor) {
     declarations.add(ParseRuntime.getErrorMessageProcessor());
   }
@@ -42,4 +48,35 @@ Future<void> fastBuild(
     process.stdout.transform(utf8.decoder).forEach(print);
     process.stderr.transform(utf8.decoder).forEach(print);
   }
+}
+
+String _publish(String name, Named builder) {
+  const template = r'''
+{{O}} {{name}}({{I}} source) {
+  final state = State(source);
+  final result = {{parse}}(state);
+  if (!state.ok) {
+    final errors = Err.errorReport(state.error);
+    final message = _errorMessage(source, errors);
+    throw FormatException('\n$message');
+  }
+
+  return {{result}};
+}''';
+
+  final values = {
+    'I': builder.getInputType(),
+    'O': builder.getResultType(),
+    'name': name,
+    'parse': builder.name,
+    'result': builder.isNullableResultType() ? 'result' : 'result!',
+  };
+
+  var code = template;
+  for (final key in values.keys) {
+    final value = values[key]!;
+    code = code.replaceAll('{{$key}}', value);
+  }
+
+  return code;
 }

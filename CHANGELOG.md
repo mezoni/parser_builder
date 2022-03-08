@@ -1,3 +1,7 @@
+## 0.12.1
+
+- Changed helper function signature `fastBuild()`. Added named parameter `Map<String, Named> publish = const {}`. Example of specifying arguments: `publish: {'parse': _json}`. This will create the function `dynamic parse(String source)`. This makes it possible not to write public parsing functions by hand. The specified public parsing functions will be created automatically with the specified names and will be available for impossibility by users
+
 ## 0.12.0
 
 - Breaking change: Transformers can now have multiple parameters. This allows them to be used as converter (mapper) functions with multiple parameters. An example of a typical use is use of them with the `Map2`, `Map3` (etc) parsers

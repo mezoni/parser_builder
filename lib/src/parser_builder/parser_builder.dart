@@ -78,6 +78,10 @@ abstract class ParserBuilder<I, O> {
     return {};
   }
 
+  String getInputType() {
+    return '$I';
+  }
+
   String getResultType() {
     final name = '$O';
     final isNullable = isNullableResultType();
