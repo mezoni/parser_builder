@@ -13,10 +13,7 @@ class NoneOfEx extends StringParserBuilder<int> {
 state.ok = true;
 if (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.codeUnitAt(state.pos++);
-  if (c > 0xd7ff) {
-    c = source.decodeW2(state, c);
-  }
+  var c = source.readRune(state);
   {{transform}}
   final list = {{chars}};
   for (var i = 0; i < list.length; i++) {
@@ -40,15 +37,16 @@ if (state.pos < source.length) {
   state.ok = false;
 }''';
 
-  final Transformer<dynamic, List<int>> characters;
+  final Transformer<List<int>> characters;
 
   const NoneOfEx(this.characters);
 
   @override
   Map<String, String> getTags(Context context) {
+    final t = Transformation(context: context, name: 'chars', arguments: []);
     return {
-      'chars': characters.invoke(context, 'chars', 'null'),
-      'transform': characters.declare(context, 'chars'),
+      'transform': characters.declare(t),
+      'chars': characters.invoke(t),
     };
   }
 

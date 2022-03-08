@@ -1,6 +1,6 @@
 part of '../../bytes.dart';
 
-/// Parses [tags] one by one and returns the first [value] found.
+/// Parses [tags] one by one and returns the first [arguments] found.
 ///
 /// Example:
 /// ```dart

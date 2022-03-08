@@ -2,6 +2,7 @@ import 'package:tuple/tuple.dart' as _t;
 
 import 'parser_builder.dart';
 
+part 'src/multi/fold_many0.dart';
 part 'src/multi/many0.dart';
 part 'src/multi/many0_count.dart';
 part 'src/multi/many1.dart';

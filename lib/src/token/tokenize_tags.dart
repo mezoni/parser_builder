@@ -5,10 +5,7 @@ class TokenizeTags<O> extends StringParserBuilder<O> {
 state.ok = true;
 final {{pos}} = state.pos;
 if ({state.pos < source.length) {
-  var c = source.codeUnitAt(state.pos);
-  if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-  }
+  var c = source.runeAt(state.pos);
   switch (state.ch) {
     {{cases}}
   }
@@ -34,7 +31,7 @@ if (source.startsWith({{tag}}, {{pos}})) {
   break;
 }''';
 
-  final Map<String, Transformer<Tuple3<int, int, String>, O>> transformers;
+  final Map<String, Transformer<O>> transformers;
 
   const TokenizeTags(this.transformers);
 
@@ -67,12 +64,14 @@ if (source.startsWith({{tag}}, {{pos}})) {
       final tests = <String>[];
       for (final tag in tags) {
         final transformer = transformers[tag]!;
+        final t =
+            Transformation(context: context, name: 'map', arguments: ['v']);
         final values = {
+          ...locals,
           'len': tag.length.toString(),
           'tag': helper.escapeString(tag),
-          ...locals,
-          'cond': transformer.invoke(context, 'map', 'v'),
-          'transform': transformer.declare(context, 'map'),
+          'transform': transformer.declare(t),
+          'cond': transformer.invoke(t),
         };
 
         final test = render(_templateTest, values);

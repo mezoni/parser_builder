@@ -2,7 +2,6 @@ const header = r'''
 // ignore_for_file: unused_local_variable
 
 import 'package:source_span/source_span.dart';
-import 'package:tuple/tuple.dart';
 
 dynamic parse(String source) {
   final state = State(source);

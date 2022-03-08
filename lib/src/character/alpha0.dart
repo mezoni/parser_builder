@@ -11,7 +11,7 @@ class Alpha0 extends _Chars0 {
   const Alpha0();
 
   @override
-  Transformer<int, bool> _getCharacterPredicate() {
+  Transformer<bool> _getCharacterPredicate() {
     return CharClass('[#x41-#x5a] | [#x61-#x7a]');
   }
 }

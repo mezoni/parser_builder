@@ -10,11 +10,7 @@ class AnyChar extends StringParserBuilder<int> {
   static const _template = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
-  var c = source.codeUnitAt(state.pos++);
-  if (c > 0xd7ff) {
-    c = source.decodeW2(state, c);
-  }
-  {{res}} = c;
+  {{res}} = source.readRune(state);
 } else if (!state.opt) {
   state.error = ErrUnexpected.eof(state.pos);
 }''';

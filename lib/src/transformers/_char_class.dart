@@ -1,7 +1,6 @@
 part of '../../transformers.dart';
 
-abstract class _CharClass extends Transformer<int, bool>
-    implements CharPredicate {
+abstract class _CharClass extends Transformer<bool> implements CharPredicate {
   static const _templateBinarySearch = '''
 bool {{name}}(int c) {
   const list = [{{values}}];
@@ -40,9 +39,11 @@ bool {{name}}(int c) {
   }
 
   @override
-  String declare(Context context, String name) {
+  String declare(Transformation transformation) {
+    final name = transformation.name;
     switch (processing) {
       case RangeProcessing.search:
+        transformation.checkArguments(['int c']);
         final list = getCharList();
         var result = _templateBinarySearch;
         result = result.replaceAll('{{name}}', name);
@@ -65,10 +66,14 @@ bool {{name}}(int c) {
   String getChars();
 
   @override
-  String invoke(Context context, String name, String value) {
+  String invoke(Transformation transformation) {
+    final name = transformation.name;
+    final arguments = transformation.arguments;
+    transformation.checkArguments(['int c']);
+    final argument = arguments.first;
     switch (processing) {
       case RangeProcessing.search:
-        return '$name($value)';
+        return '$name($argument)';
       case RangeProcessing.test:
         final list = getCharList();
         final tests = <String>[];
@@ -77,10 +82,10 @@ bool {{name}}(int c) {
           final start = list[i];
           final end = list[i + 1];
           if (start == end) {
-            tests.add('$value == $start');
+            tests.add('$argument == $start');
             count++;
           } else {
-            tests.add('$value >= $start && $value <= $end');
+            tests.add('$argument >= $start && $argument <= $end');
             count += 2;
           }
         }
@@ -88,7 +93,7 @@ bool {{name}}(int c) {
         var result = tests.join(' || ');
         if (count > 3) {
           final max = list.last + 1;
-          result = '$value < $max && ($result)';
+          result = '$argument < $max && ($result)';
         }
 
         return negate ? '!($result)' : result;

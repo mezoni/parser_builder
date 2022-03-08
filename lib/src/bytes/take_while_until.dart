@@ -29,9 +29,7 @@ if ({{index}} != -1) {
     {{res}} = pos == state.pos ? '' : source.substring(pos, state.pos);
   } else {
     if (!state.opt) {
-      if (c > 0xd7ff) {
-        c = source.runeAt(state.pos);
-      }
+      c = source.decodeW2(state.pos, c);
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
     state.pos = pos;
@@ -50,17 +48,13 @@ if ({{index}} != -1) {
   var c = 0;
   {{transform}}
   while (state.pos < {{index}}) {
-    var size = 1;
-    c = source.codeUnitAt(state.pos);
-    if (c > 0xd7ff) {
-      c = source.runeAt(state.pos);
-      size = c > 0xffff ? 2 : 1;
-    }
+    final pos = state.pos;
+    c = source.readRune(state);
     final ok = {{cond}};
     if (!ok) {
+      state.pos = pos;
       break;
     }
-    state.pos += size;
   }
   state.ok = state.pos == {{index}};
   if (state.ok) {
@@ -78,7 +72,7 @@ if ({{index}} != -1) {
   }
 }''';
 
-  final Transformer<int, bool> predicate;
+  final Transformer<bool> predicate;
 
   final String tag;
 
@@ -87,11 +81,12 @@ if ({{index}} != -1) {
   @override
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['index']);
+    final t = Transformation(context: context, name: 'cond', arguments: ['c']);
     return {
       ...locals,
       'tag': helper.escapeString(tag),
-      'cond': predicate.invoke(context, 'cond', 'c'),
-      'transform': predicate.declare(context, 'cond'),
+      'transform': predicate.declare(t),
+      'cond': predicate.invoke(t),
     };
   }
 

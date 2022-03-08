@@ -29,9 +29,7 @@ if (state.pos < source.length) {
     state.ok = true;
     {{res}} = v;
   } else if (!state.opt) {
-    if (c > 0xd7ff) {
-      c = source.runeAt(state.pos);
-    }
+    c = source.decodeW2(state.pos, c);
     state.error = ErrUnexpected.char(state.pos, Char(c));
   }
 } else if (!state.opt) {
@@ -42,10 +40,7 @@ if (state.pos < source.length) {
 state.ok = false;
 if (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.codeUnitAt(state.pos++);
-  if (c > 0xd7ff) {
-    c = source.decodeW2(state, c);
-  }
+  var c = source.readRune(state);
   int? v;
   switch (c) {
     {{cases}}

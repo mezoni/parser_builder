@@ -11,7 +11,7 @@ if (state.ok) {
   {{res}} = {{map}};
 }''';
 
-  final Transformer<Tuple3<int, int, String>, O> map;
+  final Transformer<O> map;
 
   final ParserBuilder<String, dynamic> parser;
 
@@ -27,10 +27,11 @@ if (state.ok) {
   @override
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['pos']);
+    final t = Transformation(context: context, name: 'map', arguments: ['v2']);
     return {
       ...locals,
-      'cond': map.invoke(context, 'map', 'v2'),
-      'transform': map.declare(context, 'map'),
+      'transform': map.declare(t),
+      'cond': map.invoke(t),
     };
   }
 

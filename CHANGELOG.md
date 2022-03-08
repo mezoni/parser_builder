@@ -1,3 +1,11 @@
+## 0.12.0
+
+- Breaking change: Transformers can now have multiple parameters. This allows them to be used as converter (mapper) functions with multiple parameters. An example of a typical use is use of them with the `Map2`, `Map3` (etc) parsers
+- Implemented and tested parser builders `FoldMany0`
+- Implemented and tested parser builders `Map2`, `Map3`, `Map4`, `Map5`, `Map6`, `Map7`
+- Breaking change: The parser builder `Map$` has been renamed to `Map1`
+
+
 ## 0.11.0
 
 - Breaking change: Transformers have become more powerful, much easier to use and clearer. And now they are full citizens, they have access to the building context and can allocate local variables and have access to global declarations. The number of methods has been reduced to two methods: `declare` (optional) and  `invoke`. This makes it possible to implement more efficient configurable (on startup) and context-sensitive parsers

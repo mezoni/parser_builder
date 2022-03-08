@@ -38,6 +38,7 @@ void _test() {
   _testEof();
   _testEscapeSequence();
   // EscapedTransform
+  _testFoldMany0();
   _testHexDigit0();
   _testHexDigit1();
   _testMany0();
@@ -46,7 +47,8 @@ void _test() {
   _testMany1Count();
   _testManyMN();
   _testManyTill();
-  _testMap$();
+  _testMap();
+  _testMap1();
   _testNoneOf();
   _testNoneOfEx();
   _testNoneOfTags();
@@ -718,6 +720,47 @@ void _testEscapeSequence() {
   });
 }
 
+void _testFoldMany0() {
+  test('Many0Fold', () {
+    final parser = foldMany0Digit;
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 0);
+      expect(state.pos, 0);
+    }
+    {
+      final state = State('1');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 1);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('12');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 12);
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('123');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 123);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 0);
+      expect(state.pos, 0);
+    }
+  });
+}
+
 void _testHexDigit0() {
   test('hexDigit0', () {
     final parser = hexDigit0;
@@ -1046,7 +1089,44 @@ void _testManyTill() {
   });
 }
 
-void _testMap$() {
+void _testMap() {
+  test('Map4', () {
+    final parser = map4Digits;
+    {
+      final state = State('1234');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 1234);
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('123$s16');
+      final r = parser(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(3, Char(c16)));
+    }
+    {
+      final state = State('123');
+      final r = parser(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(3));
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(0x20)));
+    }
+  });
+}
+
+void _testMap1() {
   test('Map\$', () {
     final parser = mapC32ToStr;
     {

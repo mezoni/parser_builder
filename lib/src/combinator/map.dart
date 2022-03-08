@@ -1,6 +1,6 @@
 part of '../../combinator.dart';
 
-class Map$<I, O1, O2> extends ParserBuilder<I, O2> {
+class Map1<I, O1, O> extends ParserBuilder<I, O> {
   static const _template = '''
 {{p1}}
 if (state.ok) {
@@ -9,11 +9,11 @@ if (state.ok) {
   {{res}} = {{map}};
 }''';
 
-  final Transformer<O1, O2> map;
+  final Transformer<O> map;
 
   final ParserBuilder<I, O1> parser;
 
-  const Map$(this.parser, this.map);
+  const Map1(this.parser, this.map);
 
   @override
   Map<String, ParserBuilder> getBuilders() {
@@ -24,9 +24,10 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
+    final t = Transformation(context: context, name: 'map', arguments: ['v']);
     return {
-      'map': map.invoke(context, 'map', 'v'),
-      'transform': map.declare(context, 'map'),
+      'transform': map.declare(t),
+      'map': map.invoke(t),
     };
   }
 

@@ -24,7 +24,7 @@ if (!state.ok && !state.opt) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
-  final Transformer<String, String> convert;
+  final Transformer<String> convert;
 
   final String tag;
 
@@ -36,11 +36,12 @@ if (!state.ok && !state.opt) {
       throw ArgumentError.value(tag, 'tag', 'The tag must not be empty');
     }
 
+    final t = Transformation(context: context, name: 'conv', arguments: ['v1']);
     return {
       'len': tag.length.toString(),
       'tag': helper.escapeString(tag),
-      'conv': convert.invoke(context, 'conv', 'v1'),
-      'transform': convert.declare(context, 'cond'),
+      'transform': convert.declare(t),
+      'conv': convert.invoke(t),
     };
   }
 

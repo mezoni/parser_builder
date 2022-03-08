@@ -28,6 +28,7 @@ Future<void> main(List<String> args) async {
     _eof,
     _escapeSequence16,
     _escapeSequence32,
+    _foldMany0Digit,
     _hexDigit0,
     _hexDigit1,
     _many0C32,
@@ -36,6 +37,7 @@ Future<void> main(List<String> args) async {
     _many1CountC32,
     _manyMNC32_2_3,
     _manyTillAOrBTillAbc,
+    _map4Digits,
     _mapC32ToStr,
     _noneOfC16,
     _noneOfC16OrC32Ex,
@@ -149,6 +151,14 @@ const _escapeSequence16 =
 const _escapeSequence32 = Named('escapeSequence32',
     EscapeSequence({0x6e: 0xa, 0x72: 0xd, c16: c16, c32: c32}));
 
+const _foldMany0Digit = Named(
+    'foldMany0Digit',
+    FoldMany0(
+        Satisfy(CharClass('[0-9]')),
+        ExprTransformer([], '0'),
+        ExprTransformer(
+            ['acc', 'v'], '{{acc}} = {{acc}} * 10 + {{v}} - 0x30')));
+
 const _hexDigit0 = Named('hexDigit0', HexDigit0());
 
 const _hexDigit1 = Named('hexDigit1', HexDigit1());
@@ -156,6 +166,8 @@ const _hexDigit1 = Named('hexDigit1', HexDigit1());
 const _isC16 = CharClass('#x50');
 
 const _isC32 = CharClass('#x1d200');
+
+const _isDigit = CharClass('[0-9]');
 
 const _many0C32 = Named('many0C32', Many0(_char32));
 
@@ -170,10 +182,24 @@ const _manyMNC32_2_3 = Named('manyMNC32_2_3', ManyMN(2, 3, _char32));
 const _manyTillAOrBTillAbc =
     Named('manyTillAOrBTillAbc', ManyTill(Alt([Tag('a'), Tag('b')]), Tag(abc)));
 
+const _map4Digits = Named(
+    'map4Digits',
+    Map4(
+        Satisfy(_isDigit),
+        Satisfy(_isDigit),
+        Satisfy(_isDigit),
+        Satisfy(_isDigit),
+        ExprTransformer([
+          'a',
+          'b',
+          'c',
+          'd'
+        ], '({{a}} - 0x30) * 1000 + ({{b}} - 0x30) * 100 + ({{c}} - 0x30) * 10 + {{d}} - 0x30')));
+
 const _mapC32ToStr = Named(
     'mapC32ToStr',
-    Map$(Char(c32),
-        ExprTransformer<int, String>('c', 'String.fromCharCode({{c}})')));
+    Map1(Char(c32),
+        ExprTransformer<String>(['c'], 'String.fromCharCode({{c}})')));
 
 const _noneOfC16 = Named('noneOfC16', NoneOf([c16]));
 
@@ -240,10 +266,8 @@ const _tagC32C16 = Named('tagC32C16', Tag(s32 + s16));
 const _tagExFoo =
     Named('tagExFoo', TagEx(VarTransformer('state.context.foo as String')));
 
-const _tagNoCaseAbc = Named(
-    'tagNoCaseAbc',
-    TagNoCase(
-        abc, ExprTransformer<String, String>('s', '{{s}}.toLowerCase()')));
+const _tagNoCaseAbc = Named('tagNoCaseAbc',
+    TagNoCase(abc, ExprTransformer<String>(['s'], '{{s}}.toLowerCase()')));
 
 const _tagsAbcAbdDefDegXXY =
     Named('tagsAbcAbdDefDegXXY', Tags(['abc', 'abd', 'def', 'deg', 'x', 'xy']));
@@ -279,17 +303,19 @@ const _testRef_ = Named('testRef', _ref);
 const _transformersCharClassIsDigit =
     Named('transformersCharClassIsDigit', TakeWhile(CharClass('[#x30-#x39]')));
 
-const _transformersClosureIsDigit = Named('transformersClosureIsDigit',
-    TakeWhile(ClosureTransformer('(int x) => x >= 0x30 && x <= 0x39')));
+const _transformersClosureIsDigit = Named(
+    'transformersClosureIsDigit',
+    TakeWhile(
+        ClosureTransformer(['int x'], '(int x) => x >= 0x30 && x <= 0x39')));
 
 const _transformersExprIsDigit = Named('transformersExprIsDigit',
-    TakeWhile(ExprTransformer('x', '{{x}} >= 0x30 && {{x}} <= 0x39')));
+    TakeWhile(ExprTransformer(['x'], '{{x}} >= 0x30 && {{x}} <= 0x39')));
 
 const _transformersFuncExprIsDigit = Named('transformersFuncExprIsDigit',
-    TakeWhile(FuncExprTransformer('x', 'x >= 0x30 && x <= 0x39')));
+    TakeWhile(FuncExprTransformer(['int x'], 'x >= 0x30 && x <= 0x39')));
 
 const _transformersFuncIsDigit = Named('transformersFuncIsDigit',
-    TakeWhile(FuncTransformer('x', 'return x >= 0x30 && x <= 0x39;')));
+    TakeWhile(FuncTransformer(['int x'], 'return x >= 0x30 && x <= 0x39;')));
 
 const _transformersNotCharClassIsDigit = Named(
     'transformersNotCharClassIsDigit',

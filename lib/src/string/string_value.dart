@@ -12,10 +12,7 @@ while (state.pos < source.length) {
   var {{c}} = 0;
   while (state.pos < source.length) {
     final pos = state.pos;
-    {{c}} = source.codeUnitAt(state.pos++);
-    if ({{c}} > 0xd7ff) {
-      {{c}} = source.decodeW2(state, {{c}});
-    }
+    {{c}} = source.readRune(state);
     final ok = {{cond}};
     if (!ok) {
       state.pos = pos;
@@ -44,7 +41,7 @@ if (state.ok) {
 
   final ParserBuilder<String, int> escape;
 
-  final Transformer<int, bool> normalChar;
+  final Transformer<bool> normalChar;
 
   const StringValue(this.normalChar, this.controlChar, this.escape);
 
@@ -61,12 +58,13 @@ if (state.ok) {
         context.allocateLocals(['c', 'buffer', 'cond', 'pos', 'start']);
     final c = locals['c']!;
     final cond = locals['cond']!;
+    final t = Transformation(context: context, name: cond, arguments: [c]);
     return {
       'controlChar': controlChar.toString(),
       'size': (controlChar > 0xffff ? 2 : 1).toString(),
       ...locals,
-      'cond': normalChar.invoke(context, cond, c),
-      'transform': normalChar.declare(context, cond),
+      'cond': normalChar.invoke(t),
+      'transform': normalChar.declare(t),
     };
   }
 

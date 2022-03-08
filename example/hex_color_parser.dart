@@ -1,5 +1,4 @@
 import 'package:source_span/source_span.dart';
-import 'package:tuple/tuple.dart';
 
 import 'hex_color_parser_helper.dart';
 

@@ -3,7 +3,7 @@ import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
-import 'package:tuple/tuple.dart' as _t;
+import 'package:parser_builder/transformers.dart';
 
 import 'hex_color_parser_helper.dart';
 
@@ -13,17 +13,20 @@ Future<void> main(List<String> args) async {
   await fastBuild(context, [_parse], filename, partOf: 'hex_color_parser.dart');
 }
 
-const _hexColor = Named('_hexColor',
-    Preceded(Tag('#'), Tuple3(_hexPrimary, _hexPrimary, _hexPrimary)));
+const _hexColor = Named(
+    '_hexColor',
+    Preceded(
+        Tag('#'),
+        Map3(
+            _hexPrimary,
+            _hexPrimary,
+            _hexPrimary,
+            ExprTransformer<Color>(
+                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
 
 const _hexPrimary = Named(
     '_hexPrimary',
-    Map$(TakeWhileMN(2, 2, ExprTransformer('x', 'isHexDigit({{x}})')),
-        ExprTransformer<String, int>('x', 'fromHex({{x}})')));
+    Map1(TakeWhileMN(2, 2, CharClass('[0-9A-Fa-f]')),
+        ExprTransformer<int>(['x'], 'int.parse({{x}}, radix: 16)')));
 
-const _parse = Named(
-    '_parse',
-    Map$(
-        _hexColor,
-        ExprTransformer<_t.Tuple3<int, int, int>, Color>(
-            'x', 'toColor({{x}})')));
+const _parse = Named('_parse', _hexColor);

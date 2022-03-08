@@ -626,8 +626,26 @@ class Tag {
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
-  int decodeW2(State<String> state, int w1) {
-    if (w1 < 0xe000) {
+  int decodeW2(int index, int w1) {
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (++index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 2);
+    }
+
+    return w1;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
       if (state.pos < length) {
         final w2 = codeUnitAt(state.pos++);
         if ((w2 & 0xfc00) == 0xdc00) {
@@ -639,20 +657,26 @@ extension on String {
 
       throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
     }
+
     return w1;
   }
 
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {
-    final c1 = codeUnitAt(index++);
-    if ((c1 & 0xfc00) == 0xd800 && index < length) {
-      final c2 = codeUnitAt(index);
-      if ((c2 & 0xfc00) == 0xdc00) {
-        return 0x10000 + ((c1 & 0x3ff) << 10) + (c2 & 0x3ff);
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
       }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
     }
-    return c1;
+
+    return w1;
   }
 
   /// Returns a slice (substring) of the string from [start] to [end].

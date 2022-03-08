@@ -1,7 +1,6 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:source_span/source_span.dart';
-import 'package:tuple/tuple.dart';
 
 dynamic parse(String source) {
   final state = State(source);
@@ -70,23 +69,17 @@ dynamic _json(State<String> state) {
 int? _escapeHex(State<String> state) {
   final source = state.source;
   int? $0;
-  String? $1;
   final $pos = state.pos;
-  int? $2;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 117) {
-      state.pos++;
-      state.ok = true;
-      $2 = 117;
-    }
-  }
-  if (!state.ok && !state.opt) {
+  int? $1;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 117;
+  if (state.ok) {
+    state.pos++;
+    $1 = 117;
+  } else if (!state.opt) {
     state.error = ErrExpected.char(state.pos, const Char(117));
   }
   if (state.ok) {
-    String? $3;
+    String? $2;
     final $pos1 = state.pos;
     var $c = 0;
     var $cnt = 0;
@@ -104,13 +97,11 @@ int? _escapeHex(State<String> state) {
     }
     state.ok = $cnt >= 4;
     if (state.ok) {
-      $3 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
+      $2 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
     } else {
       if (!state.opt) {
         if (state.pos < source.length) {
-          if ($c > 0xd7ff) {
-            $c = source.runeAt(state.pos);
-          }
+          $c = source.decodeW2(state.pos, $c);
           state.error = ErrUnexpected.char(state.pos, Char($c));
         } else {
           state.error = ErrUnexpected.eof(state.pos);
@@ -119,15 +110,11 @@ int? _escapeHex(State<String> state) {
       state.pos = $pos1;
     }
     if (state.ok) {
-      $1 = $3!;
+      $0 = _toHexValue($2!);
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-  }
-  if (state.ok) {
-    final v = $1!;
-    $0 = _toHexValue(v);
   }
   return $0;
 }
@@ -167,9 +154,7 @@ int? _escaped(State<String> state) {
       state.ok = true;
       $1 = v;
     } else if (!state.opt) {
-      if (c > 0xd7ff) {
-        c = source.runeAt(state.pos);
-      }
+      c = source.decodeW2(state.pos, c);
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
   } else if (!state.opt) {
@@ -249,10 +234,7 @@ String? _string(State<String> state) {
       var $c = 0;
       while (state.pos < source.length) {
         final pos = state.pos;
-        $c = source.codeUnitAt(state.pos++);
-        if ($c > 0xd7ff) {
-          $c = source.decodeW2(state, $c);
-        }
+        $c = source.readRune(state);
         final ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
         if (!ok) {
           state.pos = pos;
@@ -853,27 +835,22 @@ String? _colon(State<String> state) {
 
 MapEntry<String, dynamic>? _keyValue(State<String> state) {
   MapEntry<String, dynamic>? $0;
-  Tuple2<String, dynamic>? $1;
   final $pos = state.pos;
-  String? $2;
-  $2 = _string(state);
+  String? $1;
+  $1 = _string(state);
   if (state.ok) {
-    String? $3;
-    $3 = _colon(state);
+    String? $2;
+    $2 = _colon(state);
     if (state.ok) {
-      dynamic $4;
-      $4 = _value(state);
+      dynamic $3;
+      $3 = _value(state);
       if (state.ok) {
-        $1 = Tuple2($2!, $4);
+        $0 = MapEntry($1!, $3);
       }
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-  }
-  if (state.ok) {
-    final v = $1!;
-    $0 = MapEntry(v.item1, v.item2);
   }
   return $0;
 }
@@ -938,29 +915,24 @@ String? _closeBrace(State<String> state) {
   return $0;
 }
 
-Map<String, dynamic>? _object(State<String> state) {
-  Map<String, dynamic>? $0;
-  List<MapEntry<String, dynamic>>? $1;
+dynamic _object(State<String> state) {
+  dynamic $0;
   final $pos = state.pos;
-  String? $2;
-  $2 = _openBrace(state);
+  String? $1;
+  $1 = _openBrace(state);
   if (state.ok) {
-    List<MapEntry<String, dynamic>>? $3;
-    $3 = _keyValues(state);
+    List<MapEntry<String, dynamic>>? $2;
+    $2 = _keyValues(state);
     if (state.ok) {
-      String? $4;
-      $4 = _closeBrace(state);
+      String? $3;
+      $3 = _closeBrace(state);
       if (state.ok) {
-        $1 = $3!;
+        $0 = Map.fromEntries($2!);
       }
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-  }
-  if (state.ok) {
-    final v = $1!;
-    $0 = Map.fromEntries(v);
   }
   return $0;
 }
@@ -1013,7 +985,7 @@ dynamic _value(State<String> state) {
       break;
     }
     final $13 = state.error;
-    Map<String, dynamic>? $14;
+    dynamic $14;
     $14 = _object(state);
     if (state.ok) {
       $1 = $14;
@@ -1417,8 +1389,26 @@ class Tag {
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
-  int decodeW2(State<String> state, int w1) {
-    if (w1 < 0xe000) {
+  int decodeW2(int index, int w1) {
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (++index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 2);
+    }
+
+    return w1;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
       if (state.pos < length) {
         final w2 = codeUnitAt(state.pos++);
         if ((w2 & 0xfc00) == 0xdc00) {
@@ -1430,20 +1420,26 @@ extension on String {
 
       throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
     }
+
     return w1;
   }
 
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {
-    final c1 = codeUnitAt(index++);
-    if ((c1 & 0xfc00) == 0xd800 && index < length) {
-      final c2 = codeUnitAt(index);
-      if ((c2 & 0xfc00) == 0xdc00) {
-        return 0x10000 + ((c1 & 0x3ff) << 10) + (c2 & 0x3ff);
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
       }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
     }
-    return c1;
+
+    return w1;
   }
 
   /// Returns a slice (substring) of the string from [start] to [end].

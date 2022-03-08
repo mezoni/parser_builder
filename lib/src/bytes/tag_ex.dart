@@ -19,7 +19,7 @@ if (state.ok) {
   state.error = ErrExpected.tag(state.pos, Tag({{tag}}));
 }''';
 
-  final Transformer<dynamic, String> tag;
+  final Transformer<String> tag;
 
   const TagEx(this.tag);
 
@@ -27,10 +27,11 @@ if (state.ok) {
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['get', 'tag']);
     final get = locals['get']!;
+    final t = Transformation(context: context, name: get, arguments: []);
     return {
       ...locals,
-      'cond': tag.invoke(context, get, 'null'),
-      'transform': tag.declare(context, get),
+      'transform': tag.declare(t),
+      'cond': tag.invoke(t),
     };
   }
 

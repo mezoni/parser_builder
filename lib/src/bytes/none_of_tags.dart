@@ -7,25 +7,10 @@ part of '../../bytes.dart';
 /// NoneOfTags(['true', 'false'])
 /// ```
 class NoneOfTags extends StringParserBuilder<bool> {
-  static const _template16 = '''
+  static const _template = '''
 state.ok = true;
 if (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
-  switch (c) {
-    {{cases}}
-  }
-}
-if (state.ok) {
-  {{res}} = true;
-}''';
-
-  static const _template32 = '''
-state.ok = true;
-if (state.pos < source.length) {
-  var c = source.codeUnitAt(state.pos);
-  if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-  }
   switch (c) {
     {{cases}}
   }
@@ -66,7 +51,7 @@ if (!state.opt) {
             tags, 'tags', 'The list of tags must not contain empty tags');
       }
 
-      final c = tag.runes.first;
+      final c = tag.codeUnitAt(0);
       var list = map[c];
       if (list == null) {
         list = [];
@@ -86,9 +71,8 @@ if (!state.opt) {
           'tag': helper.escapeString(tag),
         };
 
-        final runes = tag.runes;
         final template =
-            runes.length > 1 ? _templateTestLong : _templateTestShort;
+            tag.length > 1 ? _templateTestLong : _templateTestShort;
         final test = render(template, values);
         tests.add(test);
       }
@@ -106,9 +90,7 @@ if (!state.opt) {
       'cases': cases.join('\n'),
     };
 
-    final has32BitChars = tags.map((e) => e.runes.first).any((e) => e > 0xffff);
-    final template = has32BitChars ? _template32 : _template16;
-    final result = render(template, values);
+    final result = render(_template, values);
     return result;
   }
 

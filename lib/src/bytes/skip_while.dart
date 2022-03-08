@@ -27,10 +27,7 @@ state.ok = true;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.codeUnitAt(state.pos++);
-  if (c > 0xd7ff) {
-    c = source.decodeW2(state, c);
-  }
+  var c = source.readRune(state);
   final ok = {{cond}};
   if (!ok) {
     state.pos = pos;
@@ -41,7 +38,7 @@ if (state.ok) {
   {{res}} = true;
 }''';
 
-  final Transformer<int, bool> predicate;
+  final Transformer<bool> predicate;
 
   const SkipWhile(this.predicate);
 
@@ -49,10 +46,11 @@ if (state.ok) {
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['cond']);
     final cond = locals['cond']!;
+    final t = Transformation(context: context, name: cond, arguments: ['c']);
     return {
       ...locals,
-      'cond': predicate.invoke(context, cond, 'c'),
-      'transform': predicate.declare(context, cond),
+      'transform': predicate.declare(t),
+      'cond': predicate.invoke(t),
     };
   }
 

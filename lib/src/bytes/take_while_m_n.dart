@@ -28,9 +28,7 @@ if (state.ok) {
 } else {
   if (!state.opt) {
     if (state.pos < source.length) {
-      if ({{c}} > 0xd7ff) {
-        {{c}} = source.runeAt(state.pos);
-      }
+      {{c}} = source.decodeW2(state.pos, {{c}});
       state.error = ErrUnexpected.char(state.pos, Char({{c}}));
     } else {
       state.error = ErrUnexpected.eof(state.pos);
@@ -46,10 +44,7 @@ var {{cnt}} = 0;
 {{transform}}
 while ({{cnt}} < {{n}} && state.pos < source.length) {
   final pos = state.pos;
-  {{c}} = source.codeUnitAt(state.pos++);
-  if ({{c}} > 0xd7ff) {
-    {{c}} = source.decodeW2(state, {{c}});
-  }
+  {{c}} = source.readRune(state);
   final ok = {{cond}};
   if (!ok) {
     state.pos = pos;
@@ -67,7 +62,7 @@ if (state.ok) {
   state.pos = {{pos}};
 }''';
 
-  final Transformer<int, bool> predicate;
+  final Transformer<bool> predicate;
 
   final int m;
 
@@ -93,12 +88,13 @@ if (state.ok) {
     final locals = context.allocateLocals(['c', 'cnt', 'cond', 'pos']);
     final c = locals['c']!;
     final cond = locals['cond']!;
+    final t = Transformation(context: context, name: cond, arguments: [c]);
     return {
       ...locals,
       'm': m.toString(),
       'n': n.toString(),
-      'cond': predicate.invoke(context, cond, c),
-      'transform': predicate.declare(context, cond),
+      'transform': predicate.declare(t),
+      'cond': predicate.invoke(t),
     };
   }
 

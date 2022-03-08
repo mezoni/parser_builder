@@ -23,10 +23,7 @@ final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.codeUnitAt(state.pos++);
-  if (c > 0xd7ff) {
-    c = source.decodeW2(state, c);
-  }
+  var c = source.readRune(state);
   final ok = {{cond}};
   if (!ok) {
     state.pos = pos;
@@ -44,10 +41,11 @@ if (state.ok) {
     final locals = context.allocateLocals(['cond', 'pos']);
     final cond = locals['cond']!;
     final predicate = _getCharacterPredicate();
+    final t = Transformation(context: context, name: cond, arguments: ['c']);
     return {
       ...locals,
-      'cond': predicate.invoke(context, cond, 'c'),
-      'transform': predicate.declare(context, cond),
+      'transform': predicate.declare(t),
+      'cond': predicate.invoke(t),
     };
   }
 
@@ -65,7 +63,7 @@ if (state.ok) {
     return printName([_getCharacterPredicate()]);
   }
 
-  Transformer<int, bool> _getCharacterPredicate();
+  Transformer<bool> _getCharacterPredicate();
 }
 
 abstract class _Chars1 extends StringParserBuilder<String> {
@@ -87,9 +85,7 @@ if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (!state.opt) {
   if (state.pos < source.length) {
-    if ({{c}} > 0xd7ff) {
-      {{c}} = source.runeAt(state.pos);
-    }
+    {{c}} = source.decodeW2(state.pos, {{c}});
     state.error = ErrUnexpected.char(state.pos, Char({{c}}));
   } else {
     state.error = ErrUnexpected.eof(state.pos);
@@ -103,10 +99,7 @@ var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.codeUnitAt(state.pos++);
-  if (c > 0xd7ff) {
-    c = source.decodeW2(state, c);
-  }
+  var c = source.readRune(state);
   final ok = {{cond}};
   if (!ok) {
     state.pos = pos;
@@ -128,10 +121,11 @@ if (state.ok) {
     final c = locals['c']!;
     final cond = locals['cond']!;
     final predicate = _getCharacterPredicate();
+    final t = Transformation(context: context, name: cond, arguments: [c]);
     return {
       ...locals,
-      'cond': predicate.invoke(context, cond, c),
-      'transform': predicate.declare(context, cond),
+      'transform': predicate.declare(t),
+      'cond': predicate.invoke(t),
     };
   }
 
@@ -149,5 +143,5 @@ if (state.ok) {
     return printName([_getCharacterPredicate()]);
   }
 
-  Transformer<int, bool> _getCharacterPredicate();
+  Transformer<bool> _getCharacterPredicate();
 }

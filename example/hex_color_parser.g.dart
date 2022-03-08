@@ -8,16 +8,13 @@ int? _hexPrimary(State<String> state) {
   var $c = 0;
   var $cnt = 0;
   while ($cnt < 2 && state.pos < source.length) {
-    final pos = state.pos;
-    $c = source.codeUnitAt(state.pos++);
-    if ($c > 0xd7ff) {
-      $c = source.decodeW2(state, $c);
-    }
-    final ok = isHexDigit($c);
+    $c = source.codeUnitAt(state.pos);
+    final ok = $c < 103 &&
+        ($c >= 48 && $c <= 57 || $c >= 65 && $c <= 70 || $c >= 97 && $c <= 102);
     if (!ok) {
-      state.pos = pos;
       break;
     }
+    state.pos++;
     $cnt++;
   }
   state.ok = $cnt >= 2;
@@ -25,22 +22,25 @@ int? _hexPrimary(State<String> state) {
     $1 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   } else {
     if (!state.opt) {
-      state.error = state.pos < source.length
-          ? ErrUnexpected.char(state.pos, Char($c))
-          : ErrUnexpected.eof(state.pos);
+      if (state.pos < source.length) {
+        $c = source.decodeW2(state.pos, $c);
+        state.error = ErrUnexpected.char(state.pos, Char($c));
+      } else {
+        state.error = ErrUnexpected.eof(state.pos);
+      }
     }
     state.pos = $pos;
   }
   if (state.ok) {
     final v = $1!;
-    $0 = fromHex(v);
+    $0 = int.parse(v, radix: 16);
   }
   return $0;
 }
 
-Tuple3<int, int, int>? _hexColor(State<String> state) {
+Color? _hexColor(State<String> state) {
   final source = state.source;
-  Tuple3<int, int, int>? $0;
+  Color? $0;
   final $pos = state.pos;
   String? $1;
   state.ok = false;
@@ -56,7 +56,7 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
-    Tuple3<int, int, int>? $2;
+    Color? $2;
     final $pos1 = state.pos;
     int? $3;
     $3 = _hexPrimary(state);
@@ -67,7 +67,7 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
         int? $5;
         $5 = _hexPrimary(state);
         if (state.ok) {
-          $2 = Tuple3($3!, $4!, $5!);
+          $2 = Color($3!, $4!, $5!);
         }
       }
     }
@@ -86,12 +86,7 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
 
 Color? _parse(State<String> state) {
   Color? $0;
-  Tuple3<int, int, int>? $1;
-  $1 = _hexColor(state);
-  if (state.ok) {
-    final v = $1!;
-    $0 = toColor(v);
-  }
+  $0 = _hexColor(state);
   return $0;
 }
 
@@ -474,8 +469,26 @@ class Tag {
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
-  int decodeW2(State<String> state, int w1) {
-    if (w1 < 0xe000) {
+  int decodeW2(int index, int w1) {
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (++index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 2);
+    }
+
+    return w1;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
       if (state.pos < length) {
         final w2 = codeUnitAt(state.pos++);
         if ((w2 & 0xfc00) == 0xdc00) {
@@ -487,20 +500,26 @@ extension on String {
 
       throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
     }
+
     return w1;
   }
 
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int runeAt(int index) {
-    final c1 = codeUnitAt(index++);
-    if ((c1 & 0xfc00) == 0xd800 && index < length) {
-      final c2 = codeUnitAt(index);
-      if ((c2 & 0xfc00) == 0xdc00) {
-        return 0x10000 + ((c1 & 0x3ff) << 10) + (c2 & 0x3ff);
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
       }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
     }
-    return c1;
+
+    return w1;
   }
 
   /// Returns a slice (substring) of the string from [start] to [end].

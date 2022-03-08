@@ -18,9 +18,7 @@ if (state.pos < source.length) {
     state.pos++;
     {{res}} = c;
   } else if (!state.opt) {
-    if (c > 0xd7ff) {
-      c = source.runeAt(state.pos);
-    }
+    c = source.decodeW2(state.pos, c);
     state.error = ErrUnexpected.char(state.pos, Char(c));
   }
 } else if (!state.opt) {
@@ -32,10 +30,7 @@ state.ok = false;
 {{transform}}
 if (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.codeUnitAt(state.pos++);
-  if (c > 0xd7ff) {
-    c = source.decodeW2(state, c);
-  }
+  var c = source.readRune(state);
   state.ok = {{cond}};
   if (state.ok) {
     {{res}} = c;
@@ -60,10 +55,11 @@ if (state.pos < source.length) {
     }
 
     final predicate = ExprTransformer(
-        'c', characters.map((e) => '{{c}} == ' + e.toString()).join(' || '));
+        ['c'], characters.map((e) => '{{c}} == ' + e.toString()).join(' || '));
+    final t = Transformation(context: context, name: 'cond', arguments: ['c']);
     return {
-      'cond': predicate.invoke(context, 'cond', 'c'),
-      'transform': predicate.declare(context, 'cond'),
+      'transform': predicate.declare(t),
+      'cond': predicate.invoke(t),
     };
   }
 

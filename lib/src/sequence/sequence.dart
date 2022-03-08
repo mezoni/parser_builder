@@ -64,3 +64,40 @@ if (!state.ok) {
     return printName(parsers);
   }
 }
+
+abstract class _Sequence<I, O> extends ParserBuilder<I, O> {
+  const _Sequence();
+
+  @override
+  String getTemplate(Context context) {
+    const _templateInner = '''
+{{p}}
+ if (state.ok) {
+   {{body}}
+ }''';
+
+    const _templateOuter = '''
+final {{pos}} = state.pos;
+{{body}}
+if (!state.ok) {
+  state.pos = {{pos}};
+}''';
+
+    final parsers = getBuilders();
+    final locals = context.allocateLocals(['pos']);
+    var outer = _templateOuter;
+    for (var i = 0; i < parsers.length; i++) {
+      final k = i + 1;
+      var inner = _templateInner;
+      inner = inner.replaceAll('{{p}}', '{{p$k}}');
+      outer = outer.replaceAll('{{body}}', inner);
+    }
+
+    return render(outer, locals);
+  }
+
+  @override
+  String toString() {
+    return printName(getBuilders().values.toList());
+  }
+}

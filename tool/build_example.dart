@@ -9,7 +9,6 @@ import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
 import 'package:parser_builder/string.dart';
 import 'package:parser_builder/transformers.dart';
-import 'package:tuple/tuple.dart' as _t;
 
 import 'build_json_number_parser.dart' as _json_number;
 import 'example_footer.dart';
@@ -40,7 +39,8 @@ const _escaped = Named('_escaped', Alt([_escapeSeq, _escapeHex]));
 
 const _escapeHex = Named(
     '_escapeHex',
-    Map$(Preceded(Char(0x75), TakeWhileMN(4, 4, _isHexDigit)), _toHexValue),
+    Map2(Char(0x75), TakeWhileMN(4, 4, _isHexDigit),
+        ExprTransformer<int>(['_', 's'], '_toHexValue({{s}})')),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({
@@ -60,15 +60,21 @@ const _inline = '@pragma(\'vm:prefer-inline\')';
 
 const _isHexDigit = CharClass('[0-9a-fA-F]');
 
-const _isNormalChar = ExprTransformer<int, bool>(
-    'x', '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
+const _isNormalChar = ExprTransformer<bool>(
+    ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 
 const _json = Named<String, dynamic>('_json', Delimited(_ws, _value, _eof));
 
 const _keyValue = Named(
-    '_keyValue', Map$(SeparatedPair(_string, _colon, _value), _toMapEntry));
+    '_keyValue',
+    Map3(
+        _string,
+        _colon,
+        _value,
+        ExprTransformer<MapEntry<String, dynamic>>(
+            ['k', 's', 'v'], 'MapEntry({{k}}, {{v}})')));
 
 const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
 
@@ -77,7 +83,9 @@ const _null = Named('_null', Value(null as dynamic, Tag('null')), [_inline]);
 const _number = Named('_number', Malformed('number', _json_number.parser));
 
 const _object = Named(
-    '_object', Map$(Delimited(_openBrace, _keyValues, _closeBrace), _toMap));
+    '_object',
+    Map3(_openBrace, _keyValues, _closeBrace,
+        ExprTransformer(['o', 'kv', 'c'], 'Map.fromEntries({{kv}})')));
 
 const _openBrace = Named('_openBrace', Terminated(Tag('{'), _ws), [_inline]);
 
@@ -90,16 +98,6 @@ const _string = Named(
     '_string', Malformed('string', Delimited(Tag('"'), _stringValue, _quote)));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
-
-const _toHexValue = ExprTransformer<String, int>('x', '_toHexValue({{x}})');
-
-const _toMap =
-    ExprTransformer<List<MapEntry<String, dynamic>>, Map<String, dynamic>>(
-        'x', 'Map.fromEntries({{x}})');
-
-const _toMapEntry =
-    ExprTransformer<_t.Tuple2<String, dynamic>, MapEntry<String, dynamic>>(
-        'x', 'MapEntry({{x}}.item1, {{x}}.item2)');
 
 const _true = Named('_true', Value(true, Tag('true')), [_inline]);
 

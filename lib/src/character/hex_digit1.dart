@@ -11,7 +11,7 @@ class HexDigit1 extends _Chars1 {
   const HexDigit1();
 
   @override
-  Transformer<int, bool> _getCharacterPredicate() {
+  Transformer<bool> _getCharacterPredicate() {
     return CharClass('[#x30-#x39] | [#x41-#x46] | [#x61-#x66]');
   }
 }

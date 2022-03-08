@@ -26,9 +26,7 @@ if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (!state.opt) {
   if (state.pos < source.length) {
-    if ({{c}} > 0xd7ff) {
-      {{c}} = source.runeAt(state.pos);
-    }
+    {{c}} = source.decodeW2(state.pos, {{c}});
     state.error = ErrUnexpected.char(state.pos, Char({{c}}));
   } else {
     state.error = ErrUnexpected.eof(state.pos);
@@ -42,10 +40,7 @@ var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
-  {{c}} = source.codeUnitAt(state.pos++);
-  if ({{c}} > 0xd7ff) {
-    {{c}} = source.decodeW2(state, {{c}});
-  }
+  {{c}} = source.readRune(state);
   final ok = {{cond}};
   if (!ok) {
     state.pos = pos;
@@ -59,7 +54,7 @@ if (state.ok) {
   state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
 }''';
 
-  final Transformer<int, bool> predicate;
+  final Transformer<bool> predicate;
 
   const TakeWhile1(this.predicate);
 
@@ -68,10 +63,11 @@ if (state.ok) {
     final locals = context.allocateLocals(['c', 'cond', 'pos']);
     final c = locals['c']!;
     final cond = locals['cond']!;
+    final t = Transformation(context: context, name: cond, arguments: [c]);
     return {
       ...locals,
-      'cond': predicate.invoke(context, cond, c),
-      'transform': predicate.declare(context, cond),
+      'transform': predicate.declare(t),
+      'cond': predicate.invoke(t),
     };
   }
 

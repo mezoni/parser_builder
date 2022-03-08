@@ -8,33 +8,20 @@ part of '../../character.dart';
 /// ```
 class Char extends StringParserBuilder<int> {
   static const _template16 = '''
-state.ok = false;
-if (state.pos < source.length) {
-  final c = source.codeUnitAt(state.pos);
-  if (c == {{cc}}) {
-    state.pos++;
-    state.ok = true;
-    {{res}} = {{cc}};
-  }
-}
-if (!state.ok && !state.opt) {
+state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
+if (state.ok) {
+  state.pos++;
+  {{res}} = {{cc}};
+} else if (!state.opt) {
   state.error = ErrExpected.char(state.pos, const Char({{cc}}));
 }''';
 
   static const _template32 = '''
-state.ok = false;
-if (state.pos < source.length) {
-  var c = source.codeUnitAt(state.pos);
-  if (c > 0xd7ff) {
-    c = source.runeAt(state.pos);
-  }
-  if (c == {{cc}}) {
-    state.pos += 2;
-    state.ok = true;
-    {{res}} = {{cc}};
-  }
-}
-if (!state.ok && !state.opt) {
+state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
+if (state.ok) {
+  state.pos += 2;
+  {{res}} = {{cc}};
+} else if (!state.opt) {
   state.error = ErrExpected.char(state.pos, const Char({{cc}}));
 }''';
 

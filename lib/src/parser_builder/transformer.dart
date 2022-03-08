@@ -4,93 +4,142 @@ abstract class CharPredicate {
   bool get has32BitChars;
 }
 
-class ClosureTransformer<I, O> extends Transformer<I, O> {
+class ClosureTransformer<T> extends Transformer<T> {
   final String expression;
 
-  const ClosureTransformer(this.expression);
+  final List<String> parameters;
+
+  const ClosureTransformer(this.parameters, this.expression);
 
   @override
-  String declare(Context context, String name) {
+  String declare(Transformation transformation) {
+    final name = transformation.name;
     return 'final $name = $expression;';
   }
 
   @override
-  String invoke(Context context, String name, String value) {
-    return '$name($value)';
+  String invoke(Transformation transformation) {
+    final arguments = transformation.checkArguments(parameters);
+    final name = transformation.name;
+    return '$name($arguments)';
   }
 }
 
-class ExprTransformer<I, O> extends Transformer<I, O> {
+class ExprTransformer<T> extends Transformer<T> {
   final String expression;
 
-  final String parameter;
+  final List<String> parameters;
 
-  const ExprTransformer(this.parameter, this.expression);
+  const ExprTransformer(this.parameters, this.expression);
 
   @override
-  String invoke(Context context, String name, String value) {
-    return expression.replaceAll('{{$parameter}}', value);
+  String invoke(Transformation transformation) {
+    return transformation.replaceParameters(expression, parameters);
   }
 }
 
-class FuncExprTransformer<I, O> extends Transformer<I, O> {
+class FuncExprTransformer<T> extends Transformer<T> {
   final String expression;
 
-  final String parameter;
+  final List<String> parameters;
 
-  const FuncExprTransformer(this.parameter, this.expression);
+  const FuncExprTransformer(this.parameters, this.expression);
 
   @override
-  String declare(Context context, String name) {
-    return '$O $name($I $parameter) => $expression;';
+  String declare(Transformation transformation) {
+    final name = transformation.name;
+    final params = parameters.join(', ');
+    return '$T $name($params) => $expression;';
   }
 
   @override
-  String invoke(Context context, String name, String value) {
-    return '$name($value)';
+  String invoke(Transformation transformation) {
+    final arguments = transformation.checkArguments(parameters);
+    final name = transformation.name;
+    return '$name($arguments)';
   }
 }
 
-class FuncTransformer<I, O> extends Transformer<I, O> {
+class FuncTransformer<T> extends Transformer<T> {
   final String body;
 
-  final String parameter;
+  final List<String> parameters;
 
-  const FuncTransformer(this.parameter, this.body);
+  const FuncTransformer(this.parameters, this.body);
 
   @override
-  String declare(Context context, String name) {
-    return '$O $name($I $parameter) { $body }';
+  String declare(Transformation transformation) {
+    final name = transformation.name;
+    final params = parameters.join(', ');
+    return '$T $name($params) { $body }';
   }
 
   @override
-  String invoke(Context context, String name, String value) {
-    return '$name($value)';
+  String invoke(Transformation transformation) {
+    final arguments = transformation.checkArguments(parameters);
+    final name = transformation.name;
+    return '$name($arguments)';
   }
 }
 
-abstract class Transformer<I, O> {
+class Transformation {
+  final List<String> arguments;
+
+  final Context context;
+
+  final String name;
+
+  final Map<String, dynamic> state = {};
+
+  Transformation(
+      {required this.context, required this.name, required this.arguments});
+
+  String checkArguments(List<String> parameters) {
+    final length = parameters.length;
+    if (arguments.length != length) {
+      throw ArgumentError.value(arguments.toString(), 'arguments',
+          'List of arguments must contain $length elements to pass parameters \'${parameters.join(', ')}\'');
+    }
+
+    return arguments.join(', ');
+  }
+
+  String replaceParameters(String template, List<String> parameters) {
+    checkArguments(parameters);
+    for (var i = 0; i < parameters.length; i++) {
+      final argument = arguments[i];
+      final parameter = parameters[i];
+      template = template.replaceAll('{{$parameter}}', argument);
+    }
+
+    return template;
+  }
+}
+
+abstract class Transformer<T> {
   const Transformer();
 
-  String declare(Context context, String name) {
+  String declare(Transformation transformation) {
     return '';
   }
 
-  String invoke(Context context, String name, String value);
+  String invoke(Transformation transformation);
 }
 
-class VarTransformer<I, O> extends Transformer<I, O> {
+class VarTransformer<T> extends Transformer<T> {
   final String expression;
 
   const VarTransformer(this.expression);
 
   @override
-  String declare(Context context, String name) {
+  String declare(Transformation transformation) {
+    final name = transformation.name;
     return 'final $name = $expression;';
   }
 
   @override
-  String invoke(Context context, String name, String value) {
+  String invoke(Transformation transformation) {
+    final name = transformation.name;
     return name;
   }
 }
