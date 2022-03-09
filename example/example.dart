@@ -20,11 +20,12 @@ bool? _ws(State<String> state) {
   state.ok = true;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c < 33 && (c >= 9 && c <= 10 || c == 13 || c == 32);
-    if (!ok) {
-      break;
+    final ok = c <= 32 && (c >= 9 && c <= 10 || c == 13 || c == 32);
+    if (ok) {
+      state.pos++;
+      continue;
     }
-    state.pos++;
+    break;
   }
   if (state.ok) {
     $0 = true;
@@ -81,31 +82,26 @@ int? _escapeHex(State<String> state) {
   if (state.ok) {
     String? $2;
     final $pos1 = state.pos;
-    var $c = 0;
     var $cnt = 0;
     while ($cnt < 4 && state.pos < source.length) {
-      $c = source.codeUnitAt(state.pos);
-      final ok = $c < 103 &&
-          ($c >= 48 && $c <= 57 ||
-              $c >= 65 && $c <= 70 ||
-              $c >= 97 && $c <= 102);
-      if (!ok) {
-        break;
+      final c = source.codeUnitAt(state.pos);
+      final ok = c <= 102 &&
+          (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
+      if (ok) {
+        state.pos++;
+        $cnt++;
+        continue;
       }
-      state.pos++;
-      $cnt++;
+      break;
     }
     state.ok = $cnt >= 4;
     if (state.ok) {
-      $2 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
+      $2 = source.substring($pos1, state.pos);
     } else {
       if (!state.opt) {
-        if (state.pos < source.length) {
-          $c = source.decodeW2(state.pos, $c);
-          state.error = ErrUnexpected.char(state.pos, Char($c));
-        } else {
-          state.error = ErrUnexpected.eof(state.pos);
-        }
+        state.error = state.pos < source.length
+            ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
+            : ErrUnexpected.eof(state.pos);
       }
       state.pos = $pos1;
     }
@@ -154,8 +150,8 @@ int? _escaped(State<String> state) {
       state.ok = true;
       $1 = v;
     } else if (!state.opt) {
-      c = source.decodeW2(state.pos, c);
-      state.error = ErrUnexpected.char(state.pos, Char(c));
+      state.error =
+          ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
   } else if (!state.opt) {
     state.error = ErrUnexpected.eof(state.pos);
@@ -226,10 +222,11 @@ String? _string(State<String> state) {
         final pos = state.pos;
         $c = source.readRune(state);
         final ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
-        if (!ok) {
-          state.pos = pos;
-          break;
+        if (ok) {
+          continue;
         }
+        state.pos = pos;
+        break;
       }
       if ($start != state.pos) {
         $buffer.write(source.substring($start, state.pos));
@@ -1338,23 +1335,6 @@ class Tag {
 }
 
 extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int decodeW2(int index, int w1) {
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (++index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 2);
-    }
-
-    return w1;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

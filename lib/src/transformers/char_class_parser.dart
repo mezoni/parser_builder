@@ -21,12 +21,13 @@ bool? _ws(State<String> state) {
   state.ok = true;
   while (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final ok = c == 0x09 || c == 0xA || c == 0xD || c == 0x20;
-    if (!ok) {
-      state.pos = pos;
-      break;
+    if (ok) {
+      continue;
     }
+    state.pos = pos;
+    break;
   }
   if (state.ok) {
     $0 = true;
@@ -47,12 +48,13 @@ int? _hexVal(State<String> state) {
     final ok = $c >= 0x30 && $c <= 0x39 ||
         $c >= 0x41 && $c <= 0x46 ||
         $c >= 0x61 && $c <= 0x66;
-    if (!ok) {
-      state.pos = pos;
-      break;
+    if (ok) {
+      continue;
     }
-    state.ok = true;
+    state.pos = pos;
+    break;
   }
+  state.ok = state.pos != $pos;
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
   } else if (!state.opt) {
@@ -72,16 +74,13 @@ int? _hex(State<String> state) {
   int? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 35 && source.startsWith('#x', state.pos)) {
-      state.pos += 2;
-      state.ok = true;
-      $1 = '#x';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 35 &&
+      source.startsWith('#x', state.pos);
+  if (state.ok) {
+    state.pos += 2;
+    $1 = '#x';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('#x'));
   }
   if (state.ok) {
@@ -106,21 +105,23 @@ int? _rangeChar(State<String> state) {
   state.opt = true;
   final $pos1 = state.pos;
   String? $2;
+  state.ok = false;
   final $pos2 = state.pos;
   if (state.pos < source.length) {
     final c = source.codeUnitAt($pos2);
     switch (c) {
       case 91:
         state.pos++;
+        state.ok = true;
         $2 = '[';
         break;
       case 93:
         state.pos++;
+        state.ok = true;
         $2 = ']';
         break;
     }
   }
-  state.ok = $2 != null;
   if (!state.ok && !state.opt) {
     state.error = ErrCombined($pos2, [
       ErrExpected.tag(state.pos, Tag('[')),
@@ -194,16 +195,12 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
     $3 = _hexOrRangeChar(state);
     if (state.ok) {
       String? $4;
-      state.ok = false;
-      if (state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        if (c == 45) {
-          state.pos++;
-          state.ok = true;
-          $4 = '-';
-        }
-      }
-      if (!state.ok && !state.opt) {
+      state.ok =
+          state.pos < source.length && source.codeUnitAt(state.pos) == 45;
+      if (state.ok) {
+        state.pos++;
+        $4 = '-';
+      } else if (!state.ok && !state.opt) {
         state.error = ErrExpected.tag(state.pos, const Tag('-'));
       }
       if (state.ok) {
@@ -281,16 +278,11 @@ int? _char(State<String> state) {
   int? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 34) {
-      state.pos++;
-      state.ok = true;
-      $1 = '"';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
+  if (state.ok) {
+    state.pos++;
+    $1 = '"';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -298,16 +290,12 @@ int? _char(State<String> state) {
     $2 = _charCode(state);
     if (state.ok) {
       String? $3;
-      state.ok = false;
-      if (state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        if (c == 34) {
-          state.pos++;
-          state.ok = true;
-          $3 = '"';
-        }
-      }
-      if (!state.ok && !state.opt) {
+      state.ok =
+          state.pos < source.length && source.codeUnitAt(state.pos) == 34;
+      if (state.ok) {
+        state.pos++;
+        $3 = '"';
+      } else if (!state.ok && !state.opt) {
         state.error = ErrExpected.tag(state.pos, const Tag('"'));
       }
       if (state.ok) {
@@ -327,16 +315,11 @@ List<Tuple2<int, int>>? _range(State<String> state) {
   List<Tuple2<int, int>>? $1;
   final $pos = state.pos;
   String? $2;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 91) {
-      state.pos++;
-      state.ok = true;
-      $2 = '[';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
+  if (state.ok) {
+    state.pos++;
+    $2 = '[';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('['));
   }
   if (state.ok) {
@@ -359,16 +342,12 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     state.opt = $opt;
     if (state.ok) {
       String? $5;
-      state.ok = false;
-      if (state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        if (c == 93) {
-          state.pos++;
-          state.ok = true;
-          $5 = ']';
-        }
-      }
-      if (!state.ok && !state.opt) {
+      state.ok =
+          state.pos < source.length && source.codeUnitAt(state.pos) == 93;
+      if (state.ok) {
+        state.pos++;
+        $5 = ']';
+      } else if (!state.ok && !state.opt) {
         state.error = ErrExpected.tag(state.pos, const Tag(']'));
       }
       if (state.ok) {
@@ -417,16 +396,11 @@ String? _verbar(State<String> state) {
   String? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 124) {
-      state.pos++;
-      state.ok = true;
-      $1 = '|';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 124;
+  if (state.ok) {
+    state.pos++;
+    $1 = '|';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('|'));
   }
   if (state.ok) {
@@ -892,23 +866,6 @@ class Tag {
 }
 
 extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int decodeW2(int index, int w1) {
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (++index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 2);
-    }
-
-    return w1;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

@@ -75,6 +75,7 @@ void _test() {
   _testTakeUntil1();
   _testTakeWhile();
   _testTakeWhile1();
+  _testTakeWhile1Fold();
   _testTakeWhileMN();
   _testTakeWhileUntil();
   _testTerminated();
@@ -2471,6 +2472,56 @@ void _testTakeWhile1() {
         expect(state.pos, 0);
         expect(state.error, ErrUnexpected.char(0, Char(0x20)));
       }
+    }
+  });
+}
+
+void _testTakeWhile1Fold() {
+  test('TakeWhile1Fold', () {
+    final parser16 = takeWhile1DigitFold;
+    {
+      final state = State('1');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, 1);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('12');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, 12);
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('123');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, 123);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('123 ');
+      final r = parser16(state);
+      expect(state.ok, true);
+      _expectResult(r, 123);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      final r = parser16(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(0));
+    }
+    {
+      final state = State(' ');
+      final r = parser16(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(0x20)));
     }
   });
 }

@@ -11,7 +11,7 @@ class TakeUntil extends StringParserBuilder<String> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{index}} = source.indexOf({{tag}}, {{pos}});
-state.ok = {{index}} != -1;
+state.ok = {{index}} >= 0;
 if (state.ok) {
   state.pos = {{index}};
   {{res}} = {{pos}} == {{index}} ? '' : source.substring({{pos}}, {{index}});

@@ -9,42 +9,42 @@ part of '../../bytes.dart';
 /// ```
 class SkipWhile1 extends StringParserBuilder<bool> {
   static const _template16 = '''
-var {{c}} = 0;
+final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
-  {{c}} = source.codeUnitAt(state.pos);
+  final c = source.codeUnitAt(state.pos);
   final ok = {{cond}};
-  if (!ok) {
-    break;
+  if (ok) {
+    state.pos++;
+    continue;
   }
-  state.pos++;
-  {{res}} = true;
+  break;
 }
-state.ok = {{res}} != null;
-if (!state.ok) {
-  if (state.pos < source.length) {
-    {{c}} = source.decodeW2(state.pos, {{c}});
-    state.error = ErrUnexpected.char(state.pos, Char({{c}}));
-  } else {
-    state.error = ErrUnexpected.eof(state.pos);
-  }
+state.ok = state.pos != {{pos}};
+if (state.ok) {
+  {{res}} = true;
+} else if (!state.ok) {
+  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos))) : ErrUnexpected.eof(state.pos);
 }''';
 
   static const _template32 = '''
+final {{pos}} = state.pos;
 var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
   {{c}} = source.readRune(state);
   final ok = {{cond}};
-  if (!ok) {
-    state.pos = pos;
-    break;
+  if (ok) {
+    continue;
   }
-  {{res}} = true;
+  state.pos = pos;
+  break;
 }
-state.ok = {{res}} != null;
-if (!state.ok) {
+state.ok = state.pos != {{pos}};
+if (state.ok) {
+  {{res}} = true;
+} else if (!state.ok) {
   state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
 }''';
 
@@ -54,8 +54,12 @@ if (!state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['c', 'cond']);
-    final c = locals['c']!;
+    final has32BitChars = predicate is CharPredicate
+        ? (predicate as CharPredicate).has32BitChars
+        : true;
+    final locals =
+        context.allocateLocals([if (has32BitChars) 'c', 'cond', 'pos']);
+    final c = has32BitChars ? locals['c']! : 'c';
     final cond = locals['cond']!;
     final t = Transformation(context: context, name: cond, arguments: [c]);
     return {

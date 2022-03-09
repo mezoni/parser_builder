@@ -27,12 +27,13 @@ bool? _ws(State<String> state) {
   state.ok = true;
   while (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final ok = c == 0x9 || c == 0xa || c == 0xd || c == 0x20;
-    if (!ok) {
-      state.pos = pos;
-      break;
+    if (ok) {
+      continue;
     }
+    state.pos = pos;
+    break;
   }
   if (state.ok) {
     $0 = true;
@@ -730,23 +731,6 @@ class Tag {
 }
 
 extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int decodeW2(int index, int w1) {
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (++index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 2);
-    }
-
-    return w1;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

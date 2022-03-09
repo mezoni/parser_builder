@@ -8,6 +8,7 @@ part of '../../bytes.dart';
 /// ```
 class Tags extends StringParserBuilder<String> {
   static const _template = '''
+state.ok = false;
 final {{pos}} = state.pos;
 if (state.pos < source.length) {
   final c = source.codeUnitAt({{pos}});
@@ -15,7 +16,6 @@ if (state.pos < source.length) {
     {{cases}}
   }
 }
-state.ok = {{res}} != null;
 if (!state.ok && !state.opt) {
   state.error = ErrCombined({{pos}}, [{{errors}}]);
 }''';
@@ -28,12 +28,14 @@ case {{cc}}:
   static const _templateTestLong = '''
 if (source.startsWith({{tag}}, {{pos}})) {
   state.pos += {{len}};
+  state.ok = true;
   {{res}} = {{tag}};
   break;
 }''';
 
   static const _templateTestShort = '''
 state.pos++;
+state.ok = true;
 {{res}} = {{tag}};''';
 
   final List<String> tags;

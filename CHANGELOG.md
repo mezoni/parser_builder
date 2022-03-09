@@ -1,3 +1,9 @@
+## 0.12.2
+
+- Implemented experimental parser builder `TakeWhile1Fold`
+- Improved character and string parser builders. The overall performance of the parsing process can be increased up to 3%
+- Improved transformers (character predicates) `CharClass`, `NotCharClass` The overall performance of the parsing process can be increased up to 2%
+
 ## 0.12.1
 
 - Changed helper function signature `fastBuild()`. Added named parameter `Map<String, Named> publish = const {}`. Example of specifying arguments: `publish: {'parse': _json}`. This will create the function `dynamic parse(String source)`. This makes it possible not to write public parsing functions by hand. The specified public parsing functions will be created automatically with the specified names and will be available for impossibility by users

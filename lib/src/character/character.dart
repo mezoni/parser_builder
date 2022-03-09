@@ -8,10 +8,11 @@ final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   final ok = {{cond}};
-  if (!ok) {
-    break;
+  if (ok) {
+    state.pos++;
+    continue;
   }
-  state.pos++;
+  break;
 }
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
@@ -25,10 +26,11 @@ while (state.pos < source.length) {
   final pos = state.pos;
   var c = source.readRune(state);
   final ok = {{cond}};
-  if (!ok) {
-    state.pos = pos;
-    break;
+  if (ok) {
+    continue;
   }
+  state.pos = pos;
+  break;
 }
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
@@ -70,10 +72,9 @@ abstract class _Chars1 extends StringParserBuilder<String> {
   static const _template16 = '''
 state.ok = false;
 final {{pos}} = state.pos;
-var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
-  {{c}} = source.codeUnitAt(state.pos);
+  final c = source.codeUnitAt(state.pos);
   final ok = {{cond}};
   if (!ok) {
     break;
@@ -84,12 +85,7 @@ while (state.pos < source.length) {
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (!state.opt) {
-  if (state.pos < source.length) {
-    {{c}} = source.decodeW2(state.pos, {{c}});
-    state.error = ErrUnexpected.char(state.pos, Char({{c}}));
-  } else {
-    state.error = ErrUnexpected.eof(state.pos);
-  }
+  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos))) : ErrUnexpected.eof(state.pos);
 }''';
 
   static const _template32 = '''
@@ -110,17 +106,21 @@ while (state.pos < source.length) {
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (!state.opt) {
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(state.pos)) : ErrUnexpected.eof(state.pos);
 }''';
 
   const _Chars1();
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['c', 'cond', 'pos']);
-    final c = locals['c']!;
-    final cond = locals['cond']!;
     final predicate = _getCharacterPredicate();
+    final has32BitChars = predicate is CharPredicate
+        ? (predicate as CharPredicate).has32BitChars
+        : true;
+    final locals =
+        context.allocateLocals([if (has32BitChars) 'c', 'cond', 'pos']);
+    final c = has32BitChars ? locals['c']! : 'c';
+    final cond = locals['cond']!;
     final t = Transformation(context: context, name: cond, arguments: [c]);
     return {
       ...locals,

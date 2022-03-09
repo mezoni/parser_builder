@@ -19,18 +19,18 @@ if ({{index}} != -1) {
   while (state.pos < {{index}}) {
     c = source.codeUnitAt(state.pos);
     final ok = {{cond}};
-    if (!ok) {
-      break;
+    if (ok) {
+      state.pos++;
+      continue;
     }
-    state.pos++;
+    break;
   }
   state.ok = state.pos == {{index}};
   if (state.ok) {
-    {{res}} = pos == state.pos ? '' : source.substring(pos, state.pos);
+    {{res}} = source.substring(pos, state.pos);
   } else {
     if (!state.opt) {
-      c = source.decodeW2(state.pos, c);
-      state.error = ErrUnexpected.char(state.pos, Char(c));
+      state.error = ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
     state.pos = pos;
   }
@@ -51,14 +51,15 @@ if ({{index}} != -1) {
     final pos = state.pos;
     c = source.readRune(state);
     final ok = {{cond}};
-    if (!ok) {
-      state.pos = pos;
-      break;
+    if (ok) {
+      continue;
     }
+    state.pos = pos;
+    break;
   }
   state.ok = state.pos == {{index}};
   if (state.ok) {
-    {{res}} = pos == state.pos ? '' : source.substring(pos, state.pos);
+    {{res}} = source.substring(pos, state.pos);
   } else {
     if (!state.opt) {
       state.error = ErrUnexpected.char(state.pos, Char(c));

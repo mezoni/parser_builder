@@ -77,26 +77,77 @@ bool {{name}}(int c) {
       case RangeProcessing.test:
         final list = getCharList();
         final tests = <String>[];
-        var count = 0;
+        var simple = true;
         for (var i = 0; i < list.length; i += 2) {
-          final start = list[i];
-          final end = list[i + 1];
-          if (start == end) {
-            tests.add('$argument == $start');
-            count++;
-          } else {
-            tests.add('$argument >= $start && $argument <= $end');
-            count += 2;
+          if (list[i] != list[i + 1]) {
+            simple = false;
+            break;
           }
         }
 
-        var result = tests.join(' || ');
-        if (count > 3) {
-          final max = list.last + 1;
-          result = '$argument < $max && ($result)';
-        }
+        if (negate && simple) {
+          var count = 0;
+          for (var i = 0; i < list.length; i += 2) {
+            final start = list[i];
+            tests.add('$argument != $start');
+            count++;
+          }
 
-        return negate ? '!($result)' : result;
+          var result = tests.join(' && ');
+          if (count > 3) {
+            final last = list.last;
+            result = '$argument > $last || $result';
+          }
+
+          return result;
+        } else if (negate && list.length == 2) {
+          final start = list[0];
+          final end = list[1];
+          final result = '$argument < $start && $argument > $end';
+          return result;
+        } else if (negate) {
+          var count = 0;
+          for (var i = 0; i < list.length; i += 2) {
+            final start = list[i];
+            final end = list[i + 1];
+            if (start == end) {
+              tests.add('$argument == $start');
+              count++;
+            } else {
+              tests.add('$argument >= $start && $argument <= $end');
+              count += 2;
+            }
+          }
+
+          var result = tests.join(' || ');
+          if (count > 3) {
+            final last = list.last;
+            result = '$argument > $last || !($result)';
+          }
+
+          return result;
+        } else {
+          var count = 0;
+          for (var i = 0; i < list.length; i += 2) {
+            final start = list[i];
+            final end = list[i + 1];
+            if (start == end) {
+              tests.add('$argument == $start');
+              count++;
+            } else {
+              tests.add('$argument >= $start && $argument <= $end');
+              count += 2;
+            }
+          }
+
+          var result = tests.join(' || ');
+          if (count > 3) {
+            final last = list.last;
+            result = '$argument <= $last && ($result)';
+          }
+
+          return result;
+        }
     }
   }
 }

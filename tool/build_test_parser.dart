@@ -73,6 +73,7 @@ Future<void> main(List<String> args) async {
     _takeUntil1Abc,
     _takeWhile1C16,
     _takeWhile1C32,
+    _takeWhile1DigitFold,
     _takeWhileC16,
     _takeWhileC16UntilAbc,
     _takeWhileC32UntilAbc,
@@ -279,6 +280,14 @@ const _takeUntilAbc = Named('takeUntilAbc', TakeUntil(abc));
 const _takeWhile1C16 = Named('takeWhile1C16', TakeWhile1(_isC16));
 
 const _takeWhile1C32 = Named('takeWhile1C32', TakeWhile1(_isC32));
+
+const _takeWhile1DigitFold = Named(
+    'takeWhile1DigitFold',
+    TakeWhile1Fold(
+        CharClass('[0-9]'),
+        ExprTransformer([], '0'),
+        ExprTransformer(
+            ['acc', 'v'], '{{acc}} = {{acc}} * 10 + {{v}} - 0x30')));
 
 const _takeWhileC16 = Named('takeWhileC16', TakeWhile(_isC16));
 

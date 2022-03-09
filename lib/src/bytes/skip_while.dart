@@ -13,10 +13,11 @@ state.ok = true;
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   final ok = {{cond}};
-  if (!ok) {
-    break;
+  if (ok) {
+    state.pos++;
+    continue;
   }
-  state.pos++;
+  break;
 }
 if (state.ok) {
   {{res}} = true;
@@ -27,12 +28,13 @@ state.ok = true;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.readRune(state);
+  final c = source.readRune(state);
   final ok = {{cond}};
-  if (!ok) {
-    state.pos = pos;
-    break;
+  if (ok) {
+    continue;
   }
+  state.pos = pos;
+  break;
 }
 if (state.ok) {
   {{res}} = true;

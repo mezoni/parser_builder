@@ -18,8 +18,7 @@ if (state.pos < source.length) {
     state.pos++;
     {{res}} = c;
   } else if (!state.opt) {
-    c = source.decodeW2(state.pos, c);
-    state.error = ErrUnexpected.char(state.pos, Char(c));
+    state.error = ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
   }
 } else if (!state.opt) {
   state.error = ErrUnexpected.eof(state.pos);

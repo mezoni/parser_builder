@@ -19,15 +19,12 @@ int? _hexPrimary(State<String> state) {
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
-    $1 = $pos == state.pos ? '' : source.substring($pos, state.pos);
+    $1 = source.substring($pos, state.pos);
   } else {
     if (!state.opt) {
-      if (state.pos < source.length) {
-        $c = source.decodeW2(state.pos, $c);
-        state.error = ErrUnexpected.char(state.pos, Char($c));
-      } else {
-        state.error = ErrUnexpected.eof(state.pos);
-      }
+      state.error = state.pos < source.length
+          ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
+          : ErrUnexpected.eof(state.pos);
     }
     state.pos = $pos;
   }
@@ -43,16 +40,11 @@ Color? _hexColor(State<String> state) {
   Color? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = false;
-  if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    if (c == 35) {
-      state.pos++;
-      state.ok = true;
-      $1 = '#';
-    }
-  }
-  if (!state.ok && !state.opt) {
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
+  if (state.ok) {
+    state.pos++;
+    $1 = '#';
+  } else if (!state.ok && !state.opt) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
@@ -467,23 +459,6 @@ class Tag {
 }
 
 extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int decodeW2(int index, int w1) {
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (++index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 2);
-    }
-
-    return w1;
-  }
-
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

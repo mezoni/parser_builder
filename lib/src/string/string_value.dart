@@ -14,10 +14,11 @@ while (state.pos < source.length) {
     final pos = state.pos;
     {{c}} = source.readRune(state);
     final ok = {{cond}};
-    if (!ok) {
-      state.pos = pos;
-      break;
+    if (ok) {
+      continue;
     }
+    state.pos = pos;
+    break;
   }
   if ({{start}} != state.pos) {
     {{buffer}}.write(source.substring({{start}}, state.pos));
