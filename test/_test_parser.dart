@@ -30,18 +30,17 @@ String? alpha1(State<String> state) {
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     final ok = c <= 122 && (c >= 65 && c <= 90 || c >= 97 && c <= 122);
-    if (!ok) {
-      break;
+    if (ok) {
+      state.pos++;
+      state.ok = true;
+      continue;
     }
-    state.pos++;
-    state.ok = true;
+    break;
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -76,18 +75,17 @@ String? alphanumeric1(State<String> state) {
     final c = source.codeUnitAt(state.pos);
     final ok = c <= 122 &&
         (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
-    if (!ok) {
-      break;
+    if (ok) {
+      state.pos++;
+      state.ok = true;
+      continue;
     }
-    state.pos++;
-    state.ok = true;
+    break;
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -249,18 +247,17 @@ String? digit1(State<String> state) {
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     final ok = c >= 48 && c <= 57;
-    if (!ok) {
-      break;
+    if (ok) {
+      state.pos++;
+      state.ok = true;
+      continue;
     }
-    state.pos++;
-    state.ok = true;
+    break;
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -409,18 +406,17 @@ String? hexDigit1(State<String> state) {
     final c = source.codeUnitAt(state.pos);
     final ok = c <= 102 &&
         (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
-    if (!ok) {
-      break;
+    if (ok) {
+      state.pos++;
+      state.ok = true;
+      continue;
     }
-    state.pos++;
-    state.ok = true;
+    break;
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -1213,9 +1209,7 @@ bool? skipWhile1C16(State<String> state) {
   if (state.ok) {
     $0 = true;
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -1239,9 +1233,7 @@ bool? skipWhile1C32(State<String> state) {
   if (state.ok) {
     $0 = true;
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
   }
   return $0;
 }
@@ -1316,9 +1308,9 @@ String? tagC16C32(State<String> state) {
 String? tagC32(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = state.pos < source.length &&
+  state.ok = state.pos + 1 < source.length &&
       source.codeUnitAt(state.pos) == 55348 &&
-      source.startsWith('𝈀', state.pos);
+      source.codeUnitAt(state.pos + 1) == 56832;
   if (state.ok) {
     state.pos += 2;
     $0 = '𝈀';
@@ -1487,9 +1479,7 @@ String? takeWhile1C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -1514,9 +1504,7 @@ String? takeWhile1C32(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
   }
   return $0;
 }
@@ -1540,9 +1528,7 @@ dynamic takeWhile1DigitFold(State<String> state) {
   if (state.ok) {
     $0 = $acc;
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-        : state.error = ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -1678,9 +1664,7 @@ String? takeWhileMN_2_4C16(State<String> state) {
     $0 = source.substring($pos, state.pos);
   } else {
     if (state.log) {
-      state.error = state.pos < source.length
-          ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-          : ErrUnexpected.eof(state.pos);
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
     }
     state.pos = $pos;
   }
@@ -1709,9 +1693,7 @@ String? takeWhileMN_2_4C32(State<String> state) {
     $0 = source.substring($pos, state.pos);
   } else {
     if (state.log) {
-      state.error = state.pos < source.length
-          ? ErrUnexpected.char(state.pos, Char($c))
-          : ErrUnexpected.eof(state.pos);
+      state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
     }
     state.pos = $pos;
   }
@@ -2259,6 +2241,12 @@ class ErrUnexpected extends Err {
   ErrUnexpected.char(this.offset, Char value)
       : length = 1,
         value = value;
+
+  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
+      : length = 1,
+        value = offset < source.length
+            ? Char(c ?? source.runeAt(offset))
+            : const Tag('EOF');
 
   ErrUnexpected.eof(this.offset)
       : length = 1,

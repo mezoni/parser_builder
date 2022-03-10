@@ -16,10 +16,19 @@ if (state.ok) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
-  static const _templateShort = '''
+  static const _templateOne = '''
 state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos++;
+  {{res}} = {{tag}};
+} else if (state.log) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
+  static const _templateTwo = '''
+state.ok = state.pos + 1 < source.length && source.codeUnitAt(state.pos) == {{cc}} && source.codeUnitAt(state.pos + 1) == {{cc2}};
+if (state.ok) {
+  state.pos += 2;
   {{res}} = {{tag}};
 } else if (state.log) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
@@ -37,6 +46,7 @@ if (state.ok) {
 
     return {
       'cc': tag.codeUnitAt(0).toString(),
+      if (tag.length == 2) 'cc2': tag.codeUnitAt(1).toString(),
       if (tag.length > 1) 'len': tag.length.toString(),
       'tag': helper.escapeString(tag),
     };
@@ -44,6 +54,13 @@ if (state.ok) {
 
   @override
   String getTemplate(Context context) {
-    return tag.length == 1 ? _templateShort : _templateLong;
+    switch (tag.length) {
+      case 1:
+        return _templateOne;
+      case 2:
+        return _templateTwo;
+      default:
+        return _templateLong;
+    }
   }
 }

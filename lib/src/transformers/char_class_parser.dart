@@ -58,9 +58,7 @@ int? _hexVal(State<String> state) {
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
   } else if (state.log) {
-    state.error = state.pos < source.length
-        ? ErrUnexpected.char(state.pos, Char($c))
-        : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
   }
   if (state.ok) {
     final v = $1!;
@@ -74,9 +72,9 @@ int? _hex(State<String> state) {
   int? $0;
   final $pos = state.pos;
   String? $1;
-  state.ok = state.pos < source.length &&
+  state.ok = state.pos + 1 < source.length &&
       source.codeUnitAt(state.pos) == 35 &&
-      source.startsWith('#x', state.pos);
+      source.codeUnitAt(state.pos + 1) == 120;
   if (state.ok) {
     state.pos += 2;
     $1 = '#x';
@@ -760,6 +758,12 @@ class ErrUnexpected extends Err {
   ErrUnexpected.char(this.offset, Char value)
       : length = 1,
         value = value;
+
+  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
+      : length = 1,
+        value = offset < source.length
+            ? Char(c ?? source.runeAt(offset))
+            : const Tag('EOF');
 
   ErrUnexpected.eof(this.offset)
       : length = 1,

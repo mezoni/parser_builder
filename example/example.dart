@@ -99,9 +99,7 @@ int? _escapeHex(State<String> state) {
       $2 = source.substring($pos1, state.pos);
     } else {
       if (state.log) {
-        state.error = state.pos < source.length
-            ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-            : ErrUnexpected.eof(state.pos);
+        state.error = ErrUnexpected.charOrEof(state.pos, source);
       }
       state.pos = $pos1;
     }
@@ -1229,6 +1227,12 @@ class ErrUnexpected extends Err {
   ErrUnexpected.char(this.offset, Char value)
       : length = 1,
         value = value;
+
+  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
+      : length = 1,
+        value = offset < source.length
+            ? Char(c ?? source.runeAt(offset))
+            : const Tag('EOF');
 
   ErrUnexpected.eof(this.offset)
       : length = 1,

@@ -22,7 +22,7 @@ state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res}} = {{acc}};
 } else if (state.log) {
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos))) : state.error = ErrUnexpected.eof(state.pos);
+  state.error = ErrUnexpected.charOrEof(state.pos, source);
 }''';
 
   static const _template32 = '''
@@ -33,20 +33,20 @@ var {{acc}} = {{init}};
 {{transform2}}
 while (state.pos < source.length) {
   final pos = state.pos;
-  {{c}} = source.readRune(state.pos);
+  {{c}} = source.readRune(state);
   final ok = {{cond}};
   if (ok) {
     {{fold}};
     continue;
   }
-  statae.pos = pos;
+  state.pos = pos;
   break;
 }
 state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res}} = {{acc}};
 } else if (state.log) {
-   state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : state.error = ErrUnexpected.eof(state.pos);
+   state.error = ErrUnexpected.charOrEof(state.pos, source, {{c}});
 }''';
 
   final Transformer<O> combine;

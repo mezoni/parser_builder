@@ -27,7 +27,7 @@ if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else {
   if (state.log) {
-    state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos))) : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   state.pos = {{pos}};
 }''';
@@ -53,7 +53,7 @@ if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else {
   if (state.log) {
-    state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
+    state.error = ErrUnexpected.charOrEof(state.pos, source, {{c}});
   }
   state.pos = {{pos}};
 }''';

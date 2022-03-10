@@ -76,16 +76,17 @@ final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   final ok = {{cond}};
-  if (!ok) {
-    break;
+  if (ok) {
+    state.pos++;
+    state.ok = true;
+    continue;
   }
-  state.pos++;
-  state.ok = true;
+  break;
 }
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (state.log) {
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos))) : ErrUnexpected.eof(state.pos);
+  state.error = ErrUnexpected.charOrEof(state.pos, source);
 }''';
 
   static const _template32 = '''
@@ -95,18 +96,19 @@ var {{c}} = 0;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.readRune(state);
+  {{c}} = source.readRune(state);
   final ok = {{cond}};
-  if (!ok) {
-    state.pos = pos;
-    break;
+  if (ok) {
+    state.ok = true;
+    continue;
   }
-  state.ok = true;
+  state.pos = pos;
+  break;
 }
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (state.log) {
-  state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(state.pos)) : ErrUnexpected.eof(state.pos);
+  state.error = ErrUnexpected.charOrEof(state.pos, source, {{c}});
 }''';
 
   const _Chars1();

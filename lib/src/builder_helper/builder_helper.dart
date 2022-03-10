@@ -61,6 +61,8 @@ String? tryGetAsCode(value) {
     return '$value';
   } else if (value == null) {
     return '$value';
+  } else if (value is List) {
+    return '[${value.join(', ')}]';
   }
 
   return null;

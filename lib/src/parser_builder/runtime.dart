@@ -390,6 +390,12 @@ class ErrUnexpected extends Err {
       : length = 1,
         value = value;
 
+  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
+      : length = 1,
+        value = offset < source.length
+            ? Char(c ?? source.runeAt(offset))
+            : const Tag('EOF');
+
   ErrUnexpected.eof(this.offset)
       : length = 1,
         value = const Tag('EOF');
@@ -432,6 +438,12 @@ class ErrUnexpected extends Err {
   ErrUnexpected.char(this.offset, Char value)
       : length = 1,
         value = value;
+
+  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
+      : length = 1,
+        value = offset < source.length
+            ? Char(c ?? source.runeAt(offset))
+            : const Tag('EOF');
 
   ErrUnexpected.eof(this.offset)
       : length = 1,

@@ -1,6 +1,7 @@
 ## 0.14.1
 
 - Fixed minor bug in builder `SkipWhile1`
+- Implemented constructor `ErrUnexpected.charOrEof(this.offset, String source, [int? c])`. Simplified (improved) the generated code of some parsers that parse characters and select the generated error depending on the position of parsing
 
 ## 0.14.0
 

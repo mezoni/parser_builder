@@ -1,5 +1,6 @@
 part of '../../token.dart';
 
+@experimental
 class Tokenize<O> extends StringParserBuilder<O> {
   static const _template = '''
 final {{pos}} = state.pos;
