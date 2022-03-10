@@ -10,16 +10,45 @@ import 'package:parser_builder/string.dart';
 import 'package:parser_builder/transformers.dart';
 
 import 'build_json_number_parser.dart' as _json_number;
-import 'example_footer.dart';
-import 'example_header.dart';
 
 Future<void> main(List<String> args) async {
   final context = Context();
   context.optimizeForSize = false;
   _configure(context, comment: false, trace: false);
   await fastBuild(context, [_json, _value_], 'example/example.dart',
-      footer: [footer].join('\n'), header: header, publish: {'parse': _json});
+      footer: __footer, header: __header, publish: {'parse': _json});
 }
+
+const __footer = r'''
+@pragma('vm:prefer-inline')
+int _toHexValue(String s) {
+  final l = s.codeUnits;
+  var r = 0;
+  for (var i = l.length - 1, j = 0; i >= 0; i--, j += 4) {
+    final c = l[i];
+    var v = 0;
+    if (c >= 0x30 && c <= 0x39) {
+      v = c - 0x30;
+    } else if (c >= 0x41 && c <= 0x46) {
+      v = c - 0x41 + 10;
+    } else if (c >= 0x61 && c <= 0x66) {
+      v = c - 0x61 + 10;
+    } else {
+      throw StateError('Internal error');
+    }
+
+    r += v * (1 << j);
+  }
+
+  return r;
+}''';
+
+const __header = r'''
+// ignore_for_file: unused_local_variable
+
+import 'package:source_span/source_span.dart';
+
+''';
 
 const _array = Named('_array', Delimited(_openBracket, _values, _closeBracket));
 
