@@ -1212,7 +1212,7 @@ bool? skipWhile1C16(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = true;
-  } else if (!state.ok) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
         : ErrUnexpected.eof(state.pos);
@@ -1238,7 +1238,7 @@ bool? skipWhile1C32(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = true;
-  } else if (!state.ok) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
         : ErrUnexpected.eof(state.pos);
@@ -1447,7 +1447,7 @@ String? takeUntilAbc(State<String> state) {
   state.ok = $index >= 0;
   if (state.ok) {
     state.pos = $index;
-    $0 = $pos == $index ? '' : source.substring($pos, $index);
+    $0 = source.substring($pos, $index);
   } else if (state.log) {
     state.error = ErrExpected.tag($pos, const Tag('abc'));
   }

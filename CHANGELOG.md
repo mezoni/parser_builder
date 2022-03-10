@@ -1,3 +1,7 @@
+## 0.14.1
+
+- Fixed minor bug in builder `SkipWhile1`
+
 ## 0.14.0
 
 - Breaking change: Changes have been made to the `State` class. The `opt` field has been removed. Instead, a `log` field has been added to indicate the need for error logging. This is an internal change that does not affect parser definitions

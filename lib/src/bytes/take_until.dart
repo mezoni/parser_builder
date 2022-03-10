@@ -14,7 +14,7 @@ final {{index}} = source.indexOf({{tag}}, {{pos}});
 state.ok = {{index}} >= 0;
 if (state.ok) {
   state.pos = {{index}};
-  {{res}} = {{pos}} == {{index}} ? '' : source.substring({{pos}}, {{index}});
+  {{res}} = source.substring({{pos}}, {{index}});
 } else if (state.log) {
   state.error = ErrExpected.tag({{pos}}, const Tag({{tag}}));
 }''';
