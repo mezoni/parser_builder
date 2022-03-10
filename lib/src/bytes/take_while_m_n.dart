@@ -26,7 +26,7 @@ state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else {
-  if (!state.opt) {
+  if (state.log) {
     state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos))) : ErrUnexpected.eof(state.pos);
   }
   state.pos = {{pos}};
@@ -52,7 +52,7 @@ state.ok = {{cnt}} >= {{m}};
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else {
-  if (!state.opt) {
+  if (state.log) {
     state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : ErrUnexpected.eof(state.pos);
   }
   state.pos = {{pos}};

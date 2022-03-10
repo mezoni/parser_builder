@@ -17,10 +17,10 @@ if (state.pos < source.length) {
   if (state.ok) {
     state.pos++;
     {{res}} = c;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
   }
-} else if (!state.opt) {
+} else if (state.log) {
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 
@@ -35,11 +35,11 @@ if (state.pos < source.length) {
     {{res}} = c;
   } else {
     state.pos = pos;
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
   }
-} else if (!state.opt) {
+} else if (state.log) {
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 

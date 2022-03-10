@@ -5,7 +5,7 @@ class Malformed<I, O> extends ParserBuilder<I, O> {
 {{p1}}
 if (state.ok) {
   {{res}} = {{p1_res}};
-} else if (!state.opt) {
+} else if (state.log) {
   state.error = ErrMalformed(state.pos, const Tag({{tag}}), [state.error]);
 }''';
 

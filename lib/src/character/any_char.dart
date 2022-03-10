@@ -11,7 +11,7 @@ class AnyChar extends StringParserBuilder<int> {
 state.ok = state.pos < source.length;
 if (state.ok) {
   {{res}} = source.readRune(state);
-} else if (!state.opt) {
+} else if (state.log) {
   state.error = ErrUnexpected.eof(state.pos);
 }''';
 

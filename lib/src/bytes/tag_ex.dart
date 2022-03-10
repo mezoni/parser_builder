@@ -15,7 +15,7 @@ state.ok = source.startsWith({{tag}}, state.pos);
 if (state.ok) {
   state.pos += {{tag}}.length;
   {{res}}= {{tag}};
-} else if (!state.opt) {
+} else if (state.log) {
   state.error = ErrExpected.tag(state.pos, Tag({{tag}}));
 }''';
 

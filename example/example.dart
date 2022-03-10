@@ -38,7 +38,7 @@ bool? _eof(State<String> state) {
   state.ok = state.pos >= state.source.length;
   if (state.ok) {
     $0 = true;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.eof(state.pos);
   }
   return $0;
@@ -76,7 +76,7 @@ int? _escapeHex(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = 'u';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('u'));
   }
   if (state.ok) {
@@ -98,7 +98,7 @@ int? _escapeHex(State<String> state) {
     if (state.ok) {
       $2 = source.substring($pos1, state.pos);
     } else {
-      if (!state.opt) {
+      if (state.log) {
         state.error = state.pos < source.length
             ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
             : ErrUnexpected.eof(state.pos);
@@ -149,11 +149,11 @@ int? _escaped(State<String> state) {
       state.pos++;
       state.ok = true;
       $1 = v;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error =
           ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   if (state.ok) {
@@ -164,7 +164,7 @@ int? _escaped(State<String> state) {
     $2 = _escapeHex(state);
     if (state.ok) {
       $0 = $2!;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -181,7 +181,7 @@ String? _quote(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = '"';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -207,7 +207,7 @@ String? _string(State<String> state) {
   if (state.ok) {
     state.pos++;
     $2 = '"';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -259,7 +259,7 @@ String? _string(State<String> state) {
   }
   if (state.ok) {
     $0 = $1;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrMalformed(state.pos, const Tag('string'), [state.error]);
   }
   return $0;
@@ -539,7 +539,7 @@ num? _number(State<String> state) {
   }
   if (state.ok) {
     $0 = $1;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrMalformed(state.pos, const Tag('number'), [state.error]);
   }
   return $0;
@@ -555,7 +555,7 @@ String? _openBracket(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = '[';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('['));
   }
   if (state.ok) {
@@ -581,7 +581,7 @@ String? _comma(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = ',';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag(','));
   }
   if (state.ok) {
@@ -599,8 +599,8 @@ String? _comma(State<String> state) {
 
 List<dynamic>? _values(State<String> state) {
   List<dynamic>? $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   var $pos = state.pos;
   final $list = <dynamic>[];
   for (;;) {
@@ -622,7 +622,7 @@ List<dynamic>? _values(State<String> state) {
   if (state.ok) {
     $0 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
@@ -636,7 +636,7 @@ String? _closeBracket(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = ']';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag(']'));
   }
   if (state.ok) {
@@ -684,7 +684,7 @@ String? _openBrace(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = '{';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('{'));
   }
   if (state.ok) {
@@ -710,7 +710,7 @@ String? _colon(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = ':';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag(':'));
   }
   if (state.ok) {
@@ -750,8 +750,8 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
 
 List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
   List<MapEntry<String, dynamic>>? $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   var $pos = state.pos;
   final $list = <MapEntry<String, dynamic>>[];
   for (;;) {
@@ -773,7 +773,7 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
   if (state.ok) {
     $0 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
@@ -787,7 +787,7 @@ String? _closeBrace(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = '}';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('}'));
   }
   if (state.ok) {
@@ -836,7 +836,7 @@ bool? _false(State<String> state) {
   if (state.ok) {
     state.pos += 5;
     $1 = 'false';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('false'));
   }
   if (state.ok) {
@@ -856,7 +856,7 @@ dynamic _null(State<String> state) {
   if (state.ok) {
     state.pos += 4;
     $1 = 'null';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('null'));
   }
   if (state.ok) {
@@ -876,7 +876,7 @@ bool? _true(State<String> state) {
   if (state.ok) {
     state.pos += 4;
     $1 = 'true';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('true'));
   }
   if (state.ok) {
@@ -940,7 +940,7 @@ dynamic _value(State<String> state) {
       break;
     }
     final $15 = state.error;
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrCombined(state.pos, [$3, $5, $7, $9, $11, $13, $15]);
     }
     break;
@@ -1285,9 +1285,9 @@ class State<T> {
 
   Err error = ErrUnknown(0);
 
-  bool ok = false;
+  bool log = true;
 
-  bool opt = false;
+  bool ok = false;
 
   int pos = 0;
 

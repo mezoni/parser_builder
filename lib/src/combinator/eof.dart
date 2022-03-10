@@ -5,7 +5,7 @@ class Eof<I> extends ParserBuilder<I, bool> {
 state.ok = state.pos >= state.source.length;
 if (state.ok) {
   {{res}} = true;
-} else if (!state.opt) {
+} else if (state.log) {
   state.error = ErrExpected.eof(state.pos);
 }''';
 

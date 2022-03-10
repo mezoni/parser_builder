@@ -12,7 +12,7 @@ state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}} &
 if (state.ok) {
   state.pos += {{len}};
   {{res}} = {{tag}};
-} else if (!state.ok && !state.opt) {
+} else if (state.log) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
@@ -21,7 +21,7 @@ state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos++;
   {{res}} = {{tag}};
-} else if (!state.ok && !state.opt) {
+} else if (state.log) {
   state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 

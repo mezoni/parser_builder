@@ -38,7 +38,7 @@ String? alpha1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
         : ErrUnexpected.eof(state.pos);
@@ -84,7 +84,7 @@ String? alphanumeric1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
         : ErrUnexpected.eof(state.pos);
@@ -99,7 +99,7 @@ int? char16(State<String> state) {
   if (state.ok) {
     state.pos++;
     $0 = 80;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.char(state.pos, const Char(80));
   }
   return $0;
@@ -112,7 +112,7 @@ int? char32(State<String> state) {
   if (state.ok) {
     state.pos += 2;
     $0 = 119296;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.char(state.pos, const Char(119296));
   }
   return $0;
@@ -130,7 +130,7 @@ int? altC16OrC32(State<String> state) {
     $2 = char32(state);
     if (state.ok) {
       $0 = $2!;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -143,7 +143,7 @@ int? anyChar(State<String> state) {
   state.ok = state.pos < source.length;
   if (state.ok) {
     $0 = source.readRune(state);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -158,7 +158,7 @@ String? tagAbc(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $0 = 'abc';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   return $0;
@@ -168,11 +168,11 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   Tuple2<String, List<String>>? $0;
   final $pos = state.pos;
   List<String>? $1;
-  final $opt = state.opt;
+  final $log = state.log;
   var $pos1 = state.pos;
   final $list = <String>[];
   for (;;) {
-    state.opt = $list.isNotEmpty;
+    state.log = $list.isEmpty;
     String? $2;
     $2 = tagAbc(state);
     if (!state.ok) {
@@ -191,7 +191,7 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
     state.ok = true;
     $1 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   if (state.ok) {
     final v = state.source.slice($pos, state.pos);
     $0 = Tuple2(v, $1!);
@@ -257,7 +257,7 @@ String? digit1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
         : ErrUnexpected.eof(state.pos);
@@ -270,7 +270,7 @@ bool? eof(State<String> state) {
   state.ok = state.pos >= state.source.length;
   if (state.ok) {
     $0 = true;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.eof(state.pos);
   }
   return $0;
@@ -298,11 +298,11 @@ int? escapeSequence16(State<String> state) {
       state.pos++;
       state.ok = true;
       $0 = v;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error =
           ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -333,11 +333,11 @@ int? escapeSequence32(State<String> state) {
       $0 = v;
     } else {
       state.pos = pos;
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -346,8 +346,8 @@ int? escapeSequence32(State<String> state) {
 dynamic foldMany0Digit(State<String> state) {
   final source = state.source;
   dynamic $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   var $acc = 0;
   for (;;) {
     int? $1;
@@ -358,11 +358,11 @@ dynamic foldMany0Digit(State<String> state) {
       if (state.ok) {
         state.pos++;
         $1 = c;
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error =
             ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
       }
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrUnexpected.eof(state.pos);
     }
     if (!state.ok) {
@@ -375,7 +375,7 @@ dynamic foldMany0Digit(State<String> state) {
   if (state.ok) {
     $0 = $acc;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
@@ -417,7 +417,7 @@ String? hexDigit1(State<String> state) {
   }
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
         : ErrUnexpected.eof(state.pos);
@@ -427,8 +427,8 @@ String? hexDigit1(State<String> state) {
 
 List<int>? many0C32(State<String> state) {
   List<int>? $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   final $list = <int>[];
   for (;;) {
     int? $1;
@@ -442,14 +442,14 @@ List<int>? many0C32(State<String> state) {
   if (state.ok) {
     $0 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
 int? many0CountC32(State<String> state) {
   int? $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   var $cnt = 0;
   while (true) {
     int? $1;
@@ -463,16 +463,16 @@ int? many0CountC32(State<String> state) {
   if (state.ok) {
     $0 = $cnt;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
 List<int>? many1C32(State<String> state) {
   List<int>? $0;
-  final $opt = state.opt;
+  final $log = state.log;
   final $list = <int>[];
   for (;;) {
-    state.opt = $list.isNotEmpty;
+    state.log = $list.isEmpty;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -484,16 +484,16 @@ List<int>? many1C32(State<String> state) {
     state.ok = true;
     $0 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
 int? many1CountC32(State<String> state) {
   int? $0;
-  final $opt = state.opt;
+  final $log = state.log;
   var $cnt = 0;
   while (true) {
-    state.opt = $cnt != 0;
+    state.log = $cnt == 0;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -505,18 +505,18 @@ int? many1CountC32(State<String> state) {
     state.ok = true;
     $0 = $cnt;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
 List<int>? manyMNC32_2_3(State<String> state) {
   List<int>? $0;
-  final $opt = state.opt;
+  final $log = state.log;
   final $pos = state.pos;
   final $list = <int>[];
   var $cnt = 0;
   while ($cnt < 3) {
-    state.opt = $cnt > 2;
+    state.log = $cnt <= 2;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -531,7 +531,7 @@ List<int>? manyMNC32_2_3(State<String> state) {
   } else {
     state.pos = $pos;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
@@ -548,7 +548,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     if (state.ok) {
       state.pos += 3;
       $1 = 'abc';
-    } else if (!state.ok && !state.opt) {
+    } else if (state.log) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (state.ok) {
@@ -561,7 +561,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     if (state.ok) {
       state.pos++;
       $3 = 'a';
-    } else if (!state.ok && !state.opt) {
+    } else if (state.log) {
       state.error = ErrExpected.tag(state.pos, const Tag('a'));
     }
     if (state.ok) {
@@ -574,12 +574,12 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       if (state.ok) {
         state.pos++;
         $4 = 'b';
-      } else if (!state.ok && !state.opt) {
+      } else if (state.log) {
         state.error = ErrExpected.tag(state.pos, const Tag('b'));
       }
       if (state.ok) {
         $2 = $4!;
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error = ErrCombined(state.pos, [$error, state.error]);
       }
     }
@@ -604,11 +604,11 @@ dynamic map4Digits(State<String> state) {
     if (state.ok) {
       state.pos++;
       $1 = c;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error =
           ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   if (state.ok) {
@@ -620,11 +620,11 @@ dynamic map4Digits(State<String> state) {
       if (state.ok) {
         state.pos++;
         $2 = c;
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error =
             ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
       }
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrUnexpected.eof(state.pos);
     }
     if (state.ok) {
@@ -636,11 +636,11 @@ dynamic map4Digits(State<String> state) {
         if (state.ok) {
           state.pos++;
           $3 = c;
-        } else if (!state.opt) {
+        } else if (state.log) {
           state.error =
               ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
         }
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error = ErrUnexpected.eof(state.pos);
       }
       if (state.ok) {
@@ -652,11 +652,11 @@ dynamic map4Digits(State<String> state) {
           if (state.ok) {
             state.pos++;
             $4 = c;
-          } else if (!state.opt) {
+          } else if (state.log) {
             state.error =
                 ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
           }
-        } else if (!state.opt) {
+        } else if (state.log) {
           state.error = ErrUnexpected.eof(state.pos);
         }
         if (state.ok) {
@@ -683,7 +683,7 @@ String? mapC32ToStr(State<String> state) {
   if (state.ok) {
     state.pos += 2;
     $1 = 119296;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.char(state.pos, const Char(119296));
   }
   if (state.ok) {
@@ -705,11 +705,11 @@ int? noneOfC16(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -729,7 +729,7 @@ int? noneOfC16OrC32Ex(State<String> state) {
       if (c == ch) {
         state.pos = pos;
         state.ok = false;
-        if (!state.opt) {
+        if (state.log) {
           state.error = ErrUnexpected.char(state.pos, Char(c));
         }
         break;
@@ -739,7 +739,7 @@ int? noneOfC16OrC32Ex(State<String> state) {
       $0 = c;
     }
   } else {
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrUnexpected.eof(state.pos);
     }
     state.ok = false;
@@ -759,11 +759,11 @@ int? noneOfC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -779,14 +779,14 @@ bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
       case 97:
         if (source.startsWith('abc', state.pos)) {
           state.ok = false;
-          if (!state.opt) {
+          if (state.log) {
             state.error = ErrUnexpected.tag(state.pos, const Tag('abc'));
           }
           break;
         }
         if (source.startsWith('abd', state.pos)) {
           state.ok = false;
-          if (!state.opt) {
+          if (state.log) {
             state.error = ErrUnexpected.tag(state.pos, const Tag('abd'));
           }
           break;
@@ -795,14 +795,14 @@ bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
       case 100:
         if (source.startsWith('def', state.pos)) {
           state.ok = false;
-          if (!state.opt) {
+          if (state.log) {
             state.error = ErrUnexpected.tag(state.pos, const Tag('def'));
           }
           break;
         }
         if (source.startsWith('deg', state.pos)) {
           state.ok = false;
-          if (!state.opt) {
+          if (state.log) {
             state.error = ErrUnexpected.tag(state.pos, const Tag('deg'));
           }
           break;
@@ -811,13 +811,13 @@ bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
       case 120:
         if (source.startsWith('xy', state.pos)) {
           state.ok = false;
-          if (!state.opt) {
+          if (state.log) {
             state.error = ErrUnexpected.tag(state.pos, const Tag('xy'));
           }
           break;
         }
         state.ok = false;
-        if (!state.opt) {
+        if (state.log) {
           state.error = ErrUnexpected.tag(state.pos, const Tag('x'));
         }
         break;
@@ -831,8 +831,8 @@ bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
 
 bool? notC32OrC16(State<String> state) {
   bool? $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   final $pos = state.pos;
   dynamic $1;
   int? $2;
@@ -845,7 +845,7 @@ bool? notC32OrC16(State<String> state) {
     $3 = char32(state);
     if (state.ok) {
       $1 = $3!;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -854,11 +854,11 @@ bool? notC32OrC16(State<String> state) {
     $0 = true;
   } else {
     state.pos = $pos;
-    if (!$opt) {
+    if ($log) {
       state.error = ErrUnknown(state.pos);
     }
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
@@ -872,11 +872,11 @@ int? oneOfC16(State<String> state) {
     if (state.ok) {
       state.pos++;
       $0 = c;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error =
           ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -894,11 +894,11 @@ int? oneOfC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -907,8 +907,8 @@ int? oneOfC32(State<String> state) {
 String? optAbc(State<String> state) {
   final source = state.source;
   String? $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   String? $1;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
@@ -916,7 +916,7 @@ String? optAbc(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $1 = 'abc';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   if (state.ok) {
@@ -925,7 +925,7 @@ String? optAbc(State<String> state) {
     state.ok = true;
     $0 = null;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
@@ -1014,11 +1014,11 @@ int? satisfyC16(State<String> state) {
     if (state.ok) {
       state.pos++;
       $0 = c;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error =
           ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -1036,11 +1036,11 @@ int? satisfyC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -1049,8 +1049,8 @@ int? satisfyC32(State<String> state) {
 List<int>? separatedList0C32Abc(State<String> state) {
   final source = state.source;
   List<int>? $0;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   var $pos = state.pos;
   final $list = <int>[];
   for (;;) {
@@ -1059,7 +1059,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
     if (state.ok) {
       state.pos += 2;
       $1 = 119296;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrExpected.char(state.pos, const Char(119296));
     }
     if (!state.ok) {
@@ -1075,7 +1075,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
     if (state.ok) {
       state.pos += 3;
       $2 = 'abc';
-    } else if (!state.ok && !state.opt) {
+    } else if (state.log) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (!state.ok) {
@@ -1086,24 +1086,24 @@ List<int>? separatedList0C32Abc(State<String> state) {
   if (state.ok) {
     $0 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
 List<int>? separatedList1C32Abc(State<String> state) {
   final source = state.source;
   List<int>? $0;
-  final $opt = state.opt;
+  final $log = state.log;
   var $pos = state.pos;
   final $list = <int>[];
   for (;;) {
-    state.opt = $list.isNotEmpty;
+    state.log = $list.isEmpty;
     int? $1;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
     if (state.ok) {
       state.pos += 2;
       $1 = 119296;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrExpected.char(state.pos, const Char(119296));
     }
     if (!state.ok) {
@@ -1119,7 +1119,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
     if (state.ok) {
       state.pos += 3;
       $2 = 'abc';
-    } else if (!state.ok && !state.opt) {
+    } else if (state.log) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (!state.ok) {
@@ -1130,7 +1130,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
     state.ok = true;
     $0 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   return $0;
 }
 
@@ -1143,7 +1143,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = 80;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.char(state.pos, const Char(80));
   }
   if (state.ok) {
@@ -1154,7 +1154,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
     if (state.ok) {
       state.pos += 3;
       $2 = 'abc';
-    } else if (!state.ok && !state.opt) {
+    } else if (state.log) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
     if (state.ok) {
@@ -1164,7 +1164,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
       if (state.ok) {
         state.pos += 2;
         $3 = 119296;
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error = ErrExpected.char(state.pos, const Char(119296));
       }
       if (state.ok) {
@@ -1292,7 +1292,7 @@ String? tagC16(State<String> state) {
   if (state.ok) {
     state.pos++;
     $0 = 'P';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('P'));
   }
   return $0;
@@ -1307,7 +1307,7 @@ String? tagC16C32(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $0 = 'P𝈀';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('P𝈀'));
   }
   return $0;
@@ -1322,7 +1322,7 @@ String? tagC32(State<String> state) {
   if (state.ok) {
     state.pos += 2;
     $0 = '𝈀';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀'));
   }
   return $0;
@@ -1337,7 +1337,7 @@ String? tagC32C16(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $0 = '𝈀P';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀P'));
   }
   return $0;
@@ -1352,7 +1352,7 @@ String? tagExFoo(State<String> state) {
   if (state.ok) {
     state.pos += $tag.length;
     $0 = $tag;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, Tag($tag));
   }
   return $0;
@@ -1371,7 +1371,7 @@ String? tagNoCaseAbc(State<String> state) {
       $0 = v1;
     }
   }
-  if (!state.ok && !state.opt) {
+  if (!state.ok && state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   return $0;
@@ -1426,7 +1426,7 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
         break;
     }
   }
-  if (!state.ok && !state.opt) {
+  if (!state.ok && state.log) {
     state.error = ErrCombined($pos, [
       ErrExpected.tag(state.pos, Tag('abc')),
       ErrExpected.tag(state.pos, Tag('abd')),
@@ -1448,7 +1448,7 @@ String? takeUntilAbc(State<String> state) {
   if (state.ok) {
     state.pos = $index;
     $0 = $pos == $index ? '' : source.substring($pos, $index);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag($pos, const Tag('abc'));
   }
   return $0;
@@ -1463,7 +1463,7 @@ String? takeUntil1Abc(State<String> state) {
   if (state.ok) {
     state.pos = $index;
     $0 = source.substring($pos, $index);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag($pos, const Tag('abc'));
   }
   return $0;
@@ -1486,7 +1486,7 @@ String? takeWhile1C16(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
         : ErrUnexpected.eof(state.pos);
@@ -1513,7 +1513,7 @@ String? takeWhile1C32(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
         : ErrUnexpected.eof(state.pos);
@@ -1539,7 +1539,7 @@ dynamic takeWhile1DigitFold(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = $acc;
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
         : state.error = ErrUnexpected.eof(state.pos);
@@ -1587,7 +1587,7 @@ String? takeWhileC16UntilAbc(State<String> state) {
     if (state.ok) {
       $0 = source.substring(pos, state.pos);
     } else {
-      if (!state.opt) {
+      if (state.log) {
         state.error =
             ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
       }
@@ -1595,7 +1595,7 @@ String? takeWhileC16UntilAbc(State<String> state) {
     }
   } else {
     state.ok = false;
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
   }
@@ -1623,14 +1623,14 @@ String? takeWhileC32UntilAbc(State<String> state) {
     if (state.ok) {
       $0 = source.substring(pos, state.pos);
     } else {
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
       state.pos = pos;
     }
   } else {
     state.ok = false;
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
     }
   }
@@ -1677,7 +1677,7 @@ String? takeWhileMN_2_4C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    if (!state.opt) {
+    if (state.log) {
       state.error = state.pos < source.length
           ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
           : ErrUnexpected.eof(state.pos);
@@ -1708,7 +1708,7 @@ String? takeWhileMN_2_4C32(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    if (!state.opt) {
+    if (state.log) {
       state.error = state.pos < source.length
           ? ErrUnexpected.char(state.pos, Char($c))
           : ErrUnexpected.eof(state.pos);
@@ -1792,7 +1792,7 @@ bool? valueAbcToTrueValue(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $1 = 'abc';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   if (state.ok) {
@@ -1966,7 +1966,7 @@ int? transformersVarIsNotDigit(State<String> state) {
       if (c == ch) {
         state.pos = pos;
         state.ok = false;
-        if (!state.opt) {
+        if (state.log) {
           state.error = ErrUnexpected.char(state.pos, Char(c));
         }
         break;
@@ -1976,7 +1976,7 @@ int? transformersVarIsNotDigit(State<String> state) {
       $0 = c;
     }
   } else {
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrUnexpected.eof(state.pos);
     }
     state.ok = false;
@@ -2367,9 +2367,9 @@ class State<T> {
 
   Err error = ErrUnknown(0);
 
-  bool ok = false;
+  bool log = true;
 
-  bool opt = false;
+  bool ok = false;
 
   int pos = 0;
 

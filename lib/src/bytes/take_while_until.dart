@@ -29,14 +29,14 @@ if ({{index}} != -1) {
   if (state.ok) {
     {{res}} = source.substring(pos, state.pos);
   } else {
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
     }
     state.pos = pos;
   }
 } else {
   state.ok = false;
-  if (!state.opt) {
+  if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
   }
 }''';
@@ -61,14 +61,14 @@ if ({{index}} != -1) {
   if (state.ok) {
     {{res}} = source.substring(pos, state.pos);
   } else {
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrUnexpected.char(state.pos, Char(c));
     }
     state.pos = pos;
   }
 } else {
   state.ok = false;
-  if (!state.opt) {
+  if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
   }
 }''';

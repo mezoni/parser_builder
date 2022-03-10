@@ -572,9 +572,9 @@ class State<T> {
 
   Err error = ErrUnknown(0);
 
-  bool ok = false;
+  bool log = true;
 
-  bool opt = false;
+  bool ok = false;
 
   int pos = 0;
 

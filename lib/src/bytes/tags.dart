@@ -16,7 +16,7 @@ if (state.pos < source.length) {
     {{cases}}
   }
 }
-if (!state.ok && !state.opt) {
+if (!state.ok && state.log) {
   state.error = ErrCombined({{pos}}, [{{errors}}]);
 }''';
 

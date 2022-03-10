@@ -57,7 +57,7 @@ int? _hexVal(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = state.pos < source.length
         ? ErrUnexpected.char(state.pos, Char($c))
         : ErrUnexpected.eof(state.pos);
@@ -80,7 +80,7 @@ int? _hex(State<String> state) {
   if (state.ok) {
     state.pos += 2;
     $1 = '#x';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('#x'));
   }
   if (state.ok) {
@@ -101,8 +101,8 @@ int? _rangeChar(State<String> state) {
   int? $0;
   final $pos = state.pos;
   bool? $1;
-  final $opt = state.opt;
-  state.opt = true;
+  final $log = state.log;
+  state.log = false;
   final $pos1 = state.pos;
   String? $2;
   state.ok = false;
@@ -122,7 +122,7 @@ int? _rangeChar(State<String> state) {
         break;
     }
   }
-  if (!state.ok && !state.opt) {
+  if (!state.ok && state.log) {
     state.error = ErrCombined($pos2, [
       ErrExpected.tag(state.pos, Tag('[')),
       ErrExpected.tag(state.pos, Tag(']'))
@@ -133,11 +133,11 @@ int? _rangeChar(State<String> state) {
     $1 = true;
   } else {
     state.pos = $pos1;
-    if (!$opt) {
+    if ($log) {
       state.error = ErrUnknown(state.pos);
     }
   }
-  state.opt = $opt;
+  state.log = $log;
   if (state.ok) {
     int? $3;
     state.ok = false;
@@ -149,11 +149,11 @@ int? _rangeChar(State<String> state) {
         $3 = c;
       } else {
         state.pos = pos;
-        if (!state.opt) {
+        if (state.log) {
           state.error = ErrUnexpected.char(state.pos, Char(c));
         }
       }
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrUnexpected.eof(state.pos);
     }
     if (state.ok) {
@@ -178,7 +178,7 @@ int? _hexOrRangeChar(State<String> state) {
     $2 = _rangeChar(state);
     if (state.ok) {
       $0 = $2!;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -200,7 +200,7 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
       if (state.ok) {
         state.pos++;
         $4 = '-';
-      } else if (!state.ok && !state.opt) {
+      } else if (state.log) {
         state.error = ErrExpected.tag(state.pos, const Tag('-'));
       }
       if (state.ok) {
@@ -243,7 +243,7 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
       break;
     }
     final $10 = state.error;
-    if (!state.opt) {
+    if (state.log) {
       state.error = ErrCombined(state.pos, [$2, $7, $10]);
     }
     break;
@@ -263,11 +263,11 @@ int? _charCode(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
     }
-  } else if (!state.opt) {
+  } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
@@ -282,7 +282,7 @@ int? _char(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = '"';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (state.ok) {
@@ -295,7 +295,7 @@ int? _char(State<String> state) {
       if (state.ok) {
         state.pos++;
         $3 = '"';
-      } else if (!state.ok && !state.opt) {
+      } else if (state.log) {
         state.error = ErrExpected.tag(state.pos, const Tag('"'));
       }
       if (state.ok) {
@@ -319,15 +319,15 @@ List<Tuple2<int, int>>? _range(State<String> state) {
   if (state.ok) {
     state.pos++;
     $2 = '[';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('['));
   }
   if (state.ok) {
     List<Tuple2<int, int>>? $3;
-    final $opt = state.opt;
+    final $log = state.log;
     final $list = <Tuple2<int, int>>[];
     for (;;) {
-      state.opt = $list.isNotEmpty;
+      state.log = $list.isEmpty;
       Tuple2<int, int>? $4;
       $4 = _rangeBody(state);
       if (!state.ok) {
@@ -339,7 +339,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
       state.ok = true;
       $3 = $list;
     }
-    state.opt = $opt;
+    state.log = $log;
     if (state.ok) {
       String? $5;
       state.ok =
@@ -347,7 +347,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
       if (state.ok) {
         state.pos++;
         $5 = ']';
-      } else if (!state.ok && !state.opt) {
+      } else if (state.log) {
         state.error = ErrExpected.tag(state.pos, const Tag(']'));
       }
       if (state.ok) {
@@ -374,7 +374,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
       $9 = _hex(state);
       if (state.ok) {
         $7 = $9!;
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error = ErrCombined(state.pos, [$error1, state.error]);
       }
     }
@@ -384,7 +384,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     }
     if (state.ok) {
       $0 = $6!;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -400,7 +400,7 @@ String? _verbar(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = '|';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('|'));
   }
   if (state.ok) {
@@ -419,11 +419,11 @@ String? _verbar(State<String> state) {
 List<Tuple2<int, int>>? _ranges(State<String> state) {
   List<Tuple2<int, int>>? $0;
   List<List<Tuple2<int, int>>>? $1;
-  final $opt = state.opt;
+  final $log = state.log;
   var $pos = state.pos;
   final $list = <List<Tuple2<int, int>>>[];
   for (;;) {
-    state.opt = $list.isNotEmpty;
+    state.log = $list.isEmpty;
     List<Tuple2<int, int>>? $2;
     final $pos1 = state.pos;
     List<Tuple2<int, int>>? $3;
@@ -454,7 +454,7 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
     state.ok = true;
     $1 = $list;
   }
-  state.opt = $opt;
+  state.log = $log;
   if (state.ok) {
     final v = $1!;
     $0 = _flatten(v, <Tuple2<int, int>>[]);
@@ -475,7 +475,7 @@ List<Tuple2<int, int>>? parse(State<String> state) {
       state.ok = state.pos >= state.source.length;
       if (state.ok) {
         $3 = true;
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error = ErrExpected.eof(state.pos);
       }
       if (state.ok) {
@@ -816,9 +816,9 @@ class State<T> {
 
   Err error = ErrUnknown(0);
 
-  bool ok = false;
+  bool log = true;
 
-  bool opt = false;
+  bool ok = false;
 
   int pos = 0;
 

@@ -2,8 +2,8 @@ part of '../../multi.dart';
 
 class FoldMany0<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
-final {{opt}} = state.opt;
-state.opt = true;
+final {{log}} = state.log;
+state.log = false;
 var {{acc}} = {{init}};
 {{transform1}}
 {{transform2}}
@@ -19,7 +19,7 @@ state.ok = true;
 if (state.ok) {
   {{res}} = {{acc}};
 }
-state.opt = {{opt}};''';
+state.log = {{log}};''';
 
   final Transformer<O> combine;
 
@@ -38,7 +38,7 @@ state.opt = {{opt}};''';
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['acc', 'opt']);
+    final locals = context.allocateLocals(['acc', 'log']);
     final acc = locals['acc']!;
     final t1 = Transformation(context: context, name: 'init', arguments: []);
     final t2 = Transformation(

@@ -21,7 +21,7 @@ while (state.pos < source.length) {
 state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res}} = {{acc}};
-} else if (!state.opt) {
+} else if (state.log) {
   state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos))) : state.error = ErrUnexpected.eof(state.pos);
 }''';
 
@@ -45,7 +45,7 @@ while (state.pos < source.length) {
 state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res}} = {{acc}};
-} else if (!state.opt) {
+} else if (state.log) {
    state.error = state.pos < source.length ? ErrUnexpected.char(state.pos, Char({{c}})) : state.error = ErrUnexpected.eof(state.pos);
 }''';
 

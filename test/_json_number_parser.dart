@@ -322,7 +322,7 @@ num? number(State<String> state) {
     }
     if (state.ok) {
       $3 = $4;
-    } else if (!state.opt) {
+    } else if (state.log) {
       state.error = ErrMalformed(state.pos, const Tag('number'), [state.error]);
     }
     if (state.ok) {
@@ -340,7 +340,7 @@ num? number(State<String> state) {
       state.ok = state.pos >= state.source.length;
       if (state.ok) {
         $6 = true;
-      } else if (!state.opt) {
+      } else if (state.log) {
         state.error = ErrExpected.eof(state.pos);
       }
       if (state.ok) {
@@ -681,9 +681,9 @@ class State<T> {
 
   Err error = ErrUnknown(0);
 
-  bool ok = false;
+  bool log = true;
 
-  bool opt = false;
+  bool ok = false;
 
   int pos = 0;
 

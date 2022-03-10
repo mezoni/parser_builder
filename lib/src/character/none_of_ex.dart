@@ -21,7 +21,7 @@ if (state.pos < source.length) {
     if (c == ch) {
       state.pos = pos;
       state.ok = false;
-      if (!state.opt) {
+      if (state.log) {
         state.error = ErrUnexpected.char(state.pos, Char(c));
       }
       break;
@@ -31,7 +31,7 @@ if (state.pos < source.length) {
     {{res}} = c;
   }
 } else {
-  if (!state.opt) {
+  if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
   state.ok = false;

@@ -2,8 +2,8 @@ part of '../../combinator.dart';
 
 class Opt<I, O> extends ParserBuilder<I, O?> {
   static const _template = '''
-final {{opt}} = state.opt;
-state.opt = true;
+final {{log}} = state.log;
+state.log = false;
 {{p1}}
 if (state.ok) {
   {{res}} = {{p1_val}};
@@ -11,7 +11,7 @@ if (state.ok) {
   state.ok = true;
   {{res}} = null;
 }
-state.opt = {{opt}};''';
+state.log = {{log}};''';
 
   final ParserBuilder<I, O> parser;
 
@@ -19,7 +19,7 @@ state.opt = {{opt}};''';
 
   @override
   Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['opt']);
+    return context.allocateLocals(['log']);
   }
 
   @override

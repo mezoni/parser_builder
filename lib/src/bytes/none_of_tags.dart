@@ -27,7 +27,7 @@ case {{cc}}:
   static const _templateTestLong = '''
 if (source.startsWith({{tag}}, state.pos)) {
   state.ok = false;
-  if (!state.opt) {
+  if (state.log) {
     state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
   }
   break;
@@ -35,7 +35,7 @@ if (source.startsWith({{tag}}, state.pos)) {
 
   static const _templateTestShort = '''
 state.ok = false;
-if (!state.opt) {
+if (state.log) {
   state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
 }''';
   final List<String> tags;
