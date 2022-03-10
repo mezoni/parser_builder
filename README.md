@@ -265,22 +265,21 @@ const _inline = '@pragma(\'vm:prefer-inline\')';
 ## Example of generated code
 
 ```dart
-Tuple3<int, int, int>? _hexColor(State<String> state) {
-  Tuple3<int, int, int>? $0;
+Color? _hexColor(State<String> state) {
+  final source = state.source;
+  Color? $0;
   final $pos = state.pos;
-  final $ch = state.ch;
   String? $1;
-  state.ok = state.ch == 35;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
-    state.nextChar();
+    state.pos++;
     $1 = '#';
-  } else {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
-    Tuple3<int, int, int>? $2;
+    Color? $2;
     final $pos1 = state.pos;
-    final $ch1 = state.ch;
     int? $3;
     $3 = _hexPrimary(state);
     if (state.ok) {
@@ -290,13 +289,12 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
         int? $5;
         $5 = _hexPrimary(state);
         if (state.ok) {
-          $2 = Tuple3($3!, $4!, $5!);
+          $2 = Color($3!, $4!, $5!);
         }
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
-      state.ch = $ch1;
     }
     if (state.ok) {
       $0 = $2!;
@@ -304,7 +302,6 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.ch = $ch;
   }
   return $0;
 }
@@ -313,8 +310,16 @@ Tuple3<int, int, int>? _hexColor(State<String> state) {
 This code was generated from this declaration:
 
 ```dart
-const _hexColor = Named('_hexColor',
-    Preceded(Tag('#'), Tuple3(_hexPrimary, _hexPrimary, _hexPrimary)));
+const _hexColor = Named(
+    '_hexColor',
+    Preceded(
+        Tag('#'),
+        Map3(
+            _hexPrimary,
+            _hexPrimary,
+            _hexPrimary,
+            ExprTransformer<Color>(
+                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
 ```
 
 ## Inlining code example
