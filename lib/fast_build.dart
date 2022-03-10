@@ -64,12 +64,19 @@ String _publish(String name, Named builder) {
   return {{result}};
 }''';
 
+  // TODO
+  final isNullableResultType = builder.isNullableResultType();
+  var resultType = builder.getResultType();
+  if (!isNullableResultType && resultType.endsWith('?')) {
+    resultType = resultType.substring(0, resultType.length - 1);
+  }
+
   final values = {
     'I': builder.getInputType(),
-    'O': builder.getResultType(),
+    'O': resultType,
     'name': name,
     'parse': builder.name,
-    'result': builder.isNullableResultType() ? 'result' : 'result!',
+    'result': isNullableResultType ? 'result' : 'result!',
   };
 
   var code = template;

@@ -24,7 +24,6 @@ num? parse(String s) {
 bool? _ws(State<String> state) {
   final source = state.source;
   bool? $0;
-  state.ok = true;
   while (state.pos < source.length) {
     final pos = state.pos;
     final c = source.readRune(state);
@@ -35,6 +34,7 @@ bool? _ws(State<String> state) {
     state.pos = pos;
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = true;
   }

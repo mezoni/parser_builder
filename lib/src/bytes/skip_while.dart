@@ -8,7 +8,6 @@ part of '../../bytes.dart';
 /// ```
 class SkipWhile extends StringParserBuilder<bool> {
   static const _template16 = '''
-state.ok = true;
 {{transform}}
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
@@ -19,12 +18,12 @@ while (state.pos < source.length) {
   }
   break;
 }
+state.ok = true;
 if (state.ok) {
   {{res}} = true;
 }''';
 
   static const _template32 = '''
-state.ok = true;
 {{transform}}
 while (state.pos < source.length) {
   final pos = state.pos;
@@ -36,6 +35,7 @@ while (state.pos < source.length) {
   state.pos = pos;
   break;
 }
+state.ok = true;
 if (state.ok) {
   {{res}} = true;
 }''';

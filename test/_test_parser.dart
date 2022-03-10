@@ -5,7 +5,6 @@ import 'package:tuple/tuple.dart';
 String? alpha0(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = true;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -16,6 +15,7 @@ String? alpha0(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -25,18 +25,17 @@ String? alpha0(State<String> state) {
 String? alpha1(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     final ok = c <= 122 && (c >= 65 && c <= 90 || c >= 97 && c <= 122);
     if (ok) {
       state.pos++;
-      state.ok = true;
       continue;
     }
     break;
   }
+  state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
@@ -48,7 +47,6 @@ String? alpha1(State<String> state) {
 String? alphanumeric0(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = true;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -60,6 +58,7 @@ String? alphanumeric0(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -69,7 +68,6 @@ String? alphanumeric0(State<String> state) {
 String? alphanumeric1(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -77,11 +75,11 @@ String? alphanumeric1(State<String> state) {
         (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
     if (ok) {
       state.pos++;
-      state.ok = true;
       continue;
     }
     break;
   }
+  state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
@@ -222,7 +220,6 @@ int? delimited(State<String> state) {
 String? digit0(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = true;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -233,6 +230,7 @@ String? digit0(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -242,18 +240,17 @@ String? digit0(State<String> state) {
 String? digit1(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     final ok = c >= 48 && c <= 57;
     if (ok) {
       state.pos++;
-      state.ok = true;
       continue;
     }
     break;
   }
+  state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
@@ -350,7 +347,7 @@ dynamic foldMany0Digit(State<String> state) {
     int? $1;
     state.ok = false;
     if (state.pos < source.length) {
-      var c = source.codeUnitAt(state.pos);
+      final c = source.codeUnitAt(state.pos);
       state.ok = c >= 48 && c <= 57;
       if (state.ok) {
         state.pos++;
@@ -379,7 +376,6 @@ dynamic foldMany0Digit(State<String> state) {
 String? hexDigit0(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = true;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -391,6 +387,7 @@ String? hexDigit0(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   }
@@ -400,7 +397,6 @@ String? hexDigit0(State<String> state) {
 String? hexDigit1(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = false;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -408,11 +404,11 @@ String? hexDigit1(State<String> state) {
         (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
     if (ok) {
       state.pos++;
-      state.ok = true;
       continue;
     }
     break;
   }
+  state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else if (state.log) {
@@ -595,7 +591,7 @@ dynamic map4Digits(State<String> state) {
   int? $1;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     state.ok = c >= 48 && c <= 57;
     if (state.ok) {
       state.pos++;
@@ -611,7 +607,7 @@ dynamic map4Digits(State<String> state) {
     int? $2;
     state.ok = false;
     if (state.pos < source.length) {
-      var c = source.codeUnitAt(state.pos);
+      final c = source.codeUnitAt(state.pos);
       state.ok = c >= 48 && c <= 57;
       if (state.ok) {
         state.pos++;
@@ -627,7 +623,7 @@ dynamic map4Digits(State<String> state) {
       int? $3;
       state.ok = false;
       if (state.pos < source.length) {
-        var c = source.codeUnitAt(state.pos);
+        final c = source.codeUnitAt(state.pos);
         state.ok = c >= 48 && c <= 57;
         if (state.ok) {
           state.pos++;
@@ -643,7 +639,7 @@ dynamic map4Digits(State<String> state) {
         int? $4;
         state.ok = false;
         if (state.pos < source.length) {
-          var c = source.codeUnitAt(state.pos);
+          final c = source.codeUnitAt(state.pos);
           state.ok = c >= 48 && c <= 57;
           if (state.ok) {
             state.pos++;
@@ -863,7 +859,7 @@ int? oneOfC16(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     state.ok = c == 80;
     if (state.ok) {
       state.pos++;
@@ -884,7 +880,7 @@ int? oneOfC32(State<String> state) {
   state.ok = false;
   if (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     state.ok = c == 119296;
     if (state.ok) {
       $0 = c;
@@ -1005,7 +1001,7 @@ int? satisfyC16(State<String> state) {
   int? $0;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     state.ok = c == 80;
     if (state.ok) {
       state.pos++;
@@ -1026,7 +1022,7 @@ int? satisfyC32(State<String> state) {
   state.ok = false;
   if (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     state.ok = c == 119296;
     if (state.ok) {
       $0 = c;
@@ -1241,7 +1237,6 @@ bool? skipWhile1C32(State<String> state) {
 bool? skipWhileC16(State<String> state) {
   final source = state.source;
   bool? $0;
-  state.ok = true;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     final ok = c == 80;
@@ -1251,6 +1246,7 @@ bool? skipWhileC16(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = true;
   }
@@ -1260,7 +1256,6 @@ bool? skipWhileC16(State<String> state) {
 bool? skipWhileC32(State<String> state) {
   final source = state.source;
   bool? $0;
-  state.ok = true;
   while (state.pos < source.length) {
     final pos = state.pos;
     final c = source.readRune(state);
@@ -1271,6 +1266,7 @@ bool? skipWhileC32(State<String> state) {
     state.pos = pos;
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = true;
   }
@@ -1536,7 +1532,6 @@ dynamic takeWhile1DigitFold(State<String> state) {
 String? takeWhileC16(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = true;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -1547,6 +1542,7 @@ String? takeWhileC16(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }
@@ -1795,7 +1791,6 @@ bool? valueTrue(State<dynamic> state) {
 String? transformersCharClassIsDigit(State<String> state) {
   final source = state.source;
   String? $0;
-  state.ok = true;
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -1806,6 +1801,7 @@ String? transformersCharClassIsDigit(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = $pos == state.pos ? '' : source.substring($pos, state.pos);
   }

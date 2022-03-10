@@ -18,7 +18,6 @@ List<Tuple2<int, int>> parseString(String source) {
 bool? _ws(State<String> state) {
   final source = state.source;
   bool? $0;
-  state.ok = true;
   while (state.pos < source.length) {
     final pos = state.pos;
     final c = source.readRune(state);
@@ -29,6 +28,7 @@ bool? _ws(State<String> state) {
     state.pos = pos;
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = true;
   }
@@ -141,7 +141,7 @@ int? _rangeChar(State<String> state) {
     state.ok = false;
     if (state.pos < source.length) {
       final pos = state.pos;
-      var c = source.readRune(state);
+      final c = source.readRune(state);
       state.ok = c > 0x20 && c < 0x7f;
       if (state.ok) {
         $3 = c;
@@ -255,7 +255,7 @@ int? _charCode(State<String> state) {
   state.ok = false;
   if (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     state.ok = c > 0x20 && c < 0x7f;
     if (state.ok) {
       $0 = c;

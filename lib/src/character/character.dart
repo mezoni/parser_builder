@@ -2,7 +2,6 @@ part of '../../character.dart';
 
 abstract class _Chars0 extends StringParserBuilder<String> {
   static const _template16 = '''
-state.ok = true;
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
@@ -14,12 +13,12 @@ while (state.pos < source.length) {
   }
   break;
 }
+state.ok = true;
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 }''';
 
   static const _template32 = '''
-state.ok = true;
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
@@ -32,6 +31,7 @@ while (state.pos < source.length) {
   state.pos = pos;
   break;
 }
+state.ok = true;
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 }''';
@@ -70,7 +70,6 @@ if (state.ok) {
 
 abstract class _Chars1 extends StringParserBuilder<String> {
   static const _template16 = '''
-state.ok = false;
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
@@ -78,11 +77,11 @@ while (state.pos < source.length) {
   final ok = {{cond}};
   if (ok) {
     state.pos++;
-    state.ok = true;
     continue;
   }
   break;
 }
+state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (state.log) {
@@ -90,7 +89,6 @@ if (state.ok) {
 }''';
 
   static const _template32 = '''
-state.ok = false;
 final {{pos}} = state.pos;
 var {{c}} = 0;
 {{transform}}
@@ -99,12 +97,12 @@ while (state.pos < source.length) {
   {{c}} = source.readRune(state);
   final ok = {{cond}};
   if (ok) {
-    state.ok = true;
     continue;
   }
   state.pos = pos;
   break;
 }
+state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res}} = source.substring({{pos}}, state.pos);
 } else if (state.log) {

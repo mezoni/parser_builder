@@ -9,7 +9,7 @@ void main(List<String> args) {
 }
 
 void _test() {
-  test('CharParser', () {
+  test('CharClassParser', () {
     final parser = parse;
     {
       final state = State(' "1" ');

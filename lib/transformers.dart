@@ -1,6 +1,6 @@
 import 'package:parser_builder/parser_builder.dart';
 
-import 'src/transformers/char_class_parser.dart';
+import 'src/transformers/char_class_parser.dart' as _char_class_parser;
 
 part 'src/transformers/_char_class.dart';
 part 'src/transformers/char_class.dart';

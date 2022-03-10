@@ -11,8 +11,8 @@ import 'package:tuple/tuple.dart' as _t;
 Future<void> main(List<String> args) async {
   final context = Context();
   final filename = 'lib/src/transformers/char_class_parser.dart';
-  await fastBuild(context, [_parser], filename,
-      footer: footer, header: __header);
+  await fastBuild(context, [_parse], filename,
+      footer: footer, header: __header, publish: {'parseString': _parse});
 }
 
 const footer = '''
@@ -48,25 +48,13 @@ int _toHexValue(String s) {
   return r;
 }''';
 
-const parser = Delimited(_ws, _ranges, Eof<String>());
-
 const __header = r'''
 // ignore_for_file: unused_local_variable
 
 import 'package:source_span/source_span.dart';
 import 'package:tuple/tuple.dart';
 
-List<Tuple2<int, int>> parseString(String source) {
-  final state = State(source);
-  final result = parse(state);
-  if (!state.ok) {
-    final errors = Err.errorReport(state.error);
-    final message = _errorMessage(source, errors);
-    throw FormatException('\n$message');
-  }
-
-  return result!;
-}''';
+''';
 
 const _char = Named('_char', Delimited(Tag('"'), _charCode, Tag('"')));
 
@@ -93,7 +81,7 @@ const _isHexDigit = ExprTransformer<bool>([
 const _isWhiteSpace = ExprTransformer<bool>(
     ['x'], '{{x}} == 0x09 || {{x}} == 0xA || {{x}} == 0xD || {{x}} == 0x20');
 
-const _parser = Named('parse', parser);
+const _parse = Named('parse', Delimited(_ws, _ranges, Eof<String>()));
 
 const _range = Named(
     '_range',

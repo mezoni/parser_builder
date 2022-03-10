@@ -20,7 +20,7 @@ while (state.pos < source.length) {
     state.pos = pos;
     break;
   }
-  if ({{start}} != state.pos) {
+  if (state.pos != {{start}}) {
     {{buffer}}.write(source.substring({{start}}, state.pos));
   }
   if ({{c}} != {{controlChar}}) {

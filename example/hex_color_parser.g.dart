@@ -1,30 +1,40 @@
 part of 'hex_color_parser.dart';
 
+Color parseString(String source) {
+  final state = State(source);
+  final result = _parse(state);
+  if (!state.ok) {
+    final errors = Err.errorReport(state.error);
+    final message = _errorMessage(source, errors);
+    throw FormatException('\n$message');
+  }
+
+  return result!;
+}
+
 int? _hexPrimary(State<String> state) {
   final source = state.source;
   int? $0;
   String? $1;
   final $pos = state.pos;
-  var $c = 0;
   var $cnt = 0;
   while ($cnt < 2 && state.pos < source.length) {
-    $c = source.codeUnitAt(state.pos);
-    final ok = $c < 103 &&
-        ($c >= 48 && $c <= 57 || $c >= 65 && $c <= 70 || $c >= 97 && $c <= 102);
-    if (!ok) {
-      break;
+    final c = source.codeUnitAt(state.pos);
+    final ok = c <= 102 &&
+        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
+    if (ok) {
+      state.pos++;
+      $cnt++;
+      continue;
     }
-    state.pos++;
-    $cnt++;
+    break;
   }
   state.ok = $cnt >= 2;
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
   } else {
-    if (!state.opt) {
-      state.error = state.pos < source.length
-          ? ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)))
-          : ErrUnexpected.eof(state.pos);
+    if (state.log) {
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
     }
     state.pos = $pos;
   }
@@ -44,7 +54,7 @@ Color? _hexColor(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = '#';
-  } else if (!state.ok && !state.opt) {
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
@@ -354,6 +364,12 @@ class ErrUnexpected extends Err {
       : length = 1,
         value = value;
 
+  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
+      : length = 1,
+        value = offset < source.length
+            ? Char(c ?? source.runeAt(offset))
+            : const Tag('EOF');
+
   ErrUnexpected.eof(this.offset)
       : length = 1,
         value = const Tag('EOF');
@@ -409,9 +425,9 @@ class State<T> {
 
   Err error = ErrUnknown(0);
 
-  bool ok = false;
+  bool log = true;
 
-  bool opt = false;
+  bool ok = false;
 
   int pos = 0;
 

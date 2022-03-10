@@ -17,7 +17,6 @@ dynamic parse(String source) {
 bool? _ws(State<String> state) {
   final source = state.source;
   bool? $0;
-  state.ok = true;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     final ok = c <= 32 && (c >= 9 && c <= 10 || c == 13 || c == 32);
@@ -27,6 +26,7 @@ bool? _ws(State<String> state) {
     }
     break;
   }
+  state.ok = true;
   if (state.ok) {
     $0 = true;
   }
@@ -226,7 +226,7 @@ String? _string(State<String> state) {
         state.pos = pos;
         break;
       }
-      if ($start != state.pos) {
+      if (state.pos != $start) {
         $buffer.write(source.substring($start, state.pos));
       }
       if ($c != 92) {

@@ -12,7 +12,7 @@ class Satisfy extends StringParserBuilder<int> {
 state.ok = false;
 if (state.pos < source.length) {
   {{transform}}
-  var c = source.codeUnitAt(state.pos);
+  final c = source.codeUnitAt(state.pos);
   state.ok = {{cond}};
   if (state.ok) {
     state.pos++;
@@ -29,7 +29,7 @@ state.ok = false;
 if (state.pos < source.length) {
   {{transform}}
   final pos = state.pos;
-  var c = source.readRune(state);
+  final c = source.readRune(state);
   state.ok = {{cond}};
   if (state.ok) {
     {{res}} = c;

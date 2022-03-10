@@ -10,7 +10,8 @@ import 'hex_color_parser_helper.dart';
 Future<void> main(List<String> args) async {
   final context = Context();
   final filename = 'example/hex_color_parser.g.dart';
-  await fastBuild(context, [_parse], filename, partOf: 'hex_color_parser.dart');
+  await fastBuild(context, [_parse], filename,
+      partOf: 'hex_color_parser.dart', publish: {'parseString': _parse});
 }
 
 const _hexColor = Named(
