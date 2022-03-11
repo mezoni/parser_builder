@@ -1,6 +1,7 @@
 ## 0.14.2
 
-- Improved parser builder `StringValue`. The overall performance of parsing data with string values can be increased by up to 5%
+- Added many improvements to the parser builder `StringValue`. The overall performance of parsing data with string values can be increased by up to 10%
+- Added tests for parser builder `StringValue`
 
 ## 0.14.1
 

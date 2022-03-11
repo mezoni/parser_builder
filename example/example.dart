@@ -210,8 +210,9 @@ String? _string(State<String> state) {
   if (state.ok) {
     String? $3;
     state.ok = true;
-    final $list = [];
     final $pos1 = state.pos;
+    final $list = [];
+    var $str = '';
     while (state.pos < source.length) {
       final $start = state.pos;
       var $c = 0;
@@ -225,8 +226,9 @@ String? _string(State<String> state) {
         state.pos = pos;
         break;
       }
-      if (state.pos != $start) {
-        $list.add(source.substring($start, state.pos));
+      $str = state.pos == $start ? '' : source.substring($start, state.pos);
+      if ($str != '' && $list.isNotEmpty) {
+        $list.add($str);
       }
       if ($c != 92) {
         break;
@@ -238,21 +240,27 @@ String? _string(State<String> state) {
         state.pos = $pos1;
         break;
       }
+      if ($list.isEmpty && $str != '') {
+        $list.add($str);
+      }
       $list.add($4!);
     }
     if (state.ok) {
       if ($list.isEmpty) {
-        $3 = '';
+        $3 = $str;
       } else if ($list.length == 1) {
-        final obj = $list[0];
-        if (obj is int) {
-          $3 = String.fromCharCode(obj);
-        } else {
-          $3 = obj as String;
-        }
+        final c = $list[0] as int;
+        $3 = String.fromCharCode(c);
       } else {
         final buffer = StringBuffer();
-        buffer.writeAll($list);
+        for (var i = 0; i < $list.length; i++) {
+          final obj = $list[i];
+          if (obj is int) {
+            buffer.writeCharCode(obj);
+          } else {
+            buffer.write(obj);
+          }
+        }
         $3 = buffer.toString();
       }
     }

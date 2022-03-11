@@ -1266,6 +1266,85 @@ bool? skipWhileC32(State<String> state) {
   return $0;
 }
 
+String? stringValue(State<String> state) {
+  final source = state.source;
+  String? $0;
+  state.ok = true;
+  final $pos = state.pos;
+  final $list = [];
+  var $str = '';
+  while (state.pos < source.length) {
+    final $start = state.pos;
+    var $c = 0;
+    while (state.pos < source.length) {
+      final pos = state.pos;
+      $c = source.readRune(state);
+      final ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
+      if (ok) {
+        continue;
+      }
+      state.pos = pos;
+      break;
+    }
+    $str = state.pos == $start ? '' : source.substring($start, state.pos);
+    if ($str != '' && $list.isNotEmpty) {
+      $list.add($str);
+    }
+    if ($c != 92) {
+      break;
+    }
+    state.pos += 1;
+    int? $1;
+    state.ok = false;
+    if (state.pos < source.length) {
+      var c = source.codeUnitAt(state.pos);
+      int? v;
+      switch (c) {
+        case 110:
+          v = 10;
+          break;
+      }
+      if (v != null) {
+        state.pos++;
+        state.ok = true;
+        $1 = v;
+      } else if (state.log) {
+        state.error = ErrUnexpected.charAt(state.pos, source);
+      }
+    } else if (state.log) {
+      state.error = ErrUnexpected.eof(state.pos);
+    }
+    if (!state.ok) {
+      state.pos = $pos;
+      break;
+    }
+    if ($list.isEmpty && $str != '') {
+      $list.add($str);
+    }
+    $list.add($1!);
+  }
+  if (state.ok) {
+    if ($list.isEmpty) {
+      $0 = $str;
+    } else if ($list.length == 1) {
+      final c = $list[0] as int;
+      $0 = String.fromCharCode(c);
+    } else {
+      final buffer = StringBuffer();
+      for (var i = 0; i < $list.length; i++) {
+        final obj = $list[i];
+        if (obj is int) {
+          buffer.writeCharCode(obj);
+        } else {
+          buffer.write(obj);
+        }
+      }
+      $0 = buffer.toString();
+    }
+  }
+  return $0;
+}
+
 String? tagC16(State<String> state) {
   final source = state.source;
   String? $0;

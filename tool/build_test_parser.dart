@@ -61,6 +61,7 @@ Future<void> main(List<String> args) async {
     _skipWhile1C32,
     _skipWhileC16,
     _skipWhileC32,
+    _stringValue,
     _tagAbc,
     _tagC16,
     _tagC16C32,
@@ -253,6 +254,14 @@ const _skipWhile1C32 = Named('skipWhile1C32', SkipWhile1(_isC32));
 const _skipWhileC16 = Named('skipWhileC16', SkipWhile(_isC16));
 
 const _skipWhileC32 = Named('skipWhileC32', SkipWhile(_isC32));
+
+const _stringValue = Named(
+    'stringValue',
+    StringValue(
+        ExprTransformer<bool>(
+            ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c'),
+        0x5c,
+        EscapeSequence({0x6e: 0xa})));
 
 const _tagAbc = Named('tagAbc', Tag(abc));
 

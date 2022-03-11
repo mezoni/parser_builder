@@ -625,20 +625,44 @@ String buildBodyEx(Context context, Map<String, ParserBuilder> builders,
 
 Current performance of the generated JSON parser.  
 
-The performance is about 1.2-1.5 times lower than that of a hand-written high-quality specialized state machine based parser from the Dart SDK.
+The performance is about 1.17-1.33 times lower than that of a hand-written high-quality specialized state machine based JSON parser from the Dart SDK.
+
+Better results in many cases are obtained in AOT mode. If the Dart SDK compiler had made more efficient use placement of (short lifetime) local variables in registers, the results could have been slightly better. At the moment, the generated parser code is not optimized for using machine registers, because performance tests, unfortunately, do not show a gain from this kind of optimization.
+
+AOT mode:
 
 ```
 Parse 10 times: E:\prj\test_json\bin\data\canada.json
-Dart SDK JSON    : k: 2.31, 45.87 MB/s, 468.00 ms (100.00%),
-Simple JSON NEW 2: k: 1.00, 105.86 MB/s, 202.80 ms (43.33%),
+Dart SDK JSON    : k: 2.06, 41.70 MB/s, 514.80 ms (100.00%),
+Simple JSON NEW 2: k: 1.00, 86.01 MB/s, 249.60 ms (48.48%),
+
+Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json
+Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (85.71%),
+Simple JSON NEW 2: k: 1.17, 75.41 MB/s, 218.40 ms (100.00%),
+
+Parse 10 times: E:\prj\test_json\bin\data\twitter.json
+Dart SDK JSON    : k: 1.00, 57.86 MB/s, 93.60 ms (85.72%),
+Simple JSON NEW 2: k: 1.17, 49.60 MB/s, 109.20 ms (100.00%),
+
+OS: Microsoft Windows 7 Ultimate 6.1.7601
+Kernel: Windows_NT 6.1.7601
+Processor (4 core) Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
+```
+
+JIT mode:
+
+```
+Parse 10 times: E:\prj\test_json\bin\data\canada.json
+Dart SDK JSON    : k: 2.38, 44.39 MB/s, 483.60 ms (100.00%),
+Simple JSON NEW 2: k: 1.00, 105.86 MB/s, 202.80 ms (41.94%),
 
 Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json
 Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (75.00%),
 Simple JSON NEW 2: k: 1.33, 65.99 MB/s, 249.60 ms (100.00%),
 
 Parse 10 times: E:\prj\test_json\bin\data\twitter.json
-Dart SDK JSON    : k: 1.00, 57.87 MB/s, 93.60 ms (85.71%),
-Simple JSON NEW 2: k: 1.17, 49.60 MB/s, 109.20 ms (100.00%),
+Dart SDK JSON    : k: 1.00, 57.87 MB/s, 93.60 ms (75.00%),
+Simple JSON NEW 2: k: 1.33, 43.40 MB/s, 124.80 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601

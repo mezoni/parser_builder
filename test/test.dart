@@ -67,6 +67,7 @@ void _test() {
   _testSequence();
   _testSkipWhile();
   _testSkipWhile1();
+  _testStringValue();
   _testTag();
   _testTagEx();
   _testTagNoCase();
@@ -2012,6 +2013,82 @@ void _testSkipWhile1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnexpected.char(0, Char(c16)));
+    }
+  });
+}
+
+void _testStringValue() {
+  test('StringValue', () {
+    final parser = stringValue;
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, '');
+      expect(state.pos, 0);
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, ' ');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State(r' \n');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, ' \n');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State(r' \n\n');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, ' \n\n');
+      expect(state.pos, 5);
+    }
+    {
+      final state = State(r' \n\n ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, ' \n\n ');
+      expect(state.pos, 6);
+    }
+    {
+      final state = State(r'\n');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, '\n');
+      expect(state.pos, 2);
+    }
+    {
+      final state = State(r'\n ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, '\n ');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State(r'\n\n ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, '\n\n ');
+      expect(state.pos, 5);
+    }
+    {
+      final state = State(r'\n \n');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, '\n \n');
+      expect(state.pos, 5);
+    }
+    {
+      final state = State(r' \n ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, ' \n ');
+      expect(state.pos, 4);
     }
   });
 }
