@@ -12,7 +12,7 @@ part of '../../branch.dart';
 /// form of a list of errors), in case of unsuccessful parsing.
 ///
 /// If the list of generated errors is not specified, then only one error is
-/// generated: `ErrUnexpected.charOrEof(state.pos, source)`.
+/// generated: `[ErrUnexpected.charOrEof(state.pos, source)]`.
 ///
 /// Example:
 /// ```dart
@@ -150,7 +150,7 @@ if (state.ok) {
     }
 
     final handler = this.errors ??
-        ExprTransformer.value('ErrUnexpected.charOrEof(state.pos, source)');
+        ExprTransformer.value('[ErrUnexpected.charOrEof(state.pos, source)]');
     final errors = locals['errors']!;
     final t = Transformation(context: context, name: errors, arguments: []);
     final values = {
