@@ -18,7 +18,7 @@ if (state.pos < source.length) {
     state.pos++;
     {{res}} = c;
   } else if (state.log) {
-    state.error = ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+    state.error = ErrUnexpected.charAt(state.pos, source);
   }
 } else if (state.log) {
   state.error = ErrUnexpected.eof(state.pos);

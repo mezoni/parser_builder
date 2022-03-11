@@ -293,8 +293,7 @@ int? escapeSequence16(State<String> state) {
       state.ok = true;
       $0 = v;
     } else if (state.log) {
-      state.error =
-          ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+      state.error = ErrUnexpected.charAt(state.pos, source);
     }
   } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
@@ -353,8 +352,7 @@ dynamic foldMany0Digit(State<String> state) {
         state.pos++;
         $1 = c;
       } else if (state.log) {
-        state.error =
-            ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+        state.error = ErrUnexpected.charAt(state.pos, source);
       }
     } else if (state.log) {
       state.error = ErrUnexpected.eof(state.pos);
@@ -597,8 +595,7 @@ dynamic map4Digits(State<String> state) {
       state.pos++;
       $1 = c;
     } else if (state.log) {
-      state.error =
-          ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+      state.error = ErrUnexpected.charAt(state.pos, source);
     }
   } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
@@ -613,8 +610,7 @@ dynamic map4Digits(State<String> state) {
         state.pos++;
         $2 = c;
       } else if (state.log) {
-        state.error =
-            ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+        state.error = ErrUnexpected.charAt(state.pos, source);
       }
     } else if (state.log) {
       state.error = ErrUnexpected.eof(state.pos);
@@ -629,8 +625,7 @@ dynamic map4Digits(State<String> state) {
           state.pos++;
           $3 = c;
         } else if (state.log) {
-          state.error =
-              ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+          state.error = ErrUnexpected.charAt(state.pos, source);
         }
       } else if (state.log) {
         state.error = ErrUnexpected.eof(state.pos);
@@ -645,8 +640,7 @@ dynamic map4Digits(State<String> state) {
             state.pos++;
             $4 = c;
           } else if (state.log) {
-            state.error =
-                ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+            state.error = ErrUnexpected.charAt(state.pos, source);
           }
         } else if (state.log) {
           state.error = ErrUnexpected.eof(state.pos);
@@ -1007,8 +1001,7 @@ int? satisfyC16(State<String> state) {
       state.pos++;
       $0 = c;
     } else if (state.log) {
-      state.error =
-          ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+      state.error = ErrUnexpected.charAt(state.pos, source);
     }
   } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
@@ -1570,8 +1563,7 @@ String? takeWhileC16UntilAbc(State<String> state) {
       $0 = source.substring(pos, state.pos);
     } else {
       if (state.log) {
-        state.error =
-            ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+        state.error = ErrUnexpected.charAt(state.pos, source);
       }
       state.pos = pos;
     }
@@ -2237,6 +2229,10 @@ class ErrUnexpected extends Err {
   ErrUnexpected.char(this.offset, Char value)
       : length = 1,
         value = value;
+
+  ErrUnexpected.charAt(this.offset, String source)
+      : length = 1,
+        value = Char(source.runeAt(offset));
 
   ErrUnexpected.charOrEof(this.offset, String source, [int? c])
       : length = 1,

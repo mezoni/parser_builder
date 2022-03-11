@@ -30,7 +30,7 @@ if ({{index}} != -1) {
     {{res}} = source.substring(pos, state.pos);
   } else {
     if (state.log) {
-      state.error = ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+      state.error = ErrUnexpected.charAt(state.pos, source);
     }
     state.pos = pos;
   }

@@ -148,8 +148,7 @@ int? _escaped(State<String> state) {
       state.ok = true;
       $1 = v;
     } else if (state.log) {
-      state.error =
-          ErrUnexpected.char(state.pos, Char(source.runeAt(state.pos)));
+      state.error = ErrUnexpected.charAt(state.pos, source);
     }
   } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
@@ -1227,6 +1226,10 @@ class ErrUnexpected extends Err {
   ErrUnexpected.char(this.offset, Char value)
       : length = 1,
         value = value;
+
+  ErrUnexpected.charAt(this.offset, String source)
+      : length = 1,
+        value = Char(source.runeAt(offset));
 
   ErrUnexpected.charOrEof(this.offset, String source, [int? c])
       : length = 1,

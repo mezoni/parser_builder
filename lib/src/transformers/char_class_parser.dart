@@ -759,6 +759,10 @@ class ErrUnexpected extends Err {
       : length = 1,
         value = value;
 
+  ErrUnexpected.charAt(this.offset, String source)
+      : length = 1,
+        value = Char(source.runeAt(offset));
+
   ErrUnexpected.charOrEof(this.offset, String source, [int? c])
       : length = 1,
         value = offset < source.length
