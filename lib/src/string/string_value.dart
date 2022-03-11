@@ -4,7 +4,7 @@ part of '../../string.dart';
 class StringValue extends StringParserBuilder<String> {
   static const _template = '''
 state.ok = true;
-final {{buffer}} = StringBuffer();
+final {{list}} = [];
 final {{pos}} = state.pos;
 {{transform}}
 while (state.pos < source.length) {
@@ -21,7 +21,7 @@ while (state.pos < source.length) {
     break;
   }
   if (state.pos != {{start}}) {
-    {{buffer}}.write(source.substring({{start}}, state.pos));
+    {{list}}.add(source.substring({{start}}, state.pos));
   }
   if ({{c}} != {{controlChar}}) {
     break;
@@ -32,10 +32,23 @@ while (state.pos < source.length) {
     state.pos = {{pos}};
     break;
   }
-  {{buffer}}.writeCharCode({{p1_val}});
+  {{list}}.add({{p1_val}});
 }
 if (state.ok) {
-  {{res}} = {{buffer}}.isEmpty ? '' : {{buffer}}.toString();
+  if ({{list}}.isEmpty) {
+    {{res}} = '';
+  } else if ({{list}}.length == 1) {
+    final obj = {{list}}[0];
+    if (obj is int) {
+      {{res}} = String.fromCharCode(obj);
+    } else {
+      {{res}} = obj as String;
+    }
+  } else {
+    final buffer = StringBuffer();
+    buffer.writeAll({{list}});
+    {{res}} = buffer.toString();
+  }
 }''';
 
   final int controlChar;
@@ -56,7 +69,7 @@ if (state.ok) {
   @override
   Map<String, String> getTags(Context context) {
     final locals =
-        context.allocateLocals(['c', 'buffer', 'cond', 'pos', 'start']);
+        context.allocateLocals(['c', 'cond', 'list', 'pos', 'start']);
     final c = locals['c']!;
     final cond = locals['cond']!;
     final t = Transformation(context: context, name: cond, arguments: [c]);

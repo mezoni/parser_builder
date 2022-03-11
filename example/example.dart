@@ -210,7 +210,7 @@ String? _string(State<String> state) {
   if (state.ok) {
     String? $3;
     state.ok = true;
-    final $buffer = StringBuffer();
+    final $list = [];
     final $pos1 = state.pos;
     while (state.pos < source.length) {
       final $start = state.pos;
@@ -226,7 +226,7 @@ String? _string(State<String> state) {
         break;
       }
       if (state.pos != $start) {
-        $buffer.write(source.substring($start, state.pos));
+        $list.add(source.substring($start, state.pos));
       }
       if ($c != 92) {
         break;
@@ -238,10 +238,23 @@ String? _string(State<String> state) {
         state.pos = $pos1;
         break;
       }
-      $buffer.writeCharCode($4!);
+      $list.add($4!);
     }
     if (state.ok) {
-      $3 = $buffer.isEmpty ? '' : $buffer.toString();
+      if ($list.isEmpty) {
+        $3 = '';
+      } else if ($list.length == 1) {
+        final obj = $list[0];
+        if (obj is int) {
+          $3 = String.fromCharCode(obj);
+        } else {
+          $3 = obj as String;
+        }
+      } else {
+        final buffer = StringBuffer();
+        buffer.writeAll($list);
+        $3 = buffer.toString();
+      }
     }
     if (state.ok) {
       String? $5;

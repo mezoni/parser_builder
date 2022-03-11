@@ -1,3 +1,7 @@
+## 0.14.2
+
+- Improved parser builder `StringValue`. The overall performance of parsing data with string values can be increased by up to 5%
+
 ## 0.14.1
 
 - Fixed minor bug in builder `SkipWhile1`
