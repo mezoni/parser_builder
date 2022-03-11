@@ -82,8 +82,6 @@ const _escapeSeq = EscapeSequence({
   0x74: 0x09
 });
 
-const _false = Named('_false', Value(false, Tag('false')), [_inline]);
-
 const _inline = '@pragma(\'vm:prefer-inline\')';
 
 const _isNormalChar = ExprTransformer<bool>(
@@ -104,8 +102,6 @@ const _keyValue = Named(
 
 const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
 
-const _null = Named('_null', Value(null as dynamic, Tag('null')), [_inline]);
-
 const _number = Named('_number', Malformed('number', _json_number.parser));
 
 const _object = Named(
@@ -125,15 +121,28 @@ const _string = Named(
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
 
-const _true = Named('_true', Value(true, Tag('true')), [_inline]);
+const _switchValue = SwitchTag({
+  '"': _string,
+  '{': _object,
+  '[': _array,
+  'false': Skip(5, ExprTransformer<bool>.value('false')),
+  'true': Skip(4, ExprTransformer<bool>.value('true')),
+  'null': Skip(4, ExprTransformer.value('null')),
+  null: _number,
+}, ExprTransformer.value('''
+[
+  ErrExpected.tag(state.pos, const Tag('[')),
+  ErrExpected.tag(state.pos, const Tag('{')),
+  ErrExpected.tag(state.pos, const Tag('false')),
+  ErrExpected.tag(state.pos, const Tag('null')),
+  ErrExpected.tag(state.pos, const Tag('number')),
+  ErrExpected.tag(state.pos, const Tag('string')),
+  ErrExpected.tag(state.pos, const Tag('true'))
+]'''));
 
 const _value = Ref<String, dynamic>('_value');
 
-const _value_ = Named<String, dynamic>(
-    '_value',
-    Terminated(
-        Alt([_string, _number, _array, _object, _false, _null, _true]), _ws),
-    [_inline]);
+const _value_ = Named('_value', Terminated(_switchValue, _ws));
 
 const _values = Named('_values', SeparatedList0(_value, _comma));
 

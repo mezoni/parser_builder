@@ -32,6 +32,8 @@ class ExprTransformer<T> extends Transformer<T> {
 
   const ExprTransformer(this.parameters, this.expression);
 
+  const ExprTransformer.value(this.expression) : parameters = const [];
+
   @override
   String invoke(Transformation transformation) {
     return transformation.replaceParameters(expression, parameters);

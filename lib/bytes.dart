@@ -4,6 +4,7 @@ import 'builder_helper.dart' as helper;
 import 'parser_builder.dart';
 
 part 'src/bytes/none_of_tags.dart';
+part 'src/bytes/skip.dart';
 part 'src/bytes/skip_while.dart';
 part 'src/bytes/skip_while1.dart';
 part 'src/bytes/tag.dart';

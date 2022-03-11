@@ -65,9 +65,11 @@ void _test() {
   _testSeparatedList0();
   _testSeparatedList1();
   _testSequence();
+  _testSkip();
   _testSkipWhile();
   _testSkipWhile1();
   _testStringValue();
+  _testSwitchTag();
   _testTag();
   _testTagEx();
   _testTagNoCase();
@@ -1859,6 +1861,34 @@ void _testSequence() {
   });
 }
 
+void _testSkip() {
+  test('Skip', () {
+    final parser = skipABC;
+    {
+      final state = State('   ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 'ABC');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('    ');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 'ABC');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(0));
+    }
+  });
+}
+
 void _testSkipWhile() {
   test('SkipWhile', () {
     final parser16 = skipWhileC16;
@@ -2089,6 +2119,88 @@ void _testStringValue() {
       expect(state.ok, true);
       _expectResult(r, ' \n ');
       expect(state.pos, 4);
+    }
+  });
+}
+
+void _testSwitchTag() {
+  test('SwitchTag', () {
+    final parser = switchTag;
+    {
+      final state = State('n');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 'n');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('null');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, null);
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('true');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, true);
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('false');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, false);
+      expect(state.pos, 5);
+    }
+    {
+      final state = State('1');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, '1');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('a');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, 'a');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(
+          state.error,
+          ErrCombined(0, [
+            ErrExpected.tag(0, const Tag('alphas')),
+            ErrExpected.tag(0, const Tag('digits')),
+            ErrExpected.tag(0, const Tag('false')),
+            ErrExpected.tag(0, const Tag('n')),
+            ErrExpected.tag(0, const Tag('null')),
+            ErrExpected.tag(0, const Tag('true'))
+          ]));
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(
+          state.error,
+          ErrCombined(0, [
+            ErrExpected.tag(0, const Tag('alphas')),
+            ErrExpected.tag(0, const Tag('digits')),
+            ErrExpected.tag(0, const Tag('false')),
+            ErrExpected.tag(0, const Tag('n')),
+            ErrExpected.tag(0, const Tag('null')),
+            ErrExpected.tag(0, const Tag('true'))
+          ]));
     }
   });
 }

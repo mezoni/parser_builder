@@ -57,14 +57,15 @@ if (state.ok) {
     final body = StringBuffer();
     for (var i = 0; i < parsers.length; i++) {
       final p = parsers[i];
-      final values = <String, String>{};
       final r = context.allocateLocal();
       final e = context.allocateLocal();
       errors.add(e);
-      values['e'] = e;
-      values['p2'] = p.buildAndAssign(context, r);
-      values['p2_res'] = r;
-      values['res'] = context.resultVariable;
+      final values = {
+        'e': e,
+        'p2': p.buildAndAssign(context, r),
+        'p2_res': r,
+        'res': context.resultVariable,
+      };
       final code = render(_templateChoice, values);
       body.write(code);
     }

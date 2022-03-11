@@ -65,9 +65,11 @@ built-in:
 
 [`branch`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch):
 - [`Alt`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/alt.dart)
+- [`SwitchTag`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/switch_tag.dart)
 
 [`bytes`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes):
 - [`NoneOfTags`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/none_of_tags.dart)
+- [`Skip`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip.dart)
 - [`SkipWhile`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip_while.dart)
 - [`SkipWhile1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip_while1.dart)
 - [`Tag`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/tag.dart)
@@ -135,6 +137,7 @@ built-in:
 
 [`string`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string):
 - [`EscapeSequence`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/escape_sequence.dart)
+- [`StringValue`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/string_value.dart)
 
 ## Included transformers
 

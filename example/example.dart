@@ -283,6 +283,286 @@ String? _string(State<String> state) {
   return $0;
 }
 
+@pragma('vm:prefer-inline')
+String? _openBrace(State<String> state) {
+  final source = state.source;
+  String? $0;
+  final $pos = state.pos;
+  String? $1;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
+  if (state.ok) {
+    state.pos++;
+    $1 = '{';
+  } else if (state.log) {
+    state.error = ErrExpected.tag(state.pos, const Tag('{'));
+  }
+  if (state.ok) {
+    bool? $2;
+    $2 = _ws(state);
+    if (state.ok) {
+      $0 = $1!;
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+String? _colon(State<String> state) {
+  final source = state.source;
+  String? $0;
+  final $pos = state.pos;
+  String? $1;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
+  if (state.ok) {
+    state.pos++;
+    $1 = ':';
+  } else if (state.log) {
+    state.error = ErrExpected.tag(state.pos, const Tag(':'));
+  }
+  if (state.ok) {
+    bool? $2;
+    $2 = _ws(state);
+    if (state.ok) {
+      $0 = $1!;
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+MapEntry<String, dynamic>? _keyValue(State<String> state) {
+  MapEntry<String, dynamic>? $0;
+  final $pos = state.pos;
+  String? $1;
+  $1 = _string(state);
+  if (state.ok) {
+    String? $2;
+    $2 = _colon(state);
+    if (state.ok) {
+      dynamic $3;
+      $3 = _value(state);
+      if (state.ok) {
+        $0 = MapEntry($1!, $3);
+      }
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+String? _comma(State<String> state) {
+  final source = state.source;
+  String? $0;
+  final $pos = state.pos;
+  String? $1;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
+  if (state.ok) {
+    state.pos++;
+    $1 = ',';
+  } else if (state.log) {
+    state.error = ErrExpected.tag(state.pos, const Tag(','));
+  }
+  if (state.ok) {
+    bool? $2;
+    $2 = _ws(state);
+    if (state.ok) {
+      $0 = $1!;
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
+  List<MapEntry<String, dynamic>>? $0;
+  final $log = state.log;
+  state.log = false;
+  var $pos = state.pos;
+  final $list = <MapEntry<String, dynamic>>[];
+  for (;;) {
+    MapEntry<String, dynamic>? $1;
+    $1 = _keyValue(state);
+    if (!state.ok) {
+      state.pos = $pos;
+      break;
+    }
+    $list.add($1!);
+    $pos = state.pos;
+    String? $2;
+    $2 = _comma(state);
+    if (!state.ok) {
+      break;
+    }
+  }
+  state.ok = true;
+  if (state.ok) {
+    $0 = $list;
+  }
+  state.log = $log;
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+String? _closeBrace(State<String> state) {
+  final source = state.source;
+  String? $0;
+  final $pos = state.pos;
+  String? $1;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
+  if (state.ok) {
+    state.pos++;
+    $1 = '}';
+  } else if (state.log) {
+    state.error = ErrExpected.tag(state.pos, const Tag('}'));
+  }
+  if (state.ok) {
+    bool? $2;
+    $2 = _ws(state);
+    if (state.ok) {
+      $0 = $1!;
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+dynamic _object(State<String> state) {
+  dynamic $0;
+  final $pos = state.pos;
+  String? $1;
+  $1 = _openBrace(state);
+  if (state.ok) {
+    List<MapEntry<String, dynamic>>? $2;
+    $2 = _keyValues(state);
+    if (state.ok) {
+      String? $3;
+      $3 = _closeBrace(state);
+      if (state.ok) {
+        $0 = Map.fromEntries($2!);
+      }
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+String? _openBracket(State<String> state) {
+  final source = state.source;
+  String? $0;
+  final $pos = state.pos;
+  String? $1;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
+  if (state.ok) {
+    state.pos++;
+    $1 = '[';
+  } else if (state.log) {
+    state.error = ErrExpected.tag(state.pos, const Tag('['));
+  }
+  if (state.ok) {
+    bool? $2;
+    $2 = _ws(state);
+    if (state.ok) {
+      $0 = $1!;
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+List<dynamic>? _values(State<String> state) {
+  List<dynamic>? $0;
+  final $log = state.log;
+  state.log = false;
+  var $pos = state.pos;
+  final $list = <dynamic>[];
+  for (;;) {
+    dynamic $1;
+    $1 = _value(state);
+    if (!state.ok) {
+      state.pos = $pos;
+      break;
+    }
+    $list.add($1);
+    $pos = state.pos;
+    String? $2;
+    $2 = _comma(state);
+    if (!state.ok) {
+      break;
+    }
+  }
+  state.ok = true;
+  if (state.ok) {
+    $0 = $list;
+  }
+  state.log = $log;
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+String? _closeBracket(State<String> state) {
+  final source = state.source;
+  String? $0;
+  final $pos = state.pos;
+  String? $1;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
+  if (state.ok) {
+    state.pos++;
+    $1 = ']';
+  } else if (state.log) {
+    state.error = ErrExpected.tag(state.pos, const Tag(']'));
+  }
+  if (state.ok) {
+    bool? $2;
+    $2 = _ws(state);
+    if (state.ok) {
+      $0 = $1!;
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+List<dynamic>? _array(State<String> state) {
+  List<dynamic>? $0;
+  final $pos = state.pos;
+  String? $1;
+  $1 = _openBracket(state);
+  if (state.ok) {
+    List<dynamic>? $2;
+    $2 = _values(state);
+    if (state.ok) {
+      String? $3;
+      $3 = _closeBracket(state);
+      if (state.ok) {
+        $0 = $2!;
+      }
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
 num? _number(State<String> state) {
   final source = state.source;
   num? $0;
@@ -563,409 +843,108 @@ num? _number(State<String> state) {
   return $0;
 }
 
-@pragma('vm:prefer-inline')
-String? _openBracket(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
-  if (state.ok) {
-    state.pos++;
-    $1 = '[';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('['));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _comma(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
-  if (state.ok) {
-    state.pos++;
-    $1 = ',';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag(','));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-List<dynamic>? _values(State<String> state) {
-  List<dynamic>? $0;
-  final $log = state.log;
-  state.log = false;
-  var $pos = state.pos;
-  final $list = <dynamic>[];
-  for (;;) {
-    dynamic $1;
-    $1 = _value(state);
-    if (!state.ok) {
-      state.pos = $pos;
-      break;
-    }
-    $list.add($1);
-    $pos = state.pos;
-    String? $2;
-    $2 = _comma(state);
-    if (!state.ok) {
-      break;
-    }
-  }
-  state.ok = true;
-  if (state.ok) {
-    $0 = $list;
-  }
-  state.log = $log;
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _closeBracket(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
-  if (state.ok) {
-    state.pos++;
-    $1 = ']';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag(']'));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-List<dynamic>? _array(State<String> state) {
-  List<dynamic>? $0;
-  final $pos = state.pos;
-  String? $1;
-  $1 = _openBracket(state);
-  if (state.ok) {
-    List<dynamic>? $2;
-    $2 = _values(state);
-    if (state.ok) {
-      String? $3;
-      $3 = _closeBracket(state);
-      if (state.ok) {
-        $0 = $2!;
-      }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _openBrace(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
-  if (state.ok) {
-    state.pos++;
-    $1 = '{';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('{'));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _colon(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
-  if (state.ok) {
-    state.pos++;
-    $1 = ':';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag(':'));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-MapEntry<String, dynamic>? _keyValue(State<String> state) {
-  MapEntry<String, dynamic>? $0;
-  final $pos = state.pos;
-  String? $1;
-  $1 = _string(state);
-  if (state.ok) {
-    String? $2;
-    $2 = _colon(state);
-    if (state.ok) {
-      dynamic $3;
-      $3 = _value(state);
-      if (state.ok) {
-        $0 = MapEntry($1!, $3);
-      }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
-  List<MapEntry<String, dynamic>>? $0;
-  final $log = state.log;
-  state.log = false;
-  var $pos = state.pos;
-  final $list = <MapEntry<String, dynamic>>[];
-  for (;;) {
-    MapEntry<String, dynamic>? $1;
-    $1 = _keyValue(state);
-    if (!state.ok) {
-      state.pos = $pos;
-      break;
-    }
-    $list.add($1!);
-    $pos = state.pos;
-    String? $2;
-    $2 = _comma(state);
-    if (!state.ok) {
-      break;
-    }
-  }
-  state.ok = true;
-  if (state.ok) {
-    $0 = $list;
-  }
-  state.log = $log;
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _closeBrace(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
-  if (state.ok) {
-    state.pos++;
-    $1 = '}';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('}'));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-dynamic _object(State<String> state) {
-  dynamic $0;
-  final $pos = state.pos;
-  String? $1;
-  $1 = _openBrace(state);
-  if (state.ok) {
-    List<MapEntry<String, dynamic>>? $2;
-    $2 = _keyValues(state);
-    if (state.ok) {
-      String? $3;
-      $3 = _closeBrace(state);
-      if (state.ok) {
-        $0 = Map.fromEntries($2!);
-      }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-bool? _false(State<String> state) {
-  final source = state.source;
-  bool? $0;
-  String? $1;
-  state.ok = state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 102 &&
-      source.startsWith('false', state.pos);
-  if (state.ok) {
-    state.pos += 5;
-    $1 = 'false';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('false'));
-  }
-  if (state.ok) {
-    $0 = false;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-dynamic _null(State<String> state) {
-  final source = state.source;
-  dynamic $0;
-  String? $1;
-  state.ok = state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 110 &&
-      source.startsWith('null', state.pos);
-  if (state.ok) {
-    state.pos += 4;
-    $1 = 'null';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('null'));
-  }
-  if (state.ok) {
-    $0 = null;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-bool? _true(State<String> state) {
-  final source = state.source;
-  bool? $0;
-  String? $1;
-  state.ok = state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 116 &&
-      source.startsWith('true', state.pos);
-  if (state.ok) {
-    state.pos += 4;
-    $1 = 'true';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('true'));
-  }
-  if (state.ok) {
-    $0 = true;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
 dynamic _value(State<String> state) {
+  final source = state.source;
   dynamic $0;
   final $pos = state.pos;
   dynamic $1;
-  for (;;) {
-    String? $2;
-    $2 = _string(state);
-    if (state.ok) {
-      $1 = $2;
-      break;
+  final $pos1 = state.pos;
+  state.ok = false;
+  if ($pos1 < source.length) {
+    final c = source.codeUnitAt($pos1);
+    switch (c) {
+      case 34:
+        String? $2;
+        $2 = _string(state);
+        if (state.ok) {
+          $1 = $2;
+        }
+        break;
+      case 123:
+        dynamic $3;
+        $3 = _object(state);
+        if (state.ok) {
+          $1 = $3;
+        }
+        break;
+      case 91:
+        List<dynamic>? $4;
+        $4 = _array(state);
+        if (state.ok) {
+          $1 = $4;
+        }
+        break;
+      case 102:
+        if (source.startsWith('false', $pos1)) {
+          dynamic $5;
+          state.ok = state.pos + 5 <= source.length;
+          if (state.ok) {
+            state.pos += 5;
+            $5 = false;
+          } else if (state.log) {
+            state.error = ErrUnexpected.eof(state.pos);
+          }
+          if (state.ok) {
+            $1 = $5;
+          }
+          break;
+        }
+        break;
+      case 116:
+        if (source.startsWith('true', $pos1)) {
+          dynamic $6;
+          state.ok = state.pos + 4 <= source.length;
+          if (state.ok) {
+            state.pos += 4;
+            $6 = true;
+          } else if (state.log) {
+            state.error = ErrUnexpected.eof(state.pos);
+          }
+          if (state.ok) {
+            $1 = $6;
+          }
+          break;
+        }
+        break;
+      case 110:
+        if (source.startsWith('null', $pos1)) {
+          dynamic $7;
+          state.ok = state.pos + 4 <= source.length;
+          if (state.ok) {
+            state.pos += 4;
+            $7 = null;
+          } else if (state.log) {
+            state.error = ErrUnexpected.eof(state.pos);
+          }
+          if (state.ok) {
+            $1 = $7;
+          }
+          break;
+        }
+        break;
     }
-    final $3 = state.error;
-    num? $4;
-    $4 = _number(state);
-    if (state.ok) {
-      $1 = $4;
-      break;
-    }
-    final $5 = state.error;
-    List<dynamic>? $6;
-    $6 = _array(state);
-    if (state.ok) {
-      $1 = $6;
-      break;
-    }
-    final $7 = state.error;
-    dynamic $8;
-    $8 = _object(state);
+  }
+  if (!state.ok) {
+    num? $8;
+    $8 = _number(state);
     if (state.ok) {
       $1 = $8;
-      break;
     }
-    final $9 = state.error;
-    bool? $10;
-    $10 = _false(state);
-    if (state.ok) {
-      $1 = $10;
-      break;
-    }
-    final $11 = state.error;
-    dynamic $12;
-    $12 = _null(state);
-    if (state.ok) {
-      $1 = $12;
-      break;
-    }
-    final $13 = state.error;
-    bool? $14;
-    $14 = _true(state);
-    if (state.ok) {
-      $1 = $14;
-      break;
-    }
-    final $15 = state.error;
-    if (state.log) {
-      state.error = ErrCombined(state.pos, [$3, $5, $7, $9, $11, $13, $15]);
-    }
-    break;
+  }
+  if (!state.ok && state.log) {
+    state.error = ErrCombined(state.pos, [
+      ErrExpected.tag(state.pos, const Tag('[')),
+      ErrExpected.tag(state.pos, const Tag('{')),
+      ErrExpected.tag(state.pos, const Tag('false')),
+      ErrExpected.tag(state.pos, const Tag('null')),
+      ErrExpected.tag(state.pos, const Tag('number')),
+      ErrExpected.tag(state.pos, const Tag('string')),
+      ErrExpected.tag(state.pos, const Tag('true'))
+    ]);
   }
   if (state.ok) {
-    bool? $16;
-    $16 = _ws(state);
+    bool? $9;
+    $9 = _ws(state);
     if (state.ok) {
       $0 = $1;
     }

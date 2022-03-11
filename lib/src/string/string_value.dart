@@ -1,5 +1,14 @@
 part of '../../string.dart';
 
+/// Parses the value of a string data type using the [normalChar] predicate to
+/// parse regular (unescaped) characters, using the [controlChar] character to
+/// match an escape character, and the [escape] parser to parse the
+/// interpretation of the escape sequence.
+///
+/// Example:
+/// ```dart
+/// StringValue(_isNormalChar, 0x5c, _escaped);
+/// ```
 class StringValue extends StringParserBuilder<String> {
   static const _template = '''
 state.ok = true;

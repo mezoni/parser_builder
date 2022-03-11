@@ -57,11 +57,13 @@ Future<void> main(List<String> args) async {
     _separatedList1C32Abc,
     _separatedPairC16AbcC32,
     _sequenceC16C32,
+    _skipABC,
     _skipWhile1C16,
     _skipWhile1C32,
     _skipWhileC16,
     _skipWhileC32,
     _stringValue,
+    _switchTag,
     _tagAbc,
     _tagC16,
     _tagC16C32,
@@ -157,7 +159,7 @@ const _foldMany0Digit = Named(
     'foldMany0Digit',
     FoldMany0(
         Satisfy(CharClass('[0-9]')),
-        ExprTransformer([], '0'),
+        ExprTransformer.value('0'),
         ExprTransformer(
             ['acc', 'v'], '{{acc}} = {{acc}} * 10 + {{v}} - 0x30')));
 
@@ -247,6 +249,8 @@ const _separatedPairC16AbcC32 = Named(
 
 const _sequenceC16C32 = Named('sequenceC16C32', Sequence([_char16, _char32]));
 
+const _skipABC = Named('skipABC', Skip(3, ExprTransformer.value('\'ABC\'')));
+
 const _skipWhile1C16 = Named('skipWhile1C16', SkipWhile1(_isC16));
 
 const _skipWhile1C32 = Named('skipWhile1C32', SkipWhile1(_isC32));
@@ -262,6 +266,25 @@ const _stringValue = Named(
             ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c'),
         0x5c,
         EscapeSequence({0x6e: 0xa})));
+
+const _switchTag = Named(
+    'switchTag',
+    SwitchTag({
+      'n': Value('n', Tag('n')),
+      'null': Value(null as dynamic, Tag('null')),
+      'false': Skip(5, ExprTransformer<bool>.value('false')),
+      'true': Value(true, Tag('true')),
+      null: Alt([Digit1(), Alpha1()]),
+    }, ExprTransformer.value('''
+[
+  ErrExpected.tag(state.pos, const Tag('alphas')),
+  ErrExpected.tag(state.pos, const Tag('digits')),
+  ErrExpected.tag(state.pos, const Tag('false')),
+  ErrExpected.tag(state.pos, const Tag('n')),
+  ErrExpected.tag(state.pos, const Tag('null')),
+  ErrExpected.tag(state.pos, const Tag('true'))
+]
+''')));
 
 const _tagAbc = Named('tagAbc', Tag(abc));
 
@@ -294,7 +317,7 @@ const _takeWhile1DigitFold = Named(
     'takeWhile1DigitFold',
     TakeWhile1Fold(
         CharClass('[0-9]'),
-        ExprTransformer([], '0'),
+        ExprTransformer.value('0'),
         ExprTransformer(
             ['acc', 'v'], '{{acc}} = {{acc}} * 10 + {{v}} - 0x30')));
 

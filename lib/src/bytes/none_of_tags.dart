@@ -9,8 +9,9 @@ part of '../../bytes.dart';
 class NoneOfTags extends StringParserBuilder<bool> {
   static const _template = '''
 state.ok = true;
+final {{pos}} = state.pos;
 if (state.pos < source.length) {
-  final c = source.codeUnitAt(state.pos);
+  final c = source.codeUnitAt({{pos}});
   switch (c) {
     {{cases}}
   }
@@ -25,10 +26,10 @@ case {{cc}}:
   break;''';
 
   static const _templateTestLong = '''
-if (source.startsWith({{tag}}, state.pos)) {
+if (source.startsWith({{tag}}, {{pos}})) {
   state.ok = false;
   if (state.log) {
-    state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
+    state.error = ErrUnexpected.tag({{pos}}, const Tag({{tag}}));
   }
   break;
 }''';
@@ -36,7 +37,7 @@ if (source.startsWith({{tag}}, state.pos)) {
   static const _templateTestShort = '''
 state.ok = false;
 if (state.log) {
-  state.error = ErrUnexpected.tag(state.pos, const Tag({{tag}}));
+  state.error = ErrUnexpected.tag({{pos}}, const Tag({{tag}}));
 }''';
   final List<String> tags;
 
@@ -44,11 +45,12 @@ if (state.log) {
 
   @override
   String getTemplate(Context context) {
+    final locals = context.allocateLocals(['pos']);
     final map = <int, List<String>>{};
     for (final tag in tags) {
       if (tag.isEmpty) {
-        throw ArgumentError.value(
-            tags, 'tags', 'The list of tags must not contain empty tags');
+        throw ArgumentError.value(tags, 'tags',
+            'The list of tags must not contain empty tags: $this');
       }
 
       final c = tag.codeUnitAt(0);
@@ -68,6 +70,7 @@ if (state.log) {
       final tests = <String>[];
       for (final tag in tags) {
         final values = {
+          ...locals,
           'tag': helper.escapeString(tag),
         };
 
@@ -87,6 +90,7 @@ if (state.log) {
     }
 
     final values = {
+      ...locals,
       'cases': cases.join('\n'),
     };
 

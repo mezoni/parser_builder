@@ -759,52 +759,53 @@ bool? noneOfTagsAbcAbdDefDegXXY(State<String> state) {
   final source = state.source;
   bool? $0;
   state.ok = true;
+  final $pos = state.pos;
   if (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
+    final c = source.codeUnitAt($pos);
     switch (c) {
       case 97:
-        if (source.startsWith('abc', state.pos)) {
+        if (source.startsWith('abc', $pos)) {
           state.ok = false;
           if (state.log) {
-            state.error = ErrUnexpected.tag(state.pos, const Tag('abc'));
+            state.error = ErrUnexpected.tag($pos, const Tag('abc'));
           }
           break;
         }
-        if (source.startsWith('abd', state.pos)) {
+        if (source.startsWith('abd', $pos)) {
           state.ok = false;
           if (state.log) {
-            state.error = ErrUnexpected.tag(state.pos, const Tag('abd'));
+            state.error = ErrUnexpected.tag($pos, const Tag('abd'));
           }
           break;
         }
         break;
       case 100:
-        if (source.startsWith('def', state.pos)) {
+        if (source.startsWith('def', $pos)) {
           state.ok = false;
           if (state.log) {
-            state.error = ErrUnexpected.tag(state.pos, const Tag('def'));
+            state.error = ErrUnexpected.tag($pos, const Tag('def'));
           }
           break;
         }
-        if (source.startsWith('deg', state.pos)) {
+        if (source.startsWith('deg', $pos)) {
           state.ok = false;
           if (state.log) {
-            state.error = ErrUnexpected.tag(state.pos, const Tag('deg'));
+            state.error = ErrUnexpected.tag($pos, const Tag('deg'));
           }
           break;
         }
         break;
       case 120:
-        if (source.startsWith('xy', state.pos)) {
+        if (source.startsWith('xy', $pos)) {
           state.ok = false;
           if (state.log) {
-            state.error = ErrUnexpected.tag(state.pos, const Tag('xy'));
+            state.error = ErrUnexpected.tag($pos, const Tag('xy'));
           }
           break;
         }
         state.ok = false;
         if (state.log) {
-          state.error = ErrUnexpected.tag(state.pos, const Tag('x'));
+          state.error = ErrUnexpected.tag($pos, const Tag('x'));
         }
         break;
     }
@@ -1181,6 +1182,19 @@ bool? sequenceC16C32(State<String> state) {
   return $0;
 }
 
+dynamic skipABC(State<String> state) {
+  final source = state.source;
+  dynamic $0;
+  state.ok = state.pos + 3 <= source.length;
+  if (state.ok) {
+    state.pos += 3;
+    $0 = 'ABC';
+  } else if (state.log) {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
+  return $0;
+}
+
 bool? skipWhile1C16(State<String> state) {
   final source = state.source;
   bool? $0;
@@ -1341,6 +1355,155 @@ String? stringValue(State<String> state) {
       }
       $0 = buffer.toString();
     }
+  }
+  return $0;
+}
+
+dynamic switchTag(State<String> state) {
+  final source = state.source;
+  dynamic $0;
+  final $pos = state.pos;
+  state.ok = false;
+  if ($pos < source.length) {
+    final c = source.codeUnitAt($pos);
+    switch (c) {
+      case 110:
+        if (source.startsWith('null', $pos)) {
+          dynamic $1;
+          String? $2;
+          state.ok = state.pos < source.length &&
+              source.codeUnitAt(state.pos) == 110 &&
+              source.startsWith('null', state.pos);
+          if (state.ok) {
+            state.pos += 4;
+            $2 = 'null';
+          } else if (state.log) {
+            state.error = ErrExpected.tag(state.pos, const Tag('null'));
+          }
+          if (state.ok) {
+            $1 = null;
+          }
+          if (state.ok) {
+            $0 = $1;
+          }
+          break;
+        }
+        dynamic $3;
+        String? $4;
+        state.ok =
+            state.pos < source.length && source.codeUnitAt(state.pos) == 110;
+        if (state.ok) {
+          state.pos++;
+          $4 = 'n';
+        } else if (state.log) {
+          state.error = ErrExpected.tag(state.pos, const Tag('n'));
+        }
+        if (state.ok) {
+          $3 = 'n';
+        }
+        if (state.ok) {
+          $0 = $3;
+        }
+        break;
+      case 102:
+        if (source.startsWith('false', $pos)) {
+          dynamic $5;
+          state.ok = state.pos + 5 <= source.length;
+          if (state.ok) {
+            state.pos += 5;
+            $5 = false;
+          } else if (state.log) {
+            state.error = ErrUnexpected.eof(state.pos);
+          }
+          if (state.ok) {
+            $0 = $5;
+          }
+          break;
+        }
+        break;
+      case 116:
+        if (source.startsWith('true', $pos)) {
+          dynamic $6;
+          String? $7;
+          state.ok = state.pos < source.length &&
+              source.codeUnitAt(state.pos) == 116 &&
+              source.startsWith('true', state.pos);
+          if (state.ok) {
+            state.pos += 4;
+            $7 = 'true';
+          } else if (state.log) {
+            state.error = ErrExpected.tag(state.pos, const Tag('true'));
+          }
+          if (state.ok) {
+            $6 = true;
+          }
+          if (state.ok) {
+            $0 = $6;
+          }
+          break;
+        }
+        break;
+    }
+  }
+  if (!state.ok) {
+    dynamic $8;
+    String? $9;
+    final $pos1 = state.pos;
+    while (state.pos < source.length) {
+      final c = source.codeUnitAt(state.pos);
+      final ok = c >= 48 && c <= 57;
+      if (ok) {
+        state.pos++;
+        continue;
+      }
+      break;
+    }
+    state.ok = state.pos != $pos1;
+    if (state.ok) {
+      $9 = source.substring($pos1, state.pos);
+    } else if (state.log) {
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
+    }
+    if (state.ok) {
+      $8 = $9!;
+    } else {
+      final $error = state.error;
+      String? $10;
+      final $pos2 = state.pos;
+      while (state.pos < source.length) {
+        final c = source.codeUnitAt(state.pos);
+        final ok = c <= 122 && (c >= 65 && c <= 90 || c >= 97 && c <= 122);
+        if (ok) {
+          state.pos++;
+          continue;
+        }
+        break;
+      }
+      state.ok = state.pos != $pos2;
+      if (state.ok) {
+        $10 = source.substring($pos2, state.pos);
+      } else if (state.log) {
+        state.error = ErrUnexpected.charOrEof(state.pos, source);
+      }
+      if (state.ok) {
+        $8 = $10!;
+      } else if (state.log) {
+        state.error = ErrCombined(state.pos, [$error, state.error]);
+      }
+    }
+    if (state.ok) {
+      $0 = $8;
+    }
+  }
+  if (!state.ok && state.log) {
+    state.error = ErrCombined(state.pos, [
+      ErrExpected.tag(state.pos, const Tag('alphas')),
+      ErrExpected.tag(state.pos, const Tag('digits')),
+      ErrExpected.tag(state.pos, const Tag('false')),
+      ErrExpected.tag(state.pos, const Tag('n')),
+      ErrExpected.tag(state.pos, const Tag('null')),
+      ErrExpected.tag(state.pos, const Tag('true'))
+    ]);
   }
   return $0;
 }

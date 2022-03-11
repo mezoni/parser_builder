@@ -1,7 +1,10 @@
 ## 0.14.2
 
-- Added many improvements to the parser builder `StringValue`. The overall performance of parsing data with string values can be increased by up to 10%
-- Added tests for parser builder `StringValue`
+- Added many improvements to the parser builder `StringValue`. The overall performance of parsing data with `String` values can be increased by up to 10%
+- Documented and tested parser builder `StringValue`
+- Implemented, tested and documented experimental parser builder `SwitchTag`. This parser builder is intended mainly for the implementation of fast lexers, but can be used (with a clever approach) for other purposes. The JSON parser (example) now parses slightly faster when using this builder in JSON parser definition
+- Implemented constructor `ExprTransformer.value(this.expression)`. To simplify the definition of expression transformers without parameters
+- Implemented, tested and documented parser builder `Skip`. This builder is intended to be used in conjunction with the builder `SwitchTag` to avoid reparsing already parsed simple data (such as literals or punctuation)
 
 ## 0.14.1
 
