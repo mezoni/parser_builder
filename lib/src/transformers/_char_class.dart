@@ -123,6 +123,8 @@ bool {{name}}(int c) {
           if (count > 3) {
             final last = list.last;
             result = '$argument > $last || !($result)';
+          } else {
+            result = '!($result)';
           }
 
           return result;

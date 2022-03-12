@@ -15,7 +15,8 @@ Future<void> main(List<String> args) async {
       footer: footer, header: __header, publish: {'parseString': _parse});
 }
 
-const footer = '''
+const footer =
+    '''
 List<T> _flatten<T>(List<List<T>> data, List<T> result) {
   for (final item1 in data) {
     for (final item2 in item1) {
@@ -48,7 +49,8 @@ int _toHexValue(String s) {
   return r;
 }''';
 
-const __header = r'''
+const __header =
+    r'''
 // ignore_for_file: unused_local_variable
 
 import 'package:source_span/source_span.dart';
@@ -60,7 +62,7 @@ const _char = Named('_char', Delimited(Tag('"'), _charCode, Tag('"')));
 
 const _charCode = Named('_charCode', Satisfy(_isAscii));
 
-const _flatten = ExprTransformer<List<_t.Tuple2<int, int>>>(
+const _flatten = Expr<List<_t.Tuple2<int, int>>>(
     ['x'], '_flatten({{x}}, <Tuple2<int, int>>[])');
 
 const _hex = Named('_hex', Preceded(Tag('#x'), _hexVal));
@@ -69,16 +71,15 @@ const _hexOrRangeChar = Named('_hexOrRangeChar', Alt([_hex, _rangeChar]));
 
 const _hexVal = Named('_hexVal', Map1(TakeWhile1(_isHexDigit), _toHexValue));
 
-const _intToTuple2 =
-    ExprTransformer<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
+const _intToTuple2 = Expr<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
 
-const _isAscii = ExprTransformer<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
+const _isAscii = Expr<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
 
-const _isHexDigit = ExprTransformer<bool>([
+const _isHexDigit = Expr<bool>([
   'x'
 ], '{{x}} >= 0x30 && {{x}} <= 0x39 || {{x}} >= 0x41 && {{x}} <= 0x46 || {{x}} >= 0x61 && {{x}}<= 0x66');
 
-const _isWhiteSpace = ExprTransformer<bool>(
+const _isWhiteSpace = Expr<bool>(
     ['x'], '{{x}} == 0x09 || {{x}} == 0xA || {{x}} == 0xD || {{x}} == 0x20');
 
 const _parse = Named('parse', Delimited(_ws, _ranges, Eof<String>()));
@@ -87,8 +88,7 @@ const _range = Named(
     '_range',
     Alt<String, List<_t.Tuple2<int, int>>>([
       Delimited(Tag('['), Many1(_rangeBody), Tag(']')),
-      Map1(Alt([_char, _hex]),
-          ExprTransformer(['x'], ('[Tuple2({{x}}, {{x}})]'))),
+      Map1(Alt([_char, _hex]), Expr(['x'], ('[Tuple2({{x}}, {{x}})]'))),
     ]));
 
 const _rangeBody = Named(
@@ -105,8 +105,10 @@ const _rangeChar =
 const _ranges = Named('_ranges',
     Map1(SeparatedList1(Terminated(_range, _ws), _verbar), _flatten));
 
-const _toHexValue = ExprTransformer<int>(['x'], '_toHexValue({{x}})');
+const _toHexValue = Expr<int>(['x'], '_toHexValue({{x}})');
 
 const _verbar = Named('_verbar', Terminated(Tag('|'), _ws));
 
 const _ws = Named('_ws', SkipWhile(_isWhiteSpace));
+
+typedef Expr<T> = ExprTransformer<T>;

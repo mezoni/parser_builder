@@ -3,6 +3,7 @@
 - Implemented, tested and documented experimental parser builder `CombinedList1`
 - Breaking change: Changed the signature of the method `Transformation.checkArguments()`. Added new parameter `String information`. This is done to make it easier to find the location of the exception when calling this method. The common value is the transformer template or other useful information to identify the transformer. This applies only to the implementation of transformers
 - Breaking change: Changed definition and behavior of transformer `VarTransformer`. Now it's a combination of a variable and an expression. The definition of the variable, the key of this variable in the expression template, and the expression (using this variable) are specified. Previously, it was possible to use only a variable by name, without the ability to use it as part of an expression. This helps make it easier to the creation of more flexible, faster, configurable (including in real time) parsers
+- Fixed bug in transformer `NotCharClass`
 
 ## 0.14.2
 

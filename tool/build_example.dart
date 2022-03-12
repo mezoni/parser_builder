@@ -67,7 +67,7 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 const _escapeHex = Named(
     '_escapeHex',
     Map2(Tag('u'), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
-        ExprTransformer<int>(['_', 's'], '_toHexValue({{s}})')),
+        Expr<int>(['_', 's'], '_toHexValue({{s}})')),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({
@@ -83,8 +83,8 @@ const _escapeSeq = EscapeSequence({
 
 const _inline = '@pragma(\'vm:prefer-inline\')';
 
-const _isNormalChar = ExprTransformer<bool>(
-    ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
+const _isNormalChar =
+    Expr<bool>(['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 
@@ -96,7 +96,7 @@ const _keyValue = Named(
         _string,
         _colon,
         _value,
-        ExprTransformer<MapEntry<String, dynamic>>(
+        Expr<MapEntry<String, dynamic>>(
             ['k', 's', 'v'], 'MapEntry({{k}}, {{v}})')));
 
 const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
@@ -106,7 +106,7 @@ const _number = Named('_number', Malformed('number', _json_number.parser));
 const _object = Named(
     '_object',
     Map3(_openBrace, _keyValues, _closeBrace,
-        ExprTransformer(['o', 'kv', 'c'], 'Map.fromEntries({{kv}})')));
+        Expr(['o', 'kv', 'c'], 'Map.fromEntries({{kv}})')));
 
 const _openBrace = Named('_openBrace', Terminated(Tag('{'), _ws), [_inline]);
 
@@ -124,11 +124,11 @@ const _switchValue = SwitchTag({
   '"': _string,
   '{': _object,
   '[': _array,
-  'false': Skip(5, ExprTransformer<bool>.value('false')),
-  'true': Skip(4, ExprTransformer<bool>.value('true')),
-  'null': Skip(4, ExprTransformer.value('null')),
+  'false': Skip(5, Expr<bool>.value('false')),
+  'true': Skip(4, Expr<bool>.value('true')),
+  'null': Skip(4, Expr.value('null')),
   null: _number,
-}, ExprTransformer.value('''
+}, Expr.value('''
 [
   ErrExpected.tag(state.pos, const Tag('[')),
   ErrExpected.tag(state.pos, const Tag('{')),
@@ -146,3 +146,5 @@ const _value_ = Named('_value', Terminated(_switchValue, _ws));
 const _values = Named('_values', SeparatedList0(_value, _comma));
 
 const _ws = Named('_ws', SkipWhile(_isWhitespace));
+
+typedef Expr<T> = ExprTransformer<T>;
