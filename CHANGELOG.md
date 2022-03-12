@@ -1,3 +1,7 @@
+## 0.14.4
+
+- Removed `lightweight runtime`. The use of this implementation did not allow a correct comparison (and filtration) of the errors in error reporting procedures. As a result, errors messages were redundant and not correct
+
 ## 0.14.3
 
 - Implemented, tested and documented experimental parser builder `CombinedList1`

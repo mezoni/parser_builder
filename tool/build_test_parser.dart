@@ -101,9 +101,7 @@ Future<void> main(List<String> args) async {
 
   final filename = 'test/_test_parser.dart';
   await fastBuild(context, builders, filename,
-      addErrorMessageProcessor: false,
-      header: header,
-      lightweightRuntime: false);
+      addErrorMessageProcessor: false, header: header);
 }
 
 const abc = 'abc';

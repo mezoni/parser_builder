@@ -54,13 +54,7 @@ abstract class Err {
         for (final nestedError in error.errors) {
           flatten(nestedError, inner);
         }
-
-        int max(int x, int y) => x > y
-            ? x
-            : y < x
-                ? x
-                : y;
-        final maxOffset = inner.map((e) => e.offset).reduce(max);
+        final maxOffset = inner.map((e) => e.offset).reduce(_max);
         final farthest = inner.where((e) => e.offset == maxOffset);
         final offset = error.offset;
         final tag = error.tag;
@@ -87,46 +81,23 @@ abstract class Err {
   }
 
   static List<Err> groupExpected(List<Err> errors) {
-    final result = <Err>[];
-    final expected = errors.whereType<ErrExpected>();
-    Map<T, List<S>> groupBy<S, T>(Iterable<S> values, T Function(S) key) {
-      final map = <T, List<S>>{};
-      for (final element in values) {
-        (map[key(element)] ??= []).add(element);
-      }
-      return map;
-    }
-
-    final groupped = groupBy(expected, (Err e) => e.offset);
-    final offsets = <int>{};
-    final processed = <Err>{};
-    for (final error in errors) {
-      if (!processed.add(error)) {
-        continue;
-      }
-
-      if (error is! ErrExpected) {
-        result.add(error);
-        continue;
-      }
-
-      final offset = error.offset;
-      if (!offsets.add(offset)) {
-        continue;
-      }
-
-      final elements = <String>[];
-      for (final error in groupped[offset]!) {
-        elements.add(error.value.toString());
-        processed.add(error);
-      }
-
-      final message = elements.join(', ');
-      final newError = ErrMessage(offset, 1, 'Expected: $message');
-      result.add(newError);
+    final result = errors.toList();
+    final maxOffset = result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
+    result.removeWhere((e) => (e is ErrExpected || e is ErrUnexpected) && e.offset < maxOffset);
+    final message = result.whereType<ErrExpected>().map((e) => e.value).join(', ');
+    if (message.isNotEmpty) {
+      result.removeWhere((e) => e is ErrExpected);
+      result.add(ErrMessage(maxOffset, 1, 'Expected: $message'));
     }
 
     return result;
+  }
+
+  static int _max(int x, int y) {
+    if (x > y) {
+      return x;
+    }
+    return y > x ? y : x;
   }
 }''';
 
@@ -148,20 +119,6 @@ class ErrCombined extends ErrWithErrors {
   bool operator ==(other) {
     return super == other && other is ErrCombined;
   }
-}''';
-
-  static const _classErrCombinedLite = '''
-class ErrCombined extends ErrWithErrors {
-  @override
-  final List<Err> errors;
-
-  @override
-  final int offset;
-
-  ErrCombined(this.offset, this.errors);
-
-  @override
-  int get length => 1;
 }''';
 
   static const _classErrExpected = r'''
@@ -199,33 +156,6 @@ class ErrExpected extends Err {
   }
 }''';
 
-  static const _classErrExpectedLite = r'''
-class ErrExpected extends Err {
-  @override
-  final int offset;
-
-  final Object? value;
-
-  ErrExpected(this.offset, this.value);
-
-  ErrExpected.char(this.offset, Char value) : value = value;
-
-  ErrExpected.eof(this.offset) : value = const Tag('EOF');
-
-  ErrExpected.label(this.offset, String value) : value = value;
-
-  ErrExpected.tag(this.offset, Tag value) : value = value;
-
-  @override
-  int get length => 1;
-
-  @override
-  String toString() {
-    final result = 'Expected: $value';
-    return result;
-  }
-}''';
-
   static const _classErrMalformed = r'''
 class ErrMalformed extends ErrWithTagAndErrors {
   @override
@@ -247,29 +177,6 @@ class ErrMalformed extends ErrWithTagAndErrors {
   bool operator ==(other) {
     return super == other && other is ErrMalformed;
   }
-
-  @override
-  String toString() {
-    final result = 'Malformed $tag';
-    return result;
-  }
-}''';
-
-  static const _classErrMalformedLite = r'''
-class ErrMalformed extends ErrWithTagAndErrors {
-  @override
-  final List<Err> errors;
-
-  @override
-  final int offset;
-
-  @override
-  final Tag tag;
-
-  ErrMalformed(this.offset, this.tag, this.errors);
-
-  @override
-  int get length => 1;
 
   @override
   String toString() {
@@ -304,24 +211,6 @@ class ErrMessage extends Err {
   }
 }''';
 
-  static const _classErrMessageLite = '''
-class ErrMessage extends Err {
-  @override
-  final int length;
-
-  final String message;
-
-  @override
-  final int offset;
-
-  ErrMessage(this.offset, this.length, this.message);
-
-  @override
-  String toString() {
-    return message;
-  }
-}''';
-
   static const _classErrNested = r'''
 class ErrNested extends ErrWithTagAndErrors {
   @override
@@ -343,29 +232,6 @@ class ErrNested extends ErrWithTagAndErrors {
   bool operator ==(other) {
     return super == other && other is ErrNested;
   }
-
-  @override
-  String toString() {
-    final result = 'Nested $tag';
-    return result;
-  }
-}''';
-
-  static const _classErrNestedLite = r'''
-class ErrNested extends ErrWithTagAndErrors {
-  @override
-  final List<Err> errors;
-
-  @override
-  final int offset;
-
-  @override
-  final Tag tag;
-
-  ErrNested(this.offset, this.tag, this.errors);
-
-  @override
-  int get length => 1;
 
   @override
   String toString() {
@@ -427,51 +293,6 @@ class ErrUnexpected extends Err {
   }
 }''';
 
-  static const _classErrUnexpectedLite = r'''
-class ErrUnexpected extends Err {
-  @override
-  final int length;
-
-  @override
-  final int offset;
-
-  final Object? value;
-
-  ErrUnexpected(this.offset, this.length, this.value);
-
-  ErrUnexpected.char(this.offset, Char value)
-      : length = 1,
-        value = value;
-
-  ErrUnexpected.charAt(this.offset, String source)
-      : length = 1,
-        value = Char(source.runeAt(offset));
-
-  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
-      : length = 1,
-        value = offset < source.length
-            ? Char(c ?? source.runeAt(offset))
-            : const Tag('EOF');
-
-  ErrUnexpected.eof(this.offset)
-      : length = 1,
-        value = const Tag('EOF');
-
-  ErrUnexpected.label(this.offset, String value)
-      : length = value.length,
-        value = value;
-
-  ErrUnexpected.tag(this.offset, Tag value)
-      : length = value.name.length,
-        value = value;
-
-  @override
-  String toString() {
-    final result = 'Unexpected: $value';
-    return result;
-  }
-}''';
-
   static const _classErrUnknown = '''
 class ErrUnknown extends Err {
   @override
@@ -487,23 +308,6 @@ class ErrUnknown extends Err {
   bool operator ==(other) {
     return super == other && other is ErrUnknown;
   }
-
-  @override
-  String toString() {
-    final result = 'Unknown error';
-    return result;
-  }
-}''';
-
-  static const _classErrUnknownLite = '''
-class ErrUnknown extends Err {
-  @override
-  final int offset;
-
-  ErrUnknown(this.offset);
-
-  @override
-  int get length => 1;
 
   @override
   String toString() {
@@ -556,18 +360,6 @@ abstract class ErrWithErrors extends Err {
   }
 }''';
 
-  static const _classErrWithErrorsLite = r'''
-abstract class ErrWithErrors extends Err {
-  List<Err> get errors;
-
-  @override
-  String toString() {
-    final list = errors.join(', ');
-    final result = '[$list]';
-    return result;
-  }
-}''';
-
   static const _classErrWithTagAndErrors = '''
 abstract class ErrWithTagAndErrors extends ErrWithErrors {
   Tag get tag;
@@ -577,12 +369,6 @@ abstract class ErrWithTagAndErrors extends ErrWithErrors {
   bool operator ==(other) {
     return super == other && other is ErrWithTagAndErrors && other.tag == tag;
   }
-}
-''';
-
-  static const _classErrWithTagAndErrorsLite = '''
-abstract class ErrWithTagAndErrors extends ErrWithErrors {
-  Tag get tag;
 }
 ''';
 
@@ -704,7 +490,7 @@ extension on String {
       s = s.replaceAll(key, map[key]!);
     }
 
-    return '\'$s\'';
+    return s;
   }
 }''';
 
@@ -740,42 +526,23 @@ String {{name}}(String source, List<Err> errors,
 }
 ''';
 
-  static List<String> getClasses({bool lightweightRuntime = true}) {
-    if (lightweightRuntime) {
-      return const [
-        _classChar,
-        _classErr,
-        _classErrCombinedLite,
-        _classErrExpectedLite,
-        _classErrMalformedLite,
-        _classErrMessageLite,
-        _classErrNestedLite,
-        _classErrUnexpectedLite,
-        _classErrUnknownLite,
-        _classErrWithErrorsLite,
-        _classErrWithTagAndErrorsLite,
-        _classState,
-        _classTag,
-        _extensionString
-      ];
-    } else {
-      return const [
-        _classChar,
-        _classErr,
-        _classErrCombined,
-        _classErrExpected,
-        _classErrMalformed,
-        _classErrMessage,
-        _classErrNested,
-        _classErrUnexpected,
-        _classErrUnknown,
-        _classErrWithErrors,
-        _classErrWithTagAndErrors,
-        _classState,
-        _classTag,
-        _extensionString
-      ];
-    }
+  static List<String> getClasses() {
+    return const [
+      _classChar,
+      _classErr,
+      _classErrCombined,
+      _classErrExpected,
+      _classErrMalformed,
+      _classErrMessage,
+      _classErrNested,
+      _classErrUnexpected,
+      _classErrUnknown,
+      _classErrWithErrors,
+      _classErrWithTagAndErrors,
+      _classState,
+      _classTag,
+      _extensionString
+    ];
   }
 
   /// An unofficial way to display error messages.

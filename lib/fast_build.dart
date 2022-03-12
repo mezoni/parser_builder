@@ -9,7 +9,6 @@ Future<void> fastBuild(
     String? footer,
     bool format = true,
     String? header,
-    bool lightweightRuntime = true,
     String? partOf,
     Map<String, Named> publish = const {}}) async {
   for (final builder in builders) {
@@ -26,8 +25,7 @@ Future<void> fastBuild(
     declarations.add(ParseRuntime.getErrorMessageProcessor());
   }
 
-  declarations
-      .addAll(ParseRuntime.getClasses(lightweightRuntime: lightweightRuntime));
+  declarations.addAll(ParseRuntime.getClasses());
   var code = declarations.join('\n\n');
   if (partOf != null) {
     code = 'part of \'$partOf\';\n\n' + code;
