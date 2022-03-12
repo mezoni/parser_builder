@@ -1036,13 +1036,7 @@ abstract class Err {
         for (final nestedError in error.errors) {
           flatten(nestedError, inner);
         }
-
-        int max(int x, int y) => x > y
-            ? x
-            : y < x
-                ? x
-                : y;
-        final maxOffset = inner.map((e) => e.offset).reduce(max);
+        final maxOffset = inner.map((e) => e.offset).reduce(_max);
         final farthest = inner.where((e) => e.offset == maxOffset);
         final offset = error.offset;
         final tag = error.tag;
@@ -1069,46 +1063,26 @@ abstract class Err {
   }
 
   static List<Err> groupExpected(List<Err> errors) {
-    final result = <Err>[];
-    final expected = errors.whereType<ErrExpected>();
-    Map<T, List<S>> groupBy<S, T>(Iterable<S> values, T Function(S) key) {
-      final map = <T, List<S>>{};
-      for (final element in values) {
-        (map[key(element)] ??= []).add(element);
-      }
-      return map;
-    }
-
-    final groupped = groupBy(expected, (Err e) => e.offset);
-    final offsets = <int>{};
-    final processed = <Err>{};
-    for (final error in errors) {
-      if (!processed.add(error)) {
-        continue;
-      }
-
-      if (error is! ErrExpected) {
-        result.add(error);
-        continue;
-      }
-
-      final offset = error.offset;
-      if (!offsets.add(offset)) {
-        continue;
-      }
-
-      final elements = <String>[];
-      for (final error in groupped[offset]!) {
-        elements.add(error.value.toString());
-        processed.add(error);
-      }
-
-      final message = elements.join(', ');
-      final newError = ErrMessage(offset, 1, 'Expected: $message');
-      result.add(newError);
+    final result = errors.toList();
+    final maxOffset =
+        result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
+    result.removeWhere((e) =>
+        (e is ErrExpected || e is ErrUnexpected) && e.offset < maxOffset);
+    final message =
+        result.whereType<ErrExpected>().map((e) => e.value).join(', ');
+    if (message.isNotEmpty) {
+      result.removeWhere((e) => e is ErrExpected);
+      result.add(ErrMessage(maxOffset, 1, 'Expected: $message'));
     }
 
     return result;
+  }
+
+  static int _max(int x, int y) {
+    if (x > y) {
+      return x;
+    }
+    return y > x ? y : x;
   }
 }
 
@@ -1123,6 +1097,12 @@ class ErrCombined extends ErrWithErrors {
 
   @override
   int get length => 1;
+
+  @override
+  // ignore: hash_and_equals
+  bool operator ==(other) {
+    return super == other && other is ErrCombined;
+  }
 }
 
 class ErrExpected extends Err {
@@ -1142,7 +1122,15 @@ class ErrExpected extends Err {
   ErrExpected.tag(this.offset, Tag value) : value = value;
 
   @override
+  int get hashCode => super.hashCode ^ value.hashCode;
+
+  @override
   int get length => 1;
+
+  @override
+  bool operator ==(other) {
+    return super == other && other is ErrExpected && other.value == value;
+  }
 
   @override
   String toString() {
@@ -1167,6 +1155,12 @@ class ErrMalformed extends ErrWithTagAndErrors {
   int get length => 1;
 
   @override
+  // ignore: hash_and_equals
+  bool operator ==(other) {
+    return super == other && other is ErrMalformed;
+  }
+
+  @override
   String toString() {
     final result = 'Malformed $tag';
     return result;
@@ -1183,6 +1177,14 @@ class ErrMessage extends Err {
   final int offset;
 
   ErrMessage(this.offset, this.length, this.message);
+
+  @override
+  int get hashCode => super.hashCode ^ message.hashCode;
+
+  @override
+  bool operator ==(other) {
+    return super == other && other is ErrMessage && other.message == message;
+  }
 
   @override
   String toString() {
@@ -1204,6 +1206,12 @@ class ErrNested extends ErrWithTagAndErrors {
 
   @override
   int get length => 1;
+
+  @override
+  // ignore: hash_and_equals
+  bool operator ==(other) {
+    return super == other && other is ErrNested;
+  }
 
   @override
   String toString() {
@@ -1250,6 +1258,14 @@ class ErrUnexpected extends Err {
         value = value;
 
   @override
+  int get hashCode => super.hashCode ^ value.hashCode;
+
+  @override
+  bool operator ==(other) {
+    return super == other && other is ErrUnexpected && other.value == value;
+  }
+
+  @override
   String toString() {
     final result = 'Unexpected: $value';
     return result;
@@ -1266,6 +1282,12 @@ class ErrUnknown extends Err {
   int get length => 1;
 
   @override
+  // ignore: hash_and_equals
+  bool operator ==(other) {
+    return super == other && other is ErrUnknown;
+  }
+
+  @override
   String toString() {
     final result = 'Unknown error';
     return result;
@@ -1274,6 +1296,38 @@ class ErrUnknown extends Err {
 
 abstract class ErrWithErrors extends Err {
   List<Err> get errors;
+
+  @override
+  int get hashCode {
+    var result = super.hashCode;
+    for (final error in errors) {
+      result ^= error.hashCode;
+    }
+
+    return result;
+  }
+
+  @override
+  bool operator ==(other) {
+    if (super == other) {
+      if (other is ErrWithErrors) {
+        final otherErrors = other.errors;
+        if (otherErrors.length == errors.length) {
+          for (var i = 0; i < errors.length; i++) {
+            final error = errors[i];
+            final otherError = otherErrors[i];
+            if (otherError != error) {
+              return false;
+            }
+          }
+
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   @override
   String toString() {
@@ -1285,6 +1339,12 @@ abstract class ErrWithErrors extends Err {
 
 abstract class ErrWithTagAndErrors extends ErrWithErrors {
   Tag get tag;
+
+  @override
+  // ignore: hash_and_equals
+  bool operator ==(other) {
+    return super == other && other is ErrWithTagAndErrors && other.tag == tag;
+  }
 }
 
 class State<T> {
@@ -1402,7 +1462,7 @@ extension on String {
       s = s.replaceAll(key, map[key]!);
     }
 
-    return '\'$s\'';
+    return s;
   }
 }
 

@@ -2279,13 +2279,7 @@ abstract class Err {
         for (final nestedError in error.errors) {
           flatten(nestedError, inner);
         }
-
-        int max(int x, int y) => x > y
-            ? x
-            : y < x
-                ? x
-                : y;
-        final maxOffset = inner.map((e) => e.offset).reduce(max);
+        final maxOffset = inner.map((e) => e.offset).reduce(_max);
         final farthest = inner.where((e) => e.offset == maxOffset);
         final offset = error.offset;
         final tag = error.tag;
@@ -2312,46 +2306,26 @@ abstract class Err {
   }
 
   static List<Err> groupExpected(List<Err> errors) {
-    final result = <Err>[];
-    final expected = errors.whereType<ErrExpected>();
-    Map<T, List<S>> groupBy<S, T>(Iterable<S> values, T Function(S) key) {
-      final map = <T, List<S>>{};
-      for (final element in values) {
-        (map[key(element)] ??= []).add(element);
-      }
-      return map;
-    }
-
-    final groupped = groupBy(expected, (Err e) => e.offset);
-    final offsets = <int>{};
-    final processed = <Err>{};
-    for (final error in errors) {
-      if (!processed.add(error)) {
-        continue;
-      }
-
-      if (error is! ErrExpected) {
-        result.add(error);
-        continue;
-      }
-
-      final offset = error.offset;
-      if (!offsets.add(offset)) {
-        continue;
-      }
-
-      final elements = <String>[];
-      for (final error in groupped[offset]!) {
-        elements.add(error.value.toString());
-        processed.add(error);
-      }
-
-      final message = elements.join(', ');
-      final newError = ErrMessage(offset, 1, 'Expected: $message');
-      result.add(newError);
+    final result = errors.toList();
+    final maxOffset =
+        result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
+    result.removeWhere((e) =>
+        (e is ErrExpected || e is ErrUnexpected) && e.offset < maxOffset);
+    final message =
+        result.whereType<ErrExpected>().map((e) => e.value).join(', ');
+    if (message.isNotEmpty) {
+      result.removeWhere((e) => e is ErrExpected);
+      result.add(ErrMessage(maxOffset, 1, 'Expected: $message'));
     }
 
     return result;
+  }
+
+  static int _max(int x, int y) {
+    if (x > y) {
+      return x;
+    }
+    return y > x ? y : x;
   }
 }
 
@@ -2731,6 +2705,6 @@ extension on String {
       s = s.replaceAll(key, map[key]!);
     }
 
-    return '\'$s\'';
+    return s;
   }
 }
