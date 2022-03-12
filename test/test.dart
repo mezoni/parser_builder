@@ -31,6 +31,7 @@ void _test() {
   _testAlt();
   _testAnyChar();
   _testChar();
+  _testCombinedList1();
   _testConsumed();
   _testDelimited();
   _testDigit0();
@@ -459,6 +460,49 @@ void _testChar() {
         expect(state.pos, 0);
         expect(state.error, ErrExpected.char(0, Char(c)));
       }
+    }
+  });
+}
+
+void _testCombinedList1() {
+  test('CombinedList1', () {
+    final parser = combinedList1C16C32;
+    {
+      final state = State('$s16');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, [c16]);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('$s16$s32');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, [c16, c32]);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('$s16$s32$s32');
+      final r = parser(state);
+      expect(state.ok, true);
+      _expectResult(r, [c16, c32, c32]);
+      expect(state.pos, 5);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(0, Char(c16)));
+    }
+    {
+      final state = State('$s32');
+      final r = parser(state);
+      expect(state.ok, false);
+      _expectResult(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(0, Char(c16)));
     }
   });
 }

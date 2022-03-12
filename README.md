@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.14.2
+Version: 0.14.3
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -65,6 +65,7 @@ built-in:
 
 [`branch`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch):
 - [`Alt`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/alt.dart)
+- [`Alt2..Alt7`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/alt.dart)
 - [`SwitchTag`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/switch_tag.dart)
 
 [`bytes`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes):
@@ -101,7 +102,7 @@ built-in:
 [`combinator`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator):
 - [`Consumed`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/consumed.dart)
 - [`Eof`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/eof.dart)
-- [`Map$`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/map.dart)
+- [`Map1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/map1.dart)
 - [`Not`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/not.dart)
 - [`Opt`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/opt.dart)
 - [`Peek`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/peek.dart)
@@ -114,6 +115,7 @@ built-in:
 - `Nested` (not implenented yet)
 
 [`multi`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi):
+- [`CombinedList1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/combined_list1.dart)
 - `FoldMany0` (not implenented yet)
 - `FoldMany1` (not implenented yet)
 - [`Many0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/many0.dart)
@@ -127,6 +129,7 @@ built-in:
 
 [`sequence`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence):
 - [`Delimited`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/delimited.dart)
+- [`Map2..Map7`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/map.dart)
 - [`Pair`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/pair.dart)
 - [`Preceded`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/preceded.dart)
 - [`SeparatedPair`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/separated_pair.dart)
@@ -138,6 +141,14 @@ built-in:
 [`string`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string):
 - [`EscapeSequence`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/escape_sequence.dart)
 - [`StringValue`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/string_value.dart)
+
+## Transformers
+
+- [`ClosureTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
+- [`ExprTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
+- [`FuncExprTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
+- [`FuncTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
+- [`VarTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
 
 ## Included transformers
 

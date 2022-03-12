@@ -43,7 +43,7 @@ bool {{name}}(int c) {
     final name = transformation.name;
     switch (processing) {
       case RangeProcessing.search:
-        transformation.checkArguments(['int c']);
+        transformation.checkArguments(['int c'], getChars());
         final list = getCharList();
         var result = _templateBinarySearch;
         result = result.replaceAll('{{name}}', name);
@@ -69,7 +69,7 @@ bool {{name}}(int c) {
   String invoke(Transformation transformation) {
     final name = transformation.name;
     final arguments = transformation.arguments;
-    transformation.checkArguments(['int c']);
+    transformation.checkArguments(['int c'], getChars());
     final argument = arguments.first;
     switch (processing) {
       case RangeProcessing.search:

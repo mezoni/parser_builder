@@ -19,7 +19,7 @@ class ClosureTransformer<T> extends Transformer<T> {
 
   @override
   String invoke(Transformation transformation) {
-    final arguments = transformation.checkArguments(parameters);
+    final arguments = transformation.checkArguments(parameters, expression);
     final name = transformation.name;
     return '$name($arguments)';
   }
@@ -56,7 +56,7 @@ class FuncExprTransformer<T> extends Transformer<T> {
 
   @override
   String invoke(Transformation transformation) {
-    final arguments = transformation.checkArguments(parameters);
+    final arguments = transformation.checkArguments(parameters, expression);
     final name = transformation.name;
     return '$name($arguments)';
   }
@@ -78,7 +78,7 @@ class FuncTransformer<T> extends Transformer<T> {
 
   @override
   String invoke(Transformation transformation) {
-    final arguments = transformation.checkArguments(parameters);
+    final arguments = transformation.checkArguments(parameters, body);
     final name = transformation.name;
     return '$name($arguments)';
   }
@@ -96,18 +96,17 @@ class Transformation {
   Transformation(
       {required this.context, required this.name, required this.arguments});
 
-  String checkArguments(List<String> parameters) {
-    final length = parameters.length;
-    if (arguments.length != length) {
-      throw ArgumentError.value(arguments.toString(), 'arguments',
-          'List of arguments must contain $length elements to pass parameters \'${parameters.join(', ')}\'');
+  String checkArguments(List<String> parameters, String information) {
+    if (arguments.length != parameters.length) {
+      throw ArgumentError(
+          'The list of arguments [${arguments.join(', ')}] does not match the number of parameters [${parameters.join(', ')}]: $information');
     }
 
     return arguments.join(', ');
   }
 
   String replaceParameters(String template, List<String> parameters) {
-    checkArguments(parameters);
+    checkArguments(parameters, template);
     for (var i = 0; i < parameters.length; i++) {
       final argument = arguments[i];
       final parameter = parameters[i];
@@ -131,17 +130,27 @@ abstract class Transformer<T> {
 class VarTransformer<T> extends Transformer<T> {
   final String expression;
 
-  const VarTransformer(this.expression);
+  final String init;
+
+  final String key;
+
+  final List<String> parameters;
+
+  const VarTransformer(this.parameters, this.expression,
+      {required this.init, required this.key});
 
   @override
   String declare(Transformation transformation) {
     final name = transformation.name;
-    return 'final $name = $expression;';
+    return 'final $name = $init;';
   }
 
   @override
   String invoke(Transformation transformation) {
+    transformation.checkArguments(parameters, expression);
     final name = transformation.name;
-    return name;
+    var result = transformation.replaceParameters(expression, parameters);
+    result = result.replaceAll('{{$key}}', name);
+    return result;
   }
 }

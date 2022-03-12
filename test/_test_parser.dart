@@ -116,19 +116,25 @@ int? char32(State<String> state) {
 
 int? altC16OrC32(State<String> state) {
   int? $0;
-  int? $1;
-  $1 = char16(state);
-  if (state.ok) {
-    $0 = $1!;
-  } else {
-    final $error = state.error;
-    int? $2;
-    $2 = char32(state);
+  for (;;) {
+    int? $1;
+    $1 = char16(state);
     if (state.ok) {
-      $0 = $2!;
-    } else if (state.log) {
-      state.error = ErrCombined(state.pos, [$error, state.error]);
+      $0 = $1;
+      break;
     }
+    final $2 = state.error;
+    int? $3;
+    $3 = char32(state);
+    if (state.ok) {
+      $0 = $3;
+      break;
+    }
+    final $4 = state.error;
+    if (state.log) {
+      state.error = ErrCombined(state.pos, [$2, $4]);
+    }
+    break;
   }
   return $0;
 }
@@ -142,6 +148,32 @@ int? anyChar(State<String> state) {
   } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
   }
+  return $0;
+}
+
+List<int>? combinedList1C16C32(State<String> state) {
+  List<int>? $0;
+  final $log = state.log;
+  final $list = <int>[];
+  int? $1;
+  $1 = char16(state);
+  if (state.ok) {
+    $list.add($1!);
+    state.log = false;
+    for (;;) {
+      int? $2;
+      $2 = char32(state);
+      if (!state.ok) {
+        break;
+      }
+      $list.add($2!);
+    }
+  }
+  state.ok = $list.isNotEmpty;
+  if (state.ok) {
+    $0 = $list;
+  }
+  state.log = $log;
   return $0;
 }
 
@@ -168,7 +200,7 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   var $pos1 = state.pos;
   final $list = <String>[];
   for (;;) {
-    state.log = $list.isEmpty;
+    state.log = $list.isEmpty ? $log : false;
     String? $2;
     $2 = tagAbc(state);
     if (!state.ok) {
@@ -462,7 +494,7 @@ List<int>? many1C32(State<String> state) {
   final $log = state.log;
   final $list = <int>[];
   for (;;) {
-    state.log = $list.isEmpty;
+    state.log = $list.isEmpty ? $log : false;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -483,7 +515,7 @@ int? many1CountC32(State<String> state) {
   final $log = state.log;
   var $cnt = 0;
   while (true) {
-    state.log = $cnt == 0;
+    state.log = $cnt == 0 ? $log : false;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -506,7 +538,7 @@ List<int>? manyMNC32_2_3(State<String> state) {
   final $list = <int>[];
   var $cnt = 0;
   while ($cnt < 3) {
-    state.log = $cnt <= 2;
+    state.log = $cnt <= 2 ? $log : false;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -1083,7 +1115,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
   var $pos = state.pos;
   final $list = <int>[];
   for (;;) {
-    state.log = $list.isEmpty;
+    state.log = $list.isEmpty ? $log : false;
     int? $1;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
     if (state.ok) {

@@ -6,7 +6,7 @@ final {{log}} = state.log;
 var {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
 for (;;) {
-  state.log = {{list}}.isEmpty;
+  state.log = {{list}}.isEmpty ? {{log}} : false;
   {{p1}}
   if (!state.ok) {
     state.pos = {{pos}};

@@ -5,7 +5,7 @@ import 'parser_builder.dart';
 
 part 'src/combinator/consumed.dart';
 part 'src/combinator/eof.dart';
-part 'src/combinator/map.dart';
+part 'src/combinator/map1.dart';
 part 'src/combinator/not.dart';
 part 'src/combinator/opt.dart';
 part 'src/combinator/peek.dart';

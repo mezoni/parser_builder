@@ -142,7 +142,7 @@ int? _rangeChar(State<String> state) {
     if (state.pos < source.length) {
       final pos = state.pos;
       final c = source.readRune(state);
-      state.ok = c > 0x20 && c < 0x7f;
+      state.ok = c >= 0x20 && c < 0x7f;
       if (state.ok) {
         $3 = c;
       } else {
@@ -166,19 +166,25 @@ int? _rangeChar(State<String> state) {
 
 int? _hexOrRangeChar(State<String> state) {
   int? $0;
-  int? $1;
-  $1 = _hex(state);
-  if (state.ok) {
-    $0 = $1!;
-  } else {
-    final $error = state.error;
-    int? $2;
-    $2 = _rangeChar(state);
+  for (;;) {
+    int? $1;
+    $1 = _hex(state);
     if (state.ok) {
-      $0 = $2!;
-    } else if (state.log) {
-      state.error = ErrCombined(state.pos, [$error, state.error]);
+      $0 = $1;
+      break;
     }
+    final $2 = state.error;
+    int? $3;
+    $3 = _rangeChar(state);
+    if (state.ok) {
+      $0 = $3;
+      break;
+    }
+    final $4 = state.error;
+    if (state.log) {
+      state.error = ErrCombined(state.pos, [$2, $4]);
+    }
+    break;
   }
   return $0;
 }
@@ -256,7 +262,7 @@ int? _charCode(State<String> state) {
   if (state.pos < source.length) {
     final pos = state.pos;
     final c = source.readRune(state);
-    state.ok = c > 0x20 && c < 0x7f;
+    state.ok = c >= 0x20 && c < 0x7f;
     if (state.ok) {
       $0 = c;
     } else {
@@ -310,81 +316,93 @@ int? _char(State<String> state) {
 List<Tuple2<int, int>>? _range(State<String> state) {
   final source = state.source;
   List<Tuple2<int, int>>? $0;
-  List<Tuple2<int, int>>? $1;
-  final $pos = state.pos;
-  String? $2;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
-  if (state.ok) {
-    state.pos++;
-    $2 = '[';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('['));
-  }
-  if (state.ok) {
-    List<Tuple2<int, int>>? $3;
-    final $log = state.log;
-    final $list = <Tuple2<int, int>>[];
+  for (;;) {
+    List<Tuple2<int, int>>? $1;
+    final $pos = state.pos;
+    String? $3;
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
+    if (state.ok) {
+      state.pos++;
+      $3 = '[';
+    } else if (state.log) {
+      state.error = ErrExpected.tag(state.pos, const Tag('['));
+    }
+    if (state.ok) {
+      List<Tuple2<int, int>>? $4;
+      final $log = state.log;
+      final $list = <Tuple2<int, int>>[];
+      for (;;) {
+        state.log = $list.isEmpty ? $log : false;
+        Tuple2<int, int>? $5;
+        $5 = _rangeBody(state);
+        if (!state.ok) {
+          break;
+        }
+        $list.add($5!);
+      }
+      if ($list.isNotEmpty) {
+        state.ok = true;
+        $4 = $list;
+      }
+      state.log = $log;
+      if (state.ok) {
+        String? $6;
+        state.ok =
+            state.pos < source.length && source.codeUnitAt(state.pos) == 93;
+        if (state.ok) {
+          state.pos++;
+          $6 = ']';
+        } else if (state.log) {
+          state.error = ErrExpected.tag(state.pos, const Tag(']'));
+        }
+        if (state.ok) {
+          $1 = $4!;
+        }
+      }
+    }
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+    if (state.ok) {
+      $0 = $1;
+      break;
+    }
+    final $2 = state.error;
+    List<Tuple2<int, int>>? $7;
+    int? $9;
     for (;;) {
-      state.log = $list.isEmpty;
-      Tuple2<int, int>? $4;
-      $4 = _rangeBody(state);
-      if (!state.ok) {
+      int? $10;
+      $10 = _char(state);
+      if (state.ok) {
+        $9 = $10;
         break;
       }
-      $list.add($4!);
-    }
-    if ($list.isNotEmpty) {
-      state.ok = true;
-      $3 = $list;
-    }
-    state.log = $log;
-    if (state.ok) {
-      String? $5;
-      state.ok =
-          state.pos < source.length && source.codeUnitAt(state.pos) == 93;
+      final $11 = state.error;
+      int? $12;
+      $12 = _hex(state);
       if (state.ok) {
-        state.pos++;
-        $5 = ']';
-      } else if (state.log) {
-        state.error = ErrExpected.tag(state.pos, const Tag(']'));
+        $9 = $12;
+        break;
       }
-      if (state.ok) {
-        $1 = $3!;
+      final $13 = state.error;
+      if (state.log) {
+        state.error = ErrCombined(state.pos, [$11, $13]);
       }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  if (state.ok) {
-    $0 = $1!;
-  } else {
-    final $error = state.error;
-    List<Tuple2<int, int>>? $6;
-    int? $7;
-    int? $8;
-    $8 = _char(state);
-    if (state.ok) {
-      $7 = $8!;
-    } else {
-      final $error1 = state.error;
-      int? $9;
-      $9 = _hex(state);
-      if (state.ok) {
-        $7 = $9!;
-      } else if (state.log) {
-        state.error = ErrCombined(state.pos, [$error1, state.error]);
-      }
+      break;
     }
     if (state.ok) {
-      final v = $7!;
-      $6 = [Tuple2(v, v)];
+      final v = $9!;
+      $7 = [Tuple2(v, v)];
     }
     if (state.ok) {
-      $0 = $6!;
-    } else if (state.log) {
-      state.error = ErrCombined(state.pos, [$error, state.error]);
+      $0 = $7;
+      break;
     }
+    final $8 = state.error;
+    if (state.log) {
+      state.error = ErrCombined(state.pos, [$2, $8]);
+    }
+    break;
   }
   return $0;
 }
@@ -421,7 +439,7 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   var $pos = state.pos;
   final $list = <List<Tuple2<int, int>>>[];
   for (;;) {
-    state.log = $list.isEmpty;
+    state.log = $list.isEmpty ? $log : false;
     List<Tuple2<int, int>>? $2;
     final $pos1 = state.pos;
     List<Tuple2<int, int>>? $3;

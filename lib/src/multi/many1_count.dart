@@ -5,7 +5,7 @@ class Many1Count<I> extends ParserBuilder<I, int> {
 final {{log}} = state.log;
 var {{cnt}} = 0;
 while (true) {
-  state.log = {{cnt}} == 0;
+  state.log = {{cnt}} == 0 ? {{log}} : false;
   {{p1}}
   if (!state.ok) {
     break;

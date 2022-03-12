@@ -5,7 +5,7 @@ class Many1<I, O> extends ParserBuilder<I, List<O>> {
 final {{log}} = state.log;
 final {{list}} = <{{O}}>[];
 for (;;) {
-  state.log = {{list}}.isEmpty;
+  state.log = {{list}}.isEmpty ? {{log}} : false;
   {{p1}}
   if (!state.ok) {
     break;

@@ -1,7 +1,7 @@
 part of '../../bytes.dart';
 
 /// Parses the tag whose value is obtained as the result returned by the
-/// transformer [tag] and returns the tag.
+/// non-parameterized transformer [tag] and returns the tag.
 ///
 /// Example:
 /// ```dart

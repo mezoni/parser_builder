@@ -21,6 +21,7 @@ Future<void> main(List<String> args) async {
     _anyChar,
     _char16,
     _char32,
+    _combinedList1C16C32,
     _consumedSeparatedAbcC32,
     _delimited,
     _digit0,
@@ -138,6 +139,9 @@ const _char16 = Named('char16', Char(c16));
 
 const _char32 = Named('char32', Char(c32));
 
+const _combinedList1C16C32 =
+    Named('combinedList1C16C32', CombinedList1(_char16, _char32));
+
 const _consumedSeparatedAbcC32 = Named(
     'consumedSeparatedAbcC32', Consumed(SeparatedList1(_tagAbc, _char32)));
 
@@ -184,7 +188,7 @@ const _many1CountC32 = Named('many1CountC32', Many1Count(_char32));
 const _manyMNC32_2_3 = Named('manyMNC32_2_3', ManyMN(2, 3, _char32));
 
 const _manyTillAOrBTillAbc =
-    Named('manyTillAOrBTillAbc', ManyTill(Alt([Tag('a'), Tag('b')]), Tag(abc)));
+    Named('manyTillAOrBTillAbc', ManyTill(Alt2(Tag('a'), Tag('b')), Tag(abc)));
 
 const _map4Digits = Named(
     'map4Digits',
@@ -207,15 +211,17 @@ const _mapC32ToStr = Named(
 
 const _noneOfC16 = Named('noneOfC16', NoneOf([c16]));
 
-const _noneOfC16OrC32Ex = Named('noneOfC16OrC32Ex',
-    NoneOfEx(VarTransformer('state.context.listOfC16AndC32 as List<int>')));
+const _noneOfC16OrC32Ex = Named(
+    'noneOfC16OrC32Ex',
+    NoneOfEx(VarTransformer([], '{{name}}',
+        key: 'name', init: 'state.context.listOfC16AndC32 as List<int>')));
 
 const _noneOfC32 = Named('noneOfC32', NoneOf([c32]));
 
 const _noneOfTagsAbcAbdDefDegXXY = Named('noneOfTagsAbcAbdDefDegXXY',
     NoneOfTags(['abc', 'abd', 'def', 'deg', 'x', 'xy']));
 
-const _notC32OrC16 = Named('notC32OrC16', Not(Alt([_char16, _char32])));
+const _notC32OrC16 = Named('notC32OrC16', Not(Alt2(_char16, _char32)));
 
 const _oneOfC16 = Named('oneOfC16', OneOf([c16]));
 
@@ -274,7 +280,7 @@ const _switchTag = Named(
       'null': Value(null as dynamic, Tag('null')),
       'false': Skip(5, ExprTransformer<bool>.value('false')),
       'true': Value(true, Tag('true')),
-      null: Alt([Digit1(), Alpha1()]),
+      null: Alt2(Digit1(), Alpha1()),
     }, ExprTransformer.value('''
 [
   ErrExpected.tag(state.pos, const Tag('alphas')),
@@ -296,8 +302,10 @@ const _tagC32 = Named('tagC32', Tag(s32));
 
 const _tagC32C16 = Named('tagC32C16', Tag(s32 + s16));
 
-const _tagExFoo =
-    Named('tagExFoo', TagEx(VarTransformer('state.context.foo as String')));
+const _tagExFoo = Named(
+    'tagExFoo',
+    TagEx(VarTransformer([], '{{foo}}',
+        key: 'foo', init: 'state.context.foo as String')));
 
 const _tagNoCaseAbc = Named('tagNoCaseAbc',
     TagNoCase(abc, ExprTransformer<String>(['s'], '{{s}}.toLowerCase()')));
@@ -364,8 +372,10 @@ const _transformersNotCharClassIsDigit = Named(
 
 const _transformersVarIsNotDigit = Named(
     'transformersVarIsNotDigit',
-    NoneOfEx(VarTransformer(
-        'const [0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]')));
+    NoneOfEx(VarTransformer([], '{{digits}}',
+        key: 'digits',
+        init:
+            'const [0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]')));
 
 const _tuple2C32Abc = Named('tuple2C32Abc', Tuple2(_char32, _tagAbc));
 

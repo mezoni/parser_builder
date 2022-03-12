@@ -7,7 +7,7 @@ final {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
 var {{cnt}} = 0;
 while ({{cnt}} < {{n}}) {
-  state.log = {{cnt}} <= {{m}};
+  state.log = {{cnt}} <= {{m}} ? {{log}} : false;
   {{p1}}
   if (!state.ok) {
     break;

@@ -63,7 +63,7 @@ const _comma = Named('_comma', Terminated(Tag(','), _ws), [_inline]);
 
 const _eof = Named('_eof', Eof<String>());
 
-const _escaped = Named('_escaped', Alt([_escapeSeq, _escapeHex]));
+const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
 const _escapeHex = Named(
     '_escapeHex',

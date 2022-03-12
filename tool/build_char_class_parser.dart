@@ -72,7 +72,7 @@ const _hexVal = Named('_hexVal', Map1(TakeWhile1(_isHexDigit), _toHexValue));
 const _intToTuple2 =
     ExprTransformer<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
 
-const _isAscii = ExprTransformer<bool>(['x'], '{{x}} > 0x20 && {{x}} < 0x7f');
+const _isAscii = ExprTransformer<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
 
 const _isHexDigit = ExprTransformer<bool>([
   'x'
