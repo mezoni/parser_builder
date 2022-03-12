@@ -14,7 +14,6 @@ import 'build_json_number_parser.dart' as _json_number;
 Future<void> main(List<String> args) async {
   final context = Context();
   context.optimizeForSize = false;
-  _configure(context, comment: false, trace: false);
   await fastBuild(context, [_json, _value_], 'example/example.dart',
       footer: __footer, header: __header, publish: {'parse': _json});
 }
@@ -147,39 +146,3 @@ const _value_ = Named('_value', Terminated(_switchValue, _ws));
 const _values = Named('_values', SeparatedList0(_value, _comma));
 
 const _ws = Named('_ws', SkipWhile(_isWhitespace));
-
-void _configure(Context context, {bool comment = false, bool trace = false}) {
-  if (comment || trace) {
-    context.onEnter = (b) {
-      final name = b.runtimeType.toString();
-      final sb = StringBuffer();
-      if (comment) {
-        sb.writeln(' // => $name');
-      }
-
-      if (trace) {
-        // Simple tracing
-        sb.writeln('print(\'=> $name\');');
-        sb.writeln('print(state.source);');
-      }
-
-      return sb.toString();
-    };
-
-    context.onLeave = (b, r) {
-      final name = b.runtimeType.toString();
-      final sb = StringBuffer();
-      if (comment) {
-        sb.writeln(' // <= $name');
-      }
-
-      if (trace) {
-        // Simple tracing
-        sb.writeln('print(\'<= $name: $r\');');
-        sb.writeln('print(state.source);');
-      }
-
-      return sb.toString();
-    };
-  }
-}
