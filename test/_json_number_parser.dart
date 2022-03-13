@@ -51,7 +51,6 @@ num? number(State<String> state) {
     num? $2;
     final $pos1 = state.pos;
     num? $3;
-    num? $4;
     state.ok = true;
     final $pos2 = state.pos;
     for (;;) {
@@ -245,7 +244,7 @@ num? number(State<String> state) {
         }
         if (expPartLen > 18) {
           state.pos = pos;
-          $4 = double.parse(source.substring($pos2, pos));
+          $3 = double.parse(source.substring($pos2, pos));
           break;
         }
         if (hasExpSign) {
@@ -255,7 +254,7 @@ num? number(State<String> state) {
       state.pos = pos;
       final singlePart = !hasDot && !hasExp;
       if (singlePart && intPartLen <= 18) {
-        $4 = hasSign ? -intValue : intValue;
+        $3 = hasSign ? -intValue : intValue;
         break;
       }
       if (singlePart && intPartLen == 19) {
@@ -263,7 +262,7 @@ num? number(State<String> state) {
           final digit = source.codeUnitAt(intPartPos + 18) - 0x30;
           if (digit <= 7) {
             intValue = intValue * 10 + digit;
-            $4 = hasSign ? -intValue : intValue;
+            $3 = hasSign ? -intValue : intValue;
             break;
           }
         }
@@ -275,7 +274,7 @@ num? number(State<String> state) {
       final modExp = exp < 0 ? -exp : exp;
       if (modExp > 22) {
         state.pos = pos;
-        $4 = double.parse(source.substring($pos2, pos));
+        $3 = double.parse(source.substring($pos2, pos));
         break;
       }
       final k = powersOfTen[modExp];
@@ -305,7 +304,7 @@ num? number(State<String> state) {
         }
         doubleValue += value;
       }
-      $4 = hasSign ? -doubleValue : doubleValue;
+      $3 = hasSign ? -doubleValue : doubleValue;
       break;
     }
     if (!state.ok) {
@@ -321,13 +320,8 @@ num? number(State<String> state) {
       state.pos = $pos2;
     }
     if (state.ok) {
-      $3 = $4;
-    } else if (state.log) {
-      state.error = ErrMalformed(state.pos, const Tag('number'), [state.error]);
-    }
-    if (state.ok) {
-      bool? $5;
-      $5 = _ws(state);
+      bool? $4;
+      $4 = _ws(state);
       if (state.ok) {
         $2 = $3!;
       }
@@ -336,10 +330,10 @@ num? number(State<String> state) {
       state.pos = $pos1;
     }
     if (state.ok) {
-      bool? $6;
+      bool? $5;
       state.ok = state.pos >= state.source.length;
       if (state.ok) {
-        $6 = true;
+        $5 = true;
       } else if (state.log) {
         state.error = ErrExpected.eof(state.pos);
       }
@@ -429,7 +423,7 @@ abstract class Err {
       for (final error in error.errors) {
         _flatten(error, result);
       }
-    } else if (error is ErrWithTagAndErrors) {
+    } else if (error is ErrNested) {
       final inner = <Err>[];
       for (final nested in error.errors) {
         _flatten(nested, inner);
@@ -439,18 +433,13 @@ abstract class Err {
       inner.removeWhere((e) => e.offset < farthest);
       final offset = error.offset;
       final tag = error.tag;
-      result.add(ErrExpected.tag(offset, tag));
+      if (tag != null) {
+        result.add(ErrExpected.tag(offset, tag));
+      }
+
       if (farthest > offset) {
-        if (error is ErrMalformed) {
-          result.add(_ErrInner(farthest, offset, 'Malformed $tag'));
-          result.addAll(inner);
-        } else if (error is ErrNested) {
-          if (farthest > offset) {
-            result.addAll(inner);
-          }
-        } else {
-          throw StateError('Internal error');
-        }
+        result.add(_ErrInner(farthest, offset, error.message));
+        result.addAll(inner);
       }
     } else {
       result.add(error);
@@ -549,34 +538,6 @@ class ErrExpected extends Err {
   }
 }
 
-class ErrMalformed extends ErrWithTagAndErrors {
-  @override
-  final List<Err> errors;
-
-  @override
-  final int offset;
-
-  @override
-  final Tag tag;
-
-  ErrMalformed(this.offset, this.tag, this.errors);
-
-  @override
-  int get length => 1;
-
-  @override
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return super == other && other is ErrMalformed;
-  }
-
-  @override
-  String toString() {
-    final result = 'Malformed $tag';
-    return result;
-  }
-}
-
 class ErrMessage extends Err {
   @override
   final int length;
@@ -602,17 +563,18 @@ class ErrMessage extends Err {
   }
 }
 
-class ErrNested extends ErrWithTagAndErrors {
+class ErrNested extends ErrWithErrors {
   @override
   final List<Err> errors;
+
+  final String message;
 
   @override
   final int offset;
 
-  @override
-  final Tag tag;
+  final Tag? tag;
 
-  ErrNested(this.offset, this.tag, this.errors);
+  ErrNested(this.offset, this.message, this.tag, this.errors);
 
   @override
   int get length => 1;
@@ -620,13 +582,15 @@ class ErrNested extends ErrWithTagAndErrors {
   @override
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return super == other && other is ErrNested;
+    return super == other &&
+        other is ErrNested &&
+        other.message == message &&
+        other.tag == tag;
   }
 
   @override
   String toString() {
-    final result = 'Nested $tag';
-    return result;
+    return message;
   }
 }
 

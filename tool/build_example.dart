@@ -101,7 +101,8 @@ const _keyValue = Named(
 
 const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
 
-const _number = Named('_number', Malformed('number', _json_number.parser));
+const _number =
+    Named('_number', Nested('Malformed number', 'number', _json_number.parser));
 
 const _object = Named(
     '_object',
@@ -116,7 +117,9 @@ const _openBracket =
 const _quote = Named('_quote', Terminated(Tag('"'), _ws), [_inline]);
 
 const _string = Named(
-    '_string', Malformed('string', Delimited(Tag('"'), _stringValue, _quote)));
+    '_string',
+    Nested('Malformed string', 'string',
+        Delimited(Tag('"'), _stringValue, _quote)));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
 

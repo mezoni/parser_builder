@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.14.4
+Version: 0.15.0
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -110,9 +110,8 @@ built-in:
 - [`Value`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/value.dart)
 
 [`error`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error):
-- [`Labeled`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/labeled.dart) (not tested yet)
-- [`Malformed`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/malformed.dart) (not fully tested)
-- `Nested` (not implenented yet)
+- [`Expected`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/expected.dart) (not tested yet)
+- [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart) (not fully tested)
 
 [`multi`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi):
 - [`CombinedList1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/combined_list1.dart)

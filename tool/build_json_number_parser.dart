@@ -1,6 +1,5 @@
 import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/combinator.dart';
-import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
@@ -40,7 +39,7 @@ num? parse(String s) {
 const _isWhitespace = ExprTransformer<bool>(
     ['x'], '{{x}} == 0x9 || {{x}} == 0xa || {{x}} == 0xd || {{x}} == 0x20');
 
-const _number = Terminated(Malformed('number', parser), _ws);
+const _number = Terminated(parser, _ws);
 
 const _parser = Named<String, num>('number', Delimited(_ws, _number, Eof()));
 

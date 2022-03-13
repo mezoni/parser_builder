@@ -48,7 +48,7 @@ abstract class Err {
       for (final error in error.errors) {
         _flatten(error, result);
       }
-    } else if (error is ErrWithTagAndErrors) {
+    } else if (error is ErrNested) {
       final inner = <Err>[];
       for (final nested in error.errors) {
         _flatten(nested, inner);
@@ -58,18 +58,13 @@ abstract class Err {
       inner.removeWhere((e) => e.offset < farthest);
       final offset = error.offset;
       final tag = error.tag;
-      result.add(ErrExpected.tag(offset, tag));
+      if (tag != null) {
+        result.add(ErrExpected.tag(offset, tag));
+      }
+
       if (farthest > offset) {
-        if (error is ErrMalformed) {
-          result.add(_ErrInner(farthest, offset, 'Malformed $tag'));
-          result.addAll(inner);
-        } else if (error is ErrNested) {
-          if (farthest > offset) {
-            result.addAll(inner);
-          }
-        } else {
-          throw StateError('Internal error');
-        }
+        result.add(_ErrInner(farthest, offset, error.message));
+        result.addAll(inner);
       }
     } else {
       result.add(error);
@@ -170,35 +165,6 @@ class ErrExpected extends Err {
   }
 }''';
 
-  static const _classErrMalformed = r'''
-class ErrMalformed extends ErrWithTagAndErrors {
-  @override
-  final List<Err> errors;
-
-  @override
-  final int offset;
-
-  @override
-  final Tag tag;
-
-  ErrMalformed(this.offset, this.tag, this.errors);
-
-  @override
-  int get length => 1;
-
-  @override
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return super == other && other is ErrMalformed;
-  }
-
-  @override
-  String toString() {
-    final result = 'Malformed $tag';
-    return result;
-  }
-}''';
-
   static const _classErrMessage = '''
 class ErrMessage extends Err {
   @override
@@ -226,17 +192,18 @@ class ErrMessage extends Err {
 }''';
 
   static const _classErrNested = r'''
-class ErrNested extends ErrWithTagAndErrors {
+class ErrNested extends ErrWithErrors {
   @override
   final List<Err> errors;
+
+  final String message;
 
   @override
   final int offset;
 
-  @override
-  final Tag tag;
+  final Tag? tag;
 
-  ErrNested(this.offset, this.tag, this.errors);
+  ErrNested(this.offset, this.message, this.tag, this.errors);
 
   @override
   int get length => 1;
@@ -244,13 +211,15 @@ class ErrNested extends ErrWithTagAndErrors {
   @override
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return super == other && other is ErrNested;
+    return super == other &&
+        other is ErrNested &&
+        other.message == message &&
+        other.tag == tag;
   }
 
   @override
   String toString() {
-    final result = 'Nested $tag';
-    return result;
+    return message;
   }
 }''';
 
@@ -570,7 +539,6 @@ String {{name}}(String source, List<Err> errors,
       _classErr,
       _classErrCombined,
       _classErrExpected,
-      _classErrMalformed,
       _classErrMessage,
       _classErrNested,
       _classErrUnexpected,

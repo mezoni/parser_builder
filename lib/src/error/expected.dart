@@ -1,19 +1,19 @@
 part of '../../error.dart';
 
-class Labeled<I, O> extends ParserBuilder<I, O> {
+class Expected<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 {{p1}}
 if (state.ok) {
   {{res}} = {{p1_res}};
 } else if (state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{label}}));
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
 }''';
 
   final ParserBuilder<I, O> parser;
 
   final String tag;
 
-  const Labeled(this.tag, this.parser);
+  const Expected(this.tag, this.parser);
 
   @override
   Map<String, ParserBuilder> getBuilders() {

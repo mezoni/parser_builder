@@ -2,6 +2,10 @@
 
 - Improved error reporting procedures. Fixed shortcomings, defects and errors in post-processing errors when creating a parser error report. Now the error messages look like they should
 - Slightly changed the implementation of the experimental parser builder `SwitchTag` to improve error reporting
+- Breaking change: The way of generating and reporting errors with nested errors has been unified. The number of error types for such cases has been reduced, instead one type has been left (`ErrNested`). This type has been changed and is now universal and easily customizable
+- Implemented parser builder `Nested` (this is a reworked builder `Malformed`)
+- Breaking change: Removed parser builder `Malformed` in favor of using parser builder `Nested`. It supports specifying an error message value and optionally specifying a tag value
+- Breaking change: The `Labeled` parser builder has been renamed to `Expected`. To more accurately reflect its purpose
 
 ## 0.14.4
 
