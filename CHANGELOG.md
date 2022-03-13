@@ -1,3 +1,8 @@
+## 0.15.0
+
+- Improved error reporting procedures. Fixed shortcomings, defects and errors in post-processing errors when creating a parser error report. Now the error messages look like they should
+- Slightly changed the implementation of the experimental parser builder `SwitchTag` to improve error reporting
+
 ## 0.14.4
 
 - Removed `lightweight runtime`. The use of this implementation did not allow a correct comparison (and filtration) of the errors in error reporting procedures. As a result, errors messages were redundant and not correct

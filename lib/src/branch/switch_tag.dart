@@ -38,6 +38,7 @@ part of '../../branch.dart';
 class SwitchTag<O> extends StringParserBuilder<O> {
   static const _template = '''
 final {{pos}} = state.pos;
+var {{matched}} = false;
 state.ok = false;
 if ({{pos}} < source.length) {
   final c = source.codeUnitAt({{pos}});
@@ -45,10 +46,13 @@ if ({{pos}} < source.length) {
     {{cases}}
   }
 }
-{{default}}
 if (!state.ok && state.log) {
   {{transform}}
-  state.error = ErrCombined(state.pos, {{errors}});
+  List<Err> errors = {{errors}};
+  if ({{matched}}) {
+    errors.add(state.error);
+  }
+  state.error = ErrCombined(state.pos, errors);
 }''';
 
   static const _templateCase = '''
@@ -57,15 +61,17 @@ case {{cc}}:
   break;''';
 
   static const _templateDefault = '''
-if (!state.ok) {
+default:
+  {{matched}} = true;
   {{p1}}
   if (state.ok) {
     {{res}} = {{p1_res}};
   }
-}''';
+''';
 
   static const _templateTestLong = '''
 if (source.startsWith({{tag}}, {{pos}})) {
+  {{matched}} = true;
   {{p1}}
   if (state.ok) {
     {{res}} = {{p1_res}};
@@ -74,6 +80,7 @@ if (source.startsWith({{tag}}, {{pos}})) {
 }''';
 
   static const _templateTestShort = '''
+{{matched}} = true;
 {{p1}}
 if (state.ok) {
   {{res}} = {{p1_res}};
@@ -87,7 +94,7 @@ if (state.ok) {
 
   @override
   String getTemplate(Context context) {
-    final locals = context.allocateLocals(['errors', 'pos']);
+    final locals = context.allocateLocals(['errors', 'matched', 'pos']);
     final map = <int, List<String>>{};
     final tags = table.keys.where((e) => e != null).cast<String>();
     for (final tag in tags) {
@@ -137,16 +144,17 @@ if (state.ok) {
       cases.add(case_);
     }
 
-    var default_ = '';
     if (table.containsKey(null)) {
       final parser = table[null]!;
       final r = context.allocateLocal();
       final values = {
+        ...locals,
         'p1': parser.buildAndAssign(context, r),
         'p1_res': r,
         'res': context.resultVariable,
       };
-      default_ = render(_templateDefault, values);
+      final case_ = render(_templateDefault, values);
+      cases.add(case_);
     }
 
     final handler = this.errors ??
@@ -156,7 +164,6 @@ if (state.ok) {
     final values = {
       ...locals,
       'cases': cases.join('\n'),
-      'default': default_,
       'transform': handler.declare(t),
       'errors': handler.invoke(t),
     };

@@ -2243,7 +2243,11 @@ void _testSwitchTag() {
             ErrExpected.tag(0, const Tag('false')),
             ErrExpected.tag(0, const Tag('n')),
             ErrExpected.tag(0, const Tag('null')),
-            ErrExpected.tag(0, const Tag('true'))
+            ErrExpected.tag(0, const Tag('true')),
+            ErrCombined(0, [
+              ErrUnexpected.char(0, const Char(0x20)),
+              ErrUnexpected.char(0, const Char(0x20))
+            ]),
           ]));
     }
   });

@@ -425,56 +425,63 @@ abstract class Err {
   }
 
   static List<Err> flatten(Err error) {
-    void flatten(Err error, List<Err> result) {
-      if (error is ErrCombined) {
-        for (final error in error.errors) {
-          flatten(error, result);
-        }
-      } else if (error is ErrWithTagAndErrors) {
-        final inner = <Err>[];
-        for (final nestedError in error.errors) {
-          flatten(nestedError, inner);
-        }
-        final maxOffset = inner.map((e) => e.offset).reduce(_max);
-        final farthest = inner.where((e) => e.offset == maxOffset);
-        final offset = error.offset;
-        final tag = error.tag;
-        result.add(ErrExpected.tag(offset, tag));
-        if (maxOffset > offset) {
-          if (error is ErrMalformed) {
-            result
-                .add(ErrMessage(offset, maxOffset - offset, 'Malformed $tag'));
-            result.addAll(farthest);
-          } else if (error is ErrNested) {
-            result.addAll(farthest);
-          } else {
-            throw StateError('Internal error');
-          }
-        }
-      } else {
-        result.add(error);
-      }
-    }
-
     final result = <Err>[];
-    flatten(error, result);
+    _flatten(error, result);
     return result.toSet().toList();
   }
 
   static List<Err> groupExpected(List<Err> errors) {
-    final result = errors.toList();
-    final maxOffset =
+    var result = errors.toList();
+    final farthest =
         result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
-    result.removeWhere((e) =>
-        (e is ErrExpected || e is ErrUnexpected) && e.offset < maxOffset);
+    result.removeWhere((e) => e.offset < farthest);
     final message =
         result.whereType<ErrExpected>().map((e) => e.value).join(', ');
     if (message.isNotEmpty) {
       result.removeWhere((e) => e is ErrExpected);
-      result.add(ErrMessage(maxOffset, 1, 'Expected: $message'));
+      result.add(ErrMessage(farthest, 1, 'Expected: $message'));
+    }
+
+    for (var i = 0; i < result.length; i++) {
+      final error = result[i];
+      if (error.length < 0) {
+        result[i] =
+            ErrMessage(error.offset + error.length, -error.length, '$error');
+      }
     }
 
     return result;
+  }
+
+  static void _flatten(Err error, List<Err> result) {
+    if (error is ErrCombined) {
+      for (final error in error.errors) {
+        _flatten(error, result);
+      }
+    } else if (error is ErrWithTagAndErrors) {
+      final inner = <Err>[];
+      for (final nested in error.errors) {
+        _flatten(nested, inner);
+      }
+
+      final farthest = inner.map((e) => e.offset).reduce(_max);
+      inner.removeWhere((e) => e.offset < farthest);
+      final offset = error.offset;
+      final tag = error.tag;
+      result.add(ErrExpected.tag(offset, tag));
+      if (error is ErrMalformed) {
+        result.add(ErrMessage(farthest, offset - farthest, 'Malformed $tag'));
+        result.addAll(inner);
+      } else if (error is ErrNested) {
+        if (farthest > offset) {
+          result.addAll(inner);
+        }
+      } else {
+        throw StateError('Internal error');
+      }
+    } else {
+      result.add(error);
+    }
   }
 
   static int _max(int x, int y) {
