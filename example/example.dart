@@ -1049,12 +1049,12 @@ abstract class Err {
         _flatten(error, inner);
       }
 
-      final farthest = inner.map((e) => e.offset).reduce(_max);
-      inner.removeWhere((e) => e.offset < farthest);
+      final furthest = inner.map((e) => e.offset).reduce(_max);
+      inner.removeWhere((e) => e.offset < furthest);
       final offset = error.offset;
       result.add(ErrExpected.tag(offset, error.tag));
-      if (farthest > offset) {
-        result.add(ErrMessage(offset, farthest - offset, error.message));
+      if (furthest > offset) {
+        result.add(ErrMessage(offset, furthest - offset, error.message));
         result.addAll(inner.map((e) => _ErrBoxed(offset, e)));
       }
     } else {
@@ -1071,15 +1071,15 @@ abstract class Err {
 
   static List<Err> _postprocess(List<Err> errors) {
     var result = errors.toList();
-    final farthest =
+    final furthest =
         result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
-    result.removeWhere((e) => e.offset < farthest);
+    result.removeWhere((e) => e.offset < furthest);
     final expected =
         result.whereType<ErrExpected>().map((e) => '${e.value}').toList();
     if (expected.isNotEmpty) {
       expected.sort();
       result.removeWhere((e) => e is ErrExpected);
-      result.add(ErrMessage(farthest, 1, 'Expected: ${expected.join(', ')}'));
+      result.add(ErrMessage(furthest, 1, 'Expected: ${expected.join(', ')}'));
     }
 
     for (var i = 0; i < result.length; i++) {

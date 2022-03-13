@@ -6,14 +6,14 @@ class Nested<I, O> extends ParserBuilder<I, O> {
 if (state.ok) {
   {{res}} = {{p1_res}};
 } else if (state.log) {
-  state.error = ErrNested(state.pos, {{message}}, {{tag}}, [state.error]);
+  state.error = ErrNested(state.pos, {{message}}, const Tag({{tag}}), [state.error]);
 }''';
 
   final String message;
 
   final ParserBuilder<I, O> parser;
 
-  final String? tag;
+  final String tag;
 
   const Nested(this.message, this.tag, this.parser);
 
@@ -26,15 +26,9 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    var tag = 'null';
-    if (this.tag != null) {
-      final value = helper.escapeString(this.tag!, false);
-      tag = 'const Tag(\'$value\')';
-    }
-
     return {
       'message': helper.escapeString(message),
-      'tag': tag,
+      'tag': helper.escapeString(tag),
     };
   }
 
