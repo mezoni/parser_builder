@@ -23,10 +23,10 @@ Ask questions if something is not clear.
 - The performance of the generated parsers is `quite high`
 - The generated parsers `does not wrap the values` of the parse results
 - The parser builder generates `fully strongly typed` parsers
-- Small size of the embedded `runtime code (about 10 Kb)` to support the work of the parser
-- The size of the generated parsers `starts from 600 bytes` (without runtime code)
-- The generated source code of the parsers is `human-friendly`
-- Very `handy debugging` and setting breakpoints
+- Small size of the embedded `runtime code (about 11 Kb)` to support the work of the parser
+- The size of generated parser rules `starts from 350 bytes` (without runtime code)
+- The generated source code of the parsers is `human-friendly` as if you wrote it by hand
+- Very `handy debugging` and setting breakpoints to any place of parsing
 - An `elegant way to implement your own tracing` which can easily be turned off
 - Very `flexible error handling` system (with support for nested errors)
 - Built-in `error preprocessing` procedures (grouping and flattening errors)
@@ -56,6 +56,9 @@ https://github.com/mezoni/parser_builder/blob/master/example/test_example.dart
 
 A tool to create a simple JSON parser.  
 https://github.com/mezoni/parser_builder/blob/master/tool/build_example.dart
+
+Quality of the generated code of various parsers in generated tests.  
+https://github.com/mezoni/parser_builder/blob/master/test/_test_parser.dart
 
 ## Included parser builders
 
@@ -166,7 +169,7 @@ The build system itself is very simple and consists of the following files:
 - [`runtime.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/runtime.dart)
 - [`transformer.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
 
-The file `runtime.dart` contains only the static source code of the runtime, and without it, the entire build system takes about 9 KB (including a simple templating engine).  
+The file `runtime.dart` contains only the static source code of the runtime, and without it, the entire build system takes about 12 KB (including a simple templating engine).  
 Thus, all parsers building-related bugs can be easily found and fixed in this small library.  
 It is quite possible to consider this system easy to maintain and reliable enough in the sense that there is no need to hire expensive specialists to understand how it works in order to fix it in case of a malfunction.
 
