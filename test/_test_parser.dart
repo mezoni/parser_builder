@@ -577,6 +577,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       $0 = Tuple2($list, $1!);
       break;
     }
+    final $error = state.error;
     String? $2;
     String? $3;
     state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 97;
@@ -589,7 +590,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     if (state.ok) {
       $2 = $3!;
     } else {
-      final $error = state.error;
+      final $error1 = state.error;
       String? $4;
       state.ok =
           state.pos < source.length && source.codeUnitAt(state.pos) == 98;
@@ -602,10 +603,13 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       if (state.ok) {
         $2 = $4!;
       } else if (state.log) {
-        state.error = ErrCombined(state.pos, [$error, state.error]);
+        state.error = ErrCombined(state.pos, [$error1, state.error]);
       }
     }
     if (!state.ok) {
+      if (state.log) {
+        state.error = ErrCombined(state.pos, [$error, state.error]);
+      }
       state.pos = $pos;
       break;
     }
@@ -1692,12 +1696,12 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
   }
   if (!state.ok && state.log) {
     state.error = ErrCombined($pos, [
-      ErrExpected.tag(state.pos, Tag('abc')),
-      ErrExpected.tag(state.pos, Tag('abd')),
-      ErrExpected.tag(state.pos, Tag('def')),
-      ErrExpected.tag(state.pos, Tag('deg')),
-      ErrExpected.tag(state.pos, Tag('x')),
-      ErrExpected.tag(state.pos, Tag('xy'))
+      ErrExpected.tag(state.pos, const Tag('abc')),
+      ErrExpected.tag(state.pos, const Tag('abd')),
+      ErrExpected.tag(state.pos, const Tag('def')),
+      ErrExpected.tag(state.pos, const Tag('deg')),
+      ErrExpected.tag(state.pos, const Tag('x')),
+      ErrExpected.tag(state.pos, const Tag('xy'))
     ]);
   }
   return $0;
@@ -2567,16 +2571,6 @@ abstract class ErrWithErrors extends Err {
     final list = errors.join(', ');
     final result = '[$list]';
     return result;
-  }
-}
-
-abstract class ErrWithTagAndErrors extends ErrWithErrors {
-  Tag get tag;
-
-  @override
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return super == other && other is ErrWithTagAndErrors && other.tag == tag;
   }
 }
 

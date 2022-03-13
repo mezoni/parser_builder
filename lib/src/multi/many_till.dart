@@ -10,8 +10,12 @@ for (;;) {
     {{res}} = Tuple2({{list}}, {{p1_val}});
     break;
   }
+  final {{error}} = state.error;
   {{p2}}
   if (!state.ok) {
+    if (state.log) {
+      state.error = ErrCombined(state.pos, [{{error}}, state.error]);
+    }
     state.pos = {{pos}};
     break;
   }
@@ -34,7 +38,7 @@ for (;;) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['list', 'pos']);
+    final locals = context.allocateLocals(['error', 'list', 'pos']);
     return {
       'O': O.toString(),
       ...locals,

@@ -1107,8 +1107,11 @@ void _testManyTill() {
       expect(state.pos, 0);
       expect(
           state.error,
-          ErrCombined(
-              0, [ErrExpected.tag(0, Tag('a')), ErrExpected.tag(0, Tag('b'))]));
+          ErrCombined(0, [
+            ErrExpected.tag(0, Tag('abc')),
+            ErrCombined(
+                0, [ErrExpected.tag(0, Tag('a')), ErrExpected.tag(0, Tag('b'))])
+          ]));
     }
     {
       final state = State('');
@@ -1116,11 +1119,13 @@ void _testManyTill() {
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
-
       expect(
           state.error,
-          ErrCombined(
-              0, [ErrExpected.tag(0, Tag('a')), ErrExpected.tag(0, Tag('b'))]));
+          ErrCombined(0, [
+            ErrExpected.tag(0, Tag('abc')),
+            ErrCombined(
+                0, [ErrExpected.tag(0, Tag('a')), ErrExpected.tag(0, Tag('b'))])
+          ]));
     }
     {
       final state = State('a');
@@ -1128,11 +1133,13 @@ void _testManyTill() {
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
-      expect(state.error.offset, 1);
       expect(
           state.error,
-          ErrCombined(
-              1, [ErrExpected.tag(1, Tag('a')), ErrExpected.tag(1, Tag('b'))]));
+          ErrCombined(1, [
+            ErrExpected.tag(1, Tag('abc')),
+            ErrCombined(
+                1, [ErrExpected.tag(1, Tag('a')), ErrExpected.tag(1, Tag('b'))])
+          ]));
     }
   });
 }

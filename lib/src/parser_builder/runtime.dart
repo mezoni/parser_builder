@@ -343,18 +343,6 @@ abstract class ErrWithErrors extends Err {
   }
 }''';
 
-  static const _classErrWithTagAndErrors = '''
-abstract class ErrWithTagAndErrors extends ErrWithErrors {
-  Tag get tag;
-
-  @override
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return super == other && other is ErrWithTagAndErrors && other.tag == tag;
-  }
-}
-''';
-
   static const _classState = r'''
 class State<T> {
   dynamic context;
@@ -544,7 +532,6 @@ String {{name}}(String source, List<Err> errors,
       _classErrUnexpected,
       _classErrUnknown,
       _classErrWithErrors,
-      _classErrWithTagAndErrors,
       _classState,
       _classTag,
       _class_Inner,

@@ -67,7 +67,7 @@ state.ok = true;
 
       list.add(tag);
       final escaped = helper.escapeString(tag);
-      errors.add('ErrExpected.tag(state.pos, Tag($escaped))');
+      errors.add('ErrExpected.tag(state.pos, const Tag($escaped))');
     }
 
     final cases = <String>[];

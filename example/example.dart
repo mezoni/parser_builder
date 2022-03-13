@@ -1331,16 +1331,6 @@ abstract class ErrWithErrors extends Err {
   }
 }
 
-abstract class ErrWithTagAndErrors extends ErrWithErrors {
-  Tag get tag;
-
-  @override
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return super == other && other is ErrWithTagAndErrors && other.tag == tag;
-  }
-}
-
 class State<T> {
   dynamic context;
 
