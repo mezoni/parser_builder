@@ -46,9 +46,10 @@ if ({{pos}} < source.length) {
     {{cases}}
   }
 }
+{{default}}
 if (!state.ok && state.log) {
   {{transform}}
-  List<Err> errors = {{errors}};
+  final List<Err> errors = {{errors}};
   if ({{matched}}) {
     errors.add(state.error);
   }
@@ -61,13 +62,13 @@ case {{cc}}:
   break;''';
 
   static const _templateDefault = '''
-default:
+if (!state.ok) {
   {{matched}} = true;
   {{p1}}
   if (state.ok) {
     {{res}} = {{p1_res}};
   }
-''';
+}''';
 
   static const _templateTestLong = '''
 if (source.startsWith({{tag}}, {{pos}})) {
@@ -144,6 +145,7 @@ if (state.ok) {
       cases.add(case_);
     }
 
+    var default_ = '';
     if (table.containsKey(null)) {
       final parser = table[null]!;
       final r = context.allocateLocal();
@@ -153,8 +155,7 @@ if (state.ok) {
         'p1_res': r,
         'res': context.resultVariable,
       };
-      final case_ = render(_templateDefault, values);
-      cases.add(case_);
+      default_ = render(_templateDefault, values);
     }
 
     final handler = this.errors ??
@@ -164,6 +165,7 @@ if (state.ok) {
     final values = {
       ...locals,
       'cases': cases.join('\n'),
+      'default': default_,
       'transform': handler.declare(t),
       'errors': handler.invoke(t),
     };
