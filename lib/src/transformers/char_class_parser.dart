@@ -122,8 +122,8 @@ int? _rangeChar(State<String> state) {
   }
   if (!state.ok && state.log) {
     state.error = ErrCombined($pos2, [
-      ErrExpected.tag(state.pos, Tag('[')),
-      ErrExpected.tag(state.pos, Tag(']'))
+      ErrExpected.tag(state.pos, const Tag('[')),
+      ErrExpected.tag(state.pos, const Tag(']'))
     ]);
   }
   state.ok = !state.ok;
@@ -582,21 +582,17 @@ abstract class Err {
       }
     } else if (error is ErrNested) {
       final inner = <Err>[];
-      for (final nested in error.errors) {
-        _flatten(nested, inner);
+      for (final error in error.errors) {
+        _flatten(error, inner);
       }
 
       final farthest = inner.map((e) => e.offset).reduce(_max);
       inner.removeWhere((e) => e.offset < farthest);
       final offset = error.offset;
-      final tag = error.tag;
-      if (tag != null) {
-        result.add(ErrExpected.tag(offset, tag));
-      }
-
+      result.add(ErrExpected.tag(offset, error.tag));
       if (farthest > offset) {
-        result.add(_ErrInner(farthest, offset, error.message));
-        result.addAll(inner);
+        result.add(ErrMessage(offset, farthest - offset, error.message));
+        result.addAll(inner.map((e) => _ErrBoxed(offset, e)));
       }
     } else {
       result.add(error);
@@ -625,10 +621,8 @@ abstract class Err {
 
     for (var i = 0; i < result.length; i++) {
       final error = result[i];
-      if (error is _ErrInner) {
-        final length = error.offset;
-        error.offset = error.length;
-        error.length = length;
+      if (error is _ErrBoxed) {
+        result[i] = error.error;
       }
     }
 
@@ -729,7 +723,7 @@ class ErrNested extends ErrWithErrors {
   @override
   final int offset;
 
-  final Tag? tag;
+  final Tag tag;
 
   ErrNested(this.offset, this.message, this.tag, this.errors);
 
@@ -868,16 +862,6 @@ abstract class ErrWithErrors extends Err {
   }
 }
 
-abstract class ErrWithTagAndErrors extends ErrWithErrors {
-  Tag get tag;
-
-  @override
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return super == other && other is ErrWithTagAndErrors && other.tag == tag;
-  }
-}
-
 class State<T> {
   dynamic context;
 
@@ -932,26 +916,26 @@ class Tag {
   }
 }
 
-class _ErrInner extends Err {
-  @override
-  int length;
-
-  String message;
+class _ErrBoxed extends Err {
+  final Err error;
 
   @override
   int offset;
 
-  _ErrInner(this.offset, this.length, this.message);
+  _ErrBoxed(this.offset, this.error);
+
+  @override
+  int get length => 1;
 
   @override
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return super == other && other is _ErrInner && other.message == message;
+    return super == other && other is _ErrBoxed && other.error == error;
   }
 
   @override
   String toString() {
-    return message;
+    return 'Boxed: $error';
   }
 }
 

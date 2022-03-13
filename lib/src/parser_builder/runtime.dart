@@ -50,21 +50,17 @@ abstract class Err {
       }
     } else if (error is ErrNested) {
       final inner = <Err>[];
-      for (final nested in error.errors) {
-        _flatten(nested, inner);
+      for (final error in error.errors) {
+        _flatten(error, inner);
       }
 
-      final farthest = inner.map((e) => e.offset).reduce(_max);
-      inner.removeWhere((e) => e.offset < farthest);
+      final furthest = inner.map((e) => e.offset).reduce(_max);
+      inner.removeWhere((e) => e.offset < furthest);
       final offset = error.offset;
-      final tag = error.tag;
-      if (tag != null) {
-        result.add(ErrExpected.tag(offset, tag));
-      }
-
-      if (farthest > offset) {
-        result.add(_ErrInner(farthest, offset, error.message));
-        result.addAll(inner);
+      result.add(ErrExpected.tag(offset, error.tag));
+      if (furthest > offset) {
+        result.add(ErrMessage(offset, furthest - offset, error.message));
+        result.addAll(inner.map((e) => _ErrBoxed(offset, e)));
       }
     } else {
       result.add(error);
@@ -80,23 +76,21 @@ abstract class Err {
 
   static List<Err> _postprocess(List<Err> errors) {
     var result = errors.toList();
-    final farthest =
+    final furthest =
         result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
-    result.removeWhere((e) => e.offset < farthest);
+    result.removeWhere((e) => e.offset < furthest);
     final expected =
         result.whereType<ErrExpected>().map((e) => '${e.value}').toList();
     if (expected.isNotEmpty) {
       expected.sort();
       result.removeWhere((e) => e is ErrExpected);
-      result.add(ErrMessage(farthest, 1, 'Expected: ${expected.join(', ')}'));
+      result.add(ErrMessage(furthest, 1, 'Expected: ${expected.join(', ')}'));
     }
 
     for (var i = 0; i < result.length; i++) {
       final error = result[i];
-      if (error is _ErrInner) {
-        final length = error.offset;
-        error.offset = error.length;
-        error.length = length;
+      if (error is _ErrBoxed) {
+        result[i] = error.error;
       }
     }
 
@@ -201,7 +195,7 @@ class ErrNested extends ErrWithErrors {
   @override
   final int offset;
 
-  final Tag? tag;
+  final Tag tag;
 
   ErrNested(this.offset, this.message, this.tag, this.errors);
 
@@ -399,27 +393,28 @@ class Tag {
   }
 }''';
 
-  static const _class_Inner = '''
-class _ErrInner extends Err {
-  @override
-  int length;
-
-  String message;
+  // ignore: constant_identifier_names
+  static const _classErr_Boxed = r'''
+class _ErrBoxed extends Err {
+  final Err error;
 
   @override
   int offset;
 
-  _ErrInner(this.offset, this.length, this.message);
+  _ErrBoxed(this.offset, this.error);
+
+  @override
+  int get length => 1;
 
   @override
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return super == other && other is _ErrInner && other.message == message;
+    return super == other && other is _ErrBoxed && other.error == error;
   }
 
   @override
   String toString() {
-    return message;
+    return 'Boxed: $error';
   }
 }''';
 
@@ -534,7 +529,7 @@ String {{name}}(String source, List<Err> errors,
       _classErrWithErrors,
       _classState,
       _classTag,
-      _class_Inner,
+      _classErr_Boxed,
       _extensionString
     ];
   }
