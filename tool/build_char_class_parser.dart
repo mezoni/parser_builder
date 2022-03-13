@@ -15,8 +15,7 @@ Future<void> main(List<String> args) async {
       footer: footer, header: __header, publish: {'parseString': _parse});
 }
 
-const footer =
-    '''
+const footer = '''
 List<T> _flatten<T>(List<List<T>> data, List<T> result) {
   for (final item1 in data) {
     for (final item2 in item1) {
@@ -49,8 +48,7 @@ int _toHexValue(String s) {
   return r;
 }''';
 
-const __header =
-    r'''
+const __header = r'''
 // ignore_for_file: unused_local_variable
 
 import 'package:source_span/source_span.dart';

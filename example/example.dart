@@ -1031,37 +1031,8 @@ abstract class Err {
   }
 
   static List<Err> errorReport(Err error) {
-    var result = Err.flatten(error);
-    result = Err.groupExpected(result);
-    return result;
-  }
-
-  static List<Err> flatten(Err error) {
-    final result = <Err>[];
-    _flatten(error, result);
-    return result.toSet().toList();
-  }
-
-  static List<Err> groupExpected(List<Err> errors) {
-    var result = errors.toList();
-    final farthest =
-        result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
-    result.removeWhere((e) => e.offset < farthest);
-    final message =
-        result.whereType<ErrExpected>().map((e) => e.value).join(', ');
-    if (message.isNotEmpty) {
-      result.removeWhere((e) => e is ErrExpected);
-      result.add(ErrMessage(farthest, 1, 'Expected: $message'));
-    }
-
-    for (var i = 0; i < result.length; i++) {
-      final error = result[i];
-      if (error.length < 0) {
-        result[i] =
-            ErrMessage(error.offset + error.length, -error.length, '$error');
-      }
-    }
-
+    var result = _preprocess(error);
+    result = _postprocess(result);
     return result;
   }
 
@@ -1081,15 +1052,17 @@ abstract class Err {
       final offset = error.offset;
       final tag = error.tag;
       result.add(ErrExpected.tag(offset, tag));
-      if (error is ErrMalformed) {
-        result.add(ErrMessage(farthest, offset - farthest, 'Malformed $tag'));
-        result.addAll(inner);
-      } else if (error is ErrNested) {
-        if (farthest > offset) {
+      if (farthest > offset) {
+        if (error is ErrMalformed) {
+          result.add(_ErrInner(farthest, offset, 'Malformed $tag'));
           result.addAll(inner);
+        } else if (error is ErrNested) {
+          if (farthest > offset) {
+            result.addAll(inner);
+          }
+        } else {
+          throw StateError('Internal error');
         }
-      } else {
-        throw StateError('Internal error');
       }
     } else {
       result.add(error);
@@ -1101,6 +1074,37 @@ abstract class Err {
       return x;
     }
     return y > x ? y : x;
+  }
+
+  static List<Err> _postprocess(List<Err> errors) {
+    var result = errors.toList();
+    final farthest =
+        result.isEmpty ? -1 : result.map((e) => e.offset).reduce(_max);
+    result.removeWhere((e) => e.offset < farthest);
+    final expected =
+        result.whereType<ErrExpected>().map((e) => '${e.value}').toList();
+    if (expected.isNotEmpty) {
+      expected.sort();
+      result.removeWhere((e) => e is ErrExpected);
+      result.add(ErrMessage(farthest, 1, 'Expected: ${expected.join(', ')}'));
+    }
+
+    for (var i = 0; i < result.length; i++) {
+      final error = result[i];
+      if (error is _ErrInner) {
+        final length = error.offset;
+        error.offset = error.length;
+        error.length = length;
+      }
+    }
+
+    return result;
+  }
+
+  static List<Err> _preprocess(Err error) {
+    final result = <Err>[];
+    _flatten(error, result);
+    return result.toSet().toList();
   }
 }
 
@@ -1416,6 +1420,29 @@ class Tag {
   String toString() {
     final s = name._escape();
     return '\'$s\'';
+  }
+}
+
+class _ErrInner extends Err {
+  @override
+  int length;
+
+  String message;
+
+  @override
+  int offset;
+
+  _ErrInner(this.offset, this.length, this.message);
+
+  @override
+  // ignore: hash_and_equals
+  bool operator ==(other) {
+    return super == other && other is _ErrInner && other.message == message;
+  }
+
+  @override
+  String toString() {
+    return message;
   }
 }
 
