@@ -16,7 +16,7 @@ if (state.ok) {
   state.pos += {{n}};
   {{res}} = {{value}};
 } else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+  state.error = ErrUnexpected.eof(source.length);
 }''';
 
   final int count;
