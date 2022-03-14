@@ -25,6 +25,8 @@ if (state.ok) {
 
   const Skip(this.count, [this.value]);
 
+  const Skip.of(String tag, [this.value]) : count = tag.length;
+
   @override
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['n', 'value']);

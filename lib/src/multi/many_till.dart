@@ -1,9 +1,9 @@
 part of '../../multi.dart';
 
-class ManyTill<I, O> extends ParserBuilder<I, _t.Tuple2<List<O>, O>> {
+class ManyTill<I, O1, O2> extends ParserBuilder<I, _t.Tuple2<List<O1>, O2>> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{list}} = <{{O}}>[];
+final {{list}} = <{{O1}}>[];
 for (;;) {
   {{p1}}
   if (state.ok) {
@@ -22,17 +22,17 @@ for (;;) {
   {{list}}.add({{p2_val}});
 }''';
 
-  final ParserBuilder<I, O> parser1;
+  final ParserBuilder<I, O2> end;
 
-  final ParserBuilder<I, O> parser2;
+  final ParserBuilder<I, O1> parser;
 
-  const ManyTill(this.parser1, this.parser2);
+  const ManyTill(this.parser, this.end);
 
   @override
   Map<String, ParserBuilder> getBuilders() {
     return {
-      'p1': parser2,
-      'p2': parser1,
+      'p1': end,
+      'p2': parser,
     };
   }
 
@@ -40,7 +40,7 @@ for (;;) {
   Map<String, String> getTags(Context context) {
     final locals = context.allocateLocals(['error', 'list', 'pos']);
     return {
-      'O': O.toString(),
+      'O1': O1.toString(),
       ...locals,
     };
   }

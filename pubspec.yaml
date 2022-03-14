@@ -1,5 +1,5 @@
 name: parser_builder
-version: 0.15.2
+version: 0.15.3
 description: Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 environment:
   sdk: '>=2.16.0 <3.0.0'

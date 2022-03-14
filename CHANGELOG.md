@@ -1,3 +1,8 @@
+## 0.15.3
+
+- Another round to improve the error reporting system. Without breaking changes. This system is getting better and better. The results are already very good. All known shortcomings (and found bugs) have been fixed
+- Implemented and not tested parser builder `Verify`. It is very, very helpful. Allows, at runtime, to influence the parsing process and to program "smart" parsing rules in the grammar. For example, define a parser that will check the number of arguments of a known function. It is programmed not flexibly, but rigidly (you can also flexibly, this is a matter of taste). The main thing is that it works. And it works on top of another parser. No need to write duplicate code. Great
+
 ## 0.15.2
 
 - Fixed minor bug in parser builder `SwitchTag`

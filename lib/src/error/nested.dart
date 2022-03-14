@@ -2,11 +2,12 @@ part of '../../error.dart';
 
 class Nested<I, O> extends ParserBuilder<I, O> {
   static const _template = r'''
+final {{pos}} = state.pos;
 {{p1}}
 if (state.ok) {
   {{res}} = {{p1_res}};
 } else if (state.log) {
-  state.error = ErrNested(state.pos, {{message}}, const Tag({{tag}}), [state.error]);
+  state.error = ErrNested({{pos}}, {{message}}, const Tag({{tag}}), [state.error]);
 }''';
 
   final String message;
@@ -26,7 +27,9 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
+    final locals = context.allocateLocals(['pos']);
     return {
+      ...locals,
       'message': helper.escapeString(message),
       'tag': helper.escapeString(tag),
     };
