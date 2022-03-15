@@ -2,6 +2,7 @@ import 'package:parser_builder/branch.dart';
 import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/character.dart';
 import 'package:parser_builder/combinator.dart';
+import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
@@ -278,11 +279,10 @@ const _switchTag = Named(
       'null': Value(null as dynamic, Tag('null')),
       'false': Skip(5, ExprTransformer<bool>.value('false')),
       'true': Value(true, Tag('true')),
-      null: Alt2(Digit1(), Alpha1()),
+      null: Expected('alpanumeric', Alt2(Digit1(), Alpha1())),
     }, ExprTransformer.value('''
 [
-  ErrExpected.tag(state.pos, const Tag('alphas')),
-  ErrExpected.tag(state.pos, const Tag('digits')),
+  ErrExpected.tag(state.pos, const Tag('alpanumeric')),
   ErrExpected.tag(state.pos, const Tag('false')),
   ErrExpected.tag(state.pos, const Tag('n')),
   ErrExpected.tag(state.pos, const Tag('null')),

@@ -2228,12 +2228,12 @@ void _testSwitchTag() {
       expect(
           state.error,
           ErrCombined(0, [
-            ErrExpected.tag(0, const Tag('alphas')),
-            ErrExpected.tag(0, const Tag('digits')),
+            ErrExpected.tag(0, const Tag('alpanumeric')),
+            ErrExpected.tag(0, const Tag('alpanumeric')),
             ErrExpected.tag(0, const Tag('false')),
             ErrExpected.tag(0, const Tag('n')),
             ErrExpected.tag(0, const Tag('null')),
-            ErrExpected.tag(0, const Tag('true'))
+            ErrExpected.tag(0, const Tag('true')),
           ]));
     }
     {
@@ -2245,16 +2245,12 @@ void _testSwitchTag() {
       expect(
           state.error,
           ErrCombined(0, [
-            ErrExpected.tag(0, const Tag('alphas')),
-            ErrExpected.tag(0, const Tag('digits')),
+            ErrExpected.tag(0, const Tag('alpanumeric')),
+            ErrExpected.tag(0, const Tag('alpanumeric')),
             ErrExpected.tag(0, const Tag('false')),
             ErrExpected.tag(0, const Tag('n')),
             ErrExpected.tag(0, const Tag('null')),
             ErrExpected.tag(0, const Tag('true')),
-            ErrCombined(0, [
-              ErrUnexpected.char(0, const Char(0x20)),
-              ErrUnexpected.char(0, const Char(0x20))
-            ]),
           ]));
     }
   });

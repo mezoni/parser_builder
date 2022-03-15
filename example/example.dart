@@ -280,7 +280,7 @@ String? _string(State<String> state) {
     $0 = $1;
   } else if (state.log) {
     state.error =
-        ErrNested($pos, 'Malformed string', const Tag('string'), [state.error]);
+        ErrNested($pos, 'Malformed string', const Tag('string'), state.error);
   }
   return $0;
 }
@@ -842,7 +842,7 @@ num? _number(State<String> state) {
     $0 = $1;
   } else if (state.log) {
     state.error =
-        ErrNested($pos, 'Malformed number', const Tag('number'), [state.error]);
+        ErrNested($pos, 'Malformed number', const Tag('number'), state.error);
   }
   return $0;
 }
@@ -953,10 +953,13 @@ dynamic _value(State<String> state) {
       ErrExpected.tag(state.pos, const Tag('string')),
       ErrExpected.tag(state.pos, const Tag('true'))
     ];
-    if ($matched) {
-      errors.add(state.error);
-    }
-    state.error = ErrCombined(state.pos, errors);
+    state.error = ErrCombined(state.pos, [
+      if ($matched) state.error,
+      if (errors.isNotEmpty)
+        ...errors
+      else if (!$matched)
+        ErrUnexpected.charOrEof(state.pos, source)
+    ]);
   }
   if (state.ok) {
     bool? $9;
@@ -1023,7 +1026,7 @@ class Char {
 }
 
 abstract class Err {
-  int _furthest = 0;
+  int failure = 0;
 
   @override
   int get hashCode => length.hashCode ^ offset.hashCode;
@@ -1037,6 +1040,8 @@ abstract class Err {
     return other is Err && other.length == length && other.offset == offset;
   }
 
+  int getFailurePosition() => _max(failure, offset);
+
   static List<Err> errorReport(Err error) {
     var result = _preprocess(error);
     result = _postprocess(result);
@@ -1049,21 +1054,20 @@ abstract class Err {
         _flatten(error, result);
       }
     } else if (error is ErrNested) {
-      final inner = <Err>[];
-      for (final error in error.errors) {
-        _flatten(error, inner);
-      }
-
-      final furthest =
-          inner.map((e) => _max(e.offset, e._furthest)).reduce(_max);
-      inner.removeWhere((e) => _max(e.offset, e._furthest) < furthest);
-      final maxEnd = inner.map((e) => e.offset + e.length).reduce(_max);
+      final errors = <Err>[];
+      _flatten(error.error, errors);
+      final furthest = errors.map((e) => e.getFailurePosition()).reduce(_max);
+      errors.removeWhere((e) => e.getFailurePosition() < furthest);
+      final maxEnd = errors.map((e) => e.offset + e.length).reduce(_max);
       final offset = error.offset;
-      result.add(ErrExpected.tag(offset, error.tag).._furthest = furthest);
+      final expected = ErrExpected.tag(offset, error.tag);
+      expected.failure = furthest;
+      result.add(expected);
       if (furthest > offset) {
-        result.add(ErrMessage(offset, maxEnd - offset, error.message)
-          .._furthest = furthest);
-        result.addAll(inner);
+        final message = ErrMessage(offset, maxEnd - offset, error.message);
+        message.failure = furthest;
+        result.add(message);
+        result.addAll(errors);
       }
     } else {
       result.add(error);
@@ -1077,18 +1081,12 @@ abstract class Err {
     return y > x ? y : x;
   }
 
-  static List<Err> _preprocess(Err error) {
-    final result = <Err>[];
-    _flatten(error, result);
-    return result.toSet().toList();
-  }
-
   static List<Err> _postprocess(List<Err> errors) {
     final result = errors.toList();
     final furthest = result.isEmpty
         ? -1
-        : result.map((e) => _max(e.offset, e._furthest)).reduce(_max);
-    result.removeWhere((e) => _max(e.offset, e._furthest) < furthest);
+        : result.map((e) => e.getFailurePosition()).reduce(_max);
+    result.removeWhere((e) => e.getFailurePosition() < furthest);
     final map = <int, List<ErrExpected>>{};
     for (final error in result.whereType<ErrExpected>()) {
       final offset = error.offset;
@@ -1110,10 +1108,15 @@ abstract class Err {
 
     return result;
   }
+
+  static List<Err> _preprocess(Err error) {
+    final result = <Err>[];
+    _flatten(error, result);
+    return result.toSet().toList();
+  }
 }
 
-class ErrCombined extends ErrWithErrors {
-  @override
+class ErrCombined extends Err {
   final List<Err> errors;
 
   @override
@@ -1122,12 +1125,45 @@ class ErrCombined extends ErrWithErrors {
   ErrCombined(this.offset, this.errors);
 
   @override
+  int get hashCode {
+    var result = super.hashCode;
+    for (final error in errors) {
+      result ^= error.hashCode;
+    }
+
+    return result;
+  }
+
+  @override
   int get length => 1;
 
   @override
-  // ignore: hash_and_equals
   bool operator ==(other) {
-    return super == other && other is ErrCombined;
+    if (super == other) {
+      if (other is ErrCombined) {
+        final otherErrors = other.errors;
+        if (otherErrors.length == errors.length) {
+          for (var i = 0; i < errors.length; i++) {
+            final error = errors[i];
+            final otherError = otherErrors[i];
+            if (otherError != error) {
+              return false;
+            }
+          }
+
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  @override
+  String toString() {
+    final list = errors.join(', ');
+    final result = '[$list]';
+    return result;
   }
 }
 
@@ -1190,9 +1226,8 @@ class ErrMessage extends Err {
   }
 }
 
-class ErrNested extends ErrWithErrors {
-  @override
-  final List<Err> errors;
+class ErrNested extends Err {
+  final Err error;
 
   final String message;
 
@@ -1201,16 +1236,20 @@ class ErrNested extends ErrWithErrors {
 
   final Tag tag;
 
-  ErrNested(this.offset, this.message, this.tag, this.errors);
+  ErrNested(this.offset, this.message, this.tag, this.error);
+
+  @override
+  int get hashCode =>
+      super.hashCode ^ error.hashCode ^ message.hashCode ^ tag.hashCode;
 
   @override
   int get length => 0;
 
   @override
-  // ignore: hash_and_equals
   bool operator ==(other) {
     return super == other &&
         other is ErrNested &&
+        other.error == error &&
         other.message == message &&
         other.tag == tag;
   }
@@ -1291,49 +1330,6 @@ class ErrUnknown extends Err {
   @override
   String toString() {
     final result = 'Unknown error';
-    return result;
-  }
-}
-
-abstract class ErrWithErrors extends Err {
-  List<Err> get errors;
-
-  @override
-  int get hashCode {
-    var result = super.hashCode;
-    for (final error in errors) {
-      result ^= error.hashCode;
-    }
-
-    return result;
-  }
-
-  @override
-  bool operator ==(other) {
-    if (super == other) {
-      if (other is ErrWithErrors) {
-        final otherErrors = other.errors;
-        if (otherErrors.length == errors.length) {
-          for (var i = 0; i < errors.length; i++) {
-            final error = errors[i];
-            final otherError = otherErrors[i];
-            if (otherError != error) {
-              return false;
-            }
-          }
-
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-
-  @override
-  String toString() {
-    final list = errors.join(', ');
-    final result = '[$list]';
     return result;
   }
 }

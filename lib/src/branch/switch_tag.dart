@@ -50,10 +50,13 @@ if ({{pos}} < source.length) {
 if (!state.ok && state.log) {
   {{transform}}
   final List<Err> errors = {{errors}};
-  if ({{matched}}) {
-    errors.add(state.error);
-  }
-  state.error = ErrCombined(state.pos, errors);
+  state.error = ErrCombined(state.pos, [
+      if ({{matched}}) state.error,
+      if (errors.isNotEmpty)
+        ...errors
+      else if (!{{matched}})
+        ErrUnexpected.charOrEof(state.pos, source)
+    ]);
 }''';
 
   static const _templateCase = '''
@@ -158,8 +161,7 @@ if (state.ok) {
       default_ = render(_templateDefault, values);
     }
 
-    final handler = this.errors ??
-        ExprTransformer.value('[ErrUnexpected.charOrEof(state.pos, source)]');
+    final handler = this.errors ?? const ExprTransformer.value('[]');
     final errors = locals['errors']!;
     final t = Transformation(context: context, name: errors, arguments: []);
     final values = {

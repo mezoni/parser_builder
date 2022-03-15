@@ -15,6 +15,7 @@ if (state.ok) {
 } else {
   if ({{ok}}) {
     state.error = ErrMessage({{pos}}, state.pos - {{pos}}, {{message}});
+    state.error.failure = state.pos;
     state.pos = {{pos}};
   }
 } ''';
@@ -36,14 +37,14 @@ if (state.ok) {
 
   @override
   Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['ok', 'pos']);
-    final t =
-        Transformation(context: context, name: 'verify', arguments: ['v']);
+    final locals = context.allocateLocals(['ok', 'pos', 'verify']);
+    final verify = locals['verify']!;
+    final t = Transformation(context: context, name: verify, arguments: ['v']);
     return {
       ...locals,
       'message': helper.escapeString(message),
-      'transform': verify.declare(t),
-      'verify': verify.invoke(t),
+      'transform': this.verify.declare(t),
+      'verify': this.verify.invoke(t),
     };
   }
 

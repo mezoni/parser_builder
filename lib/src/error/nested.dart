@@ -7,7 +7,7 @@ final {{pos}} = state.pos;
 if (state.ok) {
   {{res}} = {{p1_res}};
 } else if (state.log) {
-  state.error = ErrNested({{pos}}, {{message}}, const Tag({{tag}}), [state.error]);
+  state.error = ErrNested({{pos}}, {{message}}, const Tag({{tag}}), state.error);
 }''';
 
   final String message;

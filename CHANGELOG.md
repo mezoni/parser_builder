@@ -1,3 +1,8 @@
+## 0.15.4
+
+- Improved `Verify` parser builder. Now the failure position in `ErrMessage` is set not to the initial position, but to the last position. Previously, this was not possible (before the improvement of the system for working with parsing errors). This applies only to cases where verification fails. In fact, this is the purpose of the generated `Verify` parser
+- Minor improvements to the error reporting system
+
 ## 0.15.3
 
 - Another round to improve the error reporting system. Without breaking changes. This system is getting better and better. The results are already very good. All known shortcomings (and found bugs) have been fixed
