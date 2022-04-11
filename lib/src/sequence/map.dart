@@ -2,7 +2,7 @@ part of '../../sequence.dart';
 
 class Map2<I, O1, O2, O> extends _Map<I, O> {
   @override
-  final Transformer<O> map;
+  final SemanticAction<O> map;
 
   final ParserBuilder<I, O1> parser1;
 
@@ -11,17 +11,17 @@ class Map2<I, O1, O2, O> extends _Map<I, O> {
   const Map2(this.parser1, this.parser2, this.map);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      parser1,
+      parser2,
+    ];
   }
 }
 
 class Map3<I, O1, O2, O3, O> extends _Map<I, O> {
   @override
-  final Transformer<O> map;
+  final SemanticAction<O> map;
 
   final ParserBuilder<I, O1> parser1;
 
@@ -32,18 +32,18 @@ class Map3<I, O1, O2, O3, O> extends _Map<I, O> {
   const Map3(this.parser1, this.parser2, this.parser3, this.map);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-      'p3': parser3,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      parser1,
+      parser2,
+      parser3,
+    ];
   }
 }
 
 class Map4<I, O1, O2, O3, O4, O> extends _Map<I, O> {
   @override
-  final Transformer<O> map;
+  final SemanticAction<O> map;
 
   final ParserBuilder<I, O1> parser1;
 
@@ -56,19 +56,19 @@ class Map4<I, O1, O2, O3, O4, O> extends _Map<I, O> {
   const Map4(this.parser1, this.parser2, this.parser3, this.parser4, this.map);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-      'p3': parser3,
-      'p4': parser4,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      parser1,
+      parser2,
+      parser3,
+      parser4,
+    ];
   }
 }
 
 class Map5<I, O1, O2, O3, O4, O5, O> extends _Map<I, O> {
   @override
-  final Transformer<O> map;
+  final SemanticAction<O> map;
 
   final ParserBuilder<I, O1> parser1;
 
@@ -84,20 +84,20 @@ class Map5<I, O1, O2, O3, O4, O5, O> extends _Map<I, O> {
       this.parser5, this.map);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-      'p3': parser3,
-      'p4': parser4,
-      'p5': parser5,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      parser1,
+      parser2,
+      parser3,
+      parser4,
+      parser5,
+    ];
   }
 }
 
 class Map6<I, O1, O2, O3, O4, O5, O6, O> extends _Map<I, O> {
   @override
-  final Transformer<O> map;
+  final SemanticAction<O> map;
 
   final ParserBuilder<I, O1> parser1;
 
@@ -115,21 +115,21 @@ class Map6<I, O1, O2, O3, O4, O5, O6, O> extends _Map<I, O> {
       this.parser5, this.parser6, this.map);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-      'p3': parser3,
-      'p4': parser4,
-      'p5': parser5,
-      'p6': parser6,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      parser1,
+      parser2,
+      parser3,
+      parser4,
+      parser5,
+      parser6,
+    ];
   }
 }
 
 class Map7<I, O1, O2, O3, O4, O5, O6, O7, O> extends _Map<I, O> {
   @override
-  final Transformer<O> map;
+  final SemanticAction<O> map;
 
   final ParserBuilder<I, O1> parser1;
 
@@ -149,48 +149,47 @@ class Map7<I, O1, O2, O3, O4, O5, O6, O7, O> extends _Map<I, O> {
       this.parser5, this.parser6, this.parser7, this.map);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-      'p3': parser3,
-      'p4': parser4,
-      'p5': parser5,
-      'p6': parser6,
-      'p7': parser7,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      parser1,
+      parser2,
+      parser3,
+      parser4,
+      parser5,
+      parser6,
+      parser7,
+    ];
   }
 }
 
 abstract class _Map<I, O> extends _Sequence<I, O> {
-  static const _template = '''
-{{transform}}
-{{res}} = {{map}};''';
-
   const _Map();
 
-  Transformer<O> get map;
+  SemanticAction<O> get map;
 
   @override
-  String getTemplate(Context context) {
-    final outer = super.getTemplate(context);
-    final locals = context.allocateLocals(['map']);
-    final parsers = getBuilders();
-    final arguments = List.generate(parsers.length, (i) => '{{p${i + 1}_val}}');
-    final func = locals['map']!;
-    final t =
-        Transformation(context: context, name: func, arguments: arguments);
-    final values = {
-      ...locals,
-      'transform': map.declare(t),
-      'map': map.invoke(t),
-    };
-    final inner = render(_template, values);
-    return render(outer, {'body': inner});
+  bool _isVoidResult(int index) {
+    final parsers = _getParsers();
+    RangeError.checkValidRange(index, parsers.length, parsers.length);
+    final parser = parsers[index];
+    return parser.getResultType() == 'void';
   }
 
   @override
-  String toString() {
-    return printName(getBuilders().values.toList());
+  void _setResults(Context context, CodeGen code, ParserResult result,
+      List<ParserResult> results) {
+    final arguments = <String>[];
+    for (var i = 0; i < results.length; i++) {
+      final result = results[i];
+      if (!result.isVoid) {
+        final r = results[i];
+        final v = 'v${i + 1}';
+        code + 'final $v = ${r.value};';
+        arguments.add(v);
+      }
+    }
+
+    final map = this.map.build(context, 'map', arguments);
+    code.setResult(result, map);
   }
 }

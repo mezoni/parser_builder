@@ -10,101 +10,84 @@ part of '../../string.dart';
 /// StringValue(_isNormalChar, 0x5c, _escaped);
 /// ```
 class StringValue extends StringParserBuilder<String> {
-  static const _template = '''
-state.ok = true;
-final {{pos}} = state.pos;
-final {{list}} = [];
-var {{str}} = '';
-{{transform}}
-while (state.pos < source.length) {
-  final {{start}} = state.pos;
-  var {{c}} = 0;
-  while (state.pos < source.length) {
-    final pos = state.pos;
-    {{c}} = source.readRune(state);
-    final ok = {{cond}};
-    if (ok) {
-      continue;
-    }
-    state.pos = pos;
-    break;
-  }
-  {{str}} = state.pos == {{start}} ? '' : source.substring({{start}}, state.pos);
-  if ({{str}} != '' && {{list}}.isNotEmpty) {
-    {{list}}.add({{str}});
-  }
-  if ({{c}} != {{controlChar}}) {
-    break;
-  }
-  state.pos += {{size}};
-  {{p1}}
-  if (!state.ok) {
-    state.pos = {{pos}};
-    break;
-  }
-  if ({{list}}.isEmpty && {{str}} != '') {
-    {{list}}.add({{str}});
-  }
-  {{list}}.add({{p1_val}});
-}
-if (state.ok) {
-  if ({{list}}.isEmpty) {
-    {{res}} = {{str}};
-  } else if ({{list}}.length == 1) {
-    final c = {{list}}[0] as int;
-    {{res}} = String.fromCharCode(c);
-  } else {
-    final buffer = StringBuffer();
-    for (var i = 0; i < {{list}}.length; i++) {
-      final obj = {{list}}[i];
-      if (obj is int) {
-        buffer.writeCharCode(obj);
-      } else {
-        buffer.write(obj);
-      }
-    }
-    {{res}} = buffer.toString();
-  }
-}''';
-
   final int controlChar;
 
   final ParserBuilder<String, int> escape;
 
-  final Transformer<bool> normalChar;
+  final SemanticAction<bool> normalChar;
 
   const StringValue(this.normalChar, this.controlChar, this.escape);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': escape,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    final locals =
-        context.allocateLocals(['c', 'cond', 'list', 'pos', 'start', 'str']);
-    final c = locals['c']!;
-    final cond = locals['cond']!;
-    final t = Transformation(context: context, name: cond, arguments: [c]);
-    return {
-      'controlChar': controlChar.toString(),
-      'size': (controlChar > 0xffff ? 2 : 1).toString(),
-      ...locals,
-      'cond': normalChar.invoke(t),
-      'transform': normalChar.declare(t),
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([normalChar, controlChar, escape]);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final c = context.allocateLocal('c');
+    final list = context.allocateLocal('list');
+    final pos = context.allocateLocal('pos');
+    final size = controlChar > 0xffff ? 2 : 1;
+    final start = context.allocateLocal('start');
+    final str = context.allocateLocal('str');
+    final normalChar = this.normalChar.build(context, 'normalChar', [c]);
+    code.setSuccess();
+    code + 'final $pos = state.pos;';
+    code + 'final $list = [];';
+    code + "var $str = '';";
+    code.while$('state.pos < source.length', (code) {
+      code + 'final $start = state.pos;';
+      code + 'var $c = 0;';
+      code.while$('state.pos < source.length', (code) {
+        code + 'final pos = state.pos;';
+        code + '$c = source.readRune(state);';
+        code + 'final ok = $normalChar;';
+        code.if_('ok', (code) {
+          code.continue$();
+        });
+        code + 'state.pos = pos;';
+        code.break$();
+      });
+      code +
+          "$str = state.pos == $start ? '' : source.substring($start, state.pos);";
+      code.if_("$str != '' && $list.isNotEmpty", (code) {
+        code + '$list.add($str);';
+      });
+      code.if_('$c != $controlChar', (code) {
+        code.break$();
+      });
+      code + 'state.pos += $size;';
+      final r1 = helper.build(context, code, escape, silent, false);
+      code.ifChildFailure(r1, (code) {
+        code + 'state.pos = $pos;';
+        code.break$();
+      });
+      code.if_("$list.isEmpty && $str != ''", (code) {
+        code + '$list.add($str);';
+      });
+      code + '$list.add(${r1.value});';
+    });
+    code.ifSuccess((code) {
+      code.if_(
+        '$list.isEmpty',
+        (code) {
+          code.setResult(result, str);
+        },
+        else_: (code) {
+          code.if_('$list.length == 1', (code) {
+            code + 'final c = $list[0] as int;';
+            code.setResult(result, 'String.fromCharCode(c)');
+          }, else_: (code) {
+            code + 'final buffer = StringBuffer();';
+            code.iteration('for (var i = 0; i < $list.length; i++)', (code) {
+              code + 'final obj = $list[i];';
+              code.if_('obj is int', (code) {
+                code + 'buffer.writeCharCode(obj);';
+              }, else_: (code) {
+                code + 'buffer.write(obj);';
+              });
+            });
+            code.setResult(result, 'buffer.toString()');
+          });
+        },
+      );
+      code.labelSuccess(result);
+    });
   }
 }

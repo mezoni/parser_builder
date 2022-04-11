@@ -1,5 +1,7 @@
-import 'package:tuple/tuple.dart' as _t;
+import 'package:tuple/tuple.dart' as tuple;
 
+import 'builder_helper.dart' as helper;
+import 'codegen/code_gen.dart';
 import 'parser_builder.dart';
 
 part 'src/sequence/delimited.dart';

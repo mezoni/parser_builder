@@ -8,64 +8,64 @@ part of '../../character.dart';
 /// Satisfy(isSomeChar)
 /// ```
 class Satisfy extends StringParserBuilder<int> {
-  static const _template16 = '''
-state.ok = false;
-if (state.pos < source.length) {
-  {{transform}}
-  final c = source.codeUnitAt(state.pos);
-  state.ok = {{cond}};
-  if (state.ok) {
-    state.pos++;
-    {{res}} = c;
-  } else if (state.log) {
-    state.error = ErrUnexpected.charAt(state.pos, source);
-  }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
-}''';
-
-  static const _template32 = '''
-state.ok = false;
-if (state.pos < source.length) {
-  {{transform}}
-  final pos = state.pos;
-  final c = source.readRune(state);
-  state.ok = {{cond}};
-  if (state.ok) {
-    {{res}} = c;
-  } else {
-    state.pos = pos;
-    if (state.log) {
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    }
-  }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
-}''';
-
-  final Transformer<bool> predicate;
+  final SemanticAction<bool> predicate;
 
   const Satisfy(this.predicate);
 
   @override
-  Map<String, String> getTags(Context context) {
-    final t = Transformation(context: context, name: 'cond', arguments: ['c']);
-    return {
-      'transform': predicate.declare(t),
-      'cond': predicate.invoke(t),
-    };
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    context.refersToStateSource = true;
+    final isUnicode = predicate.isUnicode;
+    if (isUnicode) {
+      _build32(context, code, result, silent);
+    } else {
+      _build16(context, code, result, silent);
+    }
   }
 
-  @override
-  String getTemplate(Context context) {
-    final has32BitChars = predicate is CharPredicate
-        ? (predicate as CharPredicate).has32BitChars
-        : true;
-    return has32BitChars ? _template32 : _template16;
+  void _build16(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final c = context.allocateLocal('c');
+    final predicate = this.predicate.build(context, 'predicate', [c]);
+    code + 'int? $c;';
+    code.setState('state.pos < source.length');
+    code.ifSuccess((code) {
+      code + '$c = source.codeUnitAt(state.pos);';
+      code.setState(predicate);
+    });
+    code.ifSuccess((code) {
+      code + 'state.pos++;';
+      code.setResult(result, c);
+      code.labelSuccess(result);
+    }, else_: (code) {
+      code += silent
+          ? ''
+          : 'state.error =  $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.charAt(state.pos, source);';
+      code.labelFailure(result);
+    });
   }
 
-  @override
-  String toString() {
-    return printName([predicate]);
+  void _build32(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final c = context.allocateLocal('c');
+    final pos = context.allocateLocal('pos');
+    final predicate = this.predicate.build(context, 'predicate', [c]);
+    code + 'final $pos = state.pos;';
+    code + 'int? $c;';
+    code.setState('state.pos < source.length');
+    code.ifSuccess((code) {
+      code + '$c = source.readRune(state);';
+      code.setState(predicate);
+    });
+    code.ifSuccess((code) {
+      code.setResult(result, c);
+      code.labelSuccess(result);
+    }, else_: (code) {
+      code + 'state.pos = $pos;';
+      code += silent
+          ? ''
+          : 'state.error =  $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char($c));';
+      code.labelFailure(result);
+    });
   }
 }

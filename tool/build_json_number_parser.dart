@@ -1,4 +1,5 @@
 import 'package:parser_builder/bytes.dart';
+import 'package:parser_builder/codegen/code_gen.dart';
 import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
@@ -13,7 +14,7 @@ Future<void> main(List<String> args) async {
 const parser = Number();
 
 const __header = '''
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unnecessary_cast
 
 import 'package:source_span/source_span.dart';
 
@@ -36,7 +37,7 @@ num? parse(String s) {
   return r!;
 }''';
 
-const _isWhitespace = ExprTransformer<bool>(
+const _isWhitespace = ExprAction<bool>(
     ['x'], '{{x}} == 0x9 || {{x}} == 0xa || {{x}} == 0xd || {{x}} == 0x20');
 
 const _number = Terminated(parser, _ws);
@@ -46,9 +47,10 @@ const _parser = Named<String, num>('number', Delimited(_ws, _number, Eof()));
 const _ws = Named('_ws', SkipWhile(_isWhitespace));
 
 class Number extends StringParserBuilder<num> {
-  static const _template = '''
+  static const _body = '''
     state.ok = true;
-    final {{pos}} = state.pos;
+    final pos1 = state.pos;
+    num? res;
     for (;;) {
       //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
       const eof = 0x110000;
@@ -240,7 +242,7 @@ class Number extends StringParserBuilder<num> {
         }
         if (expPartLen > 18) {
           state.pos = pos;
-          {{res}} = double.parse(source.substring({{pos}}, pos));
+          res = double.parse(source.substring(pos1, pos));
           break;
         }
         if (hasExpSign) {
@@ -250,7 +252,7 @@ class Number extends StringParserBuilder<num> {
       state.pos = pos;
       final singlePart = !hasDot && !hasExp;
       if (singlePart && intPartLen <= 18) {
-        {{res}} = hasSign ? -intValue : intValue;
+        res = hasSign ? -intValue : intValue;
         break;
       }
       if (singlePart && intPartLen == 19) {
@@ -258,7 +260,7 @@ class Number extends StringParserBuilder<num> {
           final digit = source.codeUnitAt(intPartPos + 18) - 0x30;
           if (digit <= 7) {
             intValue = intValue * 10 + digit;
-            {{res}} = hasSign ? -intValue : intValue;
+            res = hasSign ? -intValue : intValue;
             break;
           }
         }
@@ -270,7 +272,7 @@ class Number extends StringParserBuilder<num> {
       final modExp = exp < 0 ? -exp : exp;
       if (modExp > 22) {
         state.pos = pos;
-        {{res}} = double.parse(source.substring({{pos}}, pos));
+        res = double.parse(source.substring(pos1, pos));
         break;
       }
       final k = powersOfTen[modExp];
@@ -300,7 +302,7 @@ class Number extends StringParserBuilder<num> {
         }
         doubleValue += value;
       }
-      {{res}} = hasSign ? -doubleValue : doubleValue;
+      res = hasSign ? -doubleValue : doubleValue;
       break;
     }
     if (!state.ok) {
@@ -313,18 +315,17 @@ class Number extends StringParserBuilder<num> {
       } else {
         state.error = ErrUnexpected.eof(state.pos);
       }
-      state.pos = {{pos}};
-    }''';
+      state.pos = pos1;
+    }
+    return res;''';
 
   const Number();
 
   @override
-  Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['pos']);
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    context.refersToStateSource = true;
+    final parseNumber = FuncAction<num?>([], _body);
+    final action = parseNumber.build(context, 'parseNumber', []);
+    code.setResult(result, action);
   }
 }

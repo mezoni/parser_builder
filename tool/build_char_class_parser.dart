@@ -10,12 +10,12 @@ import 'package:tuple/tuple.dart' as _t;
 
 Future<void> main(List<String> args) async {
   final context = Context();
-  final filename = 'lib/src/transformers/char_class_parser.dart';
+  final filename = 'lib/src/char_class/char_class_parser.dart';
   await fastBuild(context, [_parse], filename,
-      footer: footer, header: __header, publish: {'parseString': _parse});
+      footer: __footer, header: __header, publish: {'parseString': _parse});
 }
 
-const footer = '''
+const __footer = '''
 List<T> _flatten<T>(List<List<T>> data, List<T> result) {
   for (final item1 in data) {
     for (final item2 in item1) {
@@ -49,7 +49,7 @@ int _toHexValue(String s) {
 }''';
 
 const __header = r'''
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unnecessary_cast
 
 import 'package:source_span/source_span.dart';
 import 'package:tuple/tuple.dart';
@@ -60,7 +60,7 @@ const _char = Named('_char', Delimited(Tag('"'), _charCode, Tag('"')));
 
 const _charCode = Named('_charCode', Satisfy(_isAscii));
 
-const _flatten = Expr<List<_t.Tuple2<int, int>>>(
+const _flatten = ExprAction<List<_t.Tuple2<int, int>>>(
     ['x'], '_flatten({{x}}, <Tuple2<int, int>>[])');
 
 const _hex = Named('_hex', Preceded(Tag('#x'), _hexVal));
@@ -69,15 +69,16 @@ const _hexOrRangeChar = Named('_hexOrRangeChar', Alt([_hex, _rangeChar]));
 
 const _hexVal = Named('_hexVal', Map1(TakeWhile1(_isHexDigit), _toHexValue));
 
-const _intToTuple2 = Expr<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
+const _intToTuple2 =
+    ExprAction<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
 
-const _isAscii = Expr<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
+const _isAscii = ExprAction<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
 
-const _isHexDigit = Expr<bool>([
+const _isHexDigit = ExprAction<bool>([
   'x'
 ], '{{x}} >= 0x30 && {{x}} <= 0x39 || {{x}} >= 0x41 && {{x}} <= 0x46 || {{x}} >= 0x61 && {{x}}<= 0x66');
 
-const _isWhiteSpace = Expr<bool>(
+const _isWhiteSpace = ExprAction<bool>(
     ['x'], '{{x}} == 0x09 || {{x}} == 0xA || {{x}} == 0xD || {{x}} == 0x20');
 
 const _parse = Named('parse', Delimited(_ws, _ranges, Eof<String>()));
@@ -86,7 +87,7 @@ const _range = Named(
     '_range',
     Alt<String, List<_t.Tuple2<int, int>>>([
       Delimited(Tag('['), Many1(_rangeBody), Tag(']')),
-      Map1(Alt([_char, _hex]), Expr(['x'], ('[Tuple2({{x}}, {{x}})]'))),
+      Map1(Alt([_char, _hex]), ExprAction(['x'], ('[Tuple2({{x}}, {{x}})]'))),
     ]));
 
 const _rangeBody = Named(
@@ -103,10 +104,8 @@ const _rangeChar =
 const _ranges = Named('_ranges',
     Map1(SeparatedList1(Terminated(_range, _ws), _verbar), _flatten));
 
-const _toHexValue = Expr<int>(['x'], '_toHexValue({{x}})');
+const _toHexValue = ExprAction<int>(['x'], '_toHexValue({{x}})');
 
 const _verbar = Named('_verbar', Terminated(Tag('|'), _ws));
 
 const _ws = Named('_ws', SkipWhile(_isWhiteSpace));
-
-typedef Expr<T> = ExprTransformer<T>;

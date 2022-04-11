@@ -1,30 +1,6 @@
 part of '../../multi.dart';
 
 class SeparatedList0<I, O> extends ParserBuilder<I, List<O>> {
-  static const _template = '''
-final {{log}} = state.log;
-state.log = false;
-var {{pos}} = state.pos;
-final {{list}} = <{{O}}>[];
-for (;;) {
-  {{p1}}
-  if (!state.ok) {
-    state.pos = {{pos}};
-    break;
-  }
-  {{list}}.add({{p1_val}});
-  {{pos}} = state.pos;
-  {{p2}}
-  if (!state.ok) {
-    break;
-  }
-}
-state.ok = true;
-if (state.ok) {
-  {{res}} = {{list}};
-}
-state.log = {{log}};''';
-
   final ParserBuilder<I, O> parser;
 
   final ParserBuilder<I, dynamic> separator;
@@ -32,29 +8,29 @@ state.log = {{log}};''';
   const SeparatedList0(this.parser, this.separator);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-      'p2': separator,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['list', 'log', 'pos']);
-    return {
-      'O': O.toString(),
-      ...locals,
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([parser]);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final fast = result.isVoid;
+    final list = fast ? '' : context.allocateLocal('list');
+    final pos = context.allocateLocal('pos');
+    code + 'var $pos = state.pos;';
+    code += fast ? '' : 'final $list = <$O>[];';
+    code.iteration('for(;;)', (code) {
+      final r1 = helper.build(context, code, parser, true, fast);
+      code.ifChildFailure(r1, (code) {
+        code + 'state.pos = $pos;';
+        code.break$();
+      });
+      code.onChildSuccess(r1, (code) {
+        code += fast ? '' : '$list.add(${r1.value});';
+      });
+      code + '$pos = state.pos;';
+      final r2 = helper.build(context, code, separator, true, true);
+      code.ifChildFailure(r2, (code) {
+        code.break$();
+      });
+    });
+    code.setSuccess();
+    code.setResult(result, list);
+    code.labelSuccess(result);
   }
 }

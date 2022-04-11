@@ -17,30 +17,35 @@ int? _hexPrimary(State<String> state) {
   int? $0;
   String? $1;
   final $pos = state.pos;
-  var $cnt = 0;
-  while ($cnt < 2 && state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c <= 102 &&
-        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
-    if (ok) {
+  final $pos1 = state.pos;
+  var $count = 0;
+  while ($count < 2) {
+    int? $c;
+    state.ok = state.pos < source.length;
+    if (state.ok) {
+      $c = source.codeUnitAt(state.pos);
+      state.ok = $c <= 102 &&
+          ($c >= 48 && $c <= 57 ||
+              $c >= 65 && $c <= 70 ||
+              $c >= 97 && $c <= 102);
+    }
+    if (state.ok) {
       state.pos++;
-      $cnt++;
-      continue;
+      $count++;
+    } else {
+      state.error = $c == null
+          ? ErrUnexpected.eof(state.pos)
+          : ErrUnexpected.charAt(state.pos, source);
+      break;
     }
-    break;
   }
-  state.ok = $cnt >= 2;
+  state.ok = $count >= 2;
   if (state.ok) {
-    $1 = source.substring($pos, state.pos);
-  } else {
-    if (state.log) {
-      state.error = ErrUnexpected.charOrEof(state.pos, source);
-    }
-    state.pos = $pos;
-  }
-  if (state.ok) {
+    $1 = state.source.slice($pos, state.pos) as String?;
     final v = $1!;
-    $0 = int.parse(v, radix: 16);
+    $0 = int.parse(v, radix: 16) as int?;
+  } else {
+    state.pos = $pos1;
   }
   return $0;
 }
@@ -49,15 +54,9 @@ Color? _hexColor(State<String> state) {
   final source = state.source;
   Color? $0;
   final $pos = state.pos;
-  String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
-    state.pos++;
-    $1 = '#';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('#'));
-  }
-  if (state.ok) {
+    state.pos += 1;
     Color? $2;
     final $pos1 = state.pos;
     int? $3;
@@ -69,19 +68,20 @@ Color? _hexColor(State<String> state) {
         int? $5;
         $5 = _hexPrimary(state);
         if (state.ok) {
-          $2 = Color($3!, $4!, $5!);
+          final v1 = $3!;
+          final v2 = $4!;
+          final v3 = $5!;
+          $2 = Color(v1, v2, v3) as Color?;
+          $0 = $2;
         }
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
+      state.pos = $pos;
     }
-    if (state.ok) {
-      $0 = $2!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   return $0;
 }

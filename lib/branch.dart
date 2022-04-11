@@ -1,7 +1,5 @@
-import 'package:meta/meta.dart';
-
 import 'builder_helper.dart' as helper;
+import 'codegen/code_gen.dart';
 import 'parser_builder.dart';
 
 part 'src/branch/alt.dart';
-part 'src/branch/switch_tag.dart';

@@ -1,45 +1,22 @@
 part of '../../combinator.dart';
 
-class Not<I> extends ParserBuilder<I, bool> {
-  static const _template = '''
-final {{log}} = state.log;
-state.log = false;
-final {{pos}} = state.pos;
-{{p1}}
-state.ok = !state.ok;
-if (state.ok) {
-  {{res}} = true;
-} else {
-  state.pos = {{pos}};
-  if ({{log}}) {
-    state.error = ErrUnknown(state.pos);
-  }
-}
-state.log = {{log}};''';
-
+class Not<I> extends ParserBuilder<I, void> {
   final ParserBuilder<I, dynamic> parser;
 
   const Not(this.parser);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['log', 'pos']);
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([parser]);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final pos = context.allocateLocal('pos');
+    code + 'final $pos = state.pos;';
+    helper.build(context, code, parser, true, true);
+    code.negateState();
+    code.ifFailure((code) {
+      code + 'state.pos = $pos;';
+      code += silent ? '' : 'state.error = ErrUnknown(state.pos);';
+      code.labelFailure(result);
+    }, else_: (code) {
+      code.labelSuccess(result);
+    });
   }
 }

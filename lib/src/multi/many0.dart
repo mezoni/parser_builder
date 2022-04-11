@@ -1,50 +1,26 @@
 part of '../../multi.dart';
 
 class Many0<I, O> extends ParserBuilder<I, List<O>> {
-  static const _template = '''
-final {{log}} = state.log;
-state.log = false;
-final {{list}} = <{{O}}>[];
-for (;;) {
-  {{p1}}
-  if (!state.ok) {
-    break;
-  }
-  {{list}}.add({{p1_val}});
-}
-state.ok = true;
-if (state.ok) {
-  {{res}} = {{list}};
-}
-state.log = {{log}};''';
-
   final ParserBuilder<I, O> parser;
 
   const Many0(this.parser);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['list', 'log']);
-    return {
-      'O': O.toString(),
-      ...locals,
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([parser]);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final fast = result.isVoid;
+    final list = fast ? '' : context.allocateLocal('list');
+    code += fast ? '' : 'final $list = <$O>[];';
+    code.while$('true', (code) {
+      final r1 = helper.build(context, code, parser, true, fast);
+      code.ifChildFailure(r1, (code) {
+        code.break$();
+      });
+      code.onChildSuccess(r1, (code) {
+        code += fast ? '' : '$list.add(${r1.value});';
+      });
+    });
+    code.setSuccess();
+    code.setResult(result, list);
+    code.labelSuccess(result);
   }
 }

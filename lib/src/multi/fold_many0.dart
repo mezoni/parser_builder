@@ -1,65 +1,35 @@
 part of '../../multi.dart';
 
 class FoldMany0<I, O> extends ParserBuilder<I, O> {
-  static const _template = '''
-final {{log}} = state.log;
-state.log = false;
-var {{acc}} = {{init}};
-{{transform1}}
-{{transform2}}
-for (;;) {
-  {{p1}}
-  if (!state.ok) {
-    break;
-  }
-  final v = {{p1_val}};
-  {{combine}};
-}
-state.ok = true;
-if (state.ok) {
-  {{res}} = {{acc}};
-}
-state.log = {{log}};''';
+  final SemanticAction<O> combine;
 
-  final Transformer<O> combine;
-
-  final Transformer<O> initialize;
+  final SemanticAction<O> initialize;
 
   final ParserBuilder<I, O> parser;
 
   const FoldMany0(this.parser, this.initialize, this.combine);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['acc', 'log']);
-    final acc = locals['acc']!;
-    final t1 = Transformation(context: context, name: 'init', arguments: []);
-    final t2 = Transformation(
-        context: context, name: 'combine', arguments: [acc, 'v']);
-    return {
-      'O': O.toString(),
-      ...locals,
-      'transform1': initialize.declare(t1),
-      'init': initialize.invoke(t1),
-      'transform2': combine.declare(t2),
-      'combine': combine.invoke(t2),
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([parser]);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final fast = result.isVoid;
+    final acc = fast ? '' : context.allocateLocal('acc');
+    final combine =
+        fast ? '' : this.combine.build(context, 'combine', [acc, 'v']);
+    final initialize =
+        fast ? '' : this.initialize.build(context, 'initialize', []);
+    code += fast ? '' : 'var $acc = $initialize;';
+    code.iteration('for (;;)', (code) {
+      final r1 = helper.build(context, code, parser, true, fast);
+      code.ifChildFailure(r1, (code) {
+        code.break$();
+      });
+      code.onChildSuccess(r1, (code) {
+        code += fast ? '' : 'final v = ${r1.value};';
+        code += fast ? '' : '$combine;';
+      });
+    });
+    code.setSuccess();
+    code.setResult(result, acc);
+    code.labelSuccess(result);
   }
 }

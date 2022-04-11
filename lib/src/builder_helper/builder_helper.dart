@@ -5,6 +5,20 @@ String addNullCheck<T>(String name) {
   return isNullable ? name : '$name!';
 }
 
+ParserResult build(Context context, CodeGen code, ParserBuilder parser,
+    bool silent, bool fast) {
+  final type = fast ? 'void' : parser.getResultType();
+  final name = context.allocateLocal();
+  final value = parser.getResultValue(name);
+  final result = ParserResult(name, type, value);
+  if (!fast) {
+    code + '$type $name;';
+  }
+
+  parser.build(context, code, result, silent);
+  return result;
+}
+
 String escapeString(String text, [bool quote = true]) {
   text = text.replaceAll('\\', r'\\');
   text = text.replaceAll('\b', r'\b');

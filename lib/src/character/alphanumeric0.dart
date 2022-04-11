@@ -11,7 +11,7 @@ class Alphanumeric0 extends _Chars0 {
   const Alphanumeric0();
 
   @override
-  Transformer<bool> _getCharacterPredicate() {
+  SemanticAction<bool> _getCharacterPredicate() {
     return CharClass('[#x30-#x39] | [#x41-#x5a] | [#x61-#x7a]');
   }
 }

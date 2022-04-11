@@ -1,8 +1,8 @@
-part of '../../transformers.dart';
+part of '../../char_class.dart';
 
 class RangesParser {
   List<int> parse(String chars) {
-    final ranges = _char_class_parser.parseString(chars);
+    final ranges = char_class_parser.parseString(chars);
     String rangeToString(int start, int end) {
       return '[#x${start.toRadixString(16)}-#x${end.toRadixString(16)}]';
     }

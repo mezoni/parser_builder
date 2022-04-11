@@ -1,27 +1,6 @@
 part of '../../multi.dart';
 
-class ManyTill<I, O1, O2> extends ParserBuilder<I, _t.Tuple2<List<O1>, O2>> {
-  static const _template = '''
-final {{pos}} = state.pos;
-final {{list}} = <{{O1}}>[];
-for (;;) {
-  {{p1}}
-  if (state.ok) {
-    {{res}} = Tuple2({{list}}, {{p1_val}});
-    break;
-  }
-  final {{error}} = state.error;
-  {{p2}}
-  if (!state.ok) {
-    if (state.log) {
-      state.error = ErrCombined(state.pos, [{{error}}, state.error]);
-    }
-    state.pos = {{pos}};
-    break;
-  }
-  {{list}}.add({{p2_val}});
-}''';
-
+class ManyTill<I, O1, O2> extends ParserBuilder<I, tuple.Tuple2<List<O1>, O2>> {
   final ParserBuilder<I, O2> end;
 
   final ParserBuilder<I, O1> parser;
@@ -29,24 +8,31 @@ for (;;) {
   const ManyTill(this.parser, this.end);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': end,
-      'p2': parser,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['error', 'list', 'pos']);
-    return {
-      'O1': O1.toString(),
-      ...locals,
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final fast = result.isVoid;
+    final error = silent ? '' : context.allocateLocal('error');
+    final list = fast ? '' : context.allocateLocal('list');
+    final pos = context.allocateLocal('pos');
+    code + 'final $pos = state.pos;';
+    code += fast ? '' : 'final $list = <$O1>[];';
+    code.while$('true', (code) {
+      final r1 = helper.build(context, code, end, silent, fast);
+      code.ifChildSuccess(r1, (code) {
+        code.setResult(result, 'Tuple2($list, ${r1.value})');
+        code.break$();
+      });
+      code += silent ? '' : 'final $error = state.error;';
+      final r2 = helper.build(context, code, parser, silent, fast);
+      code.ifChildFailure(r2, (code) {
+        code += silent
+            ? ''
+            : 'state.error = ErrCombined(state.pos, [$error, state.error]);';
+        code + 'state.pos = $pos;';
+        code.break$();
+      });
+      code.onChildSuccess(r2, (code) {
+        code += fast ? '' : '$list.add(${r2.value});';
+      });
+    });
   }
 }

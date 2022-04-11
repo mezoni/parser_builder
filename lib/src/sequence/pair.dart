@@ -1,45 +1,25 @@
 part of '../../sequence.dart';
 
-class Pair<I, O1, O2> extends ParserBuilder<I, _t.Tuple2<O1, O2>> {
-  static const _template = '''
-final {{pos}} = state.pos;
-{{p1}}
-if (state.ok) {
-  {{p2}}
-  if (state.ok) {
-    {{res}} = Tuple2({{p1_val}}, {{p2_val}});
-  }
-}
-if (!state.ok) {
-  state.pos = {{pos}};
-}''';
+class Pair<I, O1, O2> extends _Sequence<I, tuple.Tuple2<O1, O2>> {
+  final ParserBuilder<I, O1> first;
 
-  final ParserBuilder<I, O1> parser1;
+  final ParserBuilder<I, O2> second;
 
-  final ParserBuilder<I, O2> parser2;
-
-  const Pair(this.parser1, this.parser2);
+  const Pair(this.first, this.second);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      first,
+      second,
+    ];
   }
 
   @override
-  Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['pos']);
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([parser1, parser2]);
+  void _setResults(Context context, CodeGen code, ParserResult result,
+      List<ParserResult> results) {
+    final r1 = results[0];
+    final r2 = results[1];
+    code.setResult(result, 'Tuple2(${r1.value}, ${r2.value})');
   }
 }

@@ -11,7 +11,7 @@ class Alpha1 extends _Chars1 {
   const Alpha1();
 
   @override
-  Transformer<bool> _getCharacterPredicate() {
+  SemanticAction<bool> _getCharacterPredicate() {
     return CharClass('[#x41-#x5a] | [#x61-#x7a]');
   }
 }

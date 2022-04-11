@@ -1,15 +1,6 @@
 part of '../../error.dart';
 
 class Nested<I, O> extends ParserBuilder<I, O> {
-  static const _template = r'''
-final {{pos}} = state.pos;
-{{p1}}
-if (state.ok) {
-  {{res}} = {{p1_res}};
-} else if (state.log) {
-  state.error = ErrNested({{pos}}, {{message}}, const Tag({{tag}}), state.error);
-}''';
-
   final String message;
 
   final ParserBuilder<I, O> parser;
@@ -19,29 +10,21 @@ if (state.ok) {
   const Nested(this.message, this.tag, this.parser);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    final locals = context.allocateLocals(['pos']);
-    return {
-      ...locals,
-      'message': helper.escapeString(message),
-      'tag': helper.escapeString(tag),
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([tag, parser]);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final fast = result.isVoid;
+    final message = helper.escapeString(this.message);
+    final pos = context.allocateLocal('pos');
+    final tag = helper.escapeString(this.tag);
+    code + 'final $pos = state.pos;';
+    final r1 = helper.build(context, code, parser, silent, fast);
+    code.ifChildSuccess(r1, (code) {
+      code.setResult(result, r1.name, false);
+      code.labelSuccess(result);
+    }, else_: (code) {
+      code += silent
+          ? ''
+          : 'state.error = ErrNested($pos, $message, const Tag($tag), state.error);';
+      code.labelFailure(result);
+    });
   }
 }

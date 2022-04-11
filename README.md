@@ -1,8 +1,8 @@
 # parser_builder
 
-Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
+Lightweight parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.15.3
+Version: 0.16.0
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -13,10 +13,9 @@ The build system is already implemented and ready to use and you can try it out 
 Attention, the generated combinations of parsers are very small and very efficient.  
 Ask questions if something is not clear.  
 
-## First advantage
+## Advantage
 
 - `Very simple and clear` build and code generation system
-- `Templates-based` (visually intuitive) definition of parser builders
 - Parser declaration based on `combinations of parsers`
 - Allows to build parsers to `parse any kind of data` (binary data, tokens, etc.)
 - Support for generating parsers `into functions or into statements` (inlined parser code)
@@ -35,31 +34,6 @@ Ask questions if something is not clear.
 - Includes high-performance, most common `built-in parser builders`
 - Support for `32 bit Unicode characters` out of the box (no need to worry about that)
 
-## Second advantage
-
-Another advantage is that the build system is very simple and straightforward. Any programmer will understand it without much difficulty.  
-This means that an ordinary programmer can keep this software up to date.  
-You do not need to be a man of seven spans in the forehead for this.  
-The author of this software is also not such and is a simple person.  
-It's just a simple but handy thing.  
-Use it and don't worry about it stopping working.  
-This software is already so simple that it couldn't be easier.
-
-Documentation comming soon.  
-To get started, you can view and run the following scripts:
-
-Generated simple JSON parser.  
-https://github.com/mezoni/parser_builder/blob/master/example/example.dart
-
-Usage of generated JSON parser.  
-https://github.com/mezoni/parser_builder/blob/master/example/test_example.dart
-
-A tool to create a simple JSON parser.  
-https://github.com/mezoni/parser_builder/blob/master/tool/build_example.dart
-
-Quality of the generated code of various parsers in generated tests.  
-https://github.com/mezoni/parser_builder/blob/master/test/_test_parser.dart
-
 ## Included parser builders
 
 built-in:
@@ -77,8 +51,8 @@ built-in:
 - [`SkipWhile`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip_while.dart)
 - [`SkipWhile1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip_while1.dart)
 - [`Tag`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/tag.dart)
-- [`TagEx`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/tags_ex.dart)
 - [`TagNoCase`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/tag_no_case.dart)
+- [`TagOf`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/tag_of.dart)
 - [`Tags`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/tags.dart)
 - [`TakeUntil`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/take_until.dart)
 - [`TakeUntil1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/take_until1.dart)
@@ -105,19 +79,20 @@ built-in:
 [`combinator`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator):
 - [`Consumed`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/consumed.dart)
 - [`Eof`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/eof.dart)
+- [`Fast`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/fast.dart)
 - [`Map1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/map1.dart)
 - [`Not`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/not.dart)
 - [`Opt`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/opt.dart)
 - [`Peek`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/peek.dart)
 - [`Recognize`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/recognize.dart)
 - [`Value`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/value.dart)
+- [`Verify`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/verify.dart)
 
 [`error`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error):
 - [`Expected`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/expected.dart) (not tested yet)
 - [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart) (not fully tested)
 
 [`multi`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi):
-- [`CombinedList1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/combined_list1.dart)
 - `FoldMany0` (not implenented yet)
 - `FoldMany1` (not implenented yet)
 - [`Many0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/many0.dart)
@@ -138,42 +113,25 @@ built-in:
 - [`Skip`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/skip.dart)
 - [`SkipMany0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/skip_many0.dart)
 - [`Terminated`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/terminated.dart)
-- [`Tuple`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/tuple.dart)
+- [`Tuple1..Tuple7`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/tuple.dart)
 
 [`string`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string):
 - [`EscapeSequence`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/escape_sequence.dart)
 - [`StringValue`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/string_value.dart)
 
-## Transformers
+## Semantic action
 
-- [`ClosureTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
-- [`ExprTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
-- [`FuncExprTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
-- [`FuncTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
-- [`VarTransformer`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
+- [`ClosureAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
+- [`ExprAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
+- [`FuncExprAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
+- [`FuncAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
+- [`VarAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
 
-## Included transformers
+## Character class
 
 - [`CharClass`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_class.dart)
 - [`CharClasses`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_classes.dart)
 - [`NotCharClass`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/not_char_class.dart)
-
-## What is a build system?
-
-The build system itself is very simple and consists of the following files:  
-- [`allocator.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/allocator.dart)
-- [`context.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/context.dart)
-- [`named`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/named.dart)
-- [`parser_builder.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/parser_builder.dart)
-- [`ref.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/ref.dart)
-- [`runtime.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/runtime.dart)
-- [`transformer.dart`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/transformer.dart)
-
-The file `runtime.dart` contains only the static source code of the runtime, and without it, the entire build system takes about 12 KB (including a simple templating engine).  
-Thus, all parsers building-related bugs can be easily found and fixed in this small library.  
-It is quite possible to consider this system easy to maintain and reliable enough in the sense that there is no need to hire expensive specialists to understand how it works in order to fix it in case of a malfunction.
-
-The rest of the code in this package is mostly libraries with useful parser builders for different use cases.
 
 ## How to start write your parser?
 
@@ -285,15 +243,9 @@ Color? _hexColor(State<String> state) {
   final source = state.source;
   Color? $0;
   final $pos = state.pos;
-  String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
-    state.pos++;
-    $1 = '#';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('#'));
-  }
-  if (state.ok) {
+    state.pos += 1;
     Color? $2;
     final $pos1 = state.pos;
     int? $3;
@@ -305,22 +257,24 @@ Color? _hexColor(State<String> state) {
         int? $5;
         $5 = _hexPrimary(state);
         if (state.ok) {
-          $2 = Color($3!, $4!, $5!);
+          final v1 = $3!;
+          final v2 = $4!;
+          final v3 = $5!;
+          $2 = Color(v1, v2, v3) as Color?;
+          $0 = $2;
         }
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
+      state.pos = $pos;
     }
-    if (state.ok) {
-      $0 = $2!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   return $0;
 }
+
 ```
 
 This code was generated from this declaration:
@@ -356,21 +310,15 @@ Inlined means that it was generated without a function declaration for it (only 
 dynamic _json(State<String> state) {
   dynamic $0;
   final $pos = state.pos;
-  bool? $1;
-  $1 = _ws(state);
+  _ws(state);
   if (state.ok) {
     dynamic $2;
     $2 = _value(state);
     if (state.ok) {
-      bool? $3;
-      final $pos1 = state.pos;
-      state.ok = state.source.atEnd($pos1);
-      if (state.ok) {
-        $3 = true;
+      state.ok = state.pos >= state.source.length;
+      if (!state.ok) {
+        state.error = ErrExpected.eof(state.pos);
       } else {
-        state.error = ErrExpected.eof($pos1);
-      }
-      if (state.ok) {
         $0 = $2;
       }
     }
@@ -380,6 +328,7 @@ dynamic _json(State<String> state) {
   }
   return $0;
 }
+
 ```
 
 This code was generated from this declaration:
@@ -423,219 +372,41 @@ During parsing, errors are generated on the fly, but they are not translated on 
 
 ## How to declare a parser builder
 
-Declaring your parser (if required) is very simple. The process is very simple.  
-Let's take a look at an existing parser builder and assume it doesn't exist and you need to create one just like it.
+Declaring your own parser builder (if required) is very simple. The process is very simple.  
+Let's take a look at an existing parser builder and assume it doesn't exist and you need to create one just like it.  
+This is an implementation of the well-known parsing expression called `optional` (aka `?`).
 
 ```dart
-part of '../../combinator.dart';
+part of '../../multi.dart';
 
-class Map$<I, O1, O2> extends ParserBuilder<I, O2> {
-  static const _template = '''
-{{p1}}
-if (state.ok) {
-  {{transform}}
-  final v = {{p1_val}};
-  {{res}} = map(v);
-}''';
+class Many0<I, O> extends ParserBuilder<I, List<O>> {
+  final ParserBuilder<I, O> parser;
 
-  final ParserBuilder<I, O1> parser;
-
-  final Transformer<O1, O2> transformer;
-
-  const Map$(this.parser, this.transformer);
+  const Many0(this.parser);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    return {
-      'transform': transformer.transform('map'),
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([parser, transformer]);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final fast = result.isVoid;
+    final list = fast ? '' : context.allocateLocal('list');
+    code += fast ? '' : 'final $list = <$O>[];';
+    code.while$('true', (code) {
+      final r1 = helper.build(context, code, parser, true, fast);
+      code.ifChildFailure(r1, (code) {
+        code.break$();
+      });
+      code.onChildSuccess(r1, (code) {
+        code += fast ? '' : '$list.add(${r1.value});';
+      });
+    });
+    code.setSuccess();
+    code.setResult(result, list);
+    code.labelSuccess(result);
   }
 }
 
 ```
 
-As a result, the generated parser `Map$` will run another parser `parser` and, if successful, will transform the result using the transformer `transformer`. Everything is simple.
-
-This is a typical example of a parser builder that has dependencies (combines another parser builder) and also requires some data to generate the parser.  
-
-To start, a few explanations. Parser builders are formed from templates and are described using templates. We can say that they are similar to macros, which are expanded based on the given data (their parameters).  
-In the vast majority of cases (with the exception of self-modifying complex implementations with nested templates), this works 100%.  
-
-And so, what is what in this definition.  
-
-This parser builder uses the following parameters:
-
-```dart
-final ParserBuilder<I, O1> parser;
-
-final Transformer<O1, O2> transformer;
-
-const MapRes(this.parser, this.transformer);
-```
-
-In terms of parsing (when the source code is generated) the `parser` will produce some result (parse data), and the `transformer` will transform this result.  
-
-In terms of building, the builder `parser` should go through the build process (into the parser source code), and the transformer `transformer` should be materialized (it also should generate some code that willl be used in parser code to transform the result).  
-Instead of a transformer, other data may be used that does not require building, but requires embedding this data in the source code of the parser.  
-
-Thus, we can conclude that two types of data (parameters) can be used. These are other parser builders and any other data needed to generate the parser code (strings, symbols, functions, and other data types).  
-So, how to embed (transform) this data (parameters) into the source code?  
-
-Now let's look at the builder template:
-
-```dart
-  static const _template = '''
-{{p1}}
-if (state.ok) {
-  {{transform}}
-  final v = {{p1_val}};
-  {{res}} = map(v);
-}''';
-```
-
-This is normal Dart code, but using tags for data that hasn't been defined yet.
-
-All embedded (not defined yet) data is specified in the template through tags.  
-We can see the following tags:  
-
-- `p1`
-- `p1_val`
-- `res`
-- `transform`
-
-What do they mean and how should they be assigned (set)?   
-First, let's take a look at how values are set for them.  
-
-For parser builders:
-
-```dart
-  @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-    };
-  }
-```
-
-For other data (other tags):
-
-```dart
-  @override
-  Map<String, String> getTags(Context context) {
-    return {
-      'transform': transformer.transform('map'),
-    };
-  }
-```
-
-As you can see, the values for them are set through two methods:
-
-```dart
-Map<String, ParserBuilder> getBuilders()
-
-Map<String, String> getTags(Context context)
-```
-
-Both of these methods return hash maps, in which the keys define the tags for the template, and the values are what will be substituted into the templates.  
-
-Everything seems to be clear and simple, but how can you use builders as values for templates?  
-
-In this case, the build system takes over the work.  
-In order to be able to simply negotiate with this system, it is customary to use some convention.  
-
-There are not many of them (at the moment) and they can be described as follows.  
-For the builder to be processed, a unique tag is specified. This tag will be expanded to the following values and other tags that can be used in the template:
-
-Example for tag `p1`:
-
-- `p1` is a placeholder for the generated (by builder) parser source code
-- `p1_res` will be created and set to the local variable name with the parsed result (eg `$5`)
-- `p1_val` will be created and set to a safe expression to access the successful value of the local result variable (e.g. `$5`, `$6!`)
-
-Also, the `res` tag will always be created. It will be set to a value with the name of a local variable of the current parse result.
-
-Now looks again at the builder template:
-
-```dart
-  static const _template = '''
-{{p1}}
-if (state.ok) {
-  {{transform}}
-  final v = {{p1_val}};
-  {{res}} = map(v);
-}''';
-```
-
-How are the `map` tag created?
-
-```dart
-  @override
-  Map<String, String> getTags(Context context) {
-    return {
-      'transform': transformer.transform('map'),
-    };
-  }
-```
-
-Tag `map` is used as the name of the `transformer` source code.  
-Because the code `transformer.transform('map')` returns the `map` function source code.  
-
-An example of the generated source code for the `map` function:
-
-```dart
-String map(List<int> x) => String.fromCharCodes(x);
-```
-
-That is, everything is simple and without the need to do anything else besides setting tags.  
-
-Nothing prevents you from using your way of building in case of writing a complex builder.  
-You can generate an already filled template (without tags) in the `getTemplate` method and not return any tags. This will be the source code of the parser body.  
-
-Or you can choose not to return a list of builders from the `getBuilders` method, but you can build them yourself if you use nested templates. The main thing is to set the appropriate tags for your template.  
-Depending on the complexity of implementing some builder with a complex high-performance specific parsing logic, you can do it (build the source code template) the way your algorithm requires it.
-
-Example of complex builders:
-
-- [`Alt`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/alt.dart)
-- [`NoneOfTags`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/none_of_tags.dart)
-- [`Tuple`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/tuple.dart)
-
-To this purpose a new method `BuildBodyEx` has been introduced, which is currently the basis for building the parser body from a template.   
-It is used by the `BuildBody` method, which automatically assembles the parser body.  
-
-```dart
-  String buildBody(Context context) {
-    final builders = getBuilders();
-    final tags = getTags(context);
-    final template = getTemplate(context);
-    final result = buildBodyEx(context, builders, tags, template);
-    return result;
-  }
-```
-
-This method (`BuildBodyEx`) can be used to generate templates with nested parser blocks (templates) by calling it with the required parameters (builders, tags, and template) as many times as needed and embed the generated code into the main template.
-
-```dart
-String buildBodyEx(Context context, Map<String, ParserBuilder> builders,
-      Map<String, String> tags, String template)
-```
+An updated version of this section will be added later...
 
 ## Performance
 

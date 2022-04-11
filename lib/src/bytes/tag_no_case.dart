@@ -8,45 +8,34 @@ part of '../../bytes.dart';
 /// TagNoCase('if')
 /// ```
 class TagNoCase extends StringParserBuilder<String> {
-  static const _template = '''
-state.ok = false;
-if (state.pos + {{len}} <= source.length) {
-  {{transform}}
-  final v1 = source.substring(state.pos, state.pos + {{len}});
-  final v2 = {{conv}};
-  if (v2 == {{tag}}) {
-    state.ok = true;
-    state.pos += {{len}};
-    {{res}} = v1;
-  }
-}
-if (!state.ok && state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
-}''';
-
-  final Transformer<String> convert;
+  final SemanticAction<String> convert;
 
   final String tag;
 
   const TagNoCase(this.tag, this.convert);
 
   @override
-  Map<String, String> getTags(Context context) {
-    if (tag.isEmpty) {
-      throw ArgumentError.value(tag, 'tag', 'The tag must not be empty');
-    }
-
-    final t = Transformation(context: context, name: 'conv', arguments: ['v1']);
-    return {
-      'len': tag.length.toString(),
-      'tag': helper.escapeString(tag),
-      'transform': convert.declare(t),
-      'conv': convert.invoke(t),
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    context.refersToStateSource = true;
+    final length = this.tag.length;
+    final tag = helper.escapeString(this.tag);
+    final convert = this.convert.build(context, 'convert', ['v1']);
+    code.setFailure();
+    code.if_('state.pos + $length <= source.length', (code) {
+      code + 'final v1 = source.substring(state.pos, state.pos + $length);';
+      code + 'final v2 = $convert;';
+      code.if_('v2 == $tag', (code) {
+        code + 'state.pos += $length;';
+        code.setSuccess();
+        code.setResult(result, 'v1');
+        code.labelSuccess(result);
+      });
+    });
+    code.ifFailure((code) {
+      code += silent
+          ? ''
+          : 'state.error = ErrExpected.tag(state.pos, const Tag($tag));';
+      code.labelFailure(result);
+    });
   }
 }

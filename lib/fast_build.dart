@@ -1,10 +1,14 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:parser_builder/codegen/code_optimizer.dart';
+
+import 'codegen/code_gen.dart';
+import 'codegen/statements.dart';
 import 'parser_builder.dart';
 
-Future<void> fastBuild(
-    Context context, List<ParserBuilder> builders, String filename,
+Future<void> fastBuild(Context context, List<Named> builders, String filename,
     {bool addErrorMessageProcessor = true,
     String? footer,
     bool format = true,
@@ -12,10 +16,16 @@ Future<void> fastBuild(
     String? partOf,
     Map<String, Named> publish = const {}}) async {
   for (final builder in builders) {
-    builder.build(context);
+    final statements = LinkedList<Statement>();
+    final code = CodeGen(statements);
+    final name = '\$0';
+    final type = builder.getResultType();
+    final value = builder.getResultValue(name);
+    final result = ParserResult(name, type, value);
+    builder.build(context, code, result, false);
   }
 
-  final declarations = context.declarations;
+  final declarations = context.globalDeclarations;
   for (final entry in publish.entries) {
     final code = _publish(entry.key, entry.value);
     declarations.insert(0, code);

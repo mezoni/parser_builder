@@ -1,5 +1,7 @@
-import 'package:parser_builder/transformers.dart';
-
+import 'builder_helper.dart' as helper;
+import 'bytes.dart';
+import 'char_class.dart';
+import 'codegen/code_gen.dart';
 import 'parser_builder.dart';
 
 part 'src/character/alpha0.dart';
@@ -14,6 +16,6 @@ part 'src/character/digit1.dart';
 part 'src/character/hex_digit0.dart';
 part 'src/character/hex_digit1.dart';
 part 'src/character/none_of.dart';
-part 'src/character/none_of_ex.dart';
+part 'src/character/none_of_of.dart';
 part 'src/character/one_of.dart';
 part 'src/character/satisfy.dart';

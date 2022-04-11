@@ -1,18 +1,6 @@
 part of '../../combinator.dart';
 
 class Value<I, O> extends ParserBuilder<I, O> {
-  static const _template = '''
-{{p1}}
-if (state.ok) {
-  {{res}} = {{v}};
-}''';
-
-  static const _templateNoParser = '''
-state.ok = true;
-if (state.ok) {
-  {{res}} = {{v}};
-}''';
-
   final ParserBuilder<I, dynamic>? parser;
 
   final O value;
@@ -20,30 +8,30 @@ if (state.ok) {
   const Value(this.value, [this.parser]);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      if (parser != null) 'p1': parser!,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
-    return {
-      'v': helper.getAsCode(value),
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
     if (parser != null) {
-      return _template;
+      _buildWithParser(context, code, result, silent);
+    } else {
+      _build(context, code, result, silent);
     }
-
-    return _templateNoParser;
   }
 
-  @override
-  String toString() {
-    return printName([value, if (parser != null) parser]);
+  void _build(Context context, CodeGen code, ParserResult result, bool silent) {
+    final v = helper.getAsCode(value);
+    code.setSuccess();
+    code.setResult(result, v);
+    code.labelSuccess(result);
+  }
+
+  void _buildWithParser(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final v = helper.getAsCode(value);
+    final r1 = helper.build(context, code, parser!, silent, true);
+    code.ifChildSuccess(r1, (code) {
+      code.setResult(result, v);
+      code.labelSuccess(result);
+    }, else_: (code) {
+      code.labelFailure(result);
+    });
   }
 }

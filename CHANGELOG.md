@@ -1,3 +1,7 @@
+## 0.16.0
+
+- Breaking change: Everything is implemented almost from scratch. Now code generation is done with the code generator
+
 ## 0.15.4
 
 - Improved `Verify` parser builder. Now the failure position in `ErrMessage` is set not to the initial position, but to the last position. Previously, this was not possible (before the improvement of the system for working with parsing errors). This applies only to cases where verification fails. In fact, this is the purpose of the generated `Verify` parser

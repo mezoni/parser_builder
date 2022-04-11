@@ -3,7 +3,7 @@ import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
-import 'package:parser_builder/transformers.dart';
+import 'package:parser_builder/char_class.dart';
 
 import 'hex_color_parser_helper.dart';
 
@@ -18,16 +18,12 @@ const _hexColor = Named(
     '_hexColor',
     Preceded(
         Tag('#'),
-        Map3(
-            _hexPrimary,
-            _hexPrimary,
-            _hexPrimary,
-            ExprTransformer<Color>(
-                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
+        Map3(_hexPrimary, _hexPrimary, _hexPrimary,
+            ExprAction<Color>(['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
 
 const _hexPrimary = Named(
     '_hexPrimary',
     Map1(TakeWhileMN(2, 2, CharClass('[0-9A-Fa-f]')),
-        ExprTransformer<int>(['x'], 'int.parse({{x}}, radix: 16)')));
+        ExprAction<int>(['x'], 'int.parse({{x}}, radix: 16)')));
 
 const _parse = Named('_parse', _hexColor);

@@ -1,45 +1,8 @@
 part of '../../multi.dart';
 
 class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
-  static const _template = '''
-final {{log}} = state.log;
-final {{pos}} = state.pos;
-final {{list}} = <{{O}}>[];
-var {{cnt}} = 0;
-while ({{cnt}} < {{n}}) {
-  state.log = {{cnt}} <= {{m}} ? {{log}} : false;
-  {{p1}}
-  if (!state.ok) {
-    break;
-  }
-  {{list}}.add({{p1_val}});
-  {{cnt}}++;
-}
-state.ok = {{cnt}} >= {{m}};
-if (state.ok) {
-  {{res}} = {{list}};
-} else {
-  state.pos = {{pos}};
-}
-state.log = {{log}};''';
-
-  final int m;
-
-  final int n;
-
-  final ParserBuilder<I, O> parser;
-
-  const ManyMN(this.m, this.n, this.parser);
-
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser,
-    };
-  }
-
-  @override
-  Map<String, String> getTags(Context context) {
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
     if (m < 0) {
       throw RangeError.value(m, 'm', 'Must be equal to or greater than 0');
     }
@@ -53,22 +16,39 @@ state.log = {{log}};''';
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
-    final locals = context.allocateLocals(['cnt', 'list', 'log', 'pos']);
-    return {
-      'm': m.toString(),
-      'n': n.toString(),
-      'O': O.toString(),
-      ...locals,
-    };
+    final fast = result.isVoid;
+    final count = context.allocateLocal('count');
+    final pos = context.allocateLocal('pos');
+    final list = fast ? '' : context.allocateLocal('list');
+    code + 'final $pos = state.pos;';
+    code += fast ? '' : 'final $list = <$O>[];';
+    code + 'var $count = 0;';
+    code.while$('$count < $n', (code) {
+      final r1 =
+          helper.build(context, code, parser, silent ? true : m == 0, fast);
+      code.ifChildFailure(r1, (code) {
+        code.break$();
+      });
+      code.onChildSuccess(r1, (code) {
+        code += fast ? '' : '$list.add(${r1.value});';
+        code + '$count++;';
+      });
+    });
+    code.setState('$count >= $m');
+    code.ifSuccess((code) {
+      code.setResult(result, list);
+      code.labelSuccess(result);
+    }, else_: (code) {
+      code + 'state.pos = $pos;';
+      code.labelFailure(result);
+    });
   }
 
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
+  final int m;
 
-  @override
-  String toString() {
-    return printName([parser]);
-  }
+  final int n;
+
+  final ParserBuilder<I, O> parser;
+
+  const ManyMN(this.m, this.n, this.parser);
 }

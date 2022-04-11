@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unnecessary_cast
 
 import 'package:source_span/source_span.dart';
 
@@ -14,48 +14,36 @@ dynamic parse(String source) {
   return result;
 }
 
-bool? _ws(State<String> state) {
+void _ws(State<String> state) {
   final source = state.source;
-  bool? $0;
-  while (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c <= 32 && (c >= 9 && c <= 10 || c == 13 || c == 32);
-    if (ok) {
-      state.pos++;
-      continue;
+  while (true) {
+    int? $c;
+    state.ok = state.pos < source.length;
+    if (state.ok) {
+      $c = source.codeUnitAt(state.pos);
+      state.ok = $c <= 32 && ($c >= 9 && $c <= 10 || $c == 13 || $c == 32);
     }
-    break;
+    if (state.ok) {
+      state.pos++;
+    } else {
+      break;
+    }
   }
   state.ok = true;
-  if (state.ok) {
-    $0 = true;
-  }
-  return $0;
-}
-
-bool? _eof(State<String> state) {
-  bool? $0;
-  state.ok = state.pos >= state.source.length;
-  if (state.ok) {
-    $0 = true;
-  } else if (state.log) {
-    state.error = ErrExpected.eof(state.pos);
-  }
-  return $0;
 }
 
 dynamic _json(State<String> state) {
   dynamic $0;
   final $pos = state.pos;
-  bool? $1;
-  $1 = _ws(state);
+  _ws(state);
   if (state.ok) {
     dynamic $2;
     $2 = _value(state);
     if (state.ok) {
-      bool? $3;
-      $3 = _eof(state);
-      if (state.ok) {
+      state.ok = state.pos >= state.source.length;
+      if (!state.ok) {
+        state.error = ErrExpected.eof(state.pos);
+      } else {
         $0 = $2;
       }
     }
@@ -74,41 +62,44 @@ int? _escapeHex(State<String> state) {
   String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 117;
   if (state.ok) {
-    state.pos++;
-    $1 = 'u';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('u'));
-  }
-  if (state.ok) {
+    state.pos += 1;
+    $1 = 'u' as String?;
     String? $2;
     final $pos1 = state.pos;
-    var $cnt = 0;
-    while ($cnt < 4 && state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      final ok = c <= 102 &&
-          (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
-      if (ok) {
+    final $pos2 = state.pos;
+    var $count = 0;
+    while ($count < 4) {
+      int? $c;
+      state.ok = state.pos < source.length;
+      if (state.ok) {
+        $c = source.codeUnitAt(state.pos);
+        state.ok = $c <= 102 &&
+            ($c >= 48 && $c <= 57 ||
+                $c >= 65 && $c <= 70 ||
+                $c >= 97 && $c <= 102);
+      }
+      if (state.ok) {
         state.pos++;
-        $cnt++;
-        continue;
+        $count++;
+      } else {
+        state.error = $c == null
+            ? ErrUnexpected.eof(state.pos)
+            : ErrUnexpected.charAt(state.pos, source);
+        break;
       }
-      break;
     }
-    state.ok = $cnt >= 4;
+    state.ok = $count >= 4;
     if (state.ok) {
-      $2 = source.substring($pos1, state.pos);
+      $2 = state.source.slice($pos1, state.pos) as String?;
+      final v1 = $1!;
+      final v2 = $2!;
+      $0 = _toHexValue(v2) as int?;
     } else {
-      if (state.log) {
-        state.error = ErrUnexpected.charOrEof(state.pos, source);
-      }
-      state.pos = $pos1;
+      state.pos = $pos2;
+      state.pos = $pos;
     }
-    if (state.ok) {
-      $0 = _toHexValue($2!);
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('u'));
   }
   return $0;
 }
@@ -117,15 +108,17 @@ int? _escaped(State<String> state) {
   final source = state.source;
   int? $0;
   int? $1;
+  int? $c;
+  state.ok = state.pos < source.length;
   state.ok = false;
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
+    $c = source.codeUnitAt(state.pos);
     int? v;
-    switch (c) {
+    switch ($c) {
       case 34:
       case 47:
       case 92:
-        v = c;
+        v = $c;
         break;
       case 98:
         v = 8;
@@ -146,22 +139,20 @@ int? _escaped(State<String> state) {
     if (v != null) {
       state.pos++;
       state.ok = true;
-      $1 = v;
-    } else if (state.log) {
-      state.error = ErrUnexpected.charAt(state.pos, source);
+      $1 = v as int?;
+      $0 = $1;
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
   }
-  if (state.ok) {
-    $0 = $1!;
-  } else {
+  if (!state.ok) {
+    state.error = $c == null
+        ? ErrUnexpected.eof(state.pos)
+        : ErrUnexpected.charAt(state.pos, source);
     final $error = state.error;
     int? $2;
     $2 = _escapeHex(state);
     if (state.ok) {
-      $0 = $2!;
-    } else if (state.log) {
+      $0 = $2;
+    } else {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -169,29 +160,19 @@ int? _escaped(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-String? _quote(State<String> state) {
+void _quote(State<String> state) {
   final source = state.source;
-  String? $0;
   final $pos = state.pos;
-  String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
   if (state.ok) {
-    state.pos++;
-    $1 = '"';
-  } else if (state.log) {
+    state.pos += 1;
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  } else {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
 }
 
 String? _string(State<String> state) {
@@ -200,15 +181,9 @@ String? _string(State<String> state) {
   final $pos = state.pos;
   String? $1;
   final $pos1 = state.pos;
-  String? $2;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
   if (state.ok) {
-    state.pos++;
-    $2 = '"';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('"'));
-  }
-  if (state.ok) {
+    state.pos += 1;
     String? $3;
     state.ok = true;
     final $pos2 = state.pos;
@@ -248,250 +223,361 @@ String? _string(State<String> state) {
     }
     if (state.ok) {
       if ($list.isEmpty) {
-        $3 = $str;
-      } else if ($list.length == 1) {
-        final c = $list[0] as int;
-        $3 = String.fromCharCode(c);
+        $3 = $str as String?;
       } else {
-        final buffer = StringBuffer();
-        for (var i = 0; i < $list.length; i++) {
-          final obj = $list[i];
-          if (obj is int) {
-            buffer.writeCharCode(obj);
-          } else {
-            buffer.write(obj);
+        if ($list.length == 1) {
+          final c = $list[0] as int;
+          $3 = String.fromCharCode(c) as String?;
+        } else {
+          final buffer = StringBuffer();
+          for (var i = 0; i < $list.length; i++) {
+            final obj = $list[i];
+            if (obj is int) {
+              buffer.writeCharCode(obj);
+            } else {
+              buffer.write(obj);
+            }
           }
+          $3 = buffer.toString() as String?;
         }
-        $3 = buffer.toString();
       }
-    }
-    if (state.ok) {
-      String? $5;
-      $5 = _quote(state);
+      _quote(state);
       if (state.ok) {
-        $1 = $3!;
+        $1 = $3;
+        $0 = $1;
       }
     }
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
   if (!state.ok) {
     state.pos = $pos1;
-  }
-  if (state.ok) {
-    $0 = $1;
-  } else if (state.log) {
     state.error =
         ErrNested($pos, 'Malformed string', const Tag('string'), state.error);
   }
   return $0;
 }
 
-@pragma('vm:prefer-inline')
-String? _openBrace(State<String> state) {
+num? _number(State<String> state) {
   final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
-  if (state.ok) {
-    state.pos++;
-    $1 = '{';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('{'));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _colon(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
-  if (state.ok) {
-    state.pos++;
-    $1 = ':';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag(':'));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-MapEntry<String, dynamic>? _keyValue(State<String> state) {
-  MapEntry<String, dynamic>? $0;
-  final $pos = state.pos;
-  String? $1;
-  $1 = _string(state);
-  if (state.ok) {
-    String? $2;
-    $2 = _colon(state);
-    if (state.ok) {
-      dynamic $3;
-      $3 = _value(state);
-      if (state.ok) {
-        $0 = MapEntry($1!, $3);
+  num? $parseNumber() {
+    state.ok = true;
+    final pos1 = state.pos;
+    num? res;
+    for (;;) {
+      //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
+      const eof = 0x110000;
+      const mask = 0x30;
+      const powersOfTen = [
+        1.0,
+        1e1,
+        1e2,
+        1e3,
+        1e4,
+        1e5,
+        1e6,
+        1e7,
+        1e8,
+        1e9,
+        1e10,
+        1e11,
+        1e12,
+        1e13,
+        1e14,
+        1e15,
+        1e16,
+        1e17,
+        1e18,
+        1e19,
+        1e20,
+        1e21,
+        1e22,
+      ];
+      final length = source.length;
+      var pos = state.pos;
+      var c = eof;
+      if (pos < length) {
+        c = source.codeUnitAt(pos);
+      } else {
+        c = eof;
       }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _comma(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
-  if (state.ok) {
-    state.pos++;
-    $1 = ',';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag(','));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
-  List<MapEntry<String, dynamic>>? $0;
-  final $log = state.log;
-  state.log = false;
-  var $pos = state.pos;
-  final $list = <MapEntry<String, dynamic>>[];
-  for (;;) {
-    MapEntry<String, dynamic>? $1;
-    $1 = _keyValue(state);
-    if (!state.ok) {
-      state.pos = $pos;
+      var hasSign = false;
+      if (c == 0x2d) {
+        pos++;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
+        hasSign = true;
+      }
+      var digit = c ^ mask;
+      if (digit > 9) {
+        state.ok = false;
+        state.pos = pos;
+        break;
+      }
+      final intPartPos = pos;
+      var intPartLen = 0;
+      intPartLen = 1;
+      var intValue = 0;
+      if (digit == 0) {
+        pos++;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
+      } else {
+        pos++;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
+        intValue = digit;
+        while (true) {
+          digit = c ^ mask;
+          if (digit > 9) {
+            break;
+          }
+          pos++;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
+          if (intPartLen++ < 18) {
+            intValue = intValue * 10 + digit;
+          }
+        }
+      }
+      var hasDot = false;
+      var decPartLen = 0;
+      var decValue = 0;
+      if (c == 0x2e) {
+        pos++;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
+        hasDot = true;
+        digit = c ^ mask;
+        if (digit > 9) {
+          state.ok = false;
+          state.pos = pos;
+          break;
+        }
+        pos++;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
+        decPartLen = 1;
+        decValue = digit;
+        while (true) {
+          digit = c ^ mask;
+          if (digit > 9) {
+            break;
+          }
+          pos++;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
+          if (decPartLen++ < 18) {
+            decValue = decValue * 10 + digit;
+          }
+        }
+      }
+      var hasExp = false;
+      var hasExpSign = false;
+      var expPartLen = 0;
+      var exp = 0;
+      if (c == 0x45 || c == 0x65) {
+        pos++;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
+        hasExp = true;
+        switch (c) {
+          case 0x2b:
+            pos++;
+            if (pos < length) {
+              c = source.codeUnitAt(pos);
+            } else {
+              c = eof;
+            }
+            break;
+          case 0x2d:
+            pos++;
+            if (pos < length) {
+              c = source.codeUnitAt(pos);
+            } else {
+              c = eof;
+            }
+            hasExpSign = true;
+            break;
+        }
+        digit = c ^ mask;
+        if (digit > 9) {
+          state.ok = false;
+          state.pos = pos;
+          break;
+        }
+        pos++;
+        if (pos < length) {
+          c = source.codeUnitAt(pos);
+        } else {
+          c = eof;
+        }
+        expPartLen = 1;
+        exp = digit;
+        while (true) {
+          digit = c ^ mask;
+          if (digit > 9) {
+            break;
+          }
+          pos++;
+          if (pos < length) {
+            c = source.codeUnitAt(pos);
+          } else {
+            c = eof;
+          }
+          if (expPartLen++ < 18) {
+            exp = exp * 10 + digit;
+          }
+        }
+        if (expPartLen > 18) {
+          state.pos = pos;
+          res = double.parse(source.substring(pos1, pos));
+          break;
+        }
+        if (hasExpSign) {
+          exp = -exp;
+        }
+      }
+      state.pos = pos;
+      final singlePart = !hasDot && !hasExp;
+      if (singlePart && intPartLen <= 18) {
+        res = hasSign ? -intValue : intValue;
+        break;
+      }
+      if (singlePart && intPartLen == 19) {
+        if (intValue == 922337203685477580) {
+          final digit = source.codeUnitAt(intPartPos + 18) - 0x30;
+          if (digit <= 7) {
+            intValue = intValue * 10 + digit;
+            res = hasSign ? -intValue : intValue;
+            break;
+          }
+        }
+      }
+      var doubleValue = intValue * 1.0;
+      var expRest = intPartLen - 18;
+      expRest = expRest < 0 ? 0 : expRest;
+      exp = expRest + exp;
+      final modExp = exp < 0 ? -exp : exp;
+      if (modExp > 22) {
+        state.pos = pos;
+        res = double.parse(source.substring(pos1, pos));
+        break;
+      }
+      final k = powersOfTen[modExp];
+      if (exp > 0) {
+        doubleValue *= k;
+      } else {
+        doubleValue /= k;
+      }
+      if (decValue != 0) {
+        var value = decValue * 1.0;
+        final diff = exp - decPartLen;
+        final modDiff = diff < 0 ? -diff : diff;
+        final sign = diff < 0;
+        var rest = modDiff;
+        while (rest != 0) {
+          var i = rest;
+          if (i > 20) {
+            i = 20;
+          }
+          rest -= i;
+          final k = powersOfTen[i];
+          if (sign) {
+            value /= k;
+          } else {
+            value *= k;
+          }
+        }
+        doubleValue += value;
+      }
+      res = hasSign ? -doubleValue : doubleValue;
       break;
     }
-    $list.add($1!);
-    $pos = state.pos;
-    String? $2;
-    $2 = _comma(state);
     if (!state.ok) {
-      break;
-    }
-  }
-  state.ok = true;
-  if (state.ok) {
-    $0 = $list;
-  }
-  state.log = $log;
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-String? _closeBrace(State<String> state) {
-  final source = state.source;
-  String? $0;
-  final $pos = state.pos;
-  String? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
-  if (state.ok) {
-    state.pos++;
-    $1 = '}';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('}'));
-  }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-dynamic _object(State<String> state) {
-  dynamic $0;
-  final $pos = state.pos;
-  String? $1;
-  $1 = _openBrace(state);
-  if (state.ok) {
-    List<MapEntry<String, dynamic>>? $2;
-    $2 = _keyValues(state);
-    if (state.ok) {
-      String? $3;
-      $3 = _closeBrace(state);
-      if (state.ok) {
-        $0 = Map.fromEntries($2!);
+      if (state.pos < source.length) {
+        var c = source.codeUnitAt(state.pos);
+        if (c > 0xd7ff) {
+          c = source.runeAt(state.pos);
+        }
+        state.error = ErrUnexpected.char(state.pos, Char(c));
+      } else {
+        state.error = ErrUnexpected.eof(state.pos);
       }
+      state.pos = pos1;
     }
+    return res;
   }
-  if (!state.ok) {
-    state.pos = $pos;
+
+  num? $0;
+  final $pos = state.pos;
+  num? $1;
+  $1 = $parseNumber() as num?;
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    state.error =
+        ErrNested($pos, 'Malformed number', const Tag('number'), state.error);
   }
   return $0;
 }
 
 @pragma('vm:prefer-inline')
-String? _openBracket(State<String> state) {
+void _openBracket(State<String> state) {
   final source = state.source;
-  String? $0;
   final $pos = state.pos;
-  String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
   if (state.ok) {
-    state.pos++;
-    $1 = '[';
-  } else if (state.log) {
+    state.pos += 1;
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  } else {
     state.error = ErrExpected.tag(state.pos, const Tag('['));
   }
+}
+
+@pragma('vm:prefer-inline')
+void _comma(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
   if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
+    state.pos += 1;
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
     }
   }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
 }
 
 List<dynamic>? _values(State<String> state) {
   List<dynamic>? $0;
-  final $log = state.log;
-  state.log = false;
   var $pos = state.pos;
   final $list = <dynamic>[];
   for (;;) {
@@ -503,59 +589,43 @@ List<dynamic>? _values(State<String> state) {
     }
     $list.add($1);
     $pos = state.pos;
-    String? $2;
-    $2 = _comma(state);
+    _comma(state);
     if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  if (state.ok) {
-    $0 = $list;
-  }
-  state.log = $log;
+  $0 = $list as List<dynamic>?;
   return $0;
 }
 
 @pragma('vm:prefer-inline')
-String? _closeBracket(State<String> state) {
+void _closeBracket(State<String> state) {
   final source = state.source;
-  String? $0;
   final $pos = state.pos;
-  String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
   if (state.ok) {
-    state.pos++;
-    $1 = ']';
-  } else if (state.log) {
+    state.pos += 1;
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  } else {
     state.error = ErrExpected.tag(state.pos, const Tag(']'));
   }
-  if (state.ok) {
-    bool? $2;
-    $2 = _ws(state);
-    if (state.ok) {
-      $0 = $1!;
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
 }
 
 List<dynamic>? _array(State<String> state) {
   List<dynamic>? $0;
   final $pos = state.pos;
-  String? $1;
-  $1 = _openBracket(state);
+  _openBracket(state);
   if (state.ok) {
     List<dynamic>? $2;
     $2 = _values(state);
     if (state.ok) {
-      String? $3;
-      $3 = _closeBracket(state);
+      _closeBracket(state);
       if (state.ok) {
-        $0 = $2!;
+        $0 = $2;
       }
     }
   }
@@ -565,411 +635,231 @@ List<dynamic>? _array(State<String> state) {
   return $0;
 }
 
-num? _number(State<String> state) {
+@pragma('vm:prefer-inline')
+void _openBrace(State<String> state) {
   final source = state.source;
-  num? $0;
   final $pos = state.pos;
-  num? $1;
-  state.ok = true;
-  final $pos1 = state.pos;
-  for (;;) {
-    //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
-    const eof = 0x110000;
-    const mask = 0x30;
-    const powersOfTen = [
-      1.0,
-      1e1,
-      1e2,
-      1e3,
-      1e4,
-      1e5,
-      1e6,
-      1e7,
-      1e8,
-      1e9,
-      1e10,
-      1e11,
-      1e12,
-      1e13,
-      1e14,
-      1e15,
-      1e16,
-      1e17,
-      1e18,
-      1e19,
-      1e20,
-      1e21,
-      1e22,
-    ];
-    final length = source.length;
-    var pos = state.pos;
-    var c = eof;
-    if (pos < length) {
-      c = source.codeUnitAt(pos);
-    } else {
-      c = eof;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
+  if (state.ok) {
+    state.pos += 1;
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
     }
-    var hasSign = false;
-    if (c == 0x2d) {
-      pos++;
-      if (pos < length) {
-        c = source.codeUnitAt(pos);
-      } else {
-        c = eof;
-      }
-      hasSign = true;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('{'));
+  }
+}
+
+@pragma('vm:prefer-inline')
+void _colon(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
+  if (state.ok) {
+    state.pos += 1;
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
     }
-    var digit = c ^ mask;
-    if (digit > 9) {
-      state.ok = false;
-      state.pos = pos;
-      break;
-    }
-    final intPartPos = pos;
-    var intPartLen = 0;
-    intPartLen = 1;
-    var intValue = 0;
-    if (digit == 0) {
-      pos++;
-      if (pos < length) {
-        c = source.codeUnitAt(pos);
-      } else {
-        c = eof;
-      }
-    } else {
-      pos++;
-      if (pos < length) {
-        c = source.codeUnitAt(pos);
-      } else {
-        c = eof;
-      }
-      intValue = digit;
-      while (true) {
-        digit = c ^ mask;
-        if (digit > 9) {
-          break;
-        }
-        pos++;
-        if (pos < length) {
-          c = source.codeUnitAt(pos);
-        } else {
-          c = eof;
-        }
-        if (intPartLen++ < 18) {
-          intValue = intValue * 10 + digit;
-        }
+  }
+}
+
+MapEntry<String, dynamic>? _keyValue(State<String> state) {
+  MapEntry<String, dynamic>? $0;
+  final $pos = state.pos;
+  String? $1;
+  $1 = _string(state);
+  if (state.ok) {
+    _colon(state);
+    if (state.ok) {
+      dynamic $3;
+      $3 = _value(state);
+      if (state.ok) {
+        final v1 = $1!;
+        final v3 = $3;
+        $0 = MapEntry(v1, v3) as MapEntry<String, dynamic>?;
       }
     }
-    var hasDot = false;
-    var decPartLen = 0;
-    var decValue = 0;
-    if (c == 0x2e) {
-      pos++;
-      if (pos < length) {
-        c = source.codeUnitAt(pos);
-      } else {
-        c = eof;
-      }
-      hasDot = true;
-      digit = c ^ mask;
-      if (digit > 9) {
-        state.ok = false;
-        state.pos = pos;
-        break;
-      }
-      pos++;
-      if (pos < length) {
-        c = source.codeUnitAt(pos);
-      } else {
-        c = eof;
-      }
-      decPartLen = 1;
-      decValue = digit;
-      while (true) {
-        digit = c ^ mask;
-        if (digit > 9) {
-          break;
-        }
-        pos++;
-        if (pos < length) {
-          c = source.codeUnitAt(pos);
-        } else {
-          c = eof;
-        }
-        if (decPartLen++ < 18) {
-          decValue = decValue * 10 + digit;
-        }
-      }
-    }
-    var hasExp = false;
-    var hasExpSign = false;
-    var expPartLen = 0;
-    var exp = 0;
-    if (c == 0x45 || c == 0x65) {
-      pos++;
-      if (pos < length) {
-        c = source.codeUnitAt(pos);
-      } else {
-        c = eof;
-      }
-      hasExp = true;
-      switch (c) {
-        case 0x2b:
-          pos++;
-          if (pos < length) {
-            c = source.codeUnitAt(pos);
-          } else {
-            c = eof;
-          }
-          break;
-        case 0x2d:
-          pos++;
-          if (pos < length) {
-            c = source.codeUnitAt(pos);
-          } else {
-            c = eof;
-          }
-          hasExpSign = true;
-          break;
-      }
-      digit = c ^ mask;
-      if (digit > 9) {
-        state.ok = false;
-        state.pos = pos;
-        break;
-      }
-      pos++;
-      if (pos < length) {
-        c = source.codeUnitAt(pos);
-      } else {
-        c = eof;
-      }
-      expPartLen = 1;
-      exp = digit;
-      while (true) {
-        digit = c ^ mask;
-        if (digit > 9) {
-          break;
-        }
-        pos++;
-        if (pos < length) {
-          c = source.codeUnitAt(pos);
-        } else {
-          c = eof;
-        }
-        if (expPartLen++ < 18) {
-          exp = exp * 10 + digit;
-        }
-      }
-      if (expPartLen > 18) {
-        state.pos = pos;
-        $1 = double.parse(source.substring($pos1, pos));
-        break;
-      }
-      if (hasExpSign) {
-        exp = -exp;
-      }
-    }
-    state.pos = pos;
-    final singlePart = !hasDot && !hasExp;
-    if (singlePart && intPartLen <= 18) {
-      $1 = hasSign ? -intValue : intValue;
-      break;
-    }
-    if (singlePart && intPartLen == 19) {
-      if (intValue == 922337203685477580) {
-        final digit = source.codeUnitAt(intPartPos + 18) - 0x30;
-        if (digit <= 7) {
-          intValue = intValue * 10 + digit;
-          $1 = hasSign ? -intValue : intValue;
-          break;
-        }
-      }
-    }
-    var doubleValue = intValue * 1.0;
-    var expRest = intPartLen - 18;
-    expRest = expRest < 0 ? 0 : expRest;
-    exp = expRest + exp;
-    final modExp = exp < 0 ? -exp : exp;
-    if (modExp > 22) {
-      state.pos = pos;
-      $1 = double.parse(source.substring($pos1, pos));
-      break;
-    }
-    final k = powersOfTen[modExp];
-    if (exp > 0) {
-      doubleValue *= k;
-    } else {
-      doubleValue /= k;
-    }
-    if (decValue != 0) {
-      var value = decValue * 1.0;
-      final diff = exp - decPartLen;
-      final modDiff = diff < 0 ? -diff : diff;
-      final sign = diff < 0;
-      var rest = modDiff;
-      while (rest != 0) {
-        var i = rest;
-        if (i > 20) {
-          i = 20;
-        }
-        rest -= i;
-        final k = powersOfTen[i];
-        if (sign) {
-          value /= k;
-        } else {
-          value *= k;
-        }
-      }
-      doubleValue += value;
-    }
-    $1 = hasSign ? -doubleValue : doubleValue;
-    break;
   }
   if (!state.ok) {
-    if (state.pos < source.length) {
-      var c = source.codeUnitAt(state.pos);
-      if (c > 0xd7ff) {
-        c = source.runeAt(state.pos);
-      }
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    } else {
-      state.error = ErrUnexpected.eof(state.pos);
-    }
-    state.pos = $pos1;
+    state.pos = $pos;
   }
+  return $0;
+}
+
+List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
+  List<MapEntry<String, dynamic>>? $0;
+  var $pos = state.pos;
+  final $list = <MapEntry<String, dynamic>>[];
+  for (;;) {
+    MapEntry<String, dynamic>? $1;
+    $1 = _keyValue(state);
+    if (!state.ok) {
+      state.pos = $pos;
+      break;
+    }
+    $list.add($1!);
+    $pos = state.pos;
+    _comma(state);
+    if (!state.ok) {
+      break;
+    }
+  }
+  state.ok = true;
+  $0 = $list as List<MapEntry<String, dynamic>>?;
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+void _closeBrace(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
   if (state.ok) {
-    $0 = $1;
-  } else if (state.log) {
-    state.error =
-        ErrNested($pos, 'Malformed number', const Tag('number'), state.error);
+    state.pos += 1;
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('}'));
+  }
+}
+
+dynamic _object(State<String> state) {
+  dynamic $0;
+  final $pos = state.pos;
+  _openBrace(state);
+  if (state.ok) {
+    List<MapEntry<String, dynamic>>? $2;
+    $2 = _keyValues(state);
+    if (state.ok) {
+      _closeBrace(state);
+      if (state.ok) {
+        final v2 = $2!;
+        $0 = Map.fromEntries(v2) as dynamic;
+      }
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+bool? _false(State<String> state) {
+  final source = state.source;
+  bool? $0;
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 102 &&
+      source.startsWith('false', state.pos);
+  if (state.ok) {
+    state.pos += 5;
+    $0 = false as bool?;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('false'));
+  }
+  return $0;
+}
+
+bool? _true(State<String> state) {
+  final source = state.source;
+  bool? $0;
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 116 &&
+      source.startsWith('true', state.pos);
+  if (state.ok) {
+    state.pos += 4;
+    $0 = true as bool?;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('true'));
+  }
+  return $0;
+}
+
+dynamic _null(State<String> state) {
+  final source = state.source;
+  dynamic $0;
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 110 &&
+      source.startsWith('null', state.pos);
+  if (state.ok) {
+    state.pos += 4;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('null'));
   }
   return $0;
 }
 
 dynamic _value(State<String> state) {
-  final source = state.source;
   dynamic $0;
   final $pos = state.pos;
   dynamic $1;
-  final $pos1 = state.pos;
-  var $matched = false;
-  state.ok = false;
-  if ($pos1 < source.length) {
-    final c = source.codeUnitAt($pos1);
-    switch (c) {
-      case 34:
-        $matched = true;
-        String? $2;
-        $2 = _string(state);
+  String? $2;
+  $2 = _string(state);
+  if (state.ok) {
+    $1 = $2;
+  } else {
+    final $error = state.error;
+    num? $3;
+    $3 = _number(state);
+    if (state.ok) {
+      $1 = $3;
+    } else {
+      final $error1 = state.error;
+      List<dynamic>? $4;
+      $4 = _array(state);
+      if (state.ok) {
+        $1 = $4;
+      } else {
+        final $error2 = state.error;
+        dynamic $5;
+        $5 = _object(state);
         if (state.ok) {
-          $1 = $2;
-        }
-        break;
-      case 123:
-        $matched = true;
-        dynamic $3;
-        $3 = _object(state);
-        if (state.ok) {
-          $1 = $3;
-        }
-        break;
-      case 91:
-        $matched = true;
-        List<dynamic>? $4;
-        $4 = _array(state);
-        if (state.ok) {
-          $1 = $4;
-        }
-        break;
-      case 102:
-        if (source.startsWith('false', $pos1)) {
-          $matched = true;
-          dynamic $5;
-          state.ok = state.pos + 5 <= source.length;
-          if (state.ok) {
-            state.pos += 5;
-            $5 = false;
-          } else if (state.log) {
-            state.error = ErrUnexpected.eof(source.length);
-          }
-          if (state.ok) {
-            $1 = $5;
-          }
-          break;
-        }
-        break;
-      case 116:
-        if (source.startsWith('true', $pos1)) {
-          $matched = true;
-          dynamic $6;
-          state.ok = state.pos + 4 <= source.length;
-          if (state.ok) {
-            state.pos += 4;
-            $6 = true;
-          } else if (state.log) {
-            state.error = ErrUnexpected.eof(source.length);
-          }
+          $1 = $5;
+        } else {
+          final $error3 = state.error;
+          bool? $6;
+          $6 = _false(state);
           if (state.ok) {
             $1 = $6;
+          } else {
+            final $error4 = state.error;
+            bool? $7;
+            $7 = _true(state);
+            if (state.ok) {
+              $1 = $7;
+            } else {
+              final $error5 = state.error;
+              dynamic $8;
+              $8 = _null(state);
+              if (state.ok) {
+                $1 = $8;
+              } else {
+                state.error = ErrCombined(state.pos, [
+                  $error,
+                  $error1,
+                  $error2,
+                  $error3,
+                  $error4,
+                  $error5,
+                  state.error
+                ]);
+              }
+            }
           }
-          break;
         }
-        break;
-      case 110:
-        if (source.startsWith('null', $pos1)) {
-          $matched = true;
-          dynamic $7;
-          state.ok = state.pos + 4 <= source.length;
-          if (state.ok) {
-            state.pos += 4;
-            $7 = null;
-          } else if (state.log) {
-            state.error = ErrUnexpected.eof(source.length);
-          }
-          if (state.ok) {
-            $1 = $7;
-          }
-          break;
-        }
-        break;
+      }
     }
-  }
-  if (!state.ok) {
-    $matched = true;
-    num? $8;
-    $8 = _number(state);
-    if (state.ok) {
-      $1 = $8;
-    }
-  }
-  if (!state.ok && state.log) {
-    final List<Err> errors = [
-      ErrExpected.tag(state.pos, const Tag('[')),
-      ErrExpected.tag(state.pos, const Tag('{')),
-      ErrExpected.tag(state.pos, const Tag('false')),
-      ErrExpected.tag(state.pos, const Tag('null')),
-      ErrExpected.tag(state.pos, const Tag('number')),
-      ErrExpected.tag(state.pos, const Tag('string')),
-      ErrExpected.tag(state.pos, const Tag('true'))
-    ];
-    state.error = ErrCombined(state.pos, [
-      if ($matched) state.error,
-      if (errors.isNotEmpty)
-        ...errors
-      else if (!$matched)
-        ErrUnexpected.charOrEof(state.pos, source)
-    ]);
   }
   if (state.ok) {
-    bool? $9;
-    $9 = _ws(state);
+    _ws(state);
     if (state.ok) {
       $0 = $1;
+    } else {
+      state.pos = $pos;
     }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
   }
   return $0;
 }

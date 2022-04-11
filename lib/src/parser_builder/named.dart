@@ -1,15 +1,6 @@
 part of '../../parser_builder.dart';
 
 class Named<I, O> extends ParserBuilder<I, O> {
-  static const _template = '''
-{{res}} = {{name}}(state);''';
-
-  static const _templateDeclaration = '''
-{{type}} {{name}}(State<{{I}}> state) {
-  {{body}}
-  return {{res}};
-}''';
-
   final List<String> annotaions;
 
   final String name;
@@ -19,61 +10,68 @@ class Named<I, O> extends ParserBuilder<I, O> {
   const Named(this.name, this.parser, [this.annotaions = const []]);
 
   @override
-  String build(Context context) {
-    if (context.keys.add(this)) {
-      _buildDeclaration(context);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    if (!context.context.containsKey(this)) {
+      context.context[this] = null;
+      _buildDeclaration(context, silent);
     }
 
-    return super.build(context);
+    final fast = result.isVoid;
+    if (fast) {
+      code + '$name(state);';
+    } else {
+      code.setResult(result, '$name(state)', false);
+    }
   }
 
-  @override
-  Map<String, String> getTags(Context context) {
-    return {
-      'name': name,
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([name, parser]);
-  }
-
-  String _buildDeclaration(Context context) {
+  void _buildDeclaration(Context context, bool silent) {
     final localAllocator = context.localAllocator;
-    final resultVariable = context.resultVariable;
-    final refersToSourceVariable = context.refersToSourceVariable;
+    final localDeclarations = context.localDeclarations;
+    final refersToStateSource = context.refersToStateSource;
     context.localAllocator = localAllocator.clone();
-    context.resultVariable = context.allocateLocal();
-    context.refersToSourceVariable = false;
-    var code = parser.buildAndAssign(context, context.resultVariable);
-    if (context.refersToSourceVariable) {
-      code = 'final source = state.source;\n' + code.trim();
-    }
-
-    final values = {
-      'body': code,
-      'I': '$I',
-      'name': name,
-      'O': '$O',
-      'res': context.resultVariable,
-      'type': getResultType(),
-    };
-    var result = render(_templateDeclaration, values);
+    context.localDeclarations = {};
+    context.refersToStateSource = false;
+    final statements = LinkedList<Statement>();
+    final code = CodeGen(statements);
+    final fast = parser.getResultType() == 'void';
+    final r1 = helper.build(context, code, parser, silent, fast);
+    final codeOptimizer = CodeOptimizer();
+    codeOptimizer.optimize(statements);
+    final buffer = StringBuffer();
     if (annotaions.isNotEmpty) {
-      final code = annotaions.join('\n');
-      result = code + result;
+      buffer.writeln(annotaions.join('\n'));
     }
 
-    context.declarations.add(result);
+    buffer.write(r1.type);
+    buffer.write(' ');
+    buffer.write(name);
+    buffer.write('(State<');
+    buffer.write(I);
+    buffer.writeln('> state) {');
+    if (context.refersToStateSource) {
+      buffer.writeln('final source = state.source;');
+    }
+    for (final declaration in context.localDeclarations.values) {
+      buffer.writeln(declaration);
+    }
+
+    final printer = Printer();
+    for (final statement in statements) {
+      printer.print(statement, buffer);
+      buffer.writeln();
+    }
+
+    if (!r1.isVoid) {
+      buffer.write('return ');
+      buffer.write(r1.name);
+      buffer.write(';');
+    }
+
+    buffer.writeln('}');
+    context.refersToStateSource = refersToStateSource;
+    context.localDeclarations = localDeclarations;
     context.localAllocator = localAllocator;
-    context.resultVariable = resultVariable;
-    context.refersToSourceVariable = refersToSourceVariable;
-    return result;
+    final globalDeclarations = context.globalDeclarations;
+    globalDeclarations.add(buffer.toString());
   }
 }

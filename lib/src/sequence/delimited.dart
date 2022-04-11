@@ -1,51 +1,32 @@
 part of '../../sequence.dart';
 
-class Delimited<I, O> extends ParserBuilder<I, O> {
-  static const _template = '''
-final {{pos}} = state.pos;
-{{p1}}
-if (state.ok) {
-  {{p2}}
-  if (state.ok) {
-    {{p3}}
-    if (state.ok) {
-      {{res}} = {{p2_val}};
-    }
-  }
-}
-if (!state.ok) {
-  state.pos = {{pos}};
-}''';
+class Delimited<I, O> extends _Sequence<I, O> {
+  final ParserBuilder<I, dynamic> after;
 
-  final ParserBuilder<I, dynamic> parser1;
+  final ParserBuilder<I, dynamic> before;
 
-  final ParserBuilder<I, O> parser2;
+  final ParserBuilder<I, O> parser;
 
-  final ParserBuilder<I, dynamic> parser3;
-
-  const Delimited(this.parser1, this.parser2, this.parser3);
+  const Delimited(this.before, this.parser, this.after);
 
   @override
-  Map<String, ParserBuilder> getBuilders() {
-    return {
-      'p1': parser1,
-      'p2': parser2,
-      'p3': parser3,
-    };
+  List<ParserBuilder<I, dynamic>> _getParsers() {
+    return [
+      before,
+      parser,
+      after,
+    ];
   }
 
   @override
-  Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['pos']);
+  bool _isVoidResult(int index) {
+    return index == 0 || index == 2;
   }
 
   @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName([parser1, parser2]);
+  void _setResults(Context context, CodeGen code, ParserResult result,
+      List<ParserResult> results) {
+    final r2 = results[1];
+    code.setResult(result, r2.name, false);
   }
 }

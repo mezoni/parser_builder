@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unnecessary_cast
 
 import 'package:source_span/source_span.dart';
 
@@ -21,38 +21,30 @@ num? parse(String s) {
   return r!;
 }
 
-bool? _ws(State<String> state) {
+void _ws(State<String> state) {
   final source = state.source;
-  bool? $0;
-  while (state.pos < source.length) {
-    final pos = state.pos;
-    final c = source.readRune(state);
-    final ok = c == 0x9 || c == 0xa || c == 0xd || c == 0x20;
-    if (ok) {
-      continue;
+  while (true) {
+    final $pos = state.pos;
+    int? $c;
+    state.ok = state.pos < source.length;
+    if (state.ok) {
+      $c = source.readRune(state);
+      state.ok = $c == 0x9 || $c == 0xa || $c == 0xd || $c == 0x20;
     }
-    state.pos = pos;
-    break;
+    if (!state.ok) {
+      state.pos = $pos;
+      break;
+    }
   }
   state.ok = true;
-  if (state.ok) {
-    $0 = true;
-  }
-  return $0;
 }
 
 num? number(State<String> state) {
   final source = state.source;
-  num? $0;
-  final $pos = state.pos;
-  bool? $1;
-  $1 = _ws(state);
-  if (state.ok) {
-    num? $2;
-    final $pos1 = state.pos;
-    num? $3;
+  num? $parseNumber() {
     state.ok = true;
-    final $pos2 = state.pos;
+    final pos1 = state.pos;
+    num? res;
     for (;;) {
       //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
       const eof = 0x110000;
@@ -244,7 +236,7 @@ num? number(State<String> state) {
         }
         if (expPartLen > 18) {
           state.pos = pos;
-          $3 = double.parse(source.substring($pos2, pos));
+          res = double.parse(source.substring(pos1, pos));
           break;
         }
         if (hasExpSign) {
@@ -254,7 +246,7 @@ num? number(State<String> state) {
       state.pos = pos;
       final singlePart = !hasDot && !hasExp;
       if (singlePart && intPartLen <= 18) {
-        $3 = hasSign ? -intValue : intValue;
+        res = hasSign ? -intValue : intValue;
         break;
       }
       if (singlePart && intPartLen == 19) {
@@ -262,7 +254,7 @@ num? number(State<String> state) {
           final digit = source.codeUnitAt(intPartPos + 18) - 0x30;
           if (digit <= 7) {
             intValue = intValue * 10 + digit;
-            $3 = hasSign ? -intValue : intValue;
+            res = hasSign ? -intValue : intValue;
             break;
           }
         }
@@ -274,7 +266,7 @@ num? number(State<String> state) {
       final modExp = exp < 0 ? -exp : exp;
       if (modExp > 22) {
         state.pos = pos;
-        $3 = double.parse(source.substring($pos2, pos));
+        res = double.parse(source.substring(pos1, pos));
         break;
       }
       final k = powersOfTen[modExp];
@@ -304,7 +296,7 @@ num? number(State<String> state) {
         }
         doubleValue += value;
       }
-      $3 = hasSign ? -doubleValue : doubleValue;
+      res = hasSign ? -doubleValue : doubleValue;
       break;
     }
     if (!state.ok) {
@@ -317,28 +309,31 @@ num? number(State<String> state) {
       } else {
         state.error = ErrUnexpected.eof(state.pos);
       }
-      state.pos = $pos2;
+      state.pos = pos1;
     }
+    return res;
+  }
+
+  num? $0;
+  final $pos = state.pos;
+  _ws(state);
+  if (state.ok) {
+    num? $2;
+    final $pos1 = state.pos;
+    num? $3;
+    $3 = $parseNumber() as num?;
     if (state.ok) {
-      bool? $4;
-      $4 = _ws(state);
+      _ws(state);
       if (state.ok) {
-        $2 = $3!;
-      }
-    }
-    if (!state.ok) {
-      state.pos = $pos1;
-    }
-    if (state.ok) {
-      bool? $5;
-      state.ok = state.pos >= state.source.length;
-      if (state.ok) {
-        $5 = true;
-      } else if (state.log) {
-        state.error = ErrExpected.eof(state.pos);
-      }
-      if (state.ok) {
-        $0 = $2!;
+        $2 = $3;
+        state.ok = state.pos >= state.source.length;
+        if (!state.ok) {
+          state.error = ErrExpected.eof(state.pos);
+        } else {
+          $0 = $2;
+        }
+      } else {
+        state.pos = $pos1;
       }
     }
   }

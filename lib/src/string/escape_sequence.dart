@@ -16,102 +16,98 @@ part of '../../string.dart';
 /// }));
 /// ```
 class EscapeSequence extends StringParserBuilder<int> {
-  static const _template16 = '''
-state.ok = false;
-if (state.pos < source.length) {
-  var c = source.codeUnitAt(state.pos);
-  int? v;
-  switch (c) {
-    {{cases}}
-  }
-  if (v != null) {
-    state.pos++;
-    state.ok = true;
-    {{res}} = v;
-  } else if (state.log) {
-    state.error = ErrUnexpected.charAt(state.pos, source);
-  }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
-}''';
-
-  static const _template32 = '''
-state.ok = false;
-if (state.pos < source.length) {
-  final pos = state.pos;
-  var c = source.readRune(state);
-  int? v;
-  switch (c) {
-    {{cases}}
-  }
-  if (v != null) {
-    state.ok = true;
-    {{res}} = v;
-  } else {
-    state.pos = pos;
-    if (state.log) {
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    }
-  }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
-}''';
-
-  static const _templateCase = '''
-case {{key}}:
-  v = {{val}};
-  break;''';
-
   final Map<int, int> table;
 
   const EscapeSequence(this.table);
 
   @override
-  Map<String, String> getTags(Context context) {
-    final cases = <String>[];
-    final sameValues =
-        table.entries.where((e) => e.key == e.value).map((e) => e.key);
-    if (sameValues.isNotEmpty) {
-      final sb = StringBuffer();
-      for (final value in sameValues) {
-        sb.write('case ');
-        sb.write(value);
-        sb.writeln(':');
-      }
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    context.refersToStateSource = true;
+    final isUnicode = table.keys.any((e) => e > 0xffff);
+    if (isUnicode) {
+      _build32(context, code, result, silent);
+    } else {
+      _build16(context, code, result, silent);
+    }
+  }
 
-      sb.writeln('v = c;');
-      sb.write('break;');
-      cases.add(sb.toString());
+  void _build16(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final c = context.allocateLocal('c');
+    code + 'int? $c;';
+    code.setState('state.pos < source.length');
+    code.setFailure();
+    code.if_('state.pos < source.length', (code) {
+      code + '$c = source.codeUnitAt(state.pos);';
+      code + 'int? v;';
+      code.switch_(c, (code) {
+        _buildCases(code, c);
+      });
+      code.if_('v != null', (code) {
+        code + 'state.pos++;';
+        code.setSuccess();
+        code.setResult(result, 'v');
+        code.labelSuccess(result);
+      });
+    });
+    code.ifFailure((code) {
+      code += silent
+          ? ''
+          : 'state.error =  $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.charAt(state.pos, source);';
+      code.labelFailure(result);
+    });
+  }
+
+  void _build32(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final c = context.allocateLocal('c');
+    final pos = context.allocateLocal('pos');
+    code + 'final $pos = state.pos;';
+    code + 'int? $c;';
+    code.setState('state.pos < source.length');
+    code.setFailure();
+    code.if_('state.pos < source.length', (code) {
+      code + '$c = source.readRune(state);';
+      code + 'int? v;';
+      code.switch_(c, (code) {
+        _buildCases(code, c);
+      });
+      code.if_('v != null', (code) {
+        code.setSuccess();
+        code.setResult(result, 'v');
+        code.labelSuccess(result);
+      });
+    });
+    code.ifFailure((code) {
+      code + 'state.pos = $pos;';
+      code += silent
+          ? ''
+          : 'state.error = $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char($c));';
+      code.labelFailure(result);
+    });
+  }
+
+  void _buildCases(SwitchCodeGen code, String c) {
+    final entries = table.entries;
+    final direct = entries.where((e) => e.key == e.value).map((e) => e.key);
+    if (direct.isNotEmpty) {
+      code.case_(direct, (code) {
+        code + 'v = $c;';
+        code.break$();
+      });
     }
 
-    final sameValuesSet = sameValues.toSet();
+    final exclude = direct.toSet();
     for (final key in table.keys) {
-      if (sameValuesSet.contains(key)) {
+      if (exclude.contains(key)) {
         continue;
       }
 
       final value = table[key]!;
-      final values = {
-        'key': key.toString(),
-        'val': value.toString(),
-      };
-      final case_ = render(_templateCase, values);
-      cases.add(case_);
+      code.case_([key], (code) {
+        code + 'v = $value;';
+        code.break$();
+      });
     }
-
-    return {
-      'cases': cases.join('\n'),
-    };
-  }
-
-  @override
-  String getTemplate(Context context) {
-    final has32BitChars = table.keys.any((e) => e > 0xffff);
-    return has32BitChars ? _template32 : _template16;
-  }
-
-  @override
-  String toString() {
-    return printName([table]);
   }
 }

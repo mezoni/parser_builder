@@ -1,33 +1,25 @@
 part of '../../parser_builder.dart';
 
 class Context {
-  final List<String> declarations = [];
+  final Map<Object, Object?> context = {};
 
-  final Set<Object> keys = {};
+  final List<String> globalDeclarations = [];
+
+  Allocator globalAllocator = Allocator('_\$');
+
+  Map<String, String> localDeclarations = {};
 
   Allocator localAllocator = Allocator('\$');
 
-  String? Function(ParserBuilder builder)? onEnter;
+  bool refersToStateSource = false;
 
-  String? Function(ParserBuilder builder, String resultVariable)? onLeave;
-
-  bool optimizeForSize = true;
-
-  String resultVariable = '';
-
-  bool refersToSourceVariable = false;
-
-  String allocateLocal([String name = '']) {
-    final result = localAllocator.allocate(name);
+  String allocateGlobal([String name = '']) {
+    final result = globalAllocator.allocate(name);
     return result;
   }
 
-  Map<String, String> allocateLocals(List<String> names) {
-    final result = <String, String>{};
-    for (final name in names) {
-      result[name] = allocateLocal(name);
-    }
-
+  String allocateLocal([String name = '']) {
+    final result = localAllocator.allocate(name);
     return result;
   }
 }

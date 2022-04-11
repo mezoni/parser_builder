@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:parser_builder/transformers.dart';
+import 'package:parser_builder/char_class.dart';
 
 void main(List<String> args) {
   final array1 = _createBitArray([31 - 1, 63 + 1]);

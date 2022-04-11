@@ -7,28 +7,18 @@ part of '../../character.dart';
 /// AnyChar()
 /// ```
 class AnyChar extends StringParserBuilder<int> {
-  static const _template = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
-  {{res}} = source.readRune(state);
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
-}''';
-
   const AnyChar();
 
   @override
-  Map<String, String> getTags(Context context) {
-    return context.allocateLocals(['pos']);
-  }
-
-  @override
-  String getTemplate(Context context) {
-    return _template;
-  }
-
-  @override
-  String toString() {
-    return printName(const []);
+  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+    context.refersToStateSource = true;
+    code.setState('state.pos < source.length');
+    code.ifSuccess((code) {
+      code.setResult(result, 'source.readRune(state)');
+      code.labelSuccess(result);
+    }, else_: ((code) {
+      code += silent ? '' : 'state.error = ErrUnexpected.eof(state.pos);';
+      code.labelFailure(result);
+    }));
   }
 }
