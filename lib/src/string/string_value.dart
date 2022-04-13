@@ -19,7 +19,9 @@ class StringValue extends StringParserBuilder<String> {
   const StringValue(this.normalChar, this.controlChar, this.escape);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final c = context.allocateLocal('c');
     final list = context.allocateLocal('list');
     final pos = context.allocateLocal('pos');
@@ -53,15 +55,16 @@ class StringValue extends StringParserBuilder<String> {
         code.break$();
       });
       code + 'state.pos += $size;';
-      final r1 = helper.build(context, code, escape, silent, false);
-      code.ifChildFailure(r1, (code) {
+      final result1 = helper.getResult(context, code, escape, false);
+      helper.build(context, code, escape, result1, silent, onFailure: (code) {
         code + 'state.pos = $pos;';
         code.break$();
       });
+
       code.if_("$list.isEmpty && $str != ''", (code) {
         code + '$list.add($str);';
       });
-      code + '$list.add(${r1.value});';
+      code + '$list.add(${result1.value});';
     });
     code.ifSuccess((code) {
       code.if_(
@@ -87,7 +90,8 @@ class StringValue extends StringParserBuilder<String> {
           });
         },
       );
-      code.labelSuccess(result);
+      code.labelSuccess(key);
     });
+    return key;
   }
 }

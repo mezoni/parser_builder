@@ -5,18 +5,62 @@ String addNullCheck<T>(String name) {
   return isNullable ? name : '$name!';
 }
 
-ParserResult build(Context context, CodeGen code, ParserBuilder parser,
-    bool silent, bool fast) {
-  final type = fast ? 'void' : parser.getResultType();
-  final name = context.allocateLocal();
-  final value = parser.getResultValue(name);
-  final result = ParserResult(name, type, value);
-  if (!fast) {
-    code + '$type $name;';
+BuidlResult build(Context context, CodeGen code, ParserBuilder parser,
+    ParserResult result, bool silent,
+    {void Function(CodeGen code)? onFailure,
+    void Function(CodeGen code)? onSuccess}) {
+  final statement = Statements(LinkedList<Statement>());
+  code + statement;
+  BuidlResult? key;
+  code.scope(statement.statements, (code) {
+    key = parser.build(context, code, result, silent);
+  });
+
+  var success = code.getLabelSuccess(key!);
+  var failure = code.getLabelFailure(key!);
+  final statements = statement.statements;
+  final isAlwaysSuccess = parser.isAlwaysSuccess();
+  if (isAlwaysSuccess) {
+    success = statements;
+    failure = null;
   }
 
-  parser.build(context, code, result, silent);
-  return result;
+  ConditionalStatement? handler;
+  ConditionalStatement getHandler() {
+    if (handler == null) {
+      handler = ConditionalStatement(
+          'state.ok', LinkedList<Statement>(), LinkedList<Statement>());
+      statements.add(handler!);
+    }
+
+    return handler!;
+  }
+
+  if (onSuccess != null) {
+    if (success == null) {
+      final handler = getHandler();
+      success = handler.ifBranch;
+      failure ??= handler.elseBranch;
+    }
+  }
+
+  if (onFailure != null) {
+    if (failure == null) {
+      final handler = getHandler();
+      failure = handler.elseBranch;
+      success ??= handler.ifBranch;
+    }
+  }
+
+  if (onSuccess != null) {
+    code.scope(success!, onSuccess);
+  }
+
+  if (onFailure != null) {
+    code.scope(failure!, onFailure);
+  }
+
+  return key!;
 }
 
 String escapeString(String text, [bool quote = true]) {
@@ -43,6 +87,42 @@ String getAsCode(value) {
   }
 
   throw StateError('Unsupported type: ${value.runtimeType}');
+}
+
+ParserResult getNotVoidResult(
+    Context context, CodeGen code, ParserBuilder parser, ParserResult result) {
+  if (!result.isVoid) {
+    return result;
+  }
+
+  result = getResult(context, code, parser, false);
+  return result;
+}
+
+ParserResult getResult(
+    Context context, CodeGen code, ParserBuilder parser, bool fast) {
+  final type = fast ? 'void' : parser.getResultType();
+  final name = context.allocateLocal();
+  final value = parser.getResultValue(name);
+  final valueUnsafe = parser.getResultValueUnsafe(name);
+  final result = ParserResult(name, type, value, valueUnsafe);
+  if (!fast) {
+    final name = result.name;
+    final type = result.type;
+    code + '$type $name;';
+  }
+
+  return result;
+}
+
+ParserResult getVoidResult(
+    Context context, CodeGen code, ParserBuilder parser, ParserResult result) {
+  if (result.isVoid) {
+    return result;
+  }
+
+  result = getResult(context, code, parser, true);
+  return result;
 }
 
 bool isNullableType<T>() {

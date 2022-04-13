@@ -1,8 +1,17 @@
 part of '../../multi.dart';
 
 class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
+  final int m;
+
+  final int n;
+
+  final ParserBuilder<I, O> parser;
+
+  const ManyMN(this.m, this.n, this.parser);
+
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     if (m < 0) {
       throw RangeError.value(m, 'm', 'Must be equal to or greater than 0');
     }
@@ -16,6 +25,7 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
+    final key = BuidlResult();
     final fast = result.isVoid;
     final count = context.allocateLocal('count');
     final pos = context.allocateLocal('pos');
@@ -24,31 +34,28 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
     code += fast ? '' : 'final $list = <$O>[];';
     code + 'var $count = 0;';
     code.while$('$count < $n', (code) {
-      final r1 =
-          helper.build(context, code, parser, silent ? true : m == 0, fast);
-      code.ifChildFailure(r1, (code) {
-        code.break$();
-      });
-      code.onChildSuccess(r1, (code) {
-        code += fast ? '' : '$list.add(${r1.value});';
+      final silent1 = silent ? true : m == 0;
+      final result1 = helper.getResult(context, code, parser, fast);
+      helper.build(context, code, parser, result1, silent1, onSuccess: (code) {
+        code += fast ? '' : '$list.add(${result1.valueUnsafe});';
         code + '$count++;';
+      }, onFailure: (code) {
+        code.break$();
       });
     });
     code.setState('$count >= $m');
     code.ifSuccess((code) {
       code.setResult(result, list);
-      code.labelSuccess(result);
+      code.labelSuccess(key);
     }, else_: (code) {
       code + 'state.pos = $pos;';
-      code.labelFailure(result);
+      code.labelFailure(key);
     });
+    return key;
   }
 
-  final int m;
-
-  final int n;
-
-  final ParserBuilder<I, O> parser;
-
-  const ManyMN(this.m, this.n, this.parser);
+  @override
+  bool isAlwaysSuccess() {
+    return m == 0;
+  }
 }

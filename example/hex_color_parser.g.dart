@@ -20,30 +20,31 @@ int? _hexPrimary(State<String> state) {
   final $pos1 = state.pos;
   var $count = 0;
   while ($count < 2) {
+    final $pos2 = state.pos;
     int? $c;
+    int? $4;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $c = source.codeUnitAt(state.pos);
+      $4 = source.codeUnitAt(state.pos++) as int?;
+      $c = $4!;
       state.ok = $c <= 102 &&
           ($c >= 48 && $c <= 57 ||
               $c >= 65 && $c <= 70 ||
               $c >= 97 && $c <= 102);
     }
-    if (state.ok) {
-      state.pos++;
-      $count++;
-    } else {
-      state.error = $c == null
-          ? ErrUnexpected.eof(state.pos)
-          : ErrUnexpected.charAt(state.pos, source);
+    if (!state.ok) {
+      state.pos = $pos2;
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
       break;
+    } else {
+      $count++;
     }
   }
   state.ok = $count >= 2;
   if (state.ok) {
     $1 = state.source.slice($pos, state.pos) as String?;
-    final v = $1!;
-    $0 = int.parse(v, radix: 16) as int?;
+    final $v = ($1 as String?)!;
+    $0 = int.parse($v, radix: 16) as int?;
   } else {
     state.pos = $pos1;
   }
@@ -68,10 +69,10 @@ Color? _hexColor(State<String> state) {
         int? $5;
         $5 = _hexPrimary(state);
         if (state.ok) {
-          final v1 = $3!;
-          final v2 = $4!;
-          final v3 = $5!;
-          $2 = Color(v1, v2, v3) as Color?;
+          final $v = ($3 as int?)!;
+          final $v1 = ($4 as int?)!;
+          final $v2 = ($5 as int?)!;
+          $2 = Color($v, $v1, $v2) as Color?;
           $0 = $2;
         }
       }

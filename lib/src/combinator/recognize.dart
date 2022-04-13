@@ -6,16 +6,24 @@ class Recognize<I> extends ParserBuilder<I, I> {
   const Recognize(this.parser);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final fast = result.isVoid;
     final pos = fast ? '' : context.allocateLocal('pos');
     code += fast ? '' : 'final $pos = state.pos;';
-    final r1 = helper.build(context, code, parser, silent, true);
-    code.ifChildSuccess(r1, (code) {
+    final result1 = helper.getResult(context, code, parser, true);
+    helper.build(context, code, parser, result1, silent, onSuccess: (code) {
       code.setResult(result, 'state.source.slice($pos, state.pos)');
-      code.labelSuccess(result);
-    }, else_: (code) {
-      code.labelFailure(result);
+      code.labelSuccess(key);
+    }, onFailure: (code) {
+      code.labelFailure(key);
     });
+    return key;
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return parser.isAlwaysSuccess();
   }
 }

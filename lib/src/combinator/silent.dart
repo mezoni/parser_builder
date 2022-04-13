@@ -6,7 +6,13 @@ class Silent<I, O> extends ParserBuilder<I, O> {
   const Silent(this.parser);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
-    parser.build(context, code, result, true);
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    return parser.build(context, code, result, true);
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return parser.isAlwaysSuccess();
   }
 }

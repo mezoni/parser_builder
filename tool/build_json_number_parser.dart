@@ -322,10 +322,13 @@ class Number extends StringParserBuilder<num> {
   const Number();
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     context.refersToStateSource = true;
+    final key = BuidlResult();
     final parseNumber = FuncAction<num?>([], _body);
     final action = parseNumber.build(context, 'parseNumber', []);
     code.setResult(result, action);
+    return key;
   }
 }

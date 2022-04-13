@@ -1,11 +1,13 @@
 import 'dart:collection';
 
+import 'package:parser_builder/parser_builder.dart';
+
 import 'statements.dart';
 
 class CodeGen {
   LinkedList<Statement> statements;
 
-  final Map<ParserResult, _Ending> _endings = {};
+  final Map<BuidlResult, _Ending> _endings = {};
 
   CodeGen(this.statements);
 
@@ -44,56 +46,27 @@ class CodeGen {
     this + ContinueStatement();
   }
 
+  LinkedList<Statement>? getLabelFailure(BuidlResult key) {
+    final ending = _getEnding(key);
+    return ending.failure;
+  }
+
+  LinkedList<Statement>? getLabelSuccess(BuidlResult key) {
+    final ending = _getEnding(key);
+    return ending.success;
+  }
+
   void if_(String condition, void Function(CodeGen code) if_,
       {void Function(CodeGen code)? else_}) {
     final ifBranch = LinkedList<Statement>();
     final elseBranch = LinkedList<Statement>();
     final statement = ConditionalStatement(condition, ifBranch, elseBranch);
-    final statements = this.statements;
-    this.statements = ifBranch;
-    // TODO
-    if_(this);
+    scope(ifBranch, if_);
     if (else_ != null) {
-      this.statements = elseBranch;
-      else_(this);
+      scope(elseBranch, else_);
     }
 
-    this.statements = statements;
     this + statement;
-  }
-
-  void ifChildFailure(ParserResult child, void Function(CodeGen code) if_,
-      {void Function(CodeGen code)? else_}) {
-    void if2(CodeGen code) {
-      code.onChildFailure(child, (code) {
-        if_(code);
-      });
-    }
-
-    void else2(CodeGen code) {
-      code.onChildSuccess(child, (code) {
-        else_!(code);
-      });
-    }
-
-    return this.if_('!state.ok', if2, else_: else_ == null ? null : else2);
-  }
-
-  void ifChildSuccess(ParserResult child, void Function(CodeGen code) if_,
-      {void Function(CodeGen code)? else_}) {
-    void if2(CodeGen code) {
-      code.onChildSuccess(child, (code) {
-        if_(code);
-      });
-    }
-
-    void else2(CodeGen code) {
-      code.onChildFailure(child, (code) {
-        else_!(code);
-      });
-    }
-
-    return this.if_('state.ok', if2, else_: else_ == null ? null : else2);
   }
 
   void ifFailure(void Function(CodeGen code) if_,
@@ -108,15 +81,12 @@ class CodeGen {
 
   void iteration(String definition, void Function(CodeGen code) f) {
     final statement = IterationStatement(definition, LinkedList());
-    final statements = this.statements;
-    this.statements = statement.statements;
-    f(this);
-    this.statements = statements;
+    scope(statement.statements, f);
     this + statement;
   }
 
-  void labelFailure(ParserResult result) {
-    final ending = _getEnding(result);
+  void labelFailure(BuidlResult key) {
+    final ending = _getEnding(key);
     if (ending.failure != null) {
       throw StateError('Failure label already defined');
     }
@@ -124,8 +94,8 @@ class CodeGen {
     ending.failure = statements;
   }
 
-  void labelSuccess(ParserResult result) {
-    final ending = _getEnding(result);
+  void labelSuccess(BuidlResult key) {
+    final ending = _getEnding(key);
     if (ending.success != null) {
       throw StateError('Success label already defined');
     }
@@ -137,30 +107,11 @@ class CodeGen {
     setState('!state.ok');
   }
 
-  void onChildFailure(ParserResult child, void Function(CodeGen code) f) {
-    final ending = _getEnding(child);
-    final failure = ending.failure;
-    if (failure != null) {
-      final statements = this.statements;
-      this.statements = failure;
-      f(this);
-      this.statements = statements;
-    } else {
-      f(this);
-    }
-  }
-
-  void onChildSuccess(ParserResult child, void Function(CodeGen code) f) {
-    final ending = _getEnding(child);
-    final success = ending.success;
-    if (success != null) {
-      final statements = this.statements;
-      this.statements = success;
-      f(this);
-      this.statements = statements;
-    } else {
-      f(this);
-    }
+  void scope(LinkedList<Statement> statements, void Function(CodeGen code) f) {
+    final statements_ = this.statements;
+    this.statements = statements;
+    f(this);
+    this.statements = statements_;
   }
 
   void setFailure() {
@@ -216,11 +167,11 @@ class CodeGen {
     return false;
   }
 
-  _Ending _getEnding(ParserResult result) {
-    var endings = _endings[result];
+  _Ending _getEnding(BuidlResult key) {
+    var endings = _endings[key];
     if (endings == null) {
       endings = _Ending();
-      _endings[result] = endings;
+      _endings[key] = endings;
     }
 
     return endings;
@@ -234,14 +185,12 @@ class ParserResult {
 
   final String value;
 
-  const ParserResult(this.name, this.type, this.value);
+  final String valueUnsafe;
+
+  const ParserResult(this.name, this.type, this.value, this.valueUnsafe);
 
   bool get isVoid {
     return type.trim() == 'void';
-  }
-
-  ParserResult empty() {
-    return ParserResult('', '', '');
   }
 }
 

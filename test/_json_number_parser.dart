@@ -26,9 +26,11 @@ void _ws(State<String> state) {
   while (true) {
     final $pos = state.pos;
     int? $c;
+    int? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $c = source.readRune(state);
+      $2 = source.readRune(state) as int?;
+      $c = $2!;
       state.ok = $c == 0x9 || $c == 0xa || $c == 0xd || $c == 0x20;
     }
     if (!state.ok) {
@@ -317,24 +319,17 @@ num? number(State<String> state) {
   num? $0;
   final $pos = state.pos;
   _ws(state);
+  num? $2;
+  num? $3;
+  $3 = $parseNumber() as num?;
   if (state.ok) {
-    num? $2;
-    final $pos1 = state.pos;
-    num? $3;
-    $3 = $parseNumber() as num?;
-    if (state.ok) {
-      _ws(state);
-      if (state.ok) {
-        $2 = $3;
-        state.ok = state.pos >= state.source.length;
-        if (!state.ok) {
-          state.error = ErrExpected.eof(state.pos);
-        } else {
-          $0 = $2;
-        }
-      } else {
-        state.pos = $pos1;
-      }
+    _ws(state);
+    $2 = $3;
+    state.ok = state.pos >= state.source.length;
+    if (!state.ok) {
+      state.error = ErrExpected.eof(state.pos);
+    } else {
+      $0 = $2;
     }
   }
   if (!state.ok) {

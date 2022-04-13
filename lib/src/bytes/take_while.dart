@@ -7,14 +7,14 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhile(CharClass('[#x21-#x7e]'))
 /// ```
-class TakeWhile extends StringParserBuilder<String> {
+class TakeWhile extends Redirect<String, String> {
   final SemanticAction<bool> predicate;
 
   const TakeWhile(this.predicate);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  ParserBuilder<String, String> getRedirectParser() {
     final parser = Recognize(Many0(Satisfy(predicate)));
-    parser.build(context, code, result, silent);
+    return parser;
   }
 }

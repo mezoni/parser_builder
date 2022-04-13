@@ -8,16 +8,25 @@ class Map1<I, O1, O> extends ParserBuilder<I, O> {
   const Map1(this.parser, this.map);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final fast = result.isVoid;
-    final map = fast ? '' : this.map.build(context, 'map', ['v']);
-    final r1 = helper.build(context, code, parser, silent, fast);
-    code.ifChildSuccess(r1, (code) {
-      code += fast ? '' : 'final v = ${r1.value};';
+    final v = fast ? '' : context.allocateLocal('v');
+    final map = fast ? '' : this.map.build(context, 'map', [v]);
+    final result1 = helper.getResult(context, code, parser, fast);
+    helper.build(context, code, parser, result1, silent, onSuccess: (code) {
+      code += fast ? '' : 'final $v = ${result1.value};';
       code.setResult(result, map);
-      code.labelSuccess(result);
-    }, else_: (code) {
-      code.labelFailure(result);
+      code.labelSuccess(key);
+    }, onFailure: (code) {
+      code.labelFailure(key);
     });
+    return key;
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return parser.isAlwaysSuccess();
   }
 }

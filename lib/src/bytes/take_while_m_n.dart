@@ -7,7 +7,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhileMN(4, 4, CharClass('[0-9] | [a-f] | [A-F]'))
 /// ```
-class TakeWhileMN extends StringParserBuilder<String> {
+class TakeWhileMN extends Redirect<String, String> {
   final int m;
 
   final int n;
@@ -17,8 +17,15 @@ class TakeWhileMN extends StringParserBuilder<String> {
   const TakeWhileMN(this.m, this.n, this.predicate);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     final parser = Recognize(ManyMN(m, n, Satisfy(predicate)));
-    parser.build(context, code, result, silent);
+    return parser.build(context, code, result, silent);
+  }
+
+  @override
+  ParserBuilder<String, String> getRedirectParser() {
+    final parser = Recognize(ManyMN(m, n, Satisfy(predicate)));
+    return parser;
   }
 }

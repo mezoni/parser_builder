@@ -6,8 +6,14 @@ class Opt<I, O> extends ParserBuilder<I, O?> {
   const Opt(this.parser);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
-    Silent<I, O?>(Alt2(parser, Value(null)))
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    return Silent<I, O?>(Alt2(parser, Value(null)))
         .build(context, code, result, silent);
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return true;
   }
 }

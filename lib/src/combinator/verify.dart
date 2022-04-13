@@ -10,24 +10,27 @@ class Verify<I, O> extends ParserBuilder<I, O> {
   const Verify(this.message, this.parser, this.verify);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final message = helper.escapeString(this.message);
     final pos = context.allocateLocal('pos');
-    final verify = this.verify.build(context, 'verify', ['v']);
+    final v = context.allocateLocal('v');
+    final verify = this.verify.build(context, 'verify', [v]);
     code + 'final $pos = state.pos;';
-    final r1 = helper.build(context, code, parser, silent, false);
-    code.ifChildSuccess(r1, (code) {
-      code + 'final v = ${r1.value};';
+    final result1 = helper.getNotVoidResult(context, code, parser, result);
+    helper.build(context, code, parser, result1, silent, onSuccess: (code) {
+      code + 'final $v = ${result1.value};';
       code.setState(verify);
-      code.ifSuccess((code) {
-        code.setResult(result, r1.name);
-        code.labelSuccess(result);
-      }, else_: (code) {
+      code.ifFailure((code) {
         code += silent
             ? ''
             : 'state.error = ErrMessage($pos, state.pos - $pos, $message);';
         code += silent ? '' : 'state.error.failure = state.pos;';
+      }, else_: (code) {
+        code.labelSuccess(key);
       });
     });
+    return key;
   }
 }

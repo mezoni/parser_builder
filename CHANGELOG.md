@@ -1,3 +1,7 @@
+## 0.16.1
+
+- The improvement of code generation in the new version is almost completed
+
 ## 0.16.0
 
 - Breaking change: Everything is implemented almost from scratch. Now code generation is done with the code generator

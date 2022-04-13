@@ -79,16 +79,18 @@ class Printer extends Visitor<void> {
     final cast = node.cast;
     final name = node.name;
     final value = node.value;
-    sink.write(name);
-    sink.write(' = ');
-    sink.write(value);
-    if (cast) {
-      final type = node.type;
-      sink.write(' as ');
-      sink.write(type);
-    }
+    if (value.trim() != 'null') {
+      sink.write(name);
+      sink.write(' = ');
+      sink.write(value);
+      if (cast) {
+        final type = node.type;
+        sink.write(' as ');
+        sink.write(type);
+      }
 
-    sink.write(';');
+      sink.write(';');
+    }
   }
 
   @override
@@ -103,6 +105,20 @@ class Printer extends Visitor<void> {
     sink.write('state.ok = ');
     sink.write(value);
     sink.write(';');
+  }
+
+  @override
+  void visitStatements(Statements node) {
+    final statements = node.statements;
+    var first = true;
+    for (final statement in statements) {
+      if (!first) {
+        first = false;
+        sink.writeln();
+      }
+
+      statement.accept(this);
+    }
   }
 
   @override

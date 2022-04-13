@@ -13,14 +13,15 @@ class Tags extends _Tags<String> {
   const Tags(this.tags);
 
   @override
-  void _onDone(CodeGen code, ParserResult result, bool silent, String pos) {
+  void _onDone(CodeGen code, ParserResult result, bool silent, BuidlResult key,
+      String pos) {
     final errors = tags
         .map((e) =>
             'ErrExpected.tag($pos, const Tag(${helper.escapeString(e)}))')
         .join(', ');
     code.ifFailure((code) {
       code += silent ? '' : 'state.error = ErrCombined($pos, [$errors]);';
-      code.labelFailure(result);
+      code.labelFailure(key);
     });
   }
 

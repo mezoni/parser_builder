@@ -7,15 +7,15 @@ part of '../../character.dart';
 /// ```dart
 /// NoneOf([0x22, 0x27])
 /// ```
-class NoneOf extends StringParserBuilder<int> {
+class NoneOf extends Redirect<String, int> {
   final List<int> characters;
 
   const NoneOf(this.characters);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  ParserBuilder<String, int> getRedirectParser() {
     final predicate = NotCharClass.fromList(characters);
     final parser = Satisfy(predicate);
-    parser.build(context, code, result, silent);
+    return parser;
   }
 }

@@ -6,7 +6,10 @@ class Ref<I, O> extends ParserBuilder<I, O> {
   const Ref(this.name);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     code.callParse(name, result);
+    return key;
   }
 }

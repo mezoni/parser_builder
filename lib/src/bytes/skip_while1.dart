@@ -7,14 +7,14 @@ part of '../../bytes.dart';
 /// ```dart
 /// SkipWhile1(CharClass('[#x30-#x39]'), unicode: false)
 /// ```
-class SkipWhile1 extends StringParserBuilder<void> {
+class SkipWhile1 extends Redirect<String, void> {
   final SemanticAction<bool> predicate;
 
   const SkipWhile1(this.predicate);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  ParserBuilder<String, void> getRedirectParser() {
     final parser = Fast(Many1(Satisfy(predicate)));
-    parser.build(context, code, result, silent);
+    return parser;
   }
 }

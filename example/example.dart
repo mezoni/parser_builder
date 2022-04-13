@@ -17,15 +17,17 @@ dynamic parse(String source) {
 void _ws(State<String> state) {
   final source = state.source;
   while (true) {
+    final $pos = state.pos;
     int? $c;
+    int? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $c = source.codeUnitAt(state.pos);
+      $2 = source.codeUnitAt(state.pos++) as int?;
+      $c = $2!;
       state.ok = $c <= 32 && ($c >= 9 && $c <= 10 || $c == 13 || $c == 32);
     }
-    if (state.ok) {
-      state.pos++;
-    } else {
+    if (!state.ok) {
+      state.pos = $pos;
       break;
     }
   }
@@ -36,16 +38,14 @@ dynamic _json(State<String> state) {
   dynamic $0;
   final $pos = state.pos;
   _ws(state);
+  dynamic $2;
+  $2 = _value(state);
   if (state.ok) {
-    dynamic $2;
-    $2 = _value(state);
-    if (state.ok) {
-      state.ok = state.pos >= state.source.length;
-      if (!state.ok) {
-        state.error = ErrExpected.eof(state.pos);
-      } else {
-        $0 = $2;
-      }
+    state.ok = state.pos >= state.source.length;
+    if (!state.ok) {
+      state.error = ErrExpected.eof(state.pos);
+    } else {
+      $0 = $2;
     }
   }
   if (!state.ok) {
@@ -59,41 +59,39 @@ int? _escapeHex(State<String> state) {
   final source = state.source;
   int? $0;
   final $pos = state.pos;
-  String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 117;
   if (state.ok) {
     state.pos += 1;
-    $1 = 'u' as String?;
     String? $2;
     final $pos1 = state.pos;
     final $pos2 = state.pos;
     var $count = 0;
     while ($count < 4) {
+      final $pos3 = state.pos;
       int? $c;
+      int? $5;
       state.ok = state.pos < source.length;
       if (state.ok) {
-        $c = source.codeUnitAt(state.pos);
+        $5 = source.codeUnitAt(state.pos++) as int?;
+        $c = $5!;
         state.ok = $c <= 102 &&
             ($c >= 48 && $c <= 57 ||
                 $c >= 65 && $c <= 70 ||
                 $c >= 97 && $c <= 102);
       }
-      if (state.ok) {
-        state.pos++;
-        $count++;
-      } else {
-        state.error = $c == null
-            ? ErrUnexpected.eof(state.pos)
-            : ErrUnexpected.charAt(state.pos, source);
+      if (!state.ok) {
+        state.pos = $pos3;
+        state.error = ErrUnexpected.charOrEof(state.pos, source);
         break;
+      } else {
+        $count++;
       }
     }
     state.ok = $count >= 4;
     if (state.ok) {
       $2 = state.source.slice($pos1, state.pos) as String?;
-      final v1 = $1!;
-      final v2 = $2!;
-      $0 = _toHexValue(v2) as int?;
+      final $v = ($2 as String?)!;
+      $0 = _toHexValue($v) as int?;
     } else {
       state.pos = $pos2;
       state.pos = $pos;
@@ -107,40 +105,38 @@ int? _escapeHex(State<String> state) {
 int? _escaped(State<String> state) {
   final source = state.source;
   int? $0;
-  int? $1;
   int? $c;
   state.ok = state.pos < source.length;
   state.ok = false;
   if (state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
-    int? v;
+    int? $v;
     switch ($c) {
       case 34:
       case 47:
       case 92:
-        v = $c;
+        $v = $c;
         break;
       case 98:
-        v = 8;
+        $v = 8;
         break;
       case 102:
-        v = 12;
+        $v = 12;
         break;
       case 110:
-        v = 10;
+        $v = 10;
         break;
       case 114:
-        v = 13;
+        $v = 13;
         break;
       case 116:
-        v = 9;
+        $v = 9;
         break;
     }
-    if (v != null) {
+    if ($v != null) {
       state.pos++;
       state.ok = true;
-      $1 = v as int?;
-      $0 = $1;
+      $0 = $v as int?;
     }
   }
   if (!state.ok) {
@@ -148,11 +144,8 @@ int? _escaped(State<String> state) {
         ? ErrUnexpected.eof(state.pos)
         : ErrUnexpected.charAt(state.pos, source);
     final $error = state.error;
-    int? $2;
-    $2 = _escapeHex(state);
-    if (state.ok) {
-      $0 = $2;
-    } else {
+    $0 = _escapeHex(state);
+    if (!state.ok) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -162,14 +155,10 @@ int? _escaped(State<String> state) {
 @pragma('vm:prefer-inline')
 void _quote(State<String> state) {
   final source = state.source;
-  final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
   if (state.ok) {
     state.pos += 1;
     _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('"'));
   }
@@ -179,12 +168,11 @@ String? _string(State<String> state) {
   final source = state.source;
   String? $0;
   final $pos = state.pos;
-  String? $1;
   final $pos1 = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
   if (state.ok) {
     state.pos += 1;
-    String? $3;
+    String? $2;
     state.ok = true;
     final $pos2 = state.pos;
     final $list = [];
@@ -210,8 +198,8 @@ String? _string(State<String> state) {
         break;
       }
       state.pos += 1;
-      int? $4;
-      $4 = _escaped(state);
+      int? $3;
+      $3 = _escaped(state);
       if (!state.ok) {
         state.pos = $pos2;
         break;
@@ -219,15 +207,15 @@ String? _string(State<String> state) {
       if ($list.isEmpty && $str != '') {
         $list.add($str);
       }
-      $list.add($4!);
+      $list.add(($3 as int?)!);
     }
     if (state.ok) {
       if ($list.isEmpty) {
-        $3 = $str as String?;
+        $2 = $str as String?;
       } else {
         if ($list.length == 1) {
           final c = $list[0] as int;
-          $3 = String.fromCharCode(c) as String?;
+          $2 = String.fromCharCode(c) as String?;
         } else {
           final buffer = StringBuffer();
           for (var i = 0; i < $list.length; i++) {
@@ -238,13 +226,12 @@ String? _string(State<String> state) {
               buffer.write(obj);
             }
           }
-          $3 = buffer.toString() as String?;
+          $2 = buffer.toString() as String?;
         }
       }
       _quote(state);
       if (state.ok) {
-        $1 = $3;
-        $0 = $1;
+        $0 = $2;
       }
     }
   } else {
@@ -535,11 +522,8 @@ num? _number(State<String> state) {
 
   num? $0;
   final $pos = state.pos;
-  num? $1;
-  $1 = $parseNumber() as num?;
-  if (state.ok) {
-    $0 = $1;
-  } else {
+  $0 = $parseNumber() as num?;
+  if (!state.ok) {
     state.error =
         ErrNested($pos, 'Malformed number', const Tag('number'), state.error);
   }
@@ -549,14 +533,10 @@ num? _number(State<String> state) {
 @pragma('vm:prefer-inline')
 void _openBracket(State<String> state) {
   final source = state.source;
-  final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
   if (state.ok) {
     state.pos += 1;
     _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('['));
   }
@@ -565,14 +545,10 @@ void _openBracket(State<String> state) {
 @pragma('vm:prefer-inline')
 void _comma(State<String> state) {
   final source = state.source;
-  final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
   if (state.ok) {
     state.pos += 1;
     _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
   }
 }
 
@@ -580,14 +556,15 @@ List<dynamic>? _values(State<String> state) {
   List<dynamic>? $0;
   var $pos = state.pos;
   final $list = <dynamic>[];
-  for (;;) {
+  while (true) {
     dynamic $1;
     $1 = _value(state);
-    if (!state.ok) {
+    if (state.ok) {
+      $list.add($1);
+    } else {
       state.pos = $pos;
       break;
     }
-    $list.add($1);
     $pos = state.pos;
     _comma(state);
     if (!state.ok) {
@@ -602,14 +579,10 @@ List<dynamic>? _values(State<String> state) {
 @pragma('vm:prefer-inline')
 void _closeBracket(State<String> state) {
   final source = state.source;
-  final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
   if (state.ok) {
     state.pos += 1;
     _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag(']'));
   }
@@ -622,11 +595,9 @@ List<dynamic>? _array(State<String> state) {
   if (state.ok) {
     List<dynamic>? $2;
     $2 = _values(state);
+    _closeBracket(state);
     if (state.ok) {
-      _closeBracket(state);
-      if (state.ok) {
-        $0 = $2;
-      }
+      $0 = $2;
     }
   }
   if (!state.ok) {
@@ -638,14 +609,10 @@ List<dynamic>? _array(State<String> state) {
 @pragma('vm:prefer-inline')
 void _openBrace(State<String> state) {
   final source = state.source;
-  final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
   if (state.ok) {
     state.pos += 1;
     _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('{'));
   }
@@ -654,14 +621,10 @@ void _openBrace(State<String> state) {
 @pragma('vm:prefer-inline')
 void _colon(State<String> state) {
   final source = state.source;
-  final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
   if (state.ok) {
     state.pos += 1;
     _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
   }
 }
 
@@ -676,9 +639,9 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
       dynamic $3;
       $3 = _value(state);
       if (state.ok) {
-        final v1 = $1!;
-        final v3 = $3;
-        $0 = MapEntry(v1, v3) as MapEntry<String, dynamic>?;
+        final $v = ($1 as String?)!;
+        final $v1 = $3;
+        $0 = MapEntry($v, $v1) as MapEntry<String, dynamic>?;
       }
     }
   }
@@ -692,14 +655,15 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
   List<MapEntry<String, dynamic>>? $0;
   var $pos = state.pos;
   final $list = <MapEntry<String, dynamic>>[];
-  for (;;) {
+  while (true) {
     MapEntry<String, dynamic>? $1;
     $1 = _keyValue(state);
-    if (!state.ok) {
+    if (state.ok) {
+      $list.add($1!);
+    } else {
       state.pos = $pos;
       break;
     }
-    $list.add($1!);
     $pos = state.pos;
     _comma(state);
     if (!state.ok) {
@@ -714,14 +678,10 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
 @pragma('vm:prefer-inline')
 void _closeBrace(State<String> state) {
   final source = state.source;
-  final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
   if (state.ok) {
     state.pos += 1;
     _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('}'));
   }
@@ -734,12 +694,10 @@ dynamic _object(State<String> state) {
   if (state.ok) {
     List<MapEntry<String, dynamic>>? $2;
     $2 = _keyValues(state);
+    _closeBrace(state);
     if (state.ok) {
-      _closeBrace(state);
-      if (state.ok) {
-        final v2 = $2!;
-        $0 = Map.fromEntries(v2) as dynamic;
-      }
+      final $v = ($2 as List<MapEntry<String, dynamic>>?)!;
+      $0 = Map.fromEntries($v) as dynamic;
     }
   }
   if (!state.ok) {
@@ -794,49 +752,27 @@ dynamic _null(State<String> state) {
 
 dynamic _value(State<String> state) {
   dynamic $0;
-  final $pos = state.pos;
   dynamic $1;
-  String? $2;
-  $2 = _string(state);
-  if (state.ok) {
-    $1 = $2;
-  } else {
+  $1 = _string(state);
+  if (!state.ok) {
     final $error = state.error;
-    num? $3;
-    $3 = _number(state);
-    if (state.ok) {
-      $1 = $3;
-    } else {
+    $1 = _number(state);
+    if (!state.ok) {
       final $error1 = state.error;
-      List<dynamic>? $4;
-      $4 = _array(state);
-      if (state.ok) {
-        $1 = $4;
-      } else {
+      $1 = _array(state);
+      if (!state.ok) {
         final $error2 = state.error;
-        dynamic $5;
-        $5 = _object(state);
-        if (state.ok) {
-          $1 = $5;
-        } else {
+        $1 = _object(state);
+        if (!state.ok) {
           final $error3 = state.error;
-          bool? $6;
-          $6 = _false(state);
-          if (state.ok) {
-            $1 = $6;
-          } else {
+          $1 = _false(state);
+          if (!state.ok) {
             final $error4 = state.error;
-            bool? $7;
-            $7 = _true(state);
-            if (state.ok) {
-              $1 = $7;
-            } else {
+            $1 = _true(state);
+            if (!state.ok) {
               final $error5 = state.error;
-              dynamic $8;
-              $8 = _null(state);
-              if (state.ok) {
-                $1 = $8;
-              } else {
+              $1 = _null(state);
+              if (!state.ok) {
                 state.error = ErrCombined(state.pos, [
                   $error,
                   $error1,
@@ -855,11 +791,7 @@ dynamic _value(State<String> state) {
   }
   if (state.ok) {
     _ws(state);
-    if (state.ok) {
-      $0 = $1;
-    } else {
-      state.pos = $pos;
-    }
+    $0 = $1;
   }
   return $0;
 }

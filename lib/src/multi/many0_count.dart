@@ -6,21 +6,32 @@ class Many0Count<I> extends ParserBuilder<I, int> {
   const Many0Count(this.parser);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    if (parser.isAlwaysSuccess()) {
+      throw StateError('Using a parser that always succeeds is not valid');
+    }
+
+    final key = BuidlResult();
     final fast = result.isVoid;
     final count = fast ? '' : context.allocateLocal('count');
     code += fast ? '' : 'var $count = 0;';
     code.while$('true', (code) {
-      final r1 = helper.build(context, code, parser, true, true);
-      code.ifChildFailure(r1, (code) {
-        code.break$();
-      });
-      code.onChildSuccess(r1, (code) {
+      final result1 = helper.getResult(context, code, parser, true);
+      helper.build(context, code, parser, result1, true, onSuccess: (code) {
         code += fast ? '' : '$count++;';
+      }, onFailure: (code) {
+        code.break$();
       });
     });
     code.setSuccess();
     code.setResult(result, count);
-    code.labelSuccess(result);
+    code.labelSuccess(key);
+    return key;
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return true;
   }
 }

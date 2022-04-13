@@ -2,8 +2,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:parser_builder/codegen/code_optimizer.dart';
-
 import 'codegen/code_gen.dart';
 import 'codegen/statements.dart';
 import 'parser_builder.dart';
@@ -21,7 +19,8 @@ Future<void> fastBuild(Context context, List<Named> builders, String filename,
     final name = '\$0';
     final type = builder.getResultType();
     final value = builder.getResultValue(name);
-    final result = ParserResult(name, type, value);
+    final valueUnsafe = builder.getResultValueUnsafe(name);
+    final result = ParserResult(name, type, value, valueUnsafe);
     builder.build(context, code, result, false);
   }
 

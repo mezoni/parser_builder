@@ -66,8 +66,8 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
 const _escapeHex = Named(
     '_escapeHex',
-    Map2(Tag('u'), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
-        ExprAction<int>(['_', 's'], '_toHexValue({{s}})')),
+    Map2(Fast(Tag('u')), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
+        ExprAction<int>(['s'], '_toHexValue({{s}})')),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({

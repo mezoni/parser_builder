@@ -1,13 +1,7 @@
 part of '../../character.dart';
 
-/// Parses any single character and returns that character.
-///
-/// Example:
-/// ```dart
-/// AnyChar()
-/// ```
-class AnyChar extends StringParserBuilder<int> {
-  const AnyChar();
+class CodeUnit extends StringParserBuilder<int> {
+  const CodeUnit();
 
   @override
   BuidlResult build(
@@ -16,7 +10,7 @@ class AnyChar extends StringParserBuilder<int> {
     final key = BuidlResult();
     code.setState('state.pos < source.length');
     code.ifSuccess((code) {
-      code.setResult(result, 'source.readRune(state)');
+      code.setResult(result, 'source.codeUnitAt(state.pos++)');
       code.labelSuccess(key);
     }, else_: ((code) {
       code += silent ? '' : 'state.error = ErrUnexpected.eof(state.pos);';

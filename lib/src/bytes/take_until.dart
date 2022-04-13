@@ -7,13 +7,14 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeUntil('{{')
 /// ```
-class TakeUntil extends StringParserBuilder<String> {
+class TakeUntil extends Redirect<String, String> {
   final String tag;
 
   const TakeUntil(this.tag);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
-    Recognize(MoveTo(FindTag(tag))).build(context, code, result, silent);
+  ParserBuilder<String, String> getRedirectParser() {
+    final parser = Recognize(Fast(MoveTo(FindTag(tag))));
+    return parser;
   }
 }

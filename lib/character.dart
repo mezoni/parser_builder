@@ -1,7 +1,10 @@
+import 'package:parser_builder/combinator.dart';
+
 import 'builder_helper.dart' as helper;
 import 'bytes.dart';
 import 'char_class.dart';
 import 'codegen/code_gen.dart';
+import 'error.dart';
 import 'parser_builder.dart';
 
 part 'src/character/alpha0.dart';
@@ -11,6 +14,7 @@ part 'src/character/alphanumeric1.dart';
 part 'src/character/any_char.dart';
 part 'src/character/char.dart';
 part 'src/character/character.dart';
+part 'src/character/code_unit.dart';
 part 'src/character/digit0.dart';
 part 'src/character/digit1.dart';
 part 'src/character/hex_digit0.dart';

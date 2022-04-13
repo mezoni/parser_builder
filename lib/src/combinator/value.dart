@@ -8,30 +8,41 @@ class Value<I, O> extends ParserBuilder<I, O> {
   const Value(this.value, [this.parser]);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     if (parser != null) {
-      _buildWithParser(context, code, result, silent);
+      return _buildWithParser(context, code, result, silent);
     } else {
-      _build(context, code, result, silent);
+      return _build(context, code, result, silent);
     }
   }
 
-  void _build(Context context, CodeGen code, ParserResult result, bool silent) {
+  @override
+  bool isAlwaysSuccess() {
+    return parser == null ? true : parser!.isAlwaysSuccess();
+  }
+
+  BuidlResult _build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final v = helper.getAsCode(value);
     code.setSuccess();
     code.setResult(result, v);
-    code.labelSuccess(result);
+    code.labelSuccess(key);
+    return key;
   }
 
-  void _buildWithParser(
+  BuidlResult _buildWithParser(
       Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final v = helper.getAsCode(value);
-    final r1 = helper.build(context, code, parser!, silent, true);
-    code.ifChildSuccess(r1, (code) {
+    final result1 = helper.getResult(context, code, parser!, true);
+    helper.build(context, code, parser!, result1, silent, onSuccess: (code) {
       code.setResult(result, v);
-      code.labelSuccess(result);
-    }, else_: (code) {
-      code.labelFailure(result);
+      code.labelSuccess(key);
+    }, onFailure: (code) {
+      code.labelFailure(key);
     });
+    return key;
   }
 }

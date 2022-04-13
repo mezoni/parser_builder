@@ -13,10 +13,12 @@ class TakeUntil1 extends StringParserBuilder<String> {
   const TakeUntil1(this.tag);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
-    final tag = helper.escapeString(this.tag, false);
-    Recognize(MoveTo(Verify('Expected at least one character before \'$tag\'',
-            FindTag(this.tag), ExprAction(['index'], '{{index}} > state.pos'))))
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final tag = helper.escapeString(this.tag);
+    final message = 'Expected at least one character before $tag';
+    final verify = ExprAction<bool>(['index'], '{{index}} > state.pos');
+    return Recognize(MoveTo(Verify(message, FindTag(this.tag), verify)))
         .build(context, code, result, silent);
   }
 }

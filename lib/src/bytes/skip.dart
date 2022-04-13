@@ -16,21 +16,24 @@ class Skip<O> extends StringParserBuilder<O> {
   const Skip(this.count, this.value);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     if (count < 1) {
       throw StateError('Count must be not less than 1: $count');
     }
 
     context.refersToStateSource = true;
+    final key = BuidlResult();
     final value = this.value.build(context, 'value', []);
     code.setState('state.pos + $count <= source.length');
     code.ifSuccess((code) {
       code + 'state.pos += $count;';
       code.setResult(result, value);
-      code.labelSuccess(result);
+      code.labelSuccess(key);
     }, else_: (code) {
       code += silent ? '' : 'state.error = ErrUnexpected.eof(source.length);';
-      code.labelFailure(result);
+      code.labelFailure(key);
     });
+    return key;
   }
 }

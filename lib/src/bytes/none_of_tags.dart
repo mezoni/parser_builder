@@ -13,11 +13,6 @@ class NoneOfTags extends _Tags<void> {
   const NoneOfTags(this.tags);
 
   @override
-  void _onDone(CodeGen code, ParserResult result, bool silent, String pos) {
-    //
-  }
-
-  @override
   void _onInit(CodeGen code) {
     code.setSuccess();
   }

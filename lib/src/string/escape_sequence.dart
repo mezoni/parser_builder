@@ -21,46 +21,52 @@ class EscapeSequence extends StringParserBuilder<int> {
   const EscapeSequence(this.table);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     context.refersToStateSource = true;
     final isUnicode = table.keys.any((e) => e > 0xffff);
     if (isUnicode) {
-      _build32(context, code, result, silent);
+      return _build32(context, code, result, silent);
     } else {
-      _build16(context, code, result, silent);
+      return _build16(context, code, result, silent);
     }
   }
 
-  void _build16(
+  BuidlResult _build16(
       Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final c = context.allocateLocal('c');
+    final v = context.allocateLocal('v');
     code + 'int? $c;';
     code.setState('state.pos < source.length');
     code.setFailure();
     code.if_('state.pos < source.length', (code) {
       code + '$c = source.codeUnitAt(state.pos);';
-      code + 'int? v;';
+      code + 'int? $v;';
       code.switch_(c, (code) {
-        _buildCases(code, c);
+        _buildCases(code, c, v);
       });
-      code.if_('v != null', (code) {
+      code.if_('$v != null', (code) {
         code + 'state.pos++;';
         code.setSuccess();
-        code.setResult(result, 'v');
-        code.labelSuccess(result);
+        code.setResult(result, v);
+        code.labelSuccess(key);
       });
     });
     code.ifFailure((code) {
       code += silent
           ? ''
           : 'state.error =  $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.charAt(state.pos, source);';
-      code.labelFailure(result);
+      code.labelFailure(key);
     });
+    return key;
   }
 
-  void _build32(
+  BuidlResult _build32(
       Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final c = context.allocateLocal('c');
+    final v = context.allocateLocal('v');
     final pos = context.allocateLocal('pos');
     code + 'final $pos = state.pos;';
     code + 'int? $c;';
@@ -68,14 +74,14 @@ class EscapeSequence extends StringParserBuilder<int> {
     code.setFailure();
     code.if_('state.pos < source.length', (code) {
       code + '$c = source.readRune(state);';
-      code + 'int? v;';
+      code + 'int? $v;';
       code.switch_(c, (code) {
-        _buildCases(code, c);
+        _buildCases(code, c, v);
       });
-      code.if_('v != null', (code) {
+      code.if_('$v != null', (code) {
         code.setSuccess();
-        code.setResult(result, 'v');
-        code.labelSuccess(result);
+        code.setResult(result, v);
+        code.labelSuccess(key);
       });
     });
     code.ifFailure((code) {
@@ -83,16 +89,17 @@ class EscapeSequence extends StringParserBuilder<int> {
       code += silent
           ? ''
           : 'state.error = $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char($c));';
-      code.labelFailure(result);
+      code.labelFailure(key);
     });
+    return key;
   }
 
-  void _buildCases(SwitchCodeGen code, String c) {
+  void _buildCases(SwitchCodeGen code, String c, String v) {
     final entries = table.entries;
     final direct = entries.where((e) => e.key == e.value).map((e) => e.key);
     if (direct.isNotEmpty) {
       code.case_(direct, (code) {
-        code + 'v = $c;';
+        code + '$v = $c;';
         code.break$();
       });
     }
@@ -105,7 +112,7 @@ class EscapeSequence extends StringParserBuilder<int> {
 
       final value = table[key]!;
       code.case_([key], (code) {
-        code + 'v = $value;';
+        code + '$v = $value;';
         code.break$();
       });
     }

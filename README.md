@@ -2,7 +2,7 @@
 
 Lightweight parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.16.0
+Version: 0.16.1
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -257,10 +257,10 @@ Color? _hexColor(State<String> state) {
         int? $5;
         $5 = _hexPrimary(state);
         if (state.ok) {
-          final v1 = $3!;
-          final v2 = $4!;
-          final v3 = $5!;
-          $2 = Color(v1, v2, v3) as Color?;
+          final $v = ($3 as int?)!;
+          final $v1 = ($4 as int?)!;
+          final $v2 = ($5 as int?)!;
+          $2 = Color($v, $v1, $v2) as Color?;
           $0 = $2;
         }
       }
@@ -311,16 +311,14 @@ dynamic _json(State<String> state) {
   dynamic $0;
   final $pos = state.pos;
   _ws(state);
+  dynamic $2;
+  $2 = _value(state);
   if (state.ok) {
-    dynamic $2;
-    $2 = _value(state);
-    if (state.ok) {
-      state.ok = state.pos >= state.source.length;
-      if (!state.ok) {
-        state.error = ErrExpected.eof(state.pos);
-      } else {
-        $0 = $2;
-      }
+    state.ok = state.pos >= state.source.length;
+    if (!state.ok) {
+      state.error = ErrExpected.eof(state.pos);
+    } else {
+      $0 = $2;
     }
   }
   if (!state.ok) {
@@ -385,22 +383,33 @@ class Many0<I, O> extends ParserBuilder<I, List<O>> {
   const Many0(this.parser);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    if (parser.isAlwaysSuccess()) {
+      throw StateError('Using a parser that always succeeds is not valid');
+    }
+
+    final key = BuidlResult();
     final fast = result.isVoid;
     final list = fast ? '' : context.allocateLocal('list');
     code += fast ? '' : 'final $list = <$O>[];';
     code.while$('true', (code) {
-      final r1 = helper.build(context, code, parser, true, fast);
-      code.ifChildFailure(r1, (code) {
+      final result1 = helper.getResult(context, code, parser, fast);
+      helper.build(context, code, parser, result1, true, onSuccess: (code) {
+        code += fast ? '' : '$list.add(${result1.valueUnsafe});';
+      }, onFailure: (code) {
         code.break$();
-      });
-      code.onChildSuccess(r1, (code) {
-        code += fast ? '' : '$list.add(${r1.value});';
       });
     });
     code.setSuccess();
     code.setResult(result, list);
-    code.labelSuccess(result);
+    code.labelSuccess(key);
+    return key;
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return true;
   }
 }
 

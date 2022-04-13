@@ -6,20 +6,23 @@ class TagOf extends StringParserBuilder<String> {
   const TagOf(this.tag);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     context.refersToStateSource = true;
-    final r1 = helper.build(context, code, tag, silent, false);
-    code.ifChildSuccess(r1, (code) {
-      code + 'final tag = ${r1.value};';
+    final key = BuidlResult();
+    final result1 = helper.getResult(context, code, tag, false);
+    helper.build(context, code, tag, result1, silent, onSuccess: (code) {
+      code + 'final tag = ${result1.value};';
       code.setState('source.startsWith(tag, state.pos)');
       code.ifSuccess((code) {
         code + 'state.pos += tag.length;';
         code.setResult(result, 'tag');
-        code.labelSuccess(result);
+        code.labelSuccess(key);
       }, else_: (code) {
         code +=
             silent ? '' : 'state.error = ErrExpected.tag(state.pos, Tag(tag));';
       });
     });
+    return key;
   }
 }

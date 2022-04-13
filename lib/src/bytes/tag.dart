@@ -12,11 +12,13 @@ class Tag extends StringParserBuilder<String> {
   const Tag(this.tag);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     if (this.tag.isEmpty) {
       throw ArgumentError.value(this.tag, 'tag', 'The tag must not be empty');
     }
 
+    final key = BuidlResult();
     context.refersToStateSource = true;
     final cc = this.tag.codeUnitAt(0).toString();
     final tag = helper.escapeString(this.tag);
@@ -41,12 +43,14 @@ class Tag extends StringParserBuilder<String> {
     code.ifSuccess((code) {
       code + 'state.pos += $length;';
       code.setResult(result, tag);
-      code.labelSuccess(result);
+      code.labelSuccess(key);
     }, else_: (code) {
       code += silent
           ? ''
           : 'state.error = ErrExpected.tag(state.pos, const Tag($tag));';
-      code.labelFailure(result);
+      code.labelFailure(key);
     });
+
+    return key;
   }
 }

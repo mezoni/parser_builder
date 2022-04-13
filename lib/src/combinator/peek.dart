@@ -6,17 +6,22 @@ class Peek<I, O> extends ParserBuilder<I, O> {
   const Peek(this.parser);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
-    final fast = result.isVoid;
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final pos = context.allocateLocal('pos');
     code + 'final $pos = state.pos;';
-    final r1 = helper.build(context, code, parser, silent, fast);
-    code.ifChildSuccess(r1, (code) {
+    helper.build(context, code, parser, result, silent, onSuccess: (code) {
       code + 'state.pos = $pos;';
-      code.setResult(result, r1.name, false);
-      code.labelSuccess(result);
-    }, else_: (code) {
-      code.labelFailure(result);
+      code.labelSuccess(key);
+    }, onFailure: (code) {
+      code.labelFailure(key);
     });
+    return key;
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return parser.isAlwaysSuccess();
   }
 }

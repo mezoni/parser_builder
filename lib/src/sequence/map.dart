@@ -180,11 +180,10 @@ abstract class _Map<I, O> extends _Sequence<I, O> {
       List<ParserResult> results) {
     final arguments = <String>[];
     for (var i = 0; i < results.length; i++) {
-      final result = results[i];
-      if (!result.isVoid) {
-        final r = results[i];
-        final v = 'v${i + 1}';
-        code + 'final $v = ${r.value};';
+      final result1 = results[i];
+      if (!result1.isVoid) {
+        final v = context.allocateLocal('v');
+        code + 'final $v = ${result1.value};';
         arguments.add(v);
       }
     }

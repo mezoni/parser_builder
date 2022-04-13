@@ -10,7 +10,9 @@ class Named<I, O> extends ParserBuilder<I, O> {
   const Named(this.name, this.parser, [this.annotaions = const []]);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     if (!context.context.containsKey(this)) {
       context.context[this] = null;
       _buildDeclaration(context, silent);
@@ -22,6 +24,13 @@ class Named<I, O> extends ParserBuilder<I, O> {
     } else {
       code.setResult(result, '$name(state)', false);
     }
+
+    return key;
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return parser.isAlwaysSuccess();
   }
 
   void _buildDeclaration(Context context, bool silent) {
@@ -34,7 +43,8 @@ class Named<I, O> extends ParserBuilder<I, O> {
     final statements = LinkedList<Statement>();
     final code = CodeGen(statements);
     final fast = parser.getResultType() == 'void';
-    final r1 = helper.build(context, code, parser, silent, fast);
+    final result = helper.getResult(context, code, parser, fast);
+    helper.build(context, code, parser, result, silent);
     final codeOptimizer = CodeOptimizer();
     codeOptimizer.optimize(statements);
     final buffer = StringBuffer();
@@ -42,7 +52,7 @@ class Named<I, O> extends ParserBuilder<I, O> {
       buffer.writeln(annotaions.join('\n'));
     }
 
-    buffer.write(r1.type);
+    buffer.write(result.type);
     buffer.write(' ');
     buffer.write(name);
     buffer.write('(State<');
@@ -61,9 +71,9 @@ class Named<I, O> extends ParserBuilder<I, O> {
       buffer.writeln();
     }
 
-    if (!r1.isVoid) {
+    if (!result.isVoid) {
       buffer.write('return ');
-      buffer.write(r1.name);
+      buffer.write(result.name);
       buffer.write(';');
     }
 

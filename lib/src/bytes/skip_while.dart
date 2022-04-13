@@ -6,14 +6,14 @@ part of '../../bytes.dart';
 /// ```dart
 /// SkipWhile(CharClass('#x9 | #xA | #xD | #x20'))
 /// ```
-class SkipWhile extends StringParserBuilder<void> {
+class SkipWhile extends Redirect<String, void> {
   final SemanticAction<bool> predicate;
 
   const SkipWhile(this.predicate);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  ParserBuilder<String, void> getRedirectParser() {
     final parser = Fast(Many0(Satisfy(predicate)));
-    parser.build(context, code, result, silent);
+    return parser;
   }
 }

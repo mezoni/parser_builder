@@ -20,9 +20,11 @@ void _ws(State<String> state) {
   while (true) {
     final $pos = state.pos;
     int? $c;
+    int? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $c = source.readRune(state);
+      $2 = source.readRune(state) as int?;
+      $c = $2!;
       state.ok = $c == 0x09 || $c == 0xA || $c == 0xD || $c == 0x20;
     }
     if (!state.ok) {
@@ -42,28 +44,28 @@ int? _hexVal(State<String> state) {
   while (true) {
     final $pos1 = state.pos;
     int? $c;
+    int? $4;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $c = source.readRune(state);
+      $4 = source.readRune(state) as int?;
+      $c = $4!;
       state.ok = $c >= 0x30 && $c <= 0x39 ||
           $c >= 0x41 && $c <= 0x46 ||
           $c >= 0x61 && $c <= 0x66;
     }
-    if (state.ok) {
-      $ok = true;
-    } else {
+    if (!state.ok) {
       state.pos = $pos1;
-      state.error = $c == null
-          ? ErrUnexpected.eof(state.pos)
-          : ErrUnexpected.char(state.pos, Char($c));
+      state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
       break;
+    } else {
+      $ok = true;
     }
   }
   state.ok = $ok;
   if (state.ok) {
     $1 = state.source.slice($pos, state.pos) as String?;
-    final v = $1!;
-    $0 = _toHexValue(v) as int?;
+    final $v = ($1 as String?)!;
+    $0 = _toHexValue($v) as int?;
   }
   return $0;
 }
@@ -118,20 +120,22 @@ int? _rangeChar(State<String> state) {
     int? $3;
     final $pos3 = state.pos;
     int? $c;
+    int? $4;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $c = source.readRune(state);
+      $4 = source.readRune(state) as int?;
+      $c = ($4 as int?)!;
       state.ok = $c >= 0x20 && $c < 0x7f;
+      if (state.ok) {
+        $3 = $4;
+      }
     }
-    if (state.ok) {
-      $3 = $c as int?;
-      $0 = $3;
-    } else {
+    if (!state.ok) {
       state.pos = $pos3;
-      state.error = $c == null
-          ? ErrUnexpected.eof(state.pos)
-          : ErrUnexpected.char(state.pos, Char($c));
+      state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
       state.pos = $pos;
+    } else {
+      $0 = $3;
     }
   }
   return $0;
@@ -139,17 +143,11 @@ int? _rangeChar(State<String> state) {
 
 int? _hexOrRangeChar(State<String> state) {
   int? $0;
-  int? $1;
-  $1 = _hex(state);
-  if (state.ok) {
-    $0 = $1;
-  } else {
+  $0 = _hex(state);
+  if (!state.ok) {
     final $error = state.error;
-    int? $2;
-    $2 = _rangeChar(state);
-    if (state.ok) {
-      $0 = $2;
-    } else {
+    $0 = _rangeChar(state);
+    if (!state.ok) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
@@ -159,19 +157,17 @@ int? _hexOrRangeChar(State<String> state) {
 Tuple2<int, int>? _rangeBody(State<String> state) {
   final source = state.source;
   Tuple2<int, int>? $0;
-  Tuple2<int, int>? $1;
   final $pos = state.pos;
-  int? $2;
-  $2 = _hexOrRangeChar(state);
+  int? $1;
+  $1 = _hexOrRangeChar(state);
   if (state.ok) {
     state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 45;
     if (state.ok) {
       state.pos += 1;
-      int? $4;
-      $4 = _hexOrRangeChar(state);
+      int? $3;
+      $3 = _hexOrRangeChar(state);
       if (state.ok) {
-        $1 = Tuple2($2!, $4!) as Tuple2<int, int>?;
-        $0 = $1;
+        $0 = Tuple2(($1 as int?)!, ($3 as int?)!) as Tuple2<int, int>?;
       }
     } else {
       state.error = ErrExpected.tag(state.pos, const Tag('-'));
@@ -180,22 +176,18 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
   if (!state.ok) {
     state.pos = $pos;
     final $error = state.error;
-    Tuple2<int, int>? $5;
-    int? $6;
-    $6 = _hex(state);
+    int? $4;
+    $4 = _hex(state);
     if (state.ok) {
-      final v = $6!;
-      $5 = Tuple2(v, v) as Tuple2<int, int>?;
-      $0 = $5;
+      final $v = ($4 as int?)!;
+      $0 = Tuple2($v, $v) as Tuple2<int, int>?;
     } else {
       final $error1 = state.error;
-      Tuple2<int, int>? $7;
-      int? $8;
-      $8 = _rangeChar(state);
+      int? $5;
+      $5 = _rangeChar(state);
       if (state.ok) {
-        final v = $8!;
-        $7 = Tuple2(v, v) as Tuple2<int, int>?;
-        $0 = $7;
+        final $v1 = ($5 as int?)!;
+        $0 = Tuple2($v1, $v1) as Tuple2<int, int>?;
       } else {
         state.error = ErrCombined(state.pos, [$error, $error1, state.error]);
       }
@@ -209,18 +201,19 @@ int? _charCode(State<String> state) {
   int? $0;
   final $pos = state.pos;
   int? $c;
+  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $c = source.readRune(state);
+    $1 = source.readRune(state) as int?;
+    $c = ($1 as int?)!;
     state.ok = $c >= 0x20 && $c < 0x7f;
+    if (state.ok) {
+      $0 = $1;
+    }
   }
-  if (state.ok) {
-    $0 = $c as int?;
-  } else {
+  if (!state.ok) {
     state.pos = $pos;
-    state.error = $c == null
-        ? ErrUnexpected.eof(state.pos)
-        : ErrUnexpected.char(state.pos, Char($c));
+    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
   }
   return $0;
 }
@@ -256,30 +249,29 @@ int? _char(State<String> state) {
 List<Tuple2<int, int>>? _range(State<String> state) {
   final source = state.source;
   List<Tuple2<int, int>>? $0;
-  List<Tuple2<int, int>>? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
   if (state.ok) {
     state.pos += 1;
-    List<Tuple2<int, int>>? $3;
+    List<Tuple2<int, int>>? $2;
     final $list = <Tuple2<int, int>>[];
     while (true) {
-      Tuple2<int, int>? $4;
-      $4 = _rangeBody(state);
-      if (!state.ok) {
+      Tuple2<int, int>? $3;
+      $3 = _rangeBody(state);
+      if (state.ok) {
+        $list.add($3!);
+      } else {
         break;
       }
-      $list.add($4!);
     }
     state.ok = $list.isNotEmpty;
     if (state.ok) {
-      $3 = $list as List<Tuple2<int, int>>?;
+      $2 = $list as List<Tuple2<int, int>>?;
       state.ok =
           state.pos < source.length && source.codeUnitAt(state.pos) == 93;
       if (state.ok) {
         state.pos += 1;
-        $1 = $3;
-        $0 = $1;
+        $0 = $2;
       } else {
         state.error = ErrExpected.tag(state.pos, const Tag(']'));
       }
@@ -290,27 +282,19 @@ List<Tuple2<int, int>>? _range(State<String> state) {
   if (!state.ok) {
     state.pos = $pos;
     final $error = state.error;
-    List<Tuple2<int, int>>? $6;
-    int? $7;
-    int? $8;
-    $8 = _char(state);
-    if (state.ok) {
-      $7 = $8;
-    } else {
+    int? $5;
+    $5 = _char(state);
+    if (!state.ok) {
       final $error1 = state.error;
-      int? $9;
-      $9 = _hex(state);
-      if (state.ok) {
-        $7 = $9;
-      } else {
+      $5 = _hex(state);
+      if (!state.ok) {
         state.error = ErrCombined(state.pos, [$error1, state.error]);
         state.error = ErrCombined(state.pos, [$error, state.error]);
       }
     }
     if (state.ok) {
-      final v = $7!;
-      $6 = [Tuple2(v, v)] as List<Tuple2<int, int>>?;
-      $0 = $6;
+      final $v = ($5 as int?)!;
+      $0 = [Tuple2($v, $v)] as List<Tuple2<int, int>>?;
     }
   }
   return $0;
@@ -319,20 +303,13 @@ List<Tuple2<int, int>>? _range(State<String> state) {
 String? _verbar(State<String> state) {
   final source = state.source;
   String? $0;
-  final $pos = state.pos;
   String? $1;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 124;
   if (state.ok) {
     state.pos += 1;
     $1 = '|' as String?;
     _ws(state);
-    if (state.ok) {
-      $0 = $1;
-    } else {
-      state.pos = $pos;
-    }
-  } else {
-    state.error = ErrExpected.tag(state.pos, const Tag('|'));
+    $0 = $1;
   }
   return $0;
 }
@@ -342,19 +319,14 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   List<List<Tuple2<int, int>>>? $1;
   var $pos = state.pos;
   final $list = <List<Tuple2<int, int>>>[];
-  for (;;) {
+  while (true) {
     List<Tuple2<int, int>>? $2;
-    final $pos1 = state.pos;
     List<Tuple2<int, int>>? $3;
     $3 = _range(state);
     if (state.ok) {
       _ws(state);
-      if (state.ok) {
-        $2 = $3;
-        $list.add($2!);
-      } else {
-        state.pos = $pos1;
-      }
+      $2 = $3;
+      $list.add($2!);
     }
     if (!state.ok) {
       state.pos = $pos;
@@ -369,8 +341,8 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $1 = $list as List<List<Tuple2<int, int>>>?;
-    final v = $1!;
-    $0 = _flatten(v, <Tuple2<int, int>>[]) as List<Tuple2<int, int>>?;
+    final $v = ($1 as List<List<Tuple2<int, int>>>?)!;
+    $0 = _flatten($v, <Tuple2<int, int>>[]) as List<Tuple2<int, int>>?;
   }
   return $0;
 }
@@ -379,16 +351,14 @@ List<Tuple2<int, int>>? parse(State<String> state) {
   List<Tuple2<int, int>>? $0;
   final $pos = state.pos;
   _ws(state);
+  List<Tuple2<int, int>>? $2;
+  $2 = _ranges(state);
   if (state.ok) {
-    List<Tuple2<int, int>>? $2;
-    $2 = _ranges(state);
-    if (state.ok) {
-      state.ok = state.pos >= state.source.length;
-      if (!state.ok) {
-        state.error = ErrExpected.eof(state.pos);
-      } else {
-        $0 = $2;
-      }
+    state.ok = state.pos >= state.source.length;
+    if (!state.ok) {
+      state.error = ErrExpected.eof(state.pos);
+    } else {
+      $0 = $2;
     }
   }
   if (!state.ok) {

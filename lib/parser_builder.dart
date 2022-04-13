@@ -10,6 +10,7 @@ part 'src/parser_builder/allocator.dart';
 part 'src/parser_builder/context.dart';
 part 'src/parser_builder/named.dart';
 part 'src/parser_builder/parser_builder.dart';
+part 'src/parser_builder/redirect.dart';
 part 'src/parser_builder/ref.dart';
 part 'src/parser_builder/runtime.dart';
 part 'src/parser_builder/semantic_action.dart';

@@ -6,8 +6,10 @@ abstract class _Tags<O> extends StringParserBuilder<O> {
   List<String> get tags;
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     context.refersToStateSource = true;
+    final key = BuidlResult();
     final map = _generateMap();
     final pos = context.allocateLocal('pos');
     _onInit(code);
@@ -21,7 +23,8 @@ abstract class _Tags<O> extends StringParserBuilder<O> {
       });
     });
 
-    _onDone(code, result, silent, pos);
+    _onDone(code, result, silent, key, pos);
+    return key;
   }
 
   void _buildCase(SwitchCodeGen code, ParserResult result, bool silent, int c,
@@ -58,9 +61,14 @@ abstract class _Tags<O> extends StringParserBuilder<O> {
     return result;
   }
 
-  void _onDone(CodeGen code, ParserResult result, bool silent, String pos);
+  void _onDone(CodeGen code, ParserResult result, bool silent, BuidlResult key,
+      String pos) {
+    //
+  }
 
-  void _onInit(CodeGen code);
+  void _onInit(CodeGen code) {
+    //
+  }
 
   void _onTag(
       CodeGen code, ParserResult result, bool silent, String pos, String tag);

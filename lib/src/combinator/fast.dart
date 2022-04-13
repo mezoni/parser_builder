@@ -6,7 +6,14 @@ class Fast<I> extends ParserBuilder<I, void> {
   const Fast(this.parser);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
-    helper.build(context, code, parser, silent, true);
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final result1 = helper.getVoidResult(context, code, parser, result);
+    return helper.build(context, code, parser, result1, silent);
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return parser.isAlwaysSuccess();
   }
 }

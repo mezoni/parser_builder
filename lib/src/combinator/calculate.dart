@@ -6,12 +6,20 @@ class Calculate<I, O> extends ParserBuilder<I, O> {
   const Calculate(this.calculate);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
+    final key = BuidlResult();
     final calculate = this.calculate.build(context, 'calculate', []);
     final v = context.allocateLocal('v');
     code + 'final $v = $calculate;';
     code.setSuccess();
     code.setResult(result, v);
-    code.labelSuccess(result);
+    code.labelSuccess(key);
+    return key;
+  }
+
+  @override
+  bool isAlwaysSuccess() {
+    return true;
   }
 }

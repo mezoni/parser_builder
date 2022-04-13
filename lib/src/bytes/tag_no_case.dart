@@ -15,8 +15,10 @@ class TagNoCase extends StringParserBuilder<String> {
   const TagNoCase(this.tag, this.convert);
 
   @override
-  void build(Context context, CodeGen code, ParserResult result, bool silent) {
+  BuidlResult build(
+      Context context, CodeGen code, ParserResult result, bool silent) {
     context.refersToStateSource = true;
+    final key = BuidlResult();
     final length = this.tag.length;
     final tag = helper.escapeString(this.tag);
     final convert = this.convert.build(context, 'convert', ['v1']);
@@ -28,14 +30,16 @@ class TagNoCase extends StringParserBuilder<String> {
         code + 'state.pos += $length;';
         code.setSuccess();
         code.setResult(result, 'v1');
-        code.labelSuccess(result);
+        code.labelSuccess(key);
       });
     });
     code.ifFailure((code) {
       code += silent
           ? ''
           : 'state.error = ErrExpected.tag(state.pos, const Tag($tag));';
-      code.labelFailure(result);
+      code.labelFailure(key);
     });
+
+    return key;
   }
 }

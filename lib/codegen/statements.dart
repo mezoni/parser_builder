@@ -3,10 +3,6 @@ import 'dart:collection';
 import 'printer.dart';
 import 'visitors.dart';
 
-abstract class BreakableStatement extends Statement {
-  //
-}
-
 class BreakStatement extends Statement {
   @override
   T accept<T>(Visitor<T> visitor) {
@@ -80,7 +76,7 @@ class ContinueStatement extends Statement {
   }
 }
 
-class IterationStatement extends BreakableStatement {
+class IterationStatement extends Statement {
   final String definition;
 
   final LinkedList<Statement> statements;
@@ -155,7 +151,25 @@ abstract class Statement extends LinkedListEntry<Statement> {
   }
 }
 
-class SwitchStatement extends BreakableStatement {
+class Statements extends Statement {
+  final LinkedList<Statement> statements;
+
+  Statements(this.statements);
+
+  @override
+  T accept<T>(Visitor<T> visitor) {
+    return visitor.visitStatements(this);
+  }
+
+  @override
+  void visitChildren(Visitor visitor) {
+    for (var statement in statements) {
+      statement.accept(visitor);
+    }
+  }
+}
+
+class SwitchStatement extends Statement {
   final List<CaseStatement> cases;
 
   final LinkedList<Statement> default_;
