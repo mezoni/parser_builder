@@ -9,6 +9,30 @@ BuidlResult build(Context context, CodeGen code, ParserBuilder parser,
     ParserResult result, bool silent,
     {void Function(CodeGen code)? onFailure,
     void Function(CodeGen code)? onSuccess}) {
+  if (context.diagnose) {
+    if (parser is Named) {
+      final mode = <String>[];
+      if (silent) {
+        mode.add('silent');
+      }
+
+      final fast = result.isVoid;
+      final type = parser.getResultType();
+      if (fast && type != 'void') {
+        mode.add('fast');
+      }
+
+      if (mode.isNotEmpty) {
+        final buffer = StringBuffer();
+        buffer.write('Named parser ');
+        buffer.write(parser.name);
+        buffer.write(': called as ');
+        buffer.write(mode.join(', '));
+        print(buffer);
+      }
+    }
+  }
+
   final statement = Statements(LinkedList<Statement>());
   code + statement;
   BuidlResult? key;

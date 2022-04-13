@@ -8,6 +8,7 @@ import 'codegen/statements.dart';
 
 part 'src/parser_builder/allocator.dart';
 part 'src/parser_builder/context.dart';
+part 'src/parser_builder/marked.dart';
 part 'src/parser_builder/named.dart';
 part 'src/parser_builder/parser_builder.dart';
 part 'src/parser_builder/redirect.dart';

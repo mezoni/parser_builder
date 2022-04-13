@@ -44,7 +44,7 @@ class Named<I, O> extends ParserBuilder<I, O> {
     final code = CodeGen(statements);
     final fast = parser.getResultType() == 'void';
     final result = helper.getResult(context, code, parser, fast);
-    helper.build(context, code, parser, result, silent);
+    helper.build(context, code, parser, result, false);
     final codeOptimizer = CodeOptimizer();
     codeOptimizer.optimize(statements);
     final buffer = StringBuffer();

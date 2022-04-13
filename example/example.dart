@@ -542,17 +542,8 @@ void _openBracket(State<String> state) {
   }
 }
 
-@pragma('vm:prefer-inline')
-void _comma(State<String> state) {
-  final source = state.source;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
-  if (state.ok) {
-    state.pos += 1;
-    _ws(state);
-  }
-}
-
 List<dynamic>? _values(State<String> state) {
+  final source = state.source;
   List<dynamic>? $0;
   var $pos = state.pos;
   final $list = <dynamic>[];
@@ -566,8 +557,11 @@ List<dynamic>? _values(State<String> state) {
       break;
     }
     $pos = state.pos;
-    _comma(state);
-    if (!state.ok) {
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
+    if (state.ok) {
+      state.pos += 1;
+      _ws(state);
+    } else {
       break;
     }
   }
@@ -618,31 +612,26 @@ void _openBrace(State<String> state) {
   }
 }
 
-@pragma('vm:prefer-inline')
-void _colon(State<String> state) {
-  final source = state.source;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
-  if (state.ok) {
-    state.pos += 1;
-    _ws(state);
-  }
-}
-
 MapEntry<String, dynamic>? _keyValue(State<String> state) {
+  final source = state.source;
   MapEntry<String, dynamic>? $0;
   final $pos = state.pos;
   String? $1;
   $1 = _string(state);
   if (state.ok) {
-    _colon(state);
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
     if (state.ok) {
-      dynamic $3;
-      $3 = _value(state);
+      state.pos += 1;
+      _ws(state);
+      dynamic $5;
+      $5 = _value(state);
       if (state.ok) {
         final $v = ($1 as String?)!;
-        final $v1 = $3;
+        final $v1 = $5;
         $0 = MapEntry($v, $v1) as MapEntry<String, dynamic>?;
       }
+    } else {
+      state.error = ErrExpected.tag(state.pos, const Tag(':'));
     }
   }
   if (!state.ok) {
@@ -652,6 +641,7 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
 }
 
 List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
+  final source = state.source;
   List<MapEntry<String, dynamic>>? $0;
   var $pos = state.pos;
   final $list = <MapEntry<String, dynamic>>[];
@@ -665,8 +655,11 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
       break;
     }
     $pos = state.pos;
-    _comma(state);
-    if (!state.ok) {
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
+    if (state.ok) {
+      state.pos += 1;
+      _ws(state);
+    } else {
       break;
     }
   }

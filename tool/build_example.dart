@@ -13,6 +13,7 @@ import 'build_json_number_parser.dart' as _json_number;
 
 Future<void> main(List<String> args) async {
   final context = Context();
+  context.diagnose = true;
   await fastBuild(context, [_json, _value_], 'example/example.dart',
       footer: __footer, header: __header, publish: {'parse': _json});
 }
@@ -56,9 +57,9 @@ const _closeBrace =
 const _closeBracket =
     Named('_closeBracket', Fast(Terminated(Tag(']'), _ws)), [_inline]);
 
-const _colon = Named('_colon', Fast(Terminated(Tag(':'), _ws)), [_inline]);
+const _colon = Fast(Terminated(Tag(':'), _ws));
 
-const _comma = Named('_comma', Fast(Terminated(Tag(','), _ws)), [_inline]);
+const _comma = Terminated(Tag(','), _ws);
 
 const _eof = Eof<String>();
 

@@ -3,6 +3,8 @@ part of '../../parser_builder.dart';
 class Context {
   final Map<Object, Object?> context = {};
 
+  bool diagnose = false;
+
   final List<String> globalDeclarations = [];
 
   Allocator globalAllocator = Allocator('_\$');
