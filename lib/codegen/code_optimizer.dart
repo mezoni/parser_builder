@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:parser_builder/codegen/data_flow_analyzer.dart';
+
 import 'statements.dart';
 import 'visitors.dart';
 
@@ -7,6 +9,8 @@ class CodeOptimizer {
   void optimize(LinkedList<Statement> statements) {
     while (true) {
       var hasModifications = false;
+      final dataFlowAnalyzer = DataFlowAnalyzer();
+      final points = dataFlowAnalyzer.analyze(statements, {});
       final emptyConditiotalRemover = _EmptyConditiotalRemover();
       if (emptyConditiotalRemover.remove(statements)) {
         hasModifications = true;

@@ -19,31 +19,23 @@ class StringValue extends StringParserBuilder<String> {
   const StringValue(this.normalChar, this.controlChar, this.escape);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
-    final c = context.allocateLocal('c');
-    final list = context.allocateLocal('list');
-    final pos = context.allocateLocal('pos');
+  void build(Context context, CodeGen code) {
     final size = controlChar > 0xffff ? 2 : 1;
-    final start = context.allocateLocal('start');
-    final str = context.allocateLocal('str');
-    final normalChar = this.normalChar.build(context, 'normalChar', [c]);
     code.setSuccess();
-    code + 'final $pos = state.pos;';
-    code + 'final $list = [];';
-    code + "var $str = '';";
+    final pos = code.savePos();
+    final list = code.val('list', '[]');
+    final str = code.local('var', 'str', '\'\'');
     code.while$('state.pos < source.length', (code) {
-      code + 'final $start = state.pos;';
-      code + 'var $c = 0;';
+      final start = code.val('start', 'state.pos');
+      final c = code.local('var', 'c', '0');
       code.while$('state.pos < source.length', (code) {
-        code + 'final pos = state.pos;';
-        code + '$c = source.readRune(state);';
-        code + 'final ok = $normalChar;';
-        code.if_('ok', (code) {
+        final pos = code.val('pos', 'state.pos');
+        code.assign(c, 'source.readRune(state)');
+        final ok = code.val('ok', normalChar.build(context, 'normalChar', [c]));
+        code.if_(ok, (code) {
           code.continue$();
         });
-        code + 'state.pos = pos;';
+        code.setPos(pos);
         code.break$();
       });
       code +
@@ -54,44 +46,38 @@ class StringValue extends StringParserBuilder<String> {
       code.if_('$c != $controlChar', (code) {
         code.break$();
       });
-      code + 'state.pos += $size;';
-      final result1 = helper.getResult(context, code, escape, false);
-      helper.build(context, code, escape, result1, silent, onFailure: (code) {
-        code + 'state.pos = $pos;';
+      code.addToPos(size);
+      final result = helper.build(context, code, escape, fast: false);
+      code.ifSuccess((code) {
+        code.if_("$list.isEmpty && $str != ''", (code) {
+          code + '$list.add($str);';
+        });
+        code + '$list.add(${result.value});';
+      }, else_: (code) {
+        code.setPos(pos);
         code.break$();
       });
-
-      code.if_("$list.isEmpty && $str != ''", (code) {
-        code + '$list.add($str);';
-      });
-      code + '$list.add(${result1.value});';
     });
     code.ifSuccess((code) {
-      code.if_(
-        '$list.isEmpty',
-        (code) {
-          code.setResult(result, str);
-        },
-        else_: (code) {
-          code.if_('$list.length == 1', (code) {
-            code + 'final c = $list[0] as int;';
-            code.setResult(result, 'String.fromCharCode(c)');
-          }, else_: (code) {
-            code + 'final buffer = StringBuffer();';
-            code.iteration('for (var i = 0; i < $list.length; i++)', (code) {
-              code + 'final obj = $list[i];';
-              code.if_('obj is int', (code) {
-                code + 'buffer.writeCharCode(obj);';
-              }, else_: (code) {
-                code + 'buffer.write(obj);';
-              });
+      code.if_('$list.isEmpty', (code) {
+        code.setResult(str);
+      }, else_: (code) {
+        code.if_('$list.length == 1', (code) {
+          final c = code.val('c', '$list[0] as int');
+          code.setResult('String.fromCharCode($c)');
+        }, else_: (code) {
+          final buffer = code.val('buffer', 'StringBuffer()');
+          code.iteration('for (var i = 0; i < $list.length; i++)', (code) {
+            final obj = code.val('obj', '$list[i]');
+            code.if_('$obj is int', (code) {
+              code + '$buffer.writeCharCode($obj);';
+            }, else_: (code) {
+              code + '$buffer.write($obj);';
             });
-            code.setResult(result, 'buffer.toString()');
           });
-        },
-      );
-      code.labelSuccess(key);
+          code.setResult('$buffer.toString()');
+        });
+      });
     });
-    return key;
   }
 }

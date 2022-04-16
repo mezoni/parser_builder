@@ -6,32 +6,22 @@ class Many1Count<I> extends ParserBuilder<I, int> {
   const Many1Count(this.parser);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    if (parser.isAlwaysSuccess()) {
-      throw StateError('Using a parser that always succeeds is not valid');
-    }
-
-    final key = BuidlResult();
-    final fast = result.isVoid;
-    final count = fast ? '' : context.allocateLocal('count');
-    final ok = !fast ? '' : context.allocateLocal('ok');
-    code += fast ? 'var $ok = false;' : 'var $count = 0;';
+  void build(Context context, CodeGen code) {
+    final count = code.local('var', 'count', '0', false);
+    final ok = code.local('var', 'ok', 'false', true);
     code.while$('true', (code) {
-      final result1 = helper.getResult(context, code, parser, true);
-      helper.build(context, code, parser, result1, silent, onSuccess: (code) {
-        code += fast ? '$ok = true;' : '$count++;';
-      }, onFailure: (code) {
+      helper.build(context, code, parser, fast: true);
+      code.ifSuccess((code) {
+        code.addTo(count, 1, false);
+        code.assign(ok, 'true', true);
+      }, else_: (code) {
         code.break$();
       });
     });
-    code.setState(fast ? ok : '$count != 0');
+    code.setState('$count != 0', false);
+    code.setState(ok, true);
     code.ifSuccess((code) {
-      code.setResult(result, count);
-      code.labelSuccess(key);
-    }, else_: (code) {
-      code.labelFailure(key);
+      code.setResult(count);
     });
-    return key;
   }
 }

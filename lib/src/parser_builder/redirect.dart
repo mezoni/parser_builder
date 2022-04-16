@@ -4,17 +4,10 @@ abstract class Redirect<I, O> extends ParserBuilder<I, O> {
   const Redirect();
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
+  void build(Context context, CodeGen code) {
     final parser = getRedirectParser();
-    return parser.build(context, code, result, silent);
+    parser.build(context, code);
   }
 
   ParserBuilder<I, O> getRedirectParser();
-
-  @override
-  bool isAlwaysSuccess() {
-    final parser = getRedirectParser();
-    return parser.isAlwaysSuccess();
-  }
 }

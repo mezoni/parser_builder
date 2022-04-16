@@ -3,130 +3,148 @@
 import 'package:tuple/tuple.dart';
 
 String? alpha0(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c <= 122 && ($c >= 65 && $c <= 90 || $c >= 97 && $c <= 122);
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v <= 122 && ($v >= 65 && $v <= 90 || $v >= 97 && $v <= 122);
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? alpha1(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   var $ok = false;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c <= 122 && ($c >= 65 && $c <= 90 || $c >= 97 && $c <= 122);
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v <= 122 && ($v >= 65 && $v <= 90 || $v >= 97 && $v <= 122);
     }
     if (!state.ok) {
       state.pos = $pos1;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-      break;
-    } else {
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 String? alphanumeric0(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c <= 122 &&
-          ($c >= 48 && $c <= 57 ||
-              $c >= 65 && $c <= 90 ||
-              $c >= 97 && $c <= 122);
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v <= 122 &&
+          ($v >= 48 && $v <= 57 ||
+              $v >= 65 && $v <= 90 ||
+              $v >= 97 && $v <= 122);
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? alphanumeric1(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   var $ok = false;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c <= 122 &&
-          ($c >= 48 && $c <= 57 ||
-              $c >= 65 && $c <= 90 ||
-              $c >= 97 && $c <= 122);
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v <= 122 &&
+          ($v >= 48 && $v <= 57 ||
+              $v >= 65 && $v <= 90 ||
+              $v >= 97 && $v <= 122);
     }
     if (!state.ok) {
       state.pos = $pos1;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-      break;
-    } else {
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 int? char16(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.codeUnitAt(state.pos++) as int?;
-    state.ok = ($1 as int?)! == 80;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.codeUnitAt(state.pos++));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v == 80;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
@@ -137,53 +155,47 @@ int? char16(State<String> state) {
 }
 
 int? altC16OrC32(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   $0 = char16(state);
   if (!state.ok) {
     final $error = state.error;
     final $pos = state.pos;
-    int? $1;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $1 = source.readRune(state) as int?;
-      state.ok = ($1 as int?)! == 119296;
-      if (state.ok) {
-        $0 = $1;
+      $0 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($0);
+      state.ok = $v == 119296;
+      if (!state.ok) {
+        $0 = null;
       }
     }
     if (!state.ok) {
       state.pos = $pos;
       state.error = ErrExpected.char(state.pos, const Char(119296));
+    }
+    if (!state.ok) {
       state.error = ErrCombined(state.pos, [$error, state.error]);
     }
   }
   return $0;
 }
 
-int? anyChar(State<String> state) {
-  final source = state.source;
-  int? $0;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    $0 = source.readRune(state) as int?;
-  } else {
-    state.error = ErrUnexpected.eof(state.pos);
-  }
-  return $0;
-}
-
 int? char32(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.readRune(state) as int?;
-    state.ok = ($1 as int?)! == 119296;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.readRune(state));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v == 119296;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
@@ -193,15 +205,42 @@ int? char32(State<String> state) {
   return $0;
 }
 
-String? tagAbc(State<String> state) {
+void andC32OrC16(State<String> state) {
+  final $pos = state.pos;
+  char32(state);
+  if (!state.ok) {
+    final $error = state.error;
+    char16(state);
+    if (!state.ok) {
+      state.error = ErrCombined(state.pos, [$error, state.error]);
+    }
+  }
+  if (state.ok) {
+    state.pos = $pos;
+  }
+}
+
+int? anyChar(State<String> state) {
+  int? $0;
   final source = state.source;
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    $0 = _wrap(source.readRune(state));
+  } else {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
+  return $0;
+}
+
+String? tagAbc(State<String> state) {
   String? $0;
+  final source = state.source;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
       source.startsWith('abc', state.pos);
   if (state.ok) {
     state.pos += 3;
-    $0 = 'abc' as String?;
+    $0 = _wrap('abc');
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
@@ -210,15 +249,17 @@ String? tagAbc(State<String> state) {
 
 Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   Tuple2<String, List<String>>? $0;
+  final source = state.source;
   final $pos = state.pos;
-  List<String>? $1;
-  var $pos1 = state.pos;
+  String? $1;
+  List<String>? $3;
   final $list = <String>[];
+  var $pos1 = state.pos;
   while (true) {
-    String? $2;
-    $2 = tagAbc(state);
+    String? $4;
+    $4 = tagAbc(state);
     if (state.ok) {
-      $list.add($2!);
+      $list.add(_unwrap($4));
     } else {
       state.pos = $pos1;
       break;
@@ -231,9 +272,20 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   }
   state.ok = $list.isNotEmpty;
   if (state.ok) {
-    $1 = $list as List<String>?;
-    final $v = state.source.slice($pos, state.pos);
-    $0 = Tuple2($v, ($1 as List<String>?)!) as Tuple2<String, List<String>>?;
+    $3 = _wrap($list);
+  }
+  if (state.ok) {
+    $1 = _wrap(source.slice($pos, state.pos));
+  }
+  if (state.ok) {
+    List<String>? $6;
+    state.ok = true;
+    $6 = $3;
+    if (state.ok) {
+      $0 = _wrap(Tuple2(_unwrap($1), _unwrap($6)));
+    } else {
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -259,71 +311,79 @@ int? delimited(State<String> state) {
 }
 
 String? digit0(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c >= 48 && $c <= 57;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v >= 48 && $v <= 57;
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? digit1(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   var $ok = false;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c >= 48 && $c <= 57;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v >= 48 && $v <= 57;
     }
     if (!state.ok) {
       state.pos = $pos1;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-      break;
-    } else {
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 void eof(State<String> state) {
-  state.ok = state.pos >= state.source.length;
+  final source = state.source;
+  state.ok = state.pos >= source.length;
   if (!state.ok) {
     state.error = ErrExpected.eof(state.pos);
   }
 }
 
 int? escapeSequence16(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   int? $c;
-  state.ok = state.pos < source.length;
   state.ok = false;
   if (state.pos < source.length) {
     $c = source.codeUnitAt(state.pos);
@@ -342,7 +402,7 @@ int? escapeSequence16(State<String> state) {
     if ($v != null) {
       state.pos++;
       state.ok = true;
-      $0 = $v as int?;
+      $0 = _wrap($v);
     }
   }
   if (!state.ok) {
@@ -354,11 +414,10 @@ int? escapeSequence16(State<String> state) {
 }
 
 int? escapeSequence32(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
   int? $c;
-  state.ok = state.pos < source.length;
   state.ok = false;
   if (state.pos < source.length) {
     $c = source.readRune(state);
@@ -377,7 +436,7 @@ int? escapeSequence32(State<String> state) {
     }
     if ($v != null) {
       state.ok = true;
-      $0 = $v as int?;
+      $0 = _wrap($v);
     }
   }
   if (!state.ok) {
@@ -390,121 +449,135 @@ int? escapeSequence32(State<String> state) {
 }
 
 dynamic foldMany0Digit(State<String> state) {
-  final source = state.source;
   dynamic $0;
+  final source = state.source;
   var $acc = 0;
   while (true) {
     int? $1;
     final $pos = state.pos;
-    int? $c;
-    int? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.codeUnitAt(state.pos++) as int?;
-      $c = ($2 as int?)!;
-      state.ok = $c >= 48 && $c <= 57;
-      if (state.ok) {
-        $1 = $2;
+      $1 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($1);
+      state.ok = $v >= 48 && $v <= 57;
+      if (!state.ok) {
+        $1 = null;
       }
     }
     if (!state.ok) {
       state.pos = $pos;
-      break;
+    }
+    if (state.ok) {
+      final $v1 = _unwrap($1);
+      $acc = $acc * 10 + $v1 - 0x30;
     } else {
-      final $v = ($1 as int?)!;
-      $acc = $acc * 10 + $v - 0x30;
+      break;
     }
   }
   state.ok = true;
-  $0 = $acc as dynamic;
+  $0 = _wrap($acc);
   return $0;
 }
 
 String? hexDigit0(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c <= 102 &&
-          ($c >= 48 && $c <= 57 ||
-              $c >= 65 && $c <= 70 ||
-              $c >= 97 && $c <= 102);
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v <= 102 &&
+          ($v >= 48 && $v <= 57 ||
+              $v >= 65 && $v <= 70 ||
+              $v >= 97 && $v <= 102);
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? hexDigit1(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   var $ok = false;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c <= 102 &&
-          ($c >= 48 && $c <= 57 ||
-              $c >= 65 && $c <= 70 ||
-              $c >= 97 && $c <= 102);
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v <= 102 &&
+          ($v >= 48 && $v <= 57 ||
+              $v >= 65 && $v <= 70 ||
+              $v >= 97 && $v <= 102);
     }
     if (!state.ok) {
       state.pos = $pos1;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-      break;
-    } else {
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 List<int>? many0C16(State<String> state) {
-  final source = state.source;
   List<int>? $0;
+  final source = state.source;
   final $list = <int>[];
   while (true) {
     int? $1;
     final $pos = state.pos;
-    int? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.codeUnitAt(state.pos++) as int?;
-      state.ok = ($2 as int?)! == 80;
-      if (state.ok) {
-        $1 = $2;
+      $1 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($1);
+      state.ok = $v == 80;
+      if (!state.ok) {
+        $1 = null;
       }
     }
     if (!state.ok) {
       state.pos = $pos;
-      break;
+    }
+    if (state.ok) {
+      $list.add(_unwrap($1));
     } else {
-      $list.add($1!);
+      break;
     }
   }
   state.ok = true;
-  $0 = $list as List<int>?;
+  $0 = _wrap($list);
   return $0;
 }
 
@@ -515,13 +588,13 @@ List<int>? many0C32(State<String> state) {
     int? $1;
     $1 = char32(state);
     if (state.ok) {
-      $list.add($1!);
+      $list.add(_unwrap($1));
     } else {
       break;
     }
   }
   state.ok = true;
-  $0 = $list as List<int>?;
+  $0 = _wrap($list);
   return $0;
 }
 
@@ -537,7 +610,7 @@ int? many0CountC32(State<String> state) {
     }
   }
   state.ok = true;
-  $0 = $count as int?;
+  $0 = _wrap($count);
   return $0;
 }
 
@@ -548,14 +621,14 @@ List<int>? many1C32(State<String> state) {
     int? $1;
     $1 = char32(state);
     if (state.ok) {
-      $list.add($1!);
+      $list.add(_unwrap($1));
     } else {
       break;
     }
   }
   state.ok = $list.isNotEmpty;
   if (state.ok) {
-    $0 = $list as List<int>?;
+    $0 = _wrap($list);
   }
   return $0;
 }
@@ -573,7 +646,7 @@ int? many1CountC32(State<String> state) {
   }
   state.ok = $count != 0;
   if (state.ok) {
-    $0 = $count as int?;
+    $0 = _wrap($count);
   }
   return $0;
 }
@@ -587,7 +660,7 @@ List<int>? manyMNC32_2_3(State<String> state) {
     int? $1;
     $1 = char32(state);
     if (state.ok) {
-      $list.add($1!);
+      $list.add(_unwrap($1));
       $count++;
     } else {
       break;
@@ -595,7 +668,7 @@ List<int>? manyMNC32_2_3(State<String> state) {
   }
   state.ok = $count >= 2;
   if (state.ok) {
-    $0 = $list as List<int>?;
+    $0 = _wrap($list);
   } else {
     state.pos = $pos;
   }
@@ -603,8 +676,8 @@ List<int>? manyMNC32_2_3(State<String> state) {
 }
 
 Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
-  final source = state.source;
   Tuple2<List<String>, String>? $0;
+  final source = state.source;
   final $pos = state.pos;
   final $list = <String>[];
   while (true) {
@@ -614,36 +687,44 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-      $1 = 'abc' as String?;
-      $0 = Tuple2($list, ($1 as String?)!) as Tuple2<List<String>, String>?;
-      break;
+      $1 = _wrap('abc');
     } else {
       state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    }
+    if (state.ok) {
+      $0 = _wrap(Tuple2($list, _unwrap($1)));
+      break;
+    } else {
       final $error = state.error;
       String? $2;
       state.ok =
           state.pos < source.length && source.codeUnitAt(state.pos) == 97;
       if (state.ok) {
-        state.pos += 1;
-        $2 = 'a' as String?;
+        state.pos++;
+        $2 = _wrap('a');
       } else {
         state.error = ErrExpected.tag(state.pos, const Tag('a'));
+      }
+      if (!state.ok) {
         final $error1 = state.error;
         state.ok =
             state.pos < source.length && source.codeUnitAt(state.pos) == 98;
         if (state.ok) {
-          state.pos += 1;
-          $2 = 'b' as String?;
+          state.pos++;
+          $2 = _wrap('b');
         } else {
           state.error = ErrExpected.tag(state.pos, const Tag('b'));
+        }
+        if (!state.ok) {
           state.error = ErrCombined(state.pos, [$error1, state.error]);
-          state.error = ErrCombined(state.pos, [$error, state.error]);
-          state.pos = $pos;
-          break;
         }
       }
       if (state.ok) {
-        $list.add($2!);
+        $list.add(_unwrap($2));
+      } else {
+        state.error = ErrCombined(state.pos, [$error, state.error]);
+        state.pos = $pos;
+        break;
       }
     }
   }
@@ -651,86 +732,89 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
 }
 
 dynamic map4Digits(State<String> state) {
-  final source = state.source;
   dynamic $0;
+  final source = state.source;
   final $pos = state.pos;
   int? $1;
-  final $pos1 = state.pos;
-  int? $c;
-  int? $2;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $2 = source.codeUnitAt(state.pos++) as int?;
-    $c = ($2 as int?)!;
-    state.ok = $c >= 48 && $c <= 57;
-    if (state.ok) {
-      $1 = $2;
+    $1 = _wrap(source.codeUnitAt(state.pos++));
+  }
+  if (state.ok) {
+    final $v = _unwrap($1);
+    state.ok = $v >= 48 && $v <= 57;
+    if (!state.ok) {
+      $1 = null;
     }
   }
   if (!state.ok) {
-    state.pos = $pos1;
+    state.pos = $pos;
     state.error = ErrUnexpected.charOrEof(state.pos, source);
-  } else {
-    int? $3;
-    final $pos2 = state.pos;
-    int? $c1;
-    int? $4;
+  }
+  if (state.ok) {
+    int? $2;
+    final $pos1 = state.pos;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $4 = source.codeUnitAt(state.pos++) as int?;
-      $c1 = ($4 as int?)!;
-      state.ok = $c1 >= 48 && $c1 <= 57;
-      if (state.ok) {
-        $3 = $4;
+      $2 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v1 = _unwrap($2);
+      state.ok = $v1 >= 48 && $v1 <= 57;
+      if (!state.ok) {
+        $2 = null;
       }
     }
     if (!state.ok) {
-      state.pos = $pos2;
+      state.pos = $pos1;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-    } else {
-      int? $5;
-      final $pos3 = state.pos;
-      int? $c2;
-      int? $6;
+    }
+    if (state.ok) {
+      int? $3;
+      final $pos2 = state.pos;
       state.ok = state.pos < source.length;
       if (state.ok) {
-        $6 = source.codeUnitAt(state.pos++) as int?;
-        $c2 = ($6 as int?)!;
-        state.ok = $c2 >= 48 && $c2 <= 57;
-        if (state.ok) {
-          $5 = $6;
+        $3 = _wrap(source.codeUnitAt(state.pos++));
+      }
+      if (state.ok) {
+        final $v2 = _unwrap($3);
+        state.ok = $v2 >= 48 && $v2 <= 57;
+        if (!state.ok) {
+          $3 = null;
         }
       }
       if (!state.ok) {
-        state.pos = $pos3;
+        state.pos = $pos2;
         state.error = ErrUnexpected.charOrEof(state.pos, source);
-      } else {
-        int? $7;
-        final $pos4 = state.pos;
-        int? $c3;
-        int? $8;
+      }
+      if (state.ok) {
+        int? $4;
+        final $pos3 = state.pos;
         state.ok = state.pos < source.length;
         if (state.ok) {
-          $8 = source.codeUnitAt(state.pos++) as int?;
-          $c3 = ($8 as int?)!;
-          state.ok = $c3 >= 48 && $c3 <= 57;
-          if (state.ok) {
-            $7 = $8;
+          $4 = _wrap(source.codeUnitAt(state.pos++));
+        }
+        if (state.ok) {
+          final $v3 = _unwrap($4);
+          state.ok = $v3 >= 48 && $v3 <= 57;
+          if (!state.ok) {
+            $4 = null;
           }
         }
         if (!state.ok) {
-          state.pos = $pos4;
+          state.pos = $pos3;
           state.error = ErrUnexpected.charOrEof(state.pos, source);
-        } else {
-          final $v = ($1 as int?)!;
-          final $v1 = ($3 as int?)!;
-          final $v2 = ($5 as int?)!;
-          final $v3 = ($7 as int?)!;
-          $0 = ($v - 0x30) * 1000 +
-              ($v1 - 0x30) * 100 +
-              ($v2 - 0x30) * 10 +
-              $v3 -
-              0x30 as dynamic;
+        }
+        if (state.ok) {
+          final $v4 = _unwrap($1);
+          final $v5 = _unwrap($2);
+          final $v6 = _unwrap($3);
+          final $v7 = _unwrap($4);
+          $0 = _wrap(($v4 - 0x30) * 1000 +
+              ($v5 - 0x30) * 100 +
+              ($v6 - 0x30) * 10 +
+              $v7 -
+              0x30);
         }
       }
     }
@@ -742,100 +826,104 @@ dynamic map4Digits(State<String> state) {
 }
 
 String? mapC32ToStr(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   int? $1;
   final $pos = state.pos;
-  int? $2;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $2 = source.readRune(state) as int?;
-    state.ok = ($2 as int?)! == 119296;
-    if (state.ok) {
-      $1 = $2;
+    $1 = _wrap(source.readRune(state));
+  }
+  if (state.ok) {
+    final $v = _unwrap($1);
+    state.ok = $v == 119296;
+    if (!state.ok) {
+      $1 = null;
     }
   }
   if (!state.ok) {
     state.pos = $pos;
     state.error = ErrExpected.char(state.pos, const Char(119296));
-  } else {
-    final $v = ($1 as int?)!;
-    $0 = String.fromCharCode($v) as String?;
+  }
+  if (state.ok) {
+    final $v1 = _unwrap($1);
+    $0 = _wrap(String.fromCharCode($v1));
   }
   return $0;
 }
 
 int? noneOfC16(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $c;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.readRune(state) as int?;
-    $c = ($1 as int?)!;
-    state.ok = $c != 80;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.readRune(state));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v != 80;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
 
 int? noneOfOfC16OrC32(State<String> state) {
+  int? $0;
   final source = state.source;
   final $calculate = state.context.listOfC16AndC32 as List<int>;
-  int? $0;
   List<int>? $1;
-  final $v = $calculate;
   state.ok = true;
-  $1 = $v as List<int>?;
-  state.ok = state.pos < source.length;
+  $1 = _wrap($calculate);
   if (state.ok) {
-    final pos = state.pos;
-    final $c = source.readRune(state);
-    final list = ($1 as List<int>?)!;
-    for (var i = 0; i < list.length; i++) {
-      final ch = list[i];
-      if ($c == ch) {
-        state.pos = pos;
-        state.ok = false;
-        state.error = ErrUnexpected.char(state.pos, Char($c));
-        break;
-      }
-    }
+    state.ok = state.pos < source.length;
     if (state.ok) {
-      $0 = $c as int?;
+      final $pos = state.pos;
+      final $c = source.readRune(state);
+      final $list = _unwrap($1);
+      for (var i = 0; i < $list.length; i++) {
+        final $ch = $list[i];
+        if ($c == $ch) {
+          state.pos = $pos;
+          state.ok = false;
+          state.error = ErrUnexpected.char(state.pos, Char($c));
+          break;
+        }
+      }
+      if (state.ok) {
+        $0 = _wrap($c);
+      }
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
     }
-  } else {
-    state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
 }
 
 int? noneOfC32(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $c;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.readRune(state) as int?;
-    $c = ($1 as int?)!;
-    state.ok = $c != 119296;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.readRune(state));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v != 119296;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
@@ -845,8 +933,8 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
   state.ok = true;
   final $pos = state.pos;
   if (state.pos < source.length) {
-    final c = source.codeUnitAt($pos);
-    switch (c) {
+    final $c = source.codeUnitAt($pos);
+    switch ($c) {
       case 97:
         if (source.startsWith('abc', $pos)) {
           state.ok = false;
@@ -898,18 +986,18 @@ void notC32OrC16(State<String> state) {
 }
 
 int? oneOfC16(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $c;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.codeUnitAt(state.pos++) as int?;
-    $c = ($1 as int?)!;
-    state.ok = $c == 80;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.codeUnitAt(state.pos++));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v == 80;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
@@ -920,37 +1008,38 @@ int? oneOfC16(State<String> state) {
 }
 
 int? oneOfC32(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $c;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.readRune(state) as int?;
-    $c = ($1 as int?)!;
-    state.ok = $c == 119296;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.readRune(state));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v == 119296;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
 
 String? optAbc(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
       source.startsWith('abc', state.pos);
   if (state.ok) {
     state.pos += 3;
-    $0 = 'abc' as String?;
-  } else {
+    $0 = _wrap('abc');
+  }
+  if (!state.ok) {
     state.ok = true;
   }
   return $0;
@@ -965,7 +1054,7 @@ Tuple2<int, int>? pairC16C32(State<String> state) {
     int? $2;
     $2 = char32(state);
     if (state.ok) {
-      $0 = Tuple2(($1 as int?)!, ($2 as int?)!) as Tuple2<int, int>?;
+      $0 = _wrap(Tuple2(_unwrap($1), _unwrap($2)));
     } else {
       state.pos = $pos;
     }
@@ -984,28 +1073,32 @@ int? peekC32(State<String> state) {
 }
 
 int? precededC16C32(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
   char16(state);
   if (state.ok) {
     int? $2;
     final $pos1 = state.pos;
-    int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      state.ok = ($3 as int?)! == 119296;
-      if (state.ok) {
-        $2 = $3;
+      $2 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($2);
+      state.ok = $v == 119296;
+      if (!state.ok) {
+        $2 = null;
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
       state.error = ErrExpected.char(state.pos, const Char(119296));
-      state.pos = $pos;
-    } else {
+    }
+    if (state.ok) {
       $0 = $2;
+    } else {
+      state.pos = $pos;
     }
   }
   return $0;
@@ -1013,37 +1106,37 @@ int? precededC16C32(State<String> state) {
 
 String? recognize3C32AbcC16(State<String> state) {
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
-  final $pos1 = state.pos;
   char32(state);
   if (state.ok) {
     tagAbc(state);
     if (state.ok) {
       char16(state);
-      if (state.ok) {
-        $0 = state.source.slice($pos, state.pos) as String?;
-      }
     }
   }
   if (!state.ok) {
-    state.pos = $pos1;
+    state.pos = $pos;
+  }
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 int? satisfyC16(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $c;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.codeUnitAt(state.pos++) as int?;
-    $c = ($1 as int?)!;
-    state.ok = $c == 80;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.codeUnitAt(state.pos++));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v == 80;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
@@ -1054,50 +1147,54 @@ int? satisfyC16(State<String> state) {
 }
 
 int? satisfyC32(State<String> state) {
-  final source = state.source;
   int? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $c;
-  int? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $1 = source.readRune(state) as int?;
-    $c = ($1 as int?)!;
-    state.ok = $c == 119296;
-    if (state.ok) {
-      $0 = $1;
+    $0 = _wrap(source.readRune(state));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v == 119296;
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
   }
   return $0;
 }
 
 List<int>? separatedList0C32Abc(State<String> state) {
-  final source = state.source;
   List<int>? $0;
-  var $pos = state.pos;
+  final source = state.source;
   final $list = <int>[];
+  var $pos = state.pos;
   while (true) {
     int? $1;
     final $pos1 = state.pos;
-    int? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.readRune(state) as int?;
-      state.ok = ($2 as int?)! == 119296;
-      if (state.ok) {
-        $1 = $2;
+      $1 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($1);
+      state.ok = $v == 119296;
+      if (!state.ok) {
+        $1 = null;
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (state.ok) {
+      $list.add(_unwrap($1));
+    } else {
       state.pos = $pos;
       break;
-    } else {
-      $list.add($1!);
     }
     $pos = state.pos;
     state.ok = state.pos < source.length &&
@@ -1105,39 +1202,44 @@ List<int>? separatedList0C32Abc(State<String> state) {
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-    } else {
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = $list as List<int>?;
+  $0 = _wrap($list);
   return $0;
 }
 
 List<int>? separatedList1C32Abc(State<String> state) {
-  final source = state.source;
   List<int>? $0;
-  var $pos = state.pos;
+  final source = state.source;
   final $list = <int>[];
+  var $pos = state.pos;
   while (true) {
     int? $1;
     final $pos1 = state.pos;
-    int? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.readRune(state) as int?;
-      state.ok = ($2 as int?)! == 119296;
-      if (state.ok) {
-        $1 = $2;
+      $1 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($1);
+      state.ok = $v == 119296;
+      if (!state.ok) {
+        $1 = null;
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
       state.error = ErrExpected.char(state.pos, const Char(119296));
+    }
+    if (state.ok) {
+      $list.add(_unwrap($1));
+    } else {
       state.pos = $pos;
       break;
-    } else {
-      $list.add($1!);
     }
     $pos = state.pos;
     state.ok = state.pos < source.length &&
@@ -1145,77 +1247,72 @@ List<int>? separatedList1C32Abc(State<String> state) {
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-    } else {
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = $list.isNotEmpty;
   if (state.ok) {
-    $0 = $list as List<int>?;
+    $0 = _wrap($list);
   }
   return $0;
 }
 
 Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
-  final source = state.source;
   Tuple2<int, int>? $0;
+  final source = state.source;
   final $pos = state.pos;
   int? $1;
-  final $pos1 = state.pos;
-  int? $2;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    $2 = source.codeUnitAt(state.pos++) as int?;
-    state.ok = ($2 as int?)! == 80;
-    if (state.ok) {
-      $1 = $2;
+    $1 = _wrap(source.codeUnitAt(state.pos++));
+  }
+  if (state.ok) {
+    final $v = _unwrap($1);
+    state.ok = $v == 80;
+    if (!state.ok) {
+      $1 = null;
     }
   }
   if (!state.ok) {
-    state.pos = $pos1;
+    state.pos = $pos;
     state.error = ErrExpected.char(state.pos, const Char(80));
-  } else {
+  }
+  if (state.ok) {
     state.ok = state.pos < source.length &&
         source.codeUnitAt(state.pos) == 97 &&
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-      int? $4;
-      final $pos2 = state.pos;
-      int? $5;
+    } else {
+      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    }
+    if (state.ok) {
+      int? $3;
+      final $pos1 = state.pos;
       state.ok = state.pos < source.length;
       if (state.ok) {
-        $5 = source.readRune(state) as int?;
-        state.ok = ($5 as int?)! == 119296;
-        if (state.ok) {
-          $4 = $5;
+        $3 = _wrap(source.readRune(state));
+      }
+      if (state.ok) {
+        final $v1 = _unwrap($3);
+        state.ok = $v1 == 119296;
+        if (!state.ok) {
+          $3 = null;
         }
       }
       if (!state.ok) {
-        state.pos = $pos2;
+        state.pos = $pos1;
         state.error = ErrExpected.char(state.pos, const Char(119296));
-      } else {
-        $0 = Tuple2(($1 as int?)!, ($4 as int?)!) as Tuple2<int, int>?;
       }
-    } else {
-      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+      if (state.ok) {
+        $0 = _wrap(Tuple2(_unwrap($1), _unwrap($3)));
+      }
     }
   }
   if (!state.ok) {
     state.pos = $pos;
-  }
-  return $0;
-}
-
-dynamic skipABC(State<String> state) {
-  final source = state.source;
-  dynamic $0;
-  state.ok = state.pos + 3 <= source.length;
-  if (state.ok) {
-    state.pos += 3;
-    $0 = 'ABC' as dynamic;
-  } else {
-    state.error = ErrUnexpected.eof(source.length);
   }
   return $0;
 }
@@ -1225,20 +1322,23 @@ void skipWhile1C16(State<String> state) {
   var $ok = false;
   while (true) {
     final $pos = state.pos;
-    int? $c;
-    int? $2;
+    int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.codeUnitAt(state.pos++) as int?;
-      $c = $2!;
-      state.ok = $c == 80;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 80;
     }
     if (!state.ok) {
       state.pos = $pos;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-      break;
-    } else {
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
@@ -1249,20 +1349,23 @@ void skipWhile1C32(State<String> state) {
   var $ok = false;
   while (true) {
     final $pos = state.pos;
-    int? $c;
-    int? $2;
+    int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.readRune(state) as int?;
-      $c = $2!;
-      state.ok = $c == 119296;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 119296;
     }
     if (!state.ok) {
       state.pos = $pos;
-      state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
-      break;
-    } else {
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
@@ -1272,16 +1375,19 @@ void skipWhileC16(State<String> state) {
   final source = state.source;
   while (true) {
     final $pos = state.pos;
-    int? $c;
-    int? $2;
+    int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.codeUnitAt(state.pos++) as int?;
-      $c = $2!;
-      state.ok = $c == 80;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 80;
     }
     if (!state.ok) {
       state.pos = $pos;
+    }
+    if (!state.ok) {
       break;
     }
   }
@@ -1292,16 +1398,19 @@ void skipWhileC32(State<String> state) {
   final source = state.source;
   while (true) {
     final $pos = state.pos;
-    int? $c;
-    int? $2;
+    int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.readRune(state) as int?;
-      $c = $2!;
-      state.ok = $c == 119296;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 119296;
     }
     if (!state.ok) {
       state.pos = $pos;
+    }
+    if (!state.ok) {
       break;
     }
   }
@@ -1309,8 +1418,8 @@ void skipWhileC32(State<String> state) {
 }
 
 String? stringValue(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   state.ok = true;
   final $pos = state.pos;
   final $list = [];
@@ -1319,13 +1428,13 @@ String? stringValue(State<String> state) {
     final $start = state.pos;
     var $c = 0;
     while (state.pos < source.length) {
-      final pos = state.pos;
+      final $pos1 = state.pos;
       $c = source.readRune(state);
-      final ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
-      if (ok) {
+      final $ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
+      if ($ok) {
         continue;
       }
-      state.pos = pos;
+      state.pos = $pos1;
       break;
     }
     $str = state.pos == $start ? '' : source.substring($start, state.pos);
@@ -1335,10 +1444,9 @@ String? stringValue(State<String> state) {
     if ($c != 92) {
       break;
     }
-    state.pos += 1;
+    state.pos++;
     int? $1;
     int? $c1;
-    state.ok = state.pos < source.length;
     state.ok = false;
     if (state.pos < source.length) {
       $c1 = source.codeUnitAt(state.pos);
@@ -1351,39 +1459,42 @@ String? stringValue(State<String> state) {
       if ($v != null) {
         state.pos++;
         state.ok = true;
-        $1 = $v as int?;
+        $1 = _wrap($v);
       }
     }
     if (!state.ok) {
       state.error = $c1 == null
           ? ErrUnexpected.eof(state.pos)
           : ErrUnexpected.charAt(state.pos, source);
+    }
+    if (state.ok) {
+      if ($list.isEmpty && $str != '') {
+        $list.add($str);
+      }
+      $list.add(_unwrap($1));
+    } else {
       state.pos = $pos;
       break;
     }
-    if ($list.isEmpty && $str != '') {
-      $list.add($str);
-    }
-    $list.add(($1 as int?)!);
   }
   if (state.ok) {
     if ($list.isEmpty) {
-      $0 = $str as String?;
+      $0 = _wrap($str);
     } else {
       if ($list.length == 1) {
-        final c = $list[0] as int;
-        $0 = String.fromCharCode(c) as String?;
+        final $c2 = $list[0] as int;
+        $0 = _wrap(String.fromCharCode($c2));
       } else {
-        final buffer = StringBuffer();
+        final $buffer = StringBuffer();
         for (var i = 0; i < $list.length; i++) {
-          final obj = $list[i];
-          if (obj is int) {
-            buffer.writeCharCode(obj);
+          final $obj = $list[i];
+          if ($obj is int) {
+            $buffer.writeCharCode($obj);
           } else {
-            buffer.write(obj);
+            $buffer.write($obj);
           }
         }
-        $0 = buffer.toString() as String?;
+        $0 = _wrap($buffer.toString());
       }
     }
   }
@@ -1391,12 +1502,12 @@ String? stringValue(State<String> state) {
 }
 
 String? tagC16(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
   if (state.ok) {
-    state.pos += 1;
-    $0 = 'P' as String?;
+    state.pos++;
+    $0 = _wrap('P');
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('P'));
   }
@@ -1404,14 +1515,14 @@ String? tagC16(State<String> state) {
 }
 
 String? tagC16C32(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 80 &&
       source.startsWith('P𝈀', state.pos);
   if (state.ok) {
     state.pos += 3;
-    $0 = 'P𝈀' as String?;
+    $0 = _wrap('P𝈀');
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('P𝈀'));
   }
@@ -1419,14 +1530,14 @@ String? tagC16C32(State<String> state) {
 }
 
 String? tagC32(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   state.ok = state.pos + 1 < source.length &&
       source.codeUnitAt(state.pos) == 55348 &&
       source.codeUnitAt(state.pos + 1) == 56832;
   if (state.ok) {
     state.pos += 2;
-    $0 = '𝈀' as String?;
+    $0 = _wrap('𝈀');
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀'));
   }
@@ -1434,14 +1545,14 @@ String? tagC32(State<String> state) {
 }
 
 String? tagC32C16(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 55348 &&
       source.startsWith('𝈀P', state.pos);
   if (state.ok) {
     state.pos += 3;
-    $0 = '𝈀P' as String?;
+    $0 = _wrap('𝈀P');
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('𝈀P'));
   }
@@ -1449,62 +1560,74 @@ String? tagC32C16(State<String> state) {
 }
 
 String? tagOfFoo(State<String> state) {
+  String? $0;
   final source = state.source;
   final $calculate = state.context.foo as String;
-  String? $0;
-  String? $1;
-  final $v = $calculate;
   state.ok = true;
-  $1 = $v as String?;
-  final tag = ($1 as String?)!;
-  state.ok = source.startsWith(tag, state.pos);
+  $0 = _wrap($calculate);
   if (state.ok) {
-    state.pos += tag.length;
-    $0 = tag as String?;
-  } else {
-    state.error = ErrExpected.tag(state.pos, Tag(tag));
+    final $tag = _unwrap($0);
+    state.ok = source.startsWith($tag, state.pos);
+    if (state.ok) {
+      state.pos += $tag.length;
+    } else {
+      $0 = null;
+      state.error = ErrExpected.tag(state.pos, Tag($tag));
+    }
   }
   return $0;
 }
 
 String? tagNoCaseAbc(State<String> state) {
-  final source = state.source;
   String? $0;
-  state.ok = false;
-  if (state.pos + 3 <= source.length) {
-    final v1 = source.substring(state.pos, state.pos + 3);
-    final v2 = v1.toLowerCase();
-    if (v2 == 'abc') {
-      state.pos += 3;
-      state.ok = true;
-      $0 = v1 as String?;
+  final source = state.source;
+  final $pos = state.pos;
+  int? $2;
+  state.ok = true;
+  $2 = _wrap(3);
+  if (state.ok) {
+    final $count = _unwrap($2);
+    state.ok = state.pos + $count <= source.length;
+    if (state.ok) {
+      state.pos += $count;
+    }
+  }
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
+  if (state.ok) {
+    final $v = _unwrap($0);
+    state.ok = $v.toLowerCase() == 'abc';
+    if (!state.ok) {
+      $0 = null;
     }
   }
   if (!state.ok) {
+    state.pos = $pos;
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
   }
   return $0;
 }
 
 String? tagsAbcAbdDefDegXXY(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   state.ok = false;
   final $pos = state.pos;
   if (state.pos < source.length) {
-    final c = source.codeUnitAt($pos);
-    switch (c) {
+    final $c = source.codeUnitAt($pos);
+    switch ($c) {
       case 97:
         if (source.startsWith('abc', $pos)) {
           state.pos += 3;
           state.ok = true;
-          $0 = 'abc' as String?;
+          $0 = _wrap('abc');
           break;
         }
         if (source.startsWith('abd', $pos)) {
           state.pos += 3;
           state.ok = true;
-          $0 = 'abd' as String?;
+          $0 = _wrap('abd');
           break;
         }
         break;
@@ -1512,13 +1635,13 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
         if (source.startsWith('def', $pos)) {
           state.pos += 3;
           state.ok = true;
-          $0 = 'def' as String?;
+          $0 = _wrap('def');
           break;
         }
         if (source.startsWith('deg', $pos)) {
           state.pos += 3;
           state.ok = true;
-          $0 = 'deg' as String?;
+          $0 = _wrap('deg');
           break;
         }
         break;
@@ -1526,12 +1649,12 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
         if (source.startsWith('xy', $pos)) {
           state.pos += 2;
           state.ok = true;
-          $0 = 'xy' as String?;
+          $0 = _wrap('xy');
           break;
         }
         state.pos++;
         state.ok = true;
-        $0 = 'x' as String?;
+        $0 = _wrap('x');
         break;
     }
   }
@@ -1549,230 +1672,263 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
 }
 
 String? takeUntilAbc(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
-  int? $2;
+  int? $3;
   final $index = source.indexOf('abc', state.pos);
   state.ok = $index >= 0;
   if (state.ok) {
-    $2 = $index as int?;
-    final $pos1 = ($2 as int?)!;
-    state.ok = $pos1 <= source.length;
-    if (state.ok) {
-      state.pos = $pos1;
-      $0 = state.source.slice($pos, state.pos) as String?;
-    } else {
-      state.error = ErrUnexpected.eof($pos1);
-    }
+    $3 = _wrap($index);
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+  }
+  if (state.ok) {
+    final $v = _unwrap($3);
+    state.ok = $v <= source.length;
+    if (state.ok) {
+      state.pos = $v;
+    } else {
+      state.pos = $pos;
+      state.error = ErrUnexpected.eof($pos);
+    }
+  }
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 String? takeUntil1Abc(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   int? $2;
-  final $pos2 = state.pos;
   final $index = source.indexOf('abc', state.pos);
   state.ok = $index >= 0;
   if (state.ok) {
-    $2 = $index as int?;
-    final $v = ($2 as int?)!;
-    state.ok = $v > state.pos;
-    if (!state.ok) {
-      state.error = ErrMessage($pos2, state.pos - $pos2,
-          'Expected at least one character before \'abc\'');
-      state.error.failure = state.pos;
-    } else {
-      final $pos1 = ($2 as int?)!;
-      state.ok = $pos1 <= source.length;
-      if (state.ok) {
-        state.pos = $pos1;
-        $0 = state.source.slice($pos, state.pos) as String?;
-      } else {
-        state.error = ErrUnexpected.eof($pos1);
-      }
-    }
+    $2 = _wrap($index);
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+  }
+  if (state.ok) {
+    final $v = _unwrap($2);
+    state.ok = $v > state.pos;
+    if (!state.ok) {
+      state.error = ErrMessage($pos, state.pos - $pos,
+          'Expected at least one character before \'abc\'')
+        ..failure = state.pos;
+      state.pos = $pos;
+    }
+  }
+  if (state.ok) {
+    final $v1 = _unwrap($2);
+    state.ok = $v1 <= source.length;
+    if (state.ok) {
+      state.pos = $v1;
+    } else {
+      state.pos = $pos;
+      state.error = ErrUnexpected.eof($pos);
+    }
+  }
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 String? takeWhile1C16(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   var $ok = false;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c == 80;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 80;
     }
     if (!state.ok) {
       state.pos = $pos1;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-      break;
-    } else {
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 String? takeWhile1C32(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   var $ok = false;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
-      state.ok = $c == 119296;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 119296;
     }
     if (!state.ok) {
       state.pos = $pos1;
-      state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
-      break;
-    } else {
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
+    }
+    if (state.ok) {
       $ok = true;
+    } else {
+      break;
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 String? takeWhileC16(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c == 80;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 80;
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? takeWhileC32(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
-      state.ok = $c == 119296;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 119296;
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? takeWhileMN_2_4C16(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
-  final $pos1 = state.pos;
   var $count = 0;
   while ($count < 4) {
-    final $pos2 = state.pos;
-    int? $c;
+    final $pos1 = state.pos;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c == 80;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 80;
     }
     if (!state.ok) {
-      state.pos = $pos2;
+      state.pos = $pos1;
       state.error = ErrUnexpected.charOrEof(state.pos, source);
-      break;
-    } else {
+    }
+    if (state.ok) {
       $count++;
+    } else {
+      break;
     }
   }
   state.ok = $count >= 2;
+  if (!state.ok) {
+    state.pos = $pos;
+  }
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
-  } else {
-    state.pos = $pos1;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
 
 String? takeWhileMN_2_4C32(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
-  final $pos1 = state.pos;
   var $count = 0;
   while ($count < 4) {
-    final $pos2 = state.pos;
-    int? $c;
+    final $pos1 = state.pos;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
-      state.ok = $c == 119296;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 119296;
     }
     if (!state.ok) {
-      state.pos = $pos2;
-      state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
-      break;
-    } else {
+      state.pos = $pos1;
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
+    }
+    if (state.ok) {
       $count++;
+    } else {
+      break;
     }
   }
   state.ok = $count >= 2;
+  if (!state.ok) {
+    state.pos = $pos;
+  }
   if (state.ok) {
-    $0 = state.source.slice($pos, state.pos) as String?;
-  } else {
-    state.pos = $pos1;
+    $0 = _wrap(source.slice($pos, state.pos));
   }
   return $0;
 }
@@ -1808,7 +1964,7 @@ Tuple2<int, String>? tuple2C32Abc(State<String> state) {
     String? $2;
     $2 = tagAbc(state);
     if (state.ok) {
-      $0 = Tuple2(($1 as int?)!, ($2 as String?)!) as Tuple2<int, String>?;
+      $0 = _wrap(Tuple2(_unwrap($1), _unwrap($2)));
     } else {
       state.pos = $pos;
     }
@@ -1817,8 +1973,8 @@ Tuple2<int, String>? tuple2C32Abc(State<String> state) {
 }
 
 Tuple3<int, String, int>? tuple3C32AbcC16(State<String> state) {
-  final source = state.source;
   Tuple3<int, String, int>? $0;
+  final source = state.source;
   final $pos = state.pos;
   int? $1;
   $1 = char32(state);
@@ -1828,21 +1984,23 @@ Tuple3<int, String, int>? tuple3C32AbcC16(State<String> state) {
     if (state.ok) {
       int? $3;
       final $pos1 = state.pos;
-      int? $4;
       state.ok = state.pos < source.length;
       if (state.ok) {
-        $4 = source.codeUnitAt(state.pos++) as int?;
-        state.ok = ($4 as int?)! == 80;
-        if (state.ok) {
-          $3 = $4;
+        $3 = _wrap(source.codeUnitAt(state.pos++));
+      }
+      if (state.ok) {
+        final $v = _unwrap($3);
+        state.ok = $v == 80;
+        if (!state.ok) {
+          $3 = null;
         }
       }
       if (!state.ok) {
         state.pos = $pos1;
         state.error = ErrExpected.char(state.pos, const Char(80));
-      } else {
-        $0 = Tuple3(($1 as int?)!, ($2 as String?)!, ($3 as int?)!)
-            as Tuple3<int, String, int>?;
+      }
+      if (state.ok) {
+        $0 = _wrap(Tuple3(_unwrap($1), _unwrap($2), _unwrap($3)));
       }
     }
   }
@@ -1853,16 +2011,18 @@ Tuple3<int, String, int>? tuple3C32AbcC16(State<String> state) {
 }
 
 bool? valueAbcToTrueValue(State<String> state) {
-  final source = state.source;
   bool? $0;
+  final source = state.source;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
       source.startsWith('abc', state.pos);
   if (state.ok) {
     state.pos += 3;
-    $0 = true as bool?;
   } else {
     state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+  }
+  if (state.ok) {
+    $0 = _wrap(true);
   }
   return $0;
 }
@@ -1870,162 +2030,193 @@ bool? valueAbcToTrueValue(State<String> state) {
 bool? valueTrue(State<dynamic> state) {
   bool? $0;
   state.ok = true;
-  $0 = true as bool?;
+  $0 = _wrap(true);
   return $0;
 }
 
 String? transformersCharClassIsDigit(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.codeUnitAt(state.pos++) as int?;
-      $c = $3!;
-      state.ok = $c >= 48 && $c <= 57;
+      $3 = _wrap(source.codeUnitAt(state.pos++));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v >= 48 && $v <= 57;
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? transformersClosureIsDigit(State<String> state) {
+  String? $0;
   final source = state.source;
   final $predicate = (int x) => x >= 0x30 && x <= 0x39;
-  String? $0;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
-      state.ok = $predicate($c);
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $predicate($v);
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? transformersExprIsDigit(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
-      state.ok = $c >= 0x30 && $c <= 0x39;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v >= 0x30 && $v <= 0x39;
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? transformersFuncExprIsDigit(State<String> state) {
+  String? $0;
   final source = state.source;
   bool $predicate(int x) => x >= 0x30 && x <= 0x39;
-  String? $0;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
-      state.ok = $predicate($c);
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $predicate($v);
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? transformersFuncIsDigit(State<String> state) {
+  String? $0;
   final source = state.source;
   bool $predicate(int x) {
     return x >= 0x30 && x <= 0x39;
   }
 
-  String? $0;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
-      state.ok = $predicate($c);
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $predicate($v);
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 String? transformersNotCharClassIsDigit(State<String> state) {
-  final source = state.source;
   String? $0;
+  final source = state.source;
   final $pos = state.pos;
   while (true) {
     final $pos1 = state.pos;
-    int? $c;
     int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $3 = source.readRune(state) as int?;
-      $c = $3!;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
       state.ok =
-          $c > 1114111 || !($c >= 0 && $c <= 47 || $c >= 58 && $c <= 1114111);
+          $v > 1114111 || !($v >= 0 && $v <= 47 || $v >= 58 && $v <= 1114111);
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (!state.ok) {
       break;
     }
   }
   state.ok = true;
-  $0 = state.source.slice($pos, state.pos) as String?;
+  if (state.ok) {
+    $0 = _wrap(source.slice($pos, state.pos));
+  }
   return $0;
 }
 
 int? transformersVarIsNotDigit(State<String> state) {
+  int? $0;
   final source = state.source;
   final $calculate = const [
     0x30,
@@ -2039,33 +2230,39 @@ int? transformersVarIsNotDigit(State<String> state) {
     0x38,
     0x39
   ];
-  int? $0;
   List<int>? $1;
-  final $v = $calculate;
   state.ok = true;
-  $1 = $v as List<int>?;
-  state.ok = state.pos < source.length;
+  $1 = _wrap($calculate);
   if (state.ok) {
-    final pos = state.pos;
-    final $c = source.readRune(state);
-    final list = ($1 as List<int>?)!;
-    for (var i = 0; i < list.length; i++) {
-      final ch = list[i];
-      if ($c == ch) {
-        state.pos = pos;
-        state.ok = false;
-        state.error = ErrUnexpected.char(state.pos, Char($c));
-        break;
-      }
-    }
+    state.ok = state.pos < source.length;
     if (state.ok) {
-      $0 = $c as int?;
+      final $pos = state.pos;
+      final $c = source.readRune(state);
+      final $list = _unwrap($1);
+      for (var i = 0; i < $list.length; i++) {
+        final $ch = $list[i];
+        if ($c == $ch) {
+          state.pos = $pos;
+          state.ok = false;
+          state.error = ErrUnexpected.char(state.pos, Char($c));
+          break;
+        }
+      }
+      if (state.ok) {
+        $0 = _wrap($c);
+      }
+    } else {
+      state.error = ErrUnexpected.eof(state.pos);
     }
-  } else {
-    state.error = ErrUnexpected.eof(state.pos);
   }
   return $0;
 }
+
+@pragma('vm:prefer-inline')
+T _unwrap<T>(T? value) => value!;
+
+@pragma('vm:prefer-inline')
+T? _wrap<T>(T? value) => value;
 
 /// Represents the `char` used in parsing errors.
 class Char {

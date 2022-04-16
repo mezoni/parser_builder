@@ -25,6 +25,7 @@ void _test() {
   _testAlphanumeric0();
   _testAlphanumeric1();
   _testAlt();
+  _testAnd();
   _testAnyChar();
   _testChar();
   _testConsumed();
@@ -60,7 +61,6 @@ void _test() {
   _testSeparatedPair();
   _testSeparatedList0();
   _testSeparatedList1();
-  _testSkip();
   _testSkipWhile();
   _testSkipWhile1();
   _testStringValue();
@@ -381,6 +381,48 @@ void _testAlt() {
           ErrCombined(0, [
             ErrExpected.char(0, Char(c16)),
             ErrExpected.char(0, Char(c32))
+          ]));
+    }
+  });
+}
+
+void _testAnd() {
+  test('And', () {
+    final parser = andC32OrC16;
+    {
+      final state = State('$s32');
+      parser(state);
+      expect(state.ok, true);
+      expect(state.pos, 0);
+    }
+    {
+      final state = State('$s16');
+      parser(state);
+      expect(state.ok, true);
+      expect(state.pos, 0);
+    }
+    {
+      final state = State('');
+      parser(state);
+      expect(state.ok, false);
+      expect(state.pos, 0);
+      expect(
+          state.error,
+          ErrCombined(0, [
+            ErrExpected.char(0, Char(c32)),
+            ErrExpected.char(0, Char(c16)),
+          ]));
+    }
+    {
+      final state = State(' ');
+      parser(state);
+      expect(state.ok, false);
+      expect(state.pos, 0);
+      expect(
+          state.error,
+          ErrCombined(0, [
+            ErrExpected.char(0, Char(c32)),
+            ErrExpected.char(0, Char(c16)),
           ]));
     }
   });
@@ -1704,6 +1746,77 @@ void _testSatisfy() {
   });
 }
 
+void _testSemanticActions() {
+  final parsers = {
+    'CharClasss': transformersCharClassIsDigit,
+    'ClosureAction': transformersClosureIsDigit,
+    'ExprAction': transformersExprIsDigit,
+    'FuncExprAction': transformersFuncExprIsDigit,
+    'FuncAction': transformersFuncIsDigit,
+    'NotCharClasss': transformersNotCharClassIsDigit,
+  };
+  for (final key in parsers.keys) {
+    test('Semantic action $key', () {
+      final parser = parsers[key]!;
+      {
+        final state = State('123');
+        final r = parser(state);
+        expect(state.ok, true);
+        expect(r, '123');
+        expect(state.pos, 3);
+      }
+      {
+        final state = State('123 ');
+        final r = parser(state);
+        expect(state.ok, true);
+        expect(r, '123');
+        expect(state.pos, 3);
+      }
+      {
+        final state = State('');
+        final r = parser(state);
+        expect(state.ok, true);
+        expect(r, '');
+        expect(state.pos, 0);
+      }
+      {
+        final state = State(' ');
+        final r = parser(state);
+        expect(state.ok, true);
+        expect(r, '');
+        expect(state.pos, 0);
+      }
+    });
+
+    test('Semantic action VarAction', () {
+      final parser = transformersVarIsNotDigit;
+      {
+        final state = State('a');
+        final r = parser(state);
+        expect(state.ok, true);
+        expect(r, 0x61);
+        expect(state.pos, 1);
+      }
+      {
+        final state = State('');
+        final r = parser(state);
+        expect(state.ok, false);
+        expect(r, null);
+        expect(state.pos, 0);
+        expect(state.error, ErrUnexpected.eof(0));
+      }
+      {
+        final state = State('1');
+        final r = parser(state);
+        expect(state.ok, false);
+        expect(r, null);
+        expect(state.pos, 0);
+        expect(state.error, ErrUnexpected.char(0, Char(0x31)));
+      }
+    });
+  }
+}
+
 void _testSeparatedList0() {
   test('SeparatedList0', () {
     final parser = separatedList0C32Abc;
@@ -1835,34 +1948,6 @@ void _testSeparatedPair() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.tag(1, Tag(abc)));
-    }
-  });
-}
-
-void _testSkip() {
-  test('Skip', () {
-    final parser = skipABC;
-    {
-      final state = State('   ');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, 'ABC');
-      expect(state.pos, 3);
-    }
-    {
-      final state = State('    ');
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, 'ABC');
-      expect(state.pos, 3);
-    }
-    {
-      final state = State('');
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrUnexpected.eof(0));
     }
   });
 }
@@ -2210,47 +2295,6 @@ void _testTag() {
   });
 }
 
-void _testTagOf() {
-  test('TagOf', () {
-    final parser = tagOfFoo;
-    final foo = 'foo';
-    {
-      final state = State(foo);
-      state.context = _StateContext();
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, foo);
-      expect(state.pos, 3);
-    }
-    {
-      final state = State('$foo ');
-      state.context = _StateContext();
-      final r = parser(state);
-      expect(state.ok, true);
-      expect(r, foo);
-      expect(state.pos, 3);
-    }
-    {
-      final state = State('');
-      state.context = _StateContext();
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.tag(0, Tag(foo)));
-    }
-    {
-      final state = State(' $foo');
-      state.context = _StateContext();
-      final r = parser(state);
-      expect(state.ok, false);
-      expect(r, null);
-      expect(state.pos, 0);
-      expect(state.error, ErrExpected.tag(0, Tag(foo)));
-    }
-  });
-}
-
 void _testTagNoCase() {
   test('TagNoCase', () {
     final parser = tagNoCaseAbc;
@@ -2290,6 +2334,47 @@ void _testTagNoCase() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.tag(0, Tag(abc)));
+    }
+  });
+}
+
+void _testTagOf() {
+  test('TagOf', () {
+    final parser = tagOfFoo;
+    final foo = 'foo';
+    {
+      final state = State(foo);
+      state.context = _StateContext();
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, foo);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('$foo ');
+      state.context = _StateContext();
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, foo);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      state.context = _StateContext();
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(foo)));
+    }
+    {
+      final state = State(' $foo');
+      state.context = _StateContext();
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag(foo)));
     }
   });
 }
@@ -2658,77 +2743,6 @@ void _testTerminated() {
       expect(state.error, ErrExpected.char(1, Char(c32)));
     }
   });
-}
-
-void _testSemanticActions() {
-  final parsers = {
-    'CharClasss': transformersCharClassIsDigit,
-    'ClosureAction': transformersClosureIsDigit,
-    'ExprAction': transformersExprIsDigit,
-    'FuncExprAction': transformersFuncExprIsDigit,
-    'FuncAction': transformersFuncIsDigit,
-    'NotCharClasss': transformersNotCharClassIsDigit,
-  };
-  for (final key in parsers.keys) {
-    test('Semantic action $key', () {
-      final parser = parsers[key]!;
-      {
-        final state = State('123');
-        final r = parser(state);
-        expect(state.ok, true);
-        expect(r, '123');
-        expect(state.pos, 3);
-      }
-      {
-        final state = State('123 ');
-        final r = parser(state);
-        expect(state.ok, true);
-        expect(r, '123');
-        expect(state.pos, 3);
-      }
-      {
-        final state = State('');
-        final r = parser(state);
-        expect(state.ok, true);
-        expect(r, '');
-        expect(state.pos, 0);
-      }
-      {
-        final state = State(' ');
-        final r = parser(state);
-        expect(state.ok, true);
-        expect(r, '');
-        expect(state.pos, 0);
-      }
-    });
-
-    test('Semantic action VarAction', () {
-      final parser = transformersVarIsNotDigit;
-      {
-        final state = State('a');
-        final r = parser(state);
-        expect(state.ok, true);
-        expect(r, 0x61);
-        expect(state.pos, 1);
-      }
-      {
-        final state = State('');
-        final r = parser(state);
-        expect(state.ok, false);
-        expect(r, null);
-        expect(state.pos, 0);
-        expect(state.error, ErrUnexpected.eof(0));
-      }
-      {
-        final state = State('1');
-        final r = parser(state);
-        expect(state.ok, false);
-        expect(r, null);
-        expect(state.pos, 0);
-        expect(state.error, ErrUnexpected.char(0, Char(0x31)));
-      }
-    });
-  }
 }
 
 void _testTuple() {

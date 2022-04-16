@@ -6,32 +6,17 @@ class Many0<I, O> extends ParserBuilder<I, List<O>> {
   const Many0(this.parser);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    if (parser.isAlwaysSuccess()) {
-      throw StateError('Using a parser that always succeeds is not valid');
-    }
-
-    final key = BuidlResult();
-    final fast = result.isVoid;
-    final list = fast ? '' : context.allocateLocal('list');
-    code += fast ? '' : 'final $list = <$O>[];';
+  void build(Context context, CodeGen code) {
+    final list = code.val('list', '<$O>[]', false);
     code.while$('true', (code) {
-      final result1 = helper.getResult(context, code, parser, fast);
-      helper.build(context, code, parser, result1, true, onSuccess: (code) {
-        code += fast ? '' : '$list.add(${result1.valueUnsafe});';
-      }, onFailure: (code) {
+      final result = helper.build(context, code, parser, silent: true);
+      code.ifSuccess((code) {
+        code.add('$list.add(${result.value});', false);
+      }, else_: (code) {
         code.break$();
       });
     });
     code.setSuccess();
-    code.setResult(result, list);
-    code.labelSuccess(key);
-    return key;
-  }
-
-  @override
-  bool isAlwaysSuccess() {
-    return true;
+    code.setResult(list);
   }
 }

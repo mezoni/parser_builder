@@ -25,16 +25,19 @@ void _ws(State<String> state) {
   final source = state.source;
   while (true) {
     final $pos = state.pos;
-    int? $c;
-    int? $2;
+    int? $3;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      $2 = source.readRune(state) as int?;
-      $c = $2!;
-      state.ok = $c == 0x9 || $c == 0xa || $c == 0xd || $c == 0x20;
+      $3 = _wrap(source.readRune(state));
+    }
+    if (state.ok) {
+      final $v = _unwrap($3);
+      state.ok = $v == 0x9 || $v == 0xa || $v == 0xd || $v == 0x20;
     }
     if (!state.ok) {
       state.pos = $pos;
+    }
+    if (!state.ok) {
       break;
     }
   }
@@ -42,6 +45,7 @@ void _ws(State<String> state) {
 }
 
 num? number(State<String> state) {
+  num? $0;
   final source = state.source;
   num? $parseNumber() {
     state.ok = true;
@@ -316,20 +320,29 @@ num? number(State<String> state) {
     return res;
   }
 
-  num? $0;
   final $pos = state.pos;
   _ws(state);
-  num? $2;
-  num? $3;
-  $3 = $parseNumber() as num?;
   if (state.ok) {
-    _ws(state);
-    $2 = $3;
-    state.ok = state.pos >= state.source.length;
-    if (!state.ok) {
-      state.error = ErrExpected.eof(state.pos);
-    } else {
-      $0 = $2;
+    num? $2;
+    final $pos1 = state.pos;
+    num? $3;
+    $3 = _wrap($parseNumber());
+    if (state.ok) {
+      _ws(state);
+      if (state.ok) {
+        $2 = $3;
+      } else {
+        state.pos = $pos1;
+      }
+    }
+    if (state.ok) {
+      state.ok = state.pos >= source.length;
+      if (!state.ok) {
+        state.error = ErrExpected.eof(state.pos);
+      }
+      if (state.ok) {
+        $0 = $2;
+      }
     }
   }
   if (!state.ok) {
@@ -367,6 +380,12 @@ String _errorMessage(String source, List<Err> errors,
 
   return sb.toString();
 }
+
+@pragma('vm:prefer-inline')
+T _unwrap<T>(T? value) => value!;
+
+@pragma('vm:prefer-inline')
+T? _wrap<T>(T? value) => value;
 
 /// Represents the `char` used in parsing errors.
 class Char {

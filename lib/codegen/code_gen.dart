@@ -1,24 +1,40 @@
 import 'dart:collection';
 
-import 'package:parser_builder/parser_builder.dart';
-
+import '../parser_builder.dart';
 import 'statements.dart';
 
 class CodeGen {
+  final Allocator allocator;
+
+  bool fast;
+
+  ParserResult result;
+
+  String? pos;
+
+  bool silent;
+
   LinkedList<Statement> statements;
 
-  final Map<BuidlResult, _Ending> _endings = {};
-
-  CodeGen(this.statements);
+  CodeGen(this.statements,
+      {required this.allocator,
+      this.fast = false,
+      this.pos,
+      required this.result,
+      this.silent = false});
 
   CodeGen operator +(code) {
-    addCode(code);
+    add(code);
     return this;
   }
 
-  void addCode(code) {
+  void add(code, [bool? fast]) {
     if (_endsWithTransferControl()) {
       throw StateError('Unable to add statement after transfer of control');
+    }
+
+    if (!_testFast(fast)) {
+      return;
     }
 
     if (code is String) {
@@ -34,6 +50,56 @@ class CodeGen {
     }
   }
 
+  void addCase(SwitchStatement statement, Iterable values,
+      void Function(CodeGen code) f) {
+    final case_ = CaseStatement(values, LinkedList());
+    statement.cases.add(case_);
+    scope(case_.statements, f);
+  }
+
+  void addTo(String name, value, [bool? fast]) {
+    if (!_testFast(fast)) {
+      return;
+    }
+
+    if (value is int) {
+      switch (value) {
+        case 1:
+          this + '$name++;';
+          break;
+        case -1:
+          this + '$name--;';
+          break;
+        default:
+          if (value > 0) {
+            this + '$name += $value;';
+          } else {
+            this + '$name -= $value;';
+          }
+      }
+    } else {
+      this + '$name += $value;';
+    }
+  }
+
+  void addToPos(value) {
+    addTo('state.pos', value);
+  }
+
+  String allocate(String name, [bool? fast]) {
+    if (_testFast(fast)) {
+      return allocator.allocate(name);
+    } else {
+      return '';
+    }
+  }
+
+  void assign(String left, String right, [bool? fast]) {
+    if (_testFast(fast)) {
+      this + AssignmentStatement(left, right);
+    }
+  }
+
   void break$() {
     this + BreakStatement();
   }
@@ -42,28 +108,29 @@ class CodeGen {
     this + CallStatement(name, result.name);
   }
 
+  void clearResult() {
+    if (result.isVoid) {
+      return;
+    }
+
+    this + ResultAssignmentStatement(result.name, result.type, 'null');
+  }
+
   void continue$() {
     this + ContinueStatement();
   }
 
-  LinkedList<Statement>? getLabelFailure(BuidlResult key) {
-    final ending = _getEnding(key);
-    return ending.failure;
-  }
-
-  LinkedList<Statement>? getLabelSuccess(BuidlResult key) {
-    final ending = _getEnding(key);
-    return ending.success;
+  void errorUnexpectedEof([String pos = 'state.pos']) {
+    setError('ErrUnexpected.eof($pos)');
   }
 
   void if_(String condition, void Function(CodeGen code) if_,
       {void Function(CodeGen code)? else_}) {
-    final ifBranch = LinkedList<Statement>();
-    final elseBranch = LinkedList<Statement>();
-    final statement = ConditionalStatement(condition, ifBranch, elseBranch);
-    scope(ifBranch, if_);
+    final statement =
+        ConditionalStatement(condition, LinkedList(), LinkedList());
+    scope(statement.ifBranch, if_);
     if (else_ != null) {
-      scope(elseBranch, else_);
+      scope(statement.elseBranch, else_);
     }
 
     this + statement;
@@ -72,6 +139,11 @@ class CodeGen {
   void ifFailure(void Function(CodeGen code) if_,
       {void Function(CodeGen code)? else_}) {
     return this.if_('!state.ok', if_, else_: else_);
+  }
+
+  void ifNotEof(void Function(CodeGen code) if_,
+      {void Function(CodeGen code)? else_}) {
+    return this.if_('state.pos < source.length', if_, else_: else_);
   }
 
   void ifSuccess(void Function(CodeGen code) if_,
@@ -85,26 +157,36 @@ class CodeGen {
     this + statement;
   }
 
-  void labelFailure(BuidlResult key) {
-    final ending = _getEnding(key);
-    if (ending.failure != null) {
-      throw StateError('Failure label already defined');
+  String local(String type, String name, [String? value, bool? fast]) {
+    if (_testFast(fast)) {
+      final ident = allocate(name, fast);
+      if (value != null) {
+        this + '$type $ident = $value;';
+      } else {
+        this + '$type $ident;';
+      }
+
+      return ident;
+    } else {
+      return '';
     }
-
-    ending.failure = statements;
-  }
-
-  void labelSuccess(BuidlResult key) {
-    final ending = _getEnding(key);
-    if (ending.success != null) {
-      throw StateError('Success label already defined');
-    }
-
-    ending.success = statements;
   }
 
   void negateState() {
     setState('!state.ok');
+  }
+
+  String savePos([bool? fast]) {
+    if (!_testFast(fast)) {
+      return '';
+    }
+
+    if (pos != null) {
+      return pos!;
+    }
+
+    pos = val('pos', 'state.pos');
+    return pos!;
   }
 
   void scope(LinkedList<Statement> statements, void Function(CodeGen code) f) {
@@ -114,38 +196,66 @@ class CodeGen {
     this.statements = statements_;
   }
 
+  void setError(String error) {
+    if (!silent) {
+      add('state.error = $error;');
+    }
+  }
+
   void setFailure() {
     setState('false');
   }
 
-  void setResult(ParserResult result, String value, [bool cast = true]) {
+  void setPos(String value, [bool? fast]) {
+    if (_testFast(fast)) {
+      assign('state.pos', value);
+    }
+  }
+
+  void setResult(String value, [bool asNullable = true]) {
     if (!result.isVoid) {
       if (value.isEmpty) {
         throw ArgumentError('Value must be specified', 'value');
       }
 
       if (value.trim() != 'null') {
-        this + ResultAssignmentStatement(result.name, result.type, value, cast);
+        if (asNullable) {
+          value = '_wrap($value)';
+        }
+
+        this + ResultAssignmentStatement(result.name, result.type, value);
       }
     }
   }
 
-  void setState(String value) {
-    this + StateAssignmentStatement(value);
+  void setState(String value, [bool? fast]) {
+    if (_testFast(fast)) {
+      this + StateAssignmentStatement(value);
+    }
+  }
+
+  void setStateToEof() {
+    setState('state.pos >= source.length');
+  }
+
+  void setStateToNotEof() {
+    setState('state.pos < source.length');
   }
 
   void setSuccess() {
     setState('true');
   }
 
-  void switch_(value, void Function(SwitchCodeGen code) f) {
+  SwitchStatement switch_(value) {
     final cases = <CaseStatement>[];
     final default_ = LinkedList<Statement>();
     final statement = SwitchStatement(value, cases, default_);
-    final statements = this.statements;
-    f(SwitchCodeGen(statement, this));
-    this.statements = statements;
     this + statement;
+    return statement;
+  }
+
+  String val(String name, String? value, [bool? fast]) {
+    return local('final', name, value, fast);
   }
 
   void while$(String condition, void Function(CodeGen code) f) {
@@ -167,14 +277,9 @@ class CodeGen {
     return false;
   }
 
-  _Ending _getEnding(BuidlResult key) {
-    var endings = _endings[key];
-    if (endings == null) {
-      endings = _Ending();
-      _endings[key] = endings;
-    }
-
-    return endings;
+  bool _testFast(bool? fast) {
+    fast ??= this.fast;
+    return fast == this.fast;
   }
 }
 
@@ -185,46 +290,9 @@ class ParserResult {
 
   final String value;
 
-  final String valueUnsafe;
-
-  const ParserResult(this.name, this.type, this.value, this.valueUnsafe);
+  const ParserResult(this.name, this.type, this.value);
 
   bool get isVoid {
     return type.trim() == 'void';
   }
-}
-
-class SwitchCodeGen {
-  final CodeGen _code;
-
-  final SwitchStatement _switch;
-
-  SwitchCodeGen(this._switch, this._code);
-
-  void case_(Iterable values, void Function(CodeGen code) case_) {
-    final branch = LinkedList<Statement>();
-    final statements = _code.statements;
-    _code.statements = branch;
-    case_(_code);
-    _code.statements = statements;
-    _switch.cases.add(CaseStatement(values, branch));
-  }
-
-  void default_(List values, void Function(CodeGen code) case_) {
-    final default_ = _switch.default_;
-    if (default_.isNotEmpty) {
-      throw StateError('Default branch already contains statements');
-    }
-
-    final statements = _code.statements;
-    _code.statements = default_;
-    case_(_code);
-    _code.statements = statements;
-  }
-}
-
-class _Ending {
-  LinkedList<Statement>? failure;
-
-  LinkedList<Statement>? success;
 }

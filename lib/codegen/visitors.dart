@@ -1,6 +1,8 @@
 import 'statements.dart';
 
 abstract class Visitor<T> {
+  T visitAssignment(AssignmentStatement node);
+
   T visitBreak(BreakStatement node);
 
   T visitCall(CallStatement node);
@@ -19,13 +21,14 @@ abstract class Visitor<T> {
 
   T visitStateAssignment(StateAssignmentStatement node);
 
-  T visitStatements(Statements node);
-
   T visitSwitch(SwitchStatement node);
 }
 
 abstract class VisitorBase<T> extends Visitor<T> {
   T visit(Statement node);
+
+  @override
+  T visitAssignment(AssignmentStatement node) => visit(node);
 
   @override
   T visitBreak(BreakStatement node) => visit(node);
@@ -53,9 +56,6 @@ abstract class VisitorBase<T> extends Visitor<T> {
 
   @override
   T visitStateAssignment(StateAssignmentStatement node) => visit(node);
-
-  @override
-  T visitStatements(Statements node) => visit(node);
 
   @override
   T visitSwitch(SwitchStatement node) => visit(node);

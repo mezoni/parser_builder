@@ -15,7 +15,6 @@ class NoneOf extends Redirect<String, int> {
   @override
   ParserBuilder<String, int> getRedirectParser() {
     final predicate = NotCharClass.fromList(characters);
-    final parser = Satisfy(predicate);
-    return parser;
+    return Satisfy(predicate);
   }
 }

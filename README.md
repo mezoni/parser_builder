@@ -240,12 +240,16 @@ const _inline = '@pragma(\'vm:prefer-inline\')';
 
 ```dart
 Color? _hexColor(State<String> state) {
-  final source = state.source;
   Color? $0;
+  final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
-    state.pos += 1;
+    state.pos++;
+  } else {
+    state.error = ErrExpected.tag(state.pos, const Tag('#'));
+  }
+  if (state.ok) {
     Color? $2;
     final $pos1 = state.pos;
     int? $3;
@@ -257,20 +261,21 @@ Color? _hexColor(State<String> state) {
         int? $5;
         $5 = _hexPrimary(state);
         if (state.ok) {
-          final $v = ($3 as int?)!;
-          final $v1 = ($4 as int?)!;
-          final $v2 = ($5 as int?)!;
-          $2 = Color($v, $v1, $v2) as Color?;
-          $0 = $2;
+          final $v = _unwrap($3);
+          final $v1 = _unwrap($4);
+          final $v2 = _unwrap($5);
+          $2 = _wrap(Color($v, $v1, $v2));
         }
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
+    }
+    if (state.ok) {
+      $0 = $2;
+    } else {
       state.pos = $pos;
     }
-  } else {
-    state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   return $0;
 }
@@ -309,16 +314,20 @@ Inlined means that it was generated without a function declaration for it (only 
 ```dart
 dynamic _json(State<String> state) {
   dynamic $0;
+  final source = state.source;
   final $pos = state.pos;
   _ws(state);
-  dynamic $2;
-  $2 = _value(state);
   if (state.ok) {
-    state.ok = state.pos >= state.source.length;
-    if (!state.ok) {
-      state.error = ErrExpected.eof(state.pos);
-    } else {
-      $0 = $2;
+    dynamic $2;
+    $2 = _value(state);
+    if (state.ok) {
+      state.ok = state.pos >= source.length;
+      if (!state.ok) {
+        state.error = ErrExpected.eof(state.pos);
+      }
+      if (state.ok) {
+        $0 = $2;
+      }
     }
   }
   if (!state.ok) {
@@ -383,35 +392,21 @@ class Many0<I, O> extends ParserBuilder<I, List<O>> {
   const Many0(this.parser);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    if (parser.isAlwaysSuccess()) {
-      throw StateError('Using a parser that always succeeds is not valid');
-    }
-
-    final key = BuidlResult();
-    final fast = result.isVoid;
-    final list = fast ? '' : context.allocateLocal('list');
-    code += fast ? '' : 'final $list = <$O>[];';
+  void build(Context context, CodeGen code) {
+    final list = code.val('list', '<$O>[]', false);
     code.while$('true', (code) {
-      final result1 = helper.getResult(context, code, parser, fast);
-      helper.build(context, code, parser, result1, true, onSuccess: (code) {
-        code += fast ? '' : '$list.add(${result1.valueUnsafe});';
-      }, onFailure: (code) {
+      final result = helper.build(context, code, parser, silent: true);
+      code.ifSuccess((code) {
+        code.add('$list.add(${result.value});', false);
+      }, else_: (code) {
         code.break$();
       });
     });
     code.setSuccess();
-    code.setResult(result, list);
-    code.labelSuccess(key);
-    return key;
-  }
-
-  @override
-  bool isAlwaysSuccess() {
-    return true;
+    code.setResult(list);
   }
 }
+
 
 ```
 

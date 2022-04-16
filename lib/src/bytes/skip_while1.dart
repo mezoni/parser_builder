@@ -14,7 +14,6 @@ class SkipWhile1 extends Redirect<String, void> {
 
   @override
   ParserBuilder<String, void> getRedirectParser() {
-    final parser = Fast(Many1(Satisfy(predicate)));
-    return parser;
+    return Fast(Many1(Satisfy(predicate)));
   }
 }

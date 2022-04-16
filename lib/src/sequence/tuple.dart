@@ -152,10 +152,9 @@ abstract class _Tuple<I, O> extends _Sequence<I, O> {
   const _Tuple();
 
   @override
-  void _setResults(Context context, CodeGen code, ParserResult result,
-      List<ParserResult> results) {
-    final items = results.map((e) => e.value).join(', ');
+  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
+    final values = results.map((e) => e.value).join(', ');
     final size = results.length;
-    code.setResult(result, 'Tuple$size($items)');
+    code.setResult('Tuple$size($values)');
   }
 }

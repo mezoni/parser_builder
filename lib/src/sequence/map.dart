@@ -176,19 +176,16 @@ abstract class _Map<I, O> extends _Sequence<I, O> {
   }
 
   @override
-  void _setResults(Context context, CodeGen code, ParserResult result,
-      List<ParserResult> results) {
+  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
     final arguments = <String>[];
     for (var i = 0; i < results.length; i++) {
-      final result1 = results[i];
-      if (!result1.isVoid) {
-        final v = context.allocateLocal('v');
-        code + 'final $v = ${result1.value};';
+      final result = results[i];
+      if (!result.isVoid) {
+        final v = code.val('v', result.value);
         arguments.add(v);
       }
     }
 
-    final map = this.map.build(context, 'map', arguments);
-    code.setResult(result, map);
+    code.setResult(map.build(context, 'map', arguments));
   }
 }

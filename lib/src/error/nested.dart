@@ -10,21 +10,13 @@ class Nested<I, O> extends ParserBuilder<I, O> {
   const Nested(this.message, this.tag, this.parser);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
+  void build(Context context, CodeGen code) {
     final message = helper.escapeString(this.message);
-    final pos = context.allocateLocal('pos');
     final tag = helper.escapeString(this.tag);
-    code + 'final $pos = state.pos;';
-    helper.build(context, code, parser, result, silent, onSuccess: (code) {
-      code.labelSuccess(key);
-    }, onFailure: (code) {
-      code += silent
-          ? ''
-          : 'state.error = ErrNested($pos, $message, const Tag($tag), state.error);';
-      code.labelFailure(key);
+    final pos = code.savePos();
+    helper.build(context, code, parser, pos: pos, result: code.result);
+    code.ifFailure((code) {
+      code.setError('ErrNested($pos, $message, const Tag($tag), state.error)');
     });
-    return key;
   }
 }

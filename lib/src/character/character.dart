@@ -6,8 +6,7 @@ abstract class _Chars0 extends Redirect<String, String> {
   @override
   ParserBuilder<String, String> getRedirectParser() {
     final predicate = _getCharacterPredicate();
-    final parser = TakeWhile(predicate);
-    return parser;
+    return TakeWhile(predicate);
   }
 
   SemanticAction<bool> _getCharacterPredicate();
@@ -19,8 +18,7 @@ abstract class _Chars1 extends Redirect<String, String> {
   @override
   ParserBuilder<String, String> getRedirectParser() {
     final predicate = _getCharacterPredicate();
-    final parser = TakeWhile1(predicate);
-    return parser;
+    return TakeWhile1(predicate);
   }
 
   SemanticAction<bool> _getCharacterPredicate();

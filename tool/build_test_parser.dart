@@ -17,6 +17,7 @@ Future<void> main(List<String> args) async {
     _alphanumeric0,
     _alphanumeric1,
     _altC16OrC32,
+    _andC32OrC16,
     _anyChar,
     _char16,
     _char32,
@@ -56,7 +57,6 @@ Future<void> main(List<String> args) async {
     _separatedList0C32Abc,
     _separatedList1C32Abc,
     _separatedPairC16AbcC32,
-    _skipABC,
     _skipWhile1C16,
     _skipWhile1C32,
     _skipWhileC16,
@@ -124,6 +124,8 @@ const _alphanumeric0 = Named('alphanumeric0', Alphanumeric0());
 const _alphanumeric1 = Named('alphanumeric1', Alphanumeric1());
 
 const _altC16OrC32 = Named('altC16OrC32', Alt([_char16, Char(c32)]));
+
+const _andC32OrC16 = Named('andC32OrC16', And(Alt2(_char32, _char16)));
 
 const _anyChar = Named('anyChar', AnyChar());
 
@@ -239,8 +241,6 @@ const _separatedList1C32Abc =
 const _separatedPairC16AbcC32 = Named(
     'separatedPairC16AbcC32', SeparatedPair(Char(c16), Tag(abc), Char(c32)));
 
-const _skipABC = Named('skipABC', Skip(3, ExprAction.value('\'ABC\'')));
-
 const _skipWhile1C16 = Named('skipWhile1C16', SkipWhile1(_isC16));
 
 const _skipWhile1C32 = Named('skipWhile1C32', SkipWhile1(_isC32));
@@ -267,8 +267,7 @@ const _tagC32 = Named('tagC32', Tag(s32));
 
 const _tagC32C16 = Named('tagC32C16', Tag(s32 + s16));
 
-const _tagNoCaseAbc = Named('tagNoCaseAbc',
-    TagNoCase(abc, ExprAction<String>(['s'], '{{s}}.toLowerCase()')));
+const _tagNoCaseAbc = Named('tagNoCaseAbc', TagNoCase(abc));
 
 const _tagOfFoo = Named(
     'tagOfFoo',

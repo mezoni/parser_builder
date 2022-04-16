@@ -4,16 +4,11 @@ class Eof<I> extends ParserBuilder<I, void> {
   const Eof();
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
-    code.setState('state.pos >= state.source.length');
+  void build(Context context, CodeGen code) {
+    context.refersToStateSource = true;
+    code.setStateToEof();
     code.ifFailure((code) {
-      code += silent ? '' : 'state.error = ErrExpected.eof(state.pos);';
-      code.labelFailure(key);
-    }, else_: (code) {
-      code.labelSuccess(key);
+      code.setError('ErrExpected.eof(state.pos)');
     });
-    return key;
   }
 }

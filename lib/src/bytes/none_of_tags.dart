@@ -18,21 +18,17 @@ class NoneOfTags extends _Tags<void> {
   }
 
   @override
-  void _onTag(
-      CodeGen code, ParserResult result, bool silent, String pos, String tag) {
+  void _onTag(CodeGen code, String tag) {
+    final pos = code.pos;
     final length = tag.length;
     final value = helper.escapeString(tag);
     if (length == 1) {
       code.setFailure();
-      code += silent
-          ? ''
-          : 'state.error = ErrUnexpected.tag($pos, const Tag($value));';
+      code.setError('ErrUnexpected.tag($pos, const Tag($value))');
     } else {
       code.if_('source.startsWith($value, $pos)', (code) {
         code.setFailure();
-        code += silent
-            ? ''
-            : 'state.error = ErrUnexpected.tag($pos, const Tag($value));';
+        code.setError('ErrUnexpected.tag($pos, const Tag($value))');
         code.break$();
       });
     }

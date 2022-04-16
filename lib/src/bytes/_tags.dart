@@ -6,34 +6,29 @@ abstract class _Tags<O> extends StringParserBuilder<O> {
   List<String> get tags;
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
+  void build(Context context, CodeGen code) {
     context.refersToStateSource = true;
-    final key = BuidlResult();
     final map = _generateMap();
-    final pos = context.allocateLocal('pos');
     _onInit(code);
-    code + 'final $pos = state.pos;';
+    final pos = code.savePos();
     code.if_('state.pos < source.length', (code) {
-      code + 'final c = source.codeUnitAt($pos);';
-      code.switch_('c', (code) {
-        for (final c in map.keys) {
-          _buildCase(code, result, silent, c, map, pos);
-        }
-      });
+      final c = code.val('c', 'source.codeUnitAt($pos)');
+      final sw = code.switch_(c);
+      for (final c in map.keys) {
+        _buildCase(code, sw, c, map);
+      }
     });
 
-    _onDone(code, result, silent, key, pos);
-    return key;
+    _onDone(code);
   }
 
-  void _buildCase(SwitchCodeGen code, ParserResult result, bool silent, int c,
-      Map<int, List<String>> map, String pos) {
+  void _buildCase(
+      CodeGen code, SwitchStatement sw, int c, Map<int, List<String>> map) {
     final tags = map[c]!;
     tags.sort((x, y) => y.length.compareTo(x.length));
-    code.case_([c], (code) {
+    code.addCase(sw, [c], (code) {
       for (final tag in tags) {
-        _onTag(code, result, silent, pos, tag);
+        _onTag(code, tag);
       }
 
       code.break$();
@@ -61,8 +56,7 @@ abstract class _Tags<O> extends StringParserBuilder<O> {
     return result;
   }
 
-  void _onDone(CodeGen code, ParserResult result, bool silent, BuidlResult key,
-      String pos) {
+  void _onDone(CodeGen code) {
     //
   }
 
@@ -70,6 +64,5 @@ abstract class _Tags<O> extends StringParserBuilder<O> {
     //
   }
 
-  void _onTag(
-      CodeGen code, ParserResult result, bool silent, String pos, String tag);
+  void _onTag(CodeGen code, String tag);
 }

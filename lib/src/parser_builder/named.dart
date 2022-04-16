@@ -10,27 +10,19 @@ class Named<I, O> extends ParserBuilder<I, O> {
   const Named(this.name, this.parser, [this.annotaions = const []]);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
+  void build(Context context, CodeGen code) {
     if (!context.context.containsKey(this)) {
       context.context[this] = null;
-      _buildDeclaration(context, silent);
+      _buildDeclaration(context, code.silent);
     }
 
+    final result = code.result;
     final fast = result.isVoid;
     if (fast) {
       code + '$name(state);';
     } else {
-      code.setResult(result, '$name(state)', false);
+      code.setResult('$name(state)', false);
     }
-
-    return key;
-  }
-
-  @override
-  bool isAlwaysSuccess() {
-    return parser.isAlwaysSuccess();
   }
 
   void _buildDeclaration(Context context, bool silent) {
@@ -40,11 +32,18 @@ class Named<I, O> extends ParserBuilder<I, O> {
     context.localAllocator = localAllocator.clone();
     context.localDeclarations = {};
     context.refersToStateSource = false;
+    final type = parser.getResultType();
+    final ident = context.allocateLocal();
+    final value = parser.getResultValue(ident);
+    final fast = type == 'void';
+    var result = ParserResult(ident, type, value);
     final statements = LinkedList<Statement>();
-    final code = CodeGen(statements);
-    final fast = parser.getResultType() == 'void';
-    final result = helper.getResult(context, code, parser, fast);
-    helper.build(context, code, parser, result, false);
+    final code = CodeGen(statements,
+        allocator: context.localAllocator,
+        fast: fast,
+        result: result,
+        silent: silent);
+    result = helper.build(context, code, parser, result: result);
     final codeOptimizer = CodeOptimizer();
     codeOptimizer.optimize(statements);
     final buffer = StringBuffer();
@@ -58,6 +57,12 @@ class Named<I, O> extends ParserBuilder<I, O> {
     buffer.write('(State<');
     buffer.write(I);
     buffer.writeln('> state) {');
+    if (!result.isVoid) {
+      buffer.write(type);
+      buffer.write(' ');
+      buffer.write(result.name);
+      buffer.write(';');
+    }
     if (context.refersToStateSource) {
       buffer.writeln('final source = state.source;');
     }

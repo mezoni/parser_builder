@@ -14,14 +14,15 @@ Future<void> fastBuild(Context context, List<Named> builders, String filename,
     String? partOf,
     Map<String, Named> publish = const {}}) async {
   for (final builder in builders) {
+    context.localAllocator = context.localAllocator.clone();
     final statements = LinkedList<Statement>();
-    final code = CodeGen(statements);
     final name = '\$0';
     final type = builder.getResultType();
     final value = builder.getResultValue(name);
-    final valueUnsafe = builder.getResultValueUnsafe(name);
-    final result = ParserResult(name, type, value, valueUnsafe);
-    builder.build(context, code, result, false);
+    final result = ParserResult(name, type, value);
+    final code = CodeGen(statements,
+        allocator: context.localAllocator, fast: result.isVoid, result: result);
+    builder.build(context, code);
   }
 
   final declarations = context.globalDeclarations;
@@ -34,6 +35,7 @@ Future<void> fastBuild(Context context, List<Named> builders, String filename,
     declarations.add(ParseRuntime.getErrorMessageProcessor());
   }
 
+  declarations.addAll(ParseRuntime.getFunctions());
   declarations.addAll(ParseRuntime.getClasses());
   var code = declarations.join('\n\n');
   if (partOf != null) {

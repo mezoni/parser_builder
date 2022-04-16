@@ -12,6 +12,16 @@ class Printer extends Visitor<void> {
   }
 
   @override
+  void visitAssignment(AssignmentStatement node) {
+    final left = node.left;
+    final right = node.right;
+    sink.write(left);
+    sink.write(' = ');
+    sink.write(right);
+    sink.write(';');
+  }
+
+  @override
   void visitBreak(BreakStatement node) {
     sink.write('break;');
   }
@@ -76,21 +86,12 @@ class Printer extends Visitor<void> {
 
   @override
   void visitResultAssignment(ResultAssignmentStatement node) {
-    final cast = node.cast;
     final name = node.name;
     final value = node.value;
-    if (value.trim() != 'null') {
-      sink.write(name);
-      sink.write(' = ');
-      sink.write(value);
-      if (cast) {
-        final type = node.type;
-        sink.write(' as ');
-        sink.write(type);
-      }
-
-      sink.write(';');
-    }
+    sink.write(name);
+    sink.write(' = ');
+    sink.write(value);
+    sink.write(';');
   }
 
   @override
@@ -105,20 +106,6 @@ class Printer extends Visitor<void> {
     sink.write('state.ok = ');
     sink.write(value);
     sink.write(';');
-  }
-
-  @override
-  void visitStatements(Statements node) {
-    final statements = node.statements;
-    var first = true;
-    for (final statement in statements) {
-      if (!first) {
-        first = false;
-        sink.writeln();
-      }
-
-      statement.accept(this);
-    }
   }
 
   @override

@@ -14,7 +14,6 @@ class TakeUntil extends Redirect<String, String> {
 
   @override
   ParserBuilder<String, String> getRedirectParser() {
-    final parser = Recognize(Fast(MoveTo(FindTag(tag))));
-    return parser;
+    return Recognize(Fast(MoveTo(FindTag(tag))));
   }
 }

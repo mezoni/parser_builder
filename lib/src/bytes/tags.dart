@@ -13,15 +13,14 @@ class Tags extends _Tags<String> {
   const Tags(this.tags);
 
   @override
-  void _onDone(CodeGen code, ParserResult result, bool silent, BuidlResult key,
-      String pos) {
+  void _onDone(CodeGen code) {
+    final pos = code.pos;
     final errors = tags
         .map((e) =>
             'ErrExpected.tag($pos, const Tag(${helper.escapeString(e)}))')
         .join(', ');
     code.ifFailure((code) {
-      code += silent ? '' : 'state.error = ErrCombined($pos, [$errors]);';
-      code.labelFailure(key);
+      code.setError('ErrCombined($pos, [$errors])');
     });
   }
 
@@ -31,19 +30,18 @@ class Tags extends _Tags<String> {
   }
 
   @override
-  void _onTag(
-      CodeGen code, ParserResult result, bool silent, String pos, String tag) {
+  void _onTag(CodeGen code, String tag) {
     final length = tag.length;
     final value = helper.escapeString(tag);
     if (length == 1) {
-      code + 'state.pos++;';
+      code.addToPos(1);
       code.setSuccess();
-      code.setResult(result, value);
+      code.setResult(value);
     } else {
-      code.if_('source.startsWith($value, $pos)', (code) {
-        code + 'state.pos += $length;';
+      code.if_('source.startsWith($value, ${code.pos})', (code) {
+        code.addToPos(length);
         code.setSuccess();
-        code.setResult(result, value);
+        code.setResult(value);
         code.break$();
       });
     }

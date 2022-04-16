@@ -17,15 +17,7 @@ class TakeWhileMN extends Redirect<String, String> {
   const TakeWhileMN(this.m, this.n, this.predicate);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final parser = Recognize(ManyMN(m, n, Satisfy(predicate)));
-    return parser.build(context, code, result, silent);
-  }
-
-  @override
   ParserBuilder<String, String> getRedirectParser() {
-    final parser = Recognize(ManyMN(m, n, Satisfy(predicate)));
-    return parser;
+    return Recognize(ManyMN(m, n, Satisfy(predicate)));
   }
 }

@@ -16,10 +16,9 @@ class Pair<I, O1, O2> extends _Sequence<I, tuple.Tuple2<O1, O2>> {
   }
 
   @override
-  void _setResults(Context context, CodeGen code, ParserResult result,
-      List<ParserResult> results) {
-    final r1 = results[0];
-    final r2 = results[1];
-    code.setResult(result, 'Tuple2(${r1.value}, ${r2.value})');
+  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
+    final result1 = results[0];
+    final result2 = results[1];
+    code.setResult('Tuple2(${result1.value}, ${result2.value})');
   }
 }

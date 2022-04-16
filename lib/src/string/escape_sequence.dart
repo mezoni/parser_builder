@@ -21,85 +21,63 @@ class EscapeSequence extends StringParserBuilder<int> {
   const EscapeSequence(this.table);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
+  void build(Context context, CodeGen code) {
     context.refersToStateSource = true;
     final isUnicode = table.keys.any((e) => e > 0xffff);
     if (isUnicode) {
-      return _build32(context, code, result, silent);
+      _build32(context, code);
     } else {
-      return _build16(context, code, result, silent);
+      _build16(context, code);
     }
   }
 
-  BuidlResult _build16(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
-    final c = context.allocateLocal('c');
-    final v = context.allocateLocal('v');
-    code + 'int? $c;';
-    code.setState('state.pos < source.length');
+  void _build16(Context context, CodeGen code) {
+    final c = code.local('int?', 'c');
     code.setFailure();
-    code.if_('state.pos < source.length', (code) {
-      code + '$c = source.codeUnitAt(state.pos);';
-      code + 'int? $v;';
-      code.switch_(c, (code) {
-        _buildCases(code, c, v);
-      });
+    code.ifNotEof((code) {
+      code.assign(c, 'source.codeUnitAt(state.pos)');
+      final v = code.local('int?', 'v');
+      final sw = code.switch_(c);
+      _buildCases(code, sw, c, v);
       code.if_('$v != null', (code) {
-        code + 'state.pos++;';
+        code.addToPos(1);
         code.setSuccess();
-        code.setResult(result, v);
-        code.labelSuccess(key);
+        code.setResult(v);
       });
     });
     code.ifFailure((code) {
-      code += silent
-          ? ''
-          : 'state.error =  $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.charAt(state.pos, source);';
-      code.labelFailure(key);
+      code.setError(
+          '$c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.charAt(state.pos, source)');
     });
-    return key;
   }
 
-  BuidlResult _build32(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
-    final c = context.allocateLocal('c');
-    final v = context.allocateLocal('v');
-    final pos = context.allocateLocal('pos');
-    code + 'final $pos = state.pos;';
-    code + 'int? $c;';
-    code.setState('state.pos < source.length');
+  void _build32(Context context, CodeGen code) {
+    final pos = code.savePos();
+    final c = code.local('int?', 'c');
     code.setFailure();
-    code.if_('state.pos < source.length', (code) {
-      code + '$c = source.readRune(state);';
-      code + 'int? $v;';
-      code.switch_(c, (code) {
-        _buildCases(code, c, v);
-      });
+    code.ifNotEof((code) {
+      code.assign(c, 'source.readRune(state)');
+      final v = code.local('int?', 'v');
+      final sw = code.switch_(c);
+      _buildCases(code, sw, c, v);
       code.if_('$v != null', (code) {
         code.setSuccess();
-        code.setResult(result, v);
-        code.labelSuccess(key);
+        code.setResult(v);
       });
     });
     code.ifFailure((code) {
-      code + 'state.pos = $pos;';
-      code += silent
-          ? ''
-          : 'state.error = $c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char($c));';
-      code.labelFailure(key);
+      code.setPos(pos);
+      code.setError(
+          '$c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char($c))');
     });
-    return key;
   }
 
-  void _buildCases(SwitchCodeGen code, String c, String v) {
+  void _buildCases(CodeGen code, SwitchStatement sw, String c, String v) {
     final entries = table.entries;
     final direct = entries.where((e) => e.key == e.value).map((e) => e.key);
     if (direct.isNotEmpty) {
-      code.case_(direct, (code) {
-        code + '$v = $c;';
+      code.addCase(sw, direct, (code) {
+        code.assign(v, c);
         code.break$();
       });
     }
@@ -111,8 +89,8 @@ class EscapeSequence extends StringParserBuilder<int> {
       }
 
       final value = table[key]!;
-      code.case_([key], (code) {
-        code + '$v = $value;';
+      code.addCase(sw, [key], (code) {
+        code.assign(v, '$value');
         code.break$();
       });
     }

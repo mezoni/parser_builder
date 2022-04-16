@@ -133,45 +133,33 @@ abstract class _Alt<I, O> extends ParserBuilder<I, O> {
   const _Alt();
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
+  void build(Context context, CodeGen code) {
     final parsers = getChildren();
     if (parsers.length < 2) {
       throw StateError('The list of parsers must contain at least 2 elements');
     }
 
-    final alwaysSucceeds = parsers.where((e) => e.isAlwaysSuccess()).toList();
-    if (alwaysSucceeds.length > 1) {
-      throw StateError('More than one parser is always succeeds');
-    }
-
-    if (alwaysSucceeds.isNotEmpty && !parsers.last.isAlwaysSuccess()) {
-      throw StateError('A parser that always succeeds is not the last one');
-    }
-
     final errors = <String>[];
-    silent = silent || alwaysSucceeds.isNotEmpty;
+    var silent = code.silent;
     void plunge(int index) {
       final parser = parsers[index];
-      helper.build(context, code, parser, result, silent, onFailure: (code) {
+      helper.build(context, code, parser, result: code.result);
+      code.ifFailure((code) {
         if (index < parsers.length - 1) {
-          final error = silent ? '' : context.allocateLocal('error');
-          errors.add(error);
-          code += silent ? '' : 'final $error = state.error;';
+          if (!silent) {
+            final error = code.val('error', 'state.error');
+            errors.add(error);
+          }
+
           plunge(++index);
         } else {
           final list = errors.join(', ');
-          code += silent
-              ? ''
-              : 'state.error = ErrCombined(state.pos, [$list, state.error]);';
-          code.labelFailure(key);
+          code.setError('ErrCombined(state.pos, [$list, state.error])');
         }
       });
     }
 
     plunge(0);
-    return key;
   }
 
   List<ParserBuilder<I, O>> getChildren();

@@ -21,9 +21,8 @@ class Preceded<I, O> extends _Sequence<I, O> {
   }
 
   @override
-  void _setResults(Context context, CodeGen code, ParserResult result,
-      List<ParserResult> results) {
-    final r2 = results[1];
-    code.setResult(result, r2.name, false);
+  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
+    final result1 = results[1];
+    code.setResult(result1.name, false);
   }
 }

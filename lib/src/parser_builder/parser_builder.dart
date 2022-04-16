@@ -7,8 +7,7 @@ class BuidlResult {
 abstract class ParserBuilder<I, O> {
   const ParserBuilder();
 
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent);
+  void build(Context context, CodeGen code);
 
   String getInputType() {
     return '$I';
@@ -27,21 +26,7 @@ abstract class ParserBuilder<I, O> {
     }
 
     final isNullable = isNullableResultType();
-    final type = getResultType();
-    return (isNullable ? name : '($name as $type)!');
-  }
-
-  String getResultValueUnsafe(String name) {
-    if (name.isEmpty) {
-      return '';
-    }
-
-    final isNullable = isNullableResultType();
-    return (isNullable ? name : '$name!');
-  }
-
-  bool isAlwaysSuccess() {
-    return false;
+    return (isNullable ? name : '_unwrap($name)');
   }
 
   bool isNullableResultType() {
@@ -57,4 +42,10 @@ abstract class ParserBuilder<I, O> {
 
 abstract class StringParserBuilder<O> extends ParserBuilder<String, O> {
   const StringParserBuilder();
+}
+
+abstract class UnaryParserBuilder<I, O> extends ParserBuilder<I, O> {
+  final ParserBuilder<I, O> parser;
+
+  const UnaryParserBuilder(this.parser);
 }

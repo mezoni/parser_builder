@@ -3,6 +3,19 @@ import 'dart:collection';
 import 'printer.dart';
 import 'visitors.dart';
 
+class AssignmentStatement extends Statement {
+  final String left;
+
+  final String right;
+
+  AssignmentStatement(this.left, this.right);
+
+  @override
+  T accept<T>(Visitor<T> visitor) {
+    return visitor.visitAssignment(this);
+  }
+}
+
 class BreakStatement extends Statement {
   @override
   T accept<T>(Visitor<T> visitor) {
@@ -97,15 +110,13 @@ class IterationStatement extends Statement {
 }
 
 class ResultAssignmentStatement extends Statement {
-  final bool cast;
-
   final String name;
 
   final String type;
 
   final String value;
 
-  ResultAssignmentStatement(this.name, this.type, this.value, this.cast);
+  ResultAssignmentStatement(this.name, this.type, this.value);
 
   @override
   T accept<T>(Visitor<T> visitor) {
@@ -148,24 +159,6 @@ abstract class Statement extends LinkedListEntry<Statement> {
 
   void visitChildren(Visitor visitor) {
     return;
-  }
-}
-
-class Statements extends Statement {
-  final LinkedList<Statement> statements;
-
-  Statements(this.statements);
-
-  @override
-  T accept<T>(Visitor<T> visitor) {
-    return visitor.visitStatements(this);
-  }
-
-  @override
-  void visitChildren(Visitor visitor) {
-    for (var statement in statements) {
-      statement.accept(visitor);
-    }
   }
 }
 

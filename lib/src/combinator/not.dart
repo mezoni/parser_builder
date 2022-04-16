@@ -6,21 +6,13 @@ class Not<I> extends ParserBuilder<I, void> {
   const Not(this.parser);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    final key = BuidlResult();
-    final pos = context.allocateLocal('pos');
-    code + 'final $pos = state.pos;';
-    final result1 = helper.getResult(context, code, parser, true);
-    helper.build(context, code, parser, result1, true);
+  void build(Context context, CodeGen code) {
+    final pos = code.savePos();
+    helper.build(context, code, parser, fast: true, silent: true, pos: pos);
     code.negateState();
     code.ifFailure((code) {
-      code + 'state.pos = $pos;';
-      code += silent ? '' : 'state.error = ErrUnknown(state.pos);';
-      code.labelFailure(key);
-    }, else_: (code) {
-      code.labelSuccess(key);
+      code.setPos(pos);
+      code.setError('ErrUnknown(state.pos)');
     });
-    return key;
   }
 }

@@ -10,17 +10,17 @@ class AnyChar extends StringParserBuilder<int> {
   const AnyChar();
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
+  void build(Context context, CodeGen code) {
     context.refersToStateSource = true;
-    final key = BuidlResult();
-    code.setState('state.pos < source.length');
+    code.setStateToNotEof();
     code.ifSuccess((code) {
-      code.setResult(result, 'source.readRune(state)');
-      code.labelSuccess(key);
+      if (code.fast) {
+        code.add('source.readRune(state);');
+      } else {
+        code.setResult('source.readRune(state)');
+      }
     }, else_: ((code) {
-      code += silent ? '' : 'state.error = ErrUnexpected.eof(state.pos);';
+      code.errorUnexpectedEof();
     }));
-    return key;
   }
 }

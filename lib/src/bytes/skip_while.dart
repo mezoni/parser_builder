@@ -13,7 +13,6 @@ class SkipWhile extends Redirect<String, void> {
 
   @override
   ParserBuilder<String, void> getRedirectParser() {
-    final parser = Fast(Many0(Satisfy(predicate)));
-    return parser;
+    return Fast(Many0(Satisfy(predicate)));
   }
 }

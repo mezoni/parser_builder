@@ -13,11 +13,14 @@ class Char extends Redirect<String, int> {
 
   @override
   ParserBuilder<String, int> getRedirectParser() {
+    final predicate = ExprAction<bool>(['c'], '{{c}} == $char');
+    final error =
+        ExprAction([], 'ErrExpected.char(state.pos, const Char($char))');
     final isUnicode = char > 0xffff;
     if (isUnicode) {
-      return ExpectedChar(Silent(AnyChar()), char);
+      return Check(Silent(AnyChar()), predicate, error);
     } else {
-      return ExpectedChar(Silent(CodeUnit()), char);
+      return Check(Silent(CodeUnit()), predicate, error);
     }
   }
 }

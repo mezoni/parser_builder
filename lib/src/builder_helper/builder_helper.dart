@@ -5,10 +5,35 @@ String addNullCheck<T>(String name) {
   return isNullable ? name : '$name!';
 }
 
-BuidlResult build(Context context, CodeGen code, ParserBuilder parser,
-    ParserResult result, bool silent,
-    {void Function(CodeGen code)? onFailure,
-    void Function(CodeGen code)? onSuccess}) {
+ParserResult build(
+  Context context,
+  CodeGen code,
+  ParserBuilder parser, {
+  bool? fast,
+  String? pos,
+  ParserResult? result,
+  bool? silent,
+}) {
+  final fast_ = code.fast;
+  final pos_ = code.pos;
+  final result_ = code.result;
+  final silent_ = code.silent;
+  fast ??= code.fast;
+  silent ??= code.silent;
+  if (result == null) {
+    result = getResult(context, code, parser, fast);
+  } else {
+    if (fast) {
+      if (!result.isVoid) {
+        result = getVoidResult(context, code, parser, result);
+      }
+    } else {
+      if (result.isVoid) {
+        result = getNotVoidResult(context, code, parser, result);
+      }
+    }
+  }
+
   if (context.diagnose) {
     if (parser is Named) {
       final mode = <String>[];
@@ -33,58 +58,16 @@ BuidlResult build(Context context, CodeGen code, ParserBuilder parser,
     }
   }
 
-  final statement = Statements(LinkedList<Statement>());
-  code + statement;
-  BuidlResult? key;
-  code.scope(statement.statements, (code) {
-    key = parser.build(context, code, result, silent);
-  });
-
-  var success = code.getLabelSuccess(key!);
-  var failure = code.getLabelFailure(key!);
-  final statements = statement.statements;
-  final isAlwaysSuccess = parser.isAlwaysSuccess();
-  if (isAlwaysSuccess) {
-    success = statements;
-    failure = null;
-  }
-
-  ConditionalStatement? handler;
-  ConditionalStatement getHandler() {
-    if (handler == null) {
-      handler = ConditionalStatement(
-          'state.ok', LinkedList<Statement>(), LinkedList<Statement>());
-      statements.add(handler!);
-    }
-
-    return handler!;
-  }
-
-  if (onSuccess != null) {
-    if (success == null) {
-      final handler = getHandler();
-      success = handler.ifBranch;
-      failure ??= handler.elseBranch;
-    }
-  }
-
-  if (onFailure != null) {
-    if (failure == null) {
-      final handler = getHandler();
-      failure = handler.elseBranch;
-      success ??= handler.ifBranch;
-    }
-  }
-
-  if (onSuccess != null) {
-    code.scope(success!, onSuccess);
-  }
-
-  if (onFailure != null) {
-    code.scope(failure!, onFailure);
-  }
-
-  return key!;
+  code.fast = fast;
+  code.pos = pos;
+  code.result = result;
+  code.silent = silent;
+  parser.build(context, code);
+  code.fast = fast_;
+  code.pos = pos_;
+  code.result = result_;
+  code.silent = silent_;
+  return result;
 }
 
 String escapeString(String text, [bool quote = true]) {
@@ -128,8 +111,7 @@ ParserResult getResult(
   final type = fast ? 'void' : parser.getResultType();
   final name = context.allocateLocal();
   final value = parser.getResultValue(name);
-  final valueUnsafe = parser.getResultValueUnsafe(name);
-  final result = ParserResult(name, type, value, valueUnsafe);
+  final result = ParserResult(name, type, value);
   if (!fast) {
     final name = result.name;
     final type = result.type;

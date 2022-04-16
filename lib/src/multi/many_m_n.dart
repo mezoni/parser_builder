@@ -10,8 +10,7 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
   const ManyMN(this.m, this.n, this.parser);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
+  void build(Context context, CodeGen code) {
     if (m < 0) {
       throw RangeError.value(m, 'm', 'Must be equal to or greater than 0');
     }
@@ -25,37 +24,24 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
-    final key = BuidlResult();
-    final fast = result.isVoid;
-    final count = context.allocateLocal('count');
-    final pos = context.allocateLocal('pos');
-    final list = fast ? '' : context.allocateLocal('list');
-    code + 'final $pos = state.pos;';
-    code += fast ? '' : 'final $list = <$O>[];';
-    code + 'var $count = 0;';
+    final pos = code.savePos();
+    final list = code.val('list', '<$O>[]', false);
+    final count = code.local('var', 'count', '0');
     code.while$('$count < $n', (code) {
-      final silent1 = silent ? true : m == 0;
-      final result1 = helper.getResult(context, code, parser, fast);
-      helper.build(context, code, parser, result1, silent1, onSuccess: (code) {
-        code += fast ? '' : '$list.add(${result1.valueUnsafe});';
-        code + '$count++;';
-      }, onFailure: (code) {
+      final silent = code.silent ? true : m == 0;
+      final result = helper.build(context, code, parser, silent: silent);
+      code.ifSuccess((code) {
+        code.add('$list.add(${result.value});', false);
+        code.addTo(count, 1);
+      }, else_: (code) {
         code.break$();
       });
     });
     code.setState('$count >= $m');
     code.ifSuccess((code) {
-      code.setResult(result, list);
-      code.labelSuccess(key);
+      code.setResult(list);
     }, else_: (code) {
-      code + 'state.pos = $pos;';
-      code.labelFailure(key);
+      code.setPos(pos);
     });
-    return key;
-  }
-
-  @override
-  bool isAlwaysSuccess() {
-    return m == 0;
   }
 }

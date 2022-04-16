@@ -6,32 +6,22 @@ class Many1<I, O> extends ParserBuilder<I, List<O>> {
   const Many1(this.parser);
 
   @override
-  BuidlResult build(
-      Context context, CodeGen code, ParserResult result, bool silent) {
-    if (parser.isAlwaysSuccess()) {
-      throw StateError('Using a parser that always succeeds is not valid');
-    }
-
-    final key = BuidlResult();
-    final fast = result.isVoid;
-    final list = fast ? '' : context.allocateLocal('list');
-    final ok = !fast ? '' : context.allocateLocal('ok');
-    code += fast ? 'var $ok = false;' : 'final $list = <$O>[];';
+  void build(Context context, CodeGen code) {
+    final list = code.val('list', '<$O>[]', false);
+    final ok = code.local('var', 'ok', 'false', true);
     code.while$('true', (code) {
-      final result1 = helper.getResult(context, code, parser, fast);
-      helper.build(context, code, parser, result1, silent, onSuccess: (code) {
-        code += fast ? '$ok = true;' : '$list.add(${result1.valueUnsafe});';
-      }, onFailure: (code) {
+      final result = helper.build(context, code, parser);
+      code.ifSuccess((code) {
+        code.add('$list.add(${result.value});', false);
+        code.assign(ok, 'true', true);
+      }, else_: (code) {
         code.break$();
       });
     });
-    code.setState(fast ? ok : '$list.isNotEmpty');
+    code.setState('$list.isNotEmpty', false);
+    code.setState(ok, true);
     code.ifSuccess((code) {
-      code.setResult(result, list);
-      code.labelSuccess(key);
-    }, else_: (code) {
-      code.labelFailure(key);
+      code.setResult(list);
     });
-    return key;
   }
 }

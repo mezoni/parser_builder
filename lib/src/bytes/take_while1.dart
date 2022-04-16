@@ -14,7 +14,6 @@ class TakeWhile1 extends Redirect<String, String> {
 
   @override
   ParserBuilder<String, String> getRedirectParser() {
-    final parser = Recognize(Many1(Satisfy(predicate)));
-    return parser;
+    return Recognize(Many1(Satisfy(predicate)));
   }
 }

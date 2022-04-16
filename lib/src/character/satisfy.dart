@@ -14,10 +14,11 @@ class Satisfy extends Redirect<String, int> {
 
   @override
   ParserBuilder<String, int> getRedirectParser() {
+    final error = ExprAction([], 'ErrUnexpected.charOrEof(state.pos, source)');
     if (predicate.isUnicode) {
-      return UnexpectedCharOrEof(Silent(AnyChar()), predicate);
+      return Check(Silent(AnyChar()), predicate, error);
     } else {
-      return UnexpectedCharOrEof(Silent(CodeUnit()), predicate);
+      return Check(Silent(CodeUnit()), predicate, error);
     }
   }
 }
