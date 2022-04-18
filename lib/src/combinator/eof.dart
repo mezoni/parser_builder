@@ -6,7 +6,7 @@ class Eof<I> extends ParserBuilder<I, void> {
   @override
   void build(Context context, CodeGen code) {
     context.refersToStateSource = true;
-    code.isEof();
+    code.setStateToEof();
     code.ifFailure((code) {
       code.setError('ErrExpected.eof(state.pos)');
     });

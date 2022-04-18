@@ -153,14 +153,6 @@ class CodeGen {
     return this.if_('state.ok', if_, else_: else_);
   }
 
-  void isEof() {
-    setState('state.pos >= source.length');
-  }
-
-  void isNotEof() {
-    setState('state.pos < source.length');
-  }
-
   void iteration(String definition, void Function(CodeGen code) f) {
     final block = BlockStatement(LinkedList(), true);
     final statement = IterationStatement(definition, block);
@@ -243,6 +235,14 @@ class CodeGen {
     if (_testFast(fast)) {
       this + StateAssignmentStatement(value);
     }
+  }
+
+  void setStateToEof() {
+    setState('state.pos >= source.length');
+  }
+
+  void setStateToNotEof() {
+    setState('state.pos < source.length');
   }
 
   void setSuccess() {

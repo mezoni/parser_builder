@@ -12,7 +12,7 @@ class AnyChar extends StringParserBuilder<int> {
   @override
   void build(Context context, CodeGen code) {
     context.refersToStateSource = true;
-    code.isNotEof();
+    code.setStateToNotEof();
     code.ifSuccess((code) {
       if (code.fast) {
         code.add('source.readRune(state);');
