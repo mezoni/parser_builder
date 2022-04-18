@@ -2,7 +2,7 @@
 
 Lightweight parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.16.1
+Version: 0.17.0
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  

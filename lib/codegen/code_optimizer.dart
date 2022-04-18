@@ -7,18 +7,48 @@ import 'visitors.dart';
 
 class CodeOptimizer {
   void optimize(LinkedList<Statement> statements) {
+    //_optimizeStateOkAssignments(statements);
+    _optimizeConditiotalWithEmptyIfBranch(statements);
+    _removeEmptyCondionals(statements);
+  }
+
+  Map<Statement, DataPoint> _analyzeDataFlow(LinkedList<Statement> statements) {
+    final dataFlowAnalyzer = DataFlowAnalyzer();
+    final dataFlow = dataFlowAnalyzer.analyze(statements, {});
+    return dataFlow;
+  }
+
+  void _optimizeConditiotalWithEmptyIfBranch(LinkedList<Statement> statements) {
     while (true) {
       var hasModifications = false;
-      final dataFlowAnalyzer = DataFlowAnalyzer();
-      final points = dataFlowAnalyzer.analyze(statements, {});
-      final emptyConditiotalRemover = _EmptyConditiotalRemover();
-      if (emptyConditiotalRemover.remove(statements)) {
+      final optimizer = _ConditiotalWithEmptyIfBranchOptimizer();
+      if (optimizer.optimize(statements)) {
         hasModifications = true;
       }
 
-      final conditiotalWithEmptyIfBranchOptimizer =
-          _ConditiotalWithEmptyIfBranchOptimizer();
-      if (conditiotalWithEmptyIfBranchOptimizer.optimize(statements)) {
+      if (!hasModifications) {
+        break;
+      }
+    }
+  }
+
+  void _optimizeStateOkAssignments(LinkedList<Statement> statements) {
+    while (true) {
+      var hasModifications = false;
+      final dataFlow = _analyzeDataFlow(statements);
+      final optimizer = _StateOkAssignmentOptimizer();
+      hasModifications = optimizer.optimize(statements, dataFlow);
+      if (!hasModifications) {
+        break;
+      }
+    }
+  }
+
+  void _removeEmptyCondionals(LinkedList<Statement> statements) {
+    while (true) {
+      var hasModifications = false;
+      final remover = _EmptyConditiotalRemover();
+      if (remover.remove(statements)) {
         hasModifications = true;
       }
 
@@ -40,7 +70,7 @@ class _ConditiotalWithEmptyIfBranchOptimizer extends VisitorBase<void> {
 
     for (final item in _found) {
       final String condition;
-      switch (item.condition) {
+      switch (_trim(item.condition)) {
         case 'state.ok':
           condition = '!state.ok';
           break;
@@ -71,12 +101,16 @@ class _ConditiotalWithEmptyIfBranchOptimizer extends VisitorBase<void> {
     node.visitChildren(this);
     final elseBranch = node.elseBranch;
     final ifBranch = node.ifBranch;
-    if (ifBranch.isEmpty && elseBranch.isNotEmpty) {
-      final condition = node.condition;
+    if (ifBranch.isEmptyStatement() && !elseBranch.isEmptyStatement()) {
+      final condition = _trim(node.condition);
       if (condition == 'state.ok' || condition == '!state.ok') {
         _found.add(node);
       }
     }
+  }
+
+  String _trim(String text) {
+    return text.replaceAll(' ', '');
   }
 }
 
@@ -106,8 +140,40 @@ class _EmptyConditiotalRemover extends VisitorBase<void> {
     node.visitChildren(this);
     final elseBranch = node.elseBranch;
     final ifBranch = node.ifBranch;
-    if (ifBranch.isEmpty && elseBranch.isEmpty) {
+    if (ifBranch.isEmptyStatement() && elseBranch.isEmptyStatement()) {
       _found.add(node);
+    }
+  }
+}
+
+class _StateOkAssignmentOptimizer extends VisitorBase<void> {
+  static const _stateOk = 'state.ok';
+
+  Map<Statement, DataPoint> _dataFlow = {};
+
+  List<Statement> _found = [];
+
+  bool optimize(
+      LinkedList<Statement> statements, Map<Statement, DataPoint> dataFlow) {
+    _dataFlow = dataFlow;
+    _found = [];
+    for (final statement in statements) {
+      statement.accept(this);
+    }
+
+    return _found.isNotEmpty;
+  }
+
+  @override
+  void visit(Statement node) {
+    node.visitChildren(this);
+  }
+
+  @override
+  void visitStateAssignment(StateAssignmentStatement node) {
+    final previous = node.previous;
+    if (previous != null) {
+      //
     }
   }
 }

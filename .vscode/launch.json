@@ -11,7 +11,7 @@
             "name": "build_test_parser.dart",
             "type": "dart",
             "request": "launch",
-            "program": "tool\\build_test_parser.dart"
+            "program": "tool/build_test_parser.dart"
         },
         {
             "name": "test_example.dart",
@@ -38,22 +38,28 @@
             "program": "test/test_json_number_parser.dart"
         },
         {
-            "name": "test/test_chars_parser.dart",
+            "name": "test_chars_parser.dart",
             "type": "dart",
             "request": "launch",
             "program": "test/test_chars_parser.dart"
         },
         {
-            "name": "test/_test.dart",
+            "name": "_test.dart",
             "type": "dart",
             "request": "launch",
-            "program": "test//_test.dart"
+            "program": "test/_test.dart"
         },
         {
             "name": "test_code_optimizer.dart",
             "type": "dart",
             "request": "launch",
-            "program": "test//test_code_optimizer.dart"
+            "program": "test/test_code_optimizer.dart"
+        },
+        {
+            "name": "test_data_flow.dart",
+            "type": "dart",
+            "request": "launch",
+            "program": "test/test_data_flow.dart"
         }
     ]
 }

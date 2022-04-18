@@ -16,6 +16,31 @@ class AssignmentStatement extends Statement {
   }
 }
 
+class BlockStatement extends Statement {
+  final bool delimited;
+
+  final LinkedList<Statement> statements;
+
+  BlockStatement(this.statements, this.delimited);
+
+  @override
+  T accept<T>(Visitor<T> visitor) {
+    return visitor.visitBlock(this);
+  }
+
+  @override
+  bool isEmptyStatement() {
+    return statements.isEmpty;
+  }
+
+  @override
+  void visitChildren(Visitor visitor) {
+    for (final statement in statements) {
+      statement.accept(visitor);
+    }
+  }
+}
+
 class BreakStatement extends Statement {
   @override
   T accept<T>(Visitor<T> visitor) {
@@ -37,11 +62,11 @@ class CallStatement extends Statement {
 }
 
 class CaseStatement extends Statement {
-  final LinkedList<Statement> statements;
+  final Statement statement;
 
   final Iterable values;
 
-  CaseStatement(this.values, this.statements);
+  CaseStatement(this.values, this.statement);
 
   @override
   T accept<T>(Visitor<T> visitor) {
@@ -50,18 +75,16 @@ class CaseStatement extends Statement {
 
   @override
   void visitChildren(Visitor visitor) {
-    for (final item in statements) {
-      item.accept(visitor);
-    }
+    statement.accept(visitor);
   }
 }
 
 class ConditionalStatement extends Statement {
   String condition;
 
-  final LinkedList<Statement> elseBranch;
+  final Statement elseBranch;
 
-  final LinkedList<Statement> ifBranch;
+  final Statement ifBranch;
 
   ConditionalStatement(this.condition, this.ifBranch, this.elseBranch);
 
@@ -72,13 +95,8 @@ class ConditionalStatement extends Statement {
 
   @override
   void visitChildren(Visitor visitor) {
-    for (var statement in ifBranch) {
-      statement.accept(visitor);
-    }
-
-    for (var statement in elseBranch) {
-      statement.accept(visitor);
-    }
+    ifBranch.accept(visitor);
+    elseBranch.accept(visitor);
   }
 }
 
@@ -92,9 +110,9 @@ class ContinueStatement extends Statement {
 class IterationStatement extends Statement {
   final String definition;
 
-  final LinkedList<Statement> statements;
+  final Statement statement;
 
-  IterationStatement(this.definition, this.statements);
+  IterationStatement(this.definition, this.statement);
 
   @override
   T accept<T>(Visitor<T> visitor) {
@@ -103,9 +121,7 @@ class IterationStatement extends Statement {
 
   @override
   void visitChildren(Visitor visitor) {
-    for (var statement in statements) {
-      statement.accept(visitor);
-    }
+    statement.accept(visitor);
   }
 }
 
@@ -149,6 +165,10 @@ class StateAssignmentStatement extends Statement {
 abstract class Statement extends LinkedListEntry<Statement> {
   T accept<T>(Visitor<T> visitor);
 
+  bool isEmptyStatement() {
+    return false;
+  }
+
   @override
   String toString() {
     final buffer = StringBuffer();
@@ -165,7 +185,7 @@ abstract class Statement extends LinkedListEntry<Statement> {
 class SwitchStatement extends Statement {
   final List<CaseStatement> cases;
 
-  final LinkedList<Statement> default_;
+  final Statement default_;
 
   final String value;
 
@@ -182,8 +202,6 @@ class SwitchStatement extends Statement {
       item.accept(visitor);
     }
 
-    for (final statement in default_) {
-      statement.accept(visitor);
-    }
+    default_.accept(visitor);
   }
 }

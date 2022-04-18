@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'statements.dart';
 import 'visitors.dart';
 
@@ -22,6 +20,27 @@ class Printer extends Visitor<void> {
   }
 
   @override
+  void visitBlock(BlockStatement node) {
+    final delimited = node.delimited;
+    final statements = node.statements;
+    if (delimited) {
+      sink.write('{');
+      if (statements.isNotEmpty) {
+        sink.writeln();
+      }
+    }
+
+    for (final statement in statements) {
+      statement.accept(this);
+      sink.writeln();
+    }
+
+    if (delimited) {
+      sink.write('}');
+    }
+  }
+
+  @override
   void visitBreak(BreakStatement node) {
     sink.write('break;');
   }
@@ -41,7 +60,7 @@ class Printer extends Visitor<void> {
 
   @override
   void visitCase(CaseStatement node) {
-    final statements = node.statements;
+    final statement = node.statement;
     final values = node.values;
     for (final value in values) {
       sink.write('case ');
@@ -49,7 +68,7 @@ class Printer extends Visitor<void> {
       sink.writeln(':');
     }
 
-    _visitStatements(statements);
+    statement.accept(this);
   }
 
   @override
@@ -59,14 +78,12 @@ class Printer extends Visitor<void> {
     final ifBranch = node.ifBranch;
     sink.write('if (');
     sink.write(condition);
-    sink.writeln(') {');
-    _visitStatements(ifBranch);
-    if (elseBranch.isNotEmpty) {
-      sink.writeln('} else {');
-      _visitStatements(elseBranch);
+    sink.write(') ');
+    ifBranch.accept(this);
+    if (!elseBranch.isEmptyStatement()) {
+      sink.write(' else ');
+      elseBranch.accept(this);
     }
-
-    sink.write('}');
   }
 
   @override
@@ -77,11 +94,9 @@ class Printer extends Visitor<void> {
   @override
   void visitIteration(IterationStatement node) {
     final definition = node.definition;
-    final statements = node.statements;
+    final statement = node.statement;
     sink.write(definition);
-    sink.writeln(' {');
-    _visitStatements(statements);
-    sink.write('}');
+    statement.accept(this);
   }
 
   @override
@@ -120,17 +135,16 @@ class Printer extends Visitor<void> {
       item.accept(this);
     }
 
-    if (default_.isNotEmpty) {
+    if (default_ is BlockStatement) {
+      final statements = default_.statements;
+      if (statements.isNotEmpty) {
+        sink.writeln('default:');
+      }
+    } else {
       sink.writeln('default:');
-      _visitStatements(default_);
     }
-    sink.write('}');
-  }
 
-  void _visitStatements(LinkedList<Statement> statements) {
-    for (final statement in statements) {
-      statement.accept(this);
-      sink.writeln();
-    }
+    default_.accept(this);
+    sink.write('}');
   }
 }

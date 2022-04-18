@@ -3,6 +3,8 @@ import 'statements.dart';
 abstract class Visitor<T> {
   T visitAssignment(AssignmentStatement node);
 
+  T visitBlock(BlockStatement node);
+
   T visitBreak(BreakStatement node);
 
   T visitCall(CallStatement node);
@@ -29,6 +31,9 @@ abstract class VisitorBase<T> extends Visitor<T> {
 
   @override
   T visitAssignment(AssignmentStatement node) => visit(node);
+
+  @override
+  T visitBlock(BlockStatement node) => visit(node);
 
   @override
   T visitBreak(BreakStatement node) => visit(node);

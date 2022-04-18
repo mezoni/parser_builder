@@ -52,9 +52,10 @@ class CodeGen {
 
   void addCase(SwitchStatement statement, Iterable values,
       void Function(CodeGen code) f) {
-    final case_ = CaseStatement(values, LinkedList());
+    final statements = LinkedList<Statement>();
+    final case_ = CaseStatement(values, BlockStatement(statements, false));
     statement.cases.add(case_);
-    scope(case_.statements, f);
+    scope(statements, f);
   }
 
   void addTo(String name, value, [bool? fast]) {
@@ -126,11 +127,12 @@ class CodeGen {
 
   void if_(String condition, void Function(CodeGen code) if_,
       {void Function(CodeGen code)? else_}) {
-    final statement =
-        ConditionalStatement(condition, LinkedList(), LinkedList());
-    scope(statement.ifBranch, if_);
+    final ifBranch = BlockStatement(LinkedList(), true);
+    final elseBranch = BlockStatement(LinkedList(), true);
+    final statement = ConditionalStatement(condition, ifBranch, elseBranch);
+    scope(ifBranch.statements, if_);
     if (else_ != null) {
-      scope(statement.elseBranch, else_);
+      scope(elseBranch.statements, else_);
     }
 
     this + statement;
@@ -151,9 +153,18 @@ class CodeGen {
     return this.if_('state.ok', if_, else_: else_);
   }
 
+  void isEof() {
+    setState('state.pos >= source.length');
+  }
+
+  void isNotEof() {
+    setState('state.pos < source.length');
+  }
+
   void iteration(String definition, void Function(CodeGen code) f) {
-    final statement = IterationStatement(definition, LinkedList());
-    scope(statement.statements, f);
+    final block = BlockStatement(LinkedList(), true);
+    final statement = IterationStatement(definition, block);
+    scope(block.statements, f);
     this + statement;
   }
 
@@ -234,21 +245,13 @@ class CodeGen {
     }
   }
 
-  void setStateToEof() {
-    setState('state.pos >= source.length');
-  }
-
-  void setStateToNotEof() {
-    setState('state.pos < source.length');
-  }
-
   void setSuccess() {
     setState('true');
   }
 
   SwitchStatement switch_(value) {
     final cases = <CaseStatement>[];
-    final default_ = LinkedList<Statement>();
+    final default_ = BlockStatement(LinkedList(), false);
     final statement = SwitchStatement(value, cases, default_);
     this + statement;
     return statement;
