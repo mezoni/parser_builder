@@ -1,6 +1,6 @@
 ## 0.17.0
 
-- Breaking change: It was decided to simplify the implementation of parser builders (human work) and the build process (main work) by improving the generated code optimizer (optional work). These changes do not affect the definition of parsers and do not break the work. This refers to the implementation details of the parser builders. The implementation of the new code optimizer is under development. The implementation of the new code optimizer is under development as it requires the development of a simple data flow analyzer
+- Breaking change: It was decided to simplify the implementation of parser builders (human work) and the build process (main work) by improving the generated code optimizer (optional work). These changes do not affect the definition of parsers and do not break the work. This refers to the implementation details of the parser builders. The implementation of the new code optimizer is under development as it requires the development of a simple data flow analyzer
 
 ## 0.16.1
 
