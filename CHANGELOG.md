@@ -1,3 +1,7 @@
+## 1.0.1
+
+- Minor changes in `README.md` file
+
 ## 1.0.0
 
 - First major version

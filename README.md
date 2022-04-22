@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 1.0.0
+Version: 1.0.1
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -396,53 +396,29 @@ Let's take a look at an existing parser builder and assume it doesn't exist and 
 This is an implementation of the well-known parsing expression called `optional` (aka `?`).
 
 ```dart
-part of '../../multi.dart';
+part of '../../combinator.dart';
 
-class Many0<I, O> extends ParserBuilder<I, List<O>> {
+class Opt<I, O> extends ParserBuilder<I, O?> {
   static const _template = '''
-final {{list}} = <{{O}}>[];
 final {{log}} = state.log;
 state.log = false;
-while (true) {
-  {{var1}}
-  {{p1}}
-  if (!state.ok) {
-    break;
-  }
-  {{list}}.add({{val1}});
-}
+{{p1}}
 state.log = {{log}};
-state.ok = true;
-if (state.ok) {
-  {{res0}} = {{list}};
+if (!state.ok) {
+  state.ok = true;
 }''';
-
-  static const _templateFast = '''
-final {{log}} = state.log;
-state.log = false;
-while (true) {
-  {{p1}}
-  if (!state.ok) {
-    break;
-  }
-}
-state.log = {{log}};
-state.ok = true;''';
 
   final ParserBuilder<I, O> parser;
 
-  const Many0(this.parser);
+  const Opt(this.parser);
 
   @override
   String build(Context context, ParserResult? result) {
-    final fast = result == null;
-    final values = context.allocateLocals(['list', 'log']);
-    final r1 = context.getResult(parser, !fast);
+    final values = context.allocateLocals(['log']);
     values.addAll({
-      'O': '$O',
-      'p1': parser.build(context, r1),
+      'p1': parser.build(context, result),
     });
-    return render2(fast, _templateFast, _template, values, [result, r1]);
+    return render(_template, values);
   }
 }
 
