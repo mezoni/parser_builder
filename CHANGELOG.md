@@ -1,3 +1,7 @@
+## 1.0.2
+
+- Fixed bug in parser builder `Verify`. There was an oversight in rewriting the builder implementation (from codegen based to template-based generation) for the new version. A small piece of code was omitted to generate an error with a message if verification fails with the semantic action
+
 ## 1.0.1
 
 - Minor changes in `README.md` file
