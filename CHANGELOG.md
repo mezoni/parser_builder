@@ -1,3 +1,7 @@
+## 1.0.0
+
+- First major version
+
 ## 0.18.0
 
 - After many experiments, it was decided to return everything back as it was originally. With one small exception. The build system has been greatly simplified and improved

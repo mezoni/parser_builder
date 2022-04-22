@@ -107,8 +107,6 @@ const s16 = 'P';
 const s32 = '𝈀';
 
 const __header = r'''
-// ignore_for_file: unnecessary_cast
-
 import 'package:tuple/tuple.dart';
 
 ''';

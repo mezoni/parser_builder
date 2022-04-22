@@ -3,7 +3,7 @@ part of '../../parser_builder.dart';
 abstract class ParserBuilder<I, O> {
   const ParserBuilder();
 
-  void addResultsToTemplateValues_(
+  void addResultsToTemplateValues(
       Map<String, String> values, List<ParserResult?> results) {
     for (var i = 0; i < results.length; i++) {
       final result = results[i];
@@ -48,7 +48,7 @@ abstract class ParserBuilder<I, O> {
       [List<ParserResult?>? results]) {
     values = Map.from(values);
     if (results != null) {
-      addResultsToTemplateValues_(values, results);
+      addResultsToTemplateValues(values, results);
     }
 
     for (final key in values.keys) {

@@ -8,8 +8,8 @@ part of '../../bytes.dart';
 /// ```
 class Tags extends ParserBuilder<String, String> {
   static const _template = '''
-state.ok = false;
-if (state.pos < source.length) {
+state.ok = state.pos < source.length;
+if (state.ok) {
   final pos = state.pos;
   final c = source.codeUnitAt(pos);
   String? v;
@@ -26,8 +26,8 @@ if (!state.ok && state.log) {
 }''';
 
   static const _templateFast = '''
-state.ok = false;
-if (state.pos < source.length) {
+state.ok = state.pos < source.length;
+if (state.ok) {
   final pos = state.pos;
   final c = source.codeUnitAt(pos);
   String? v;

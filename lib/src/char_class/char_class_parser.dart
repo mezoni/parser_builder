@@ -276,12 +276,12 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     var $list = <Tuple2<int, int>>[];
     final $log = state.log;
     while (true) {
-      state.log = $list.isEmpty;
       Tuple2<int, int>? $2;
       $2 = _rangeBody(state);
       if (!state.ok) {
         break;
       }
+      state.log = false;
       $list.add($2!);
     }
     state.log = $log;
@@ -359,7 +359,6 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   final $list = <List<Tuple2<int, int>>>[];
   final $log = state.log;
   while (true) {
-    state.log = $list.isEmpty;
     List<Tuple2<int, int>>? $2;
     final $pos1 = state.pos;
     $2 = _range(state);
@@ -374,6 +373,7 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
       state.pos = $pos;
       break;
     }
+    state.log = false;
     $list.add($2!);
     $pos = state.pos;
     _verbar(state);

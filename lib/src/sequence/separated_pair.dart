@@ -45,12 +45,12 @@ if (!state.ok) {
     final fast = result == null;
     final values = context.allocateLocals(['pos']);
     final r1 = context.getResult(first, !fast);
-    final r3 = context.getResult(second, !fast);
+    final r2 = context.getResult(second, !fast);
     values.addAll({
       'p1': first.build(context, r1),
       'p2': separator.build(context, null),
-      'p3': second.build(context, r3),
+      'p3': second.build(context, r2),
     });
-    return render2(fast, _templateFast, _template, values, [result, r1, r3]);
+    return render2(fast, _templateFast, _template, values, [result, r1, r2]);
   }
 }

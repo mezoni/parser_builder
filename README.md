@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.18.0
+Version: 1.0.0
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -34,6 +34,7 @@ Ask questions if something is not clear.
 - Error messages `can be easily localized` (translated into another language) before being output
 - Includes high-performance, most common `built-in parser builders`
 - Support for `32 bit Unicode characters` out of the box (no need to worry about that)
+- Included built-in simple script for `fast building of parsers`
 
 ## Second advantage
 
@@ -129,19 +130,21 @@ built-in:
 - [`EscapeSequence`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/escape_sequence.dart)
 - [`StringValue`](https://github.com/mezoni/parser_builder/blob/master/lib/src/string/string_value.dart)
 
-## Semantic action
+## Built-in semantic actions
 
-- [`ClosureAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
-- [`ExprAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
-- [`FuncExprAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
-- [`FuncAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
-- [`VarAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
+- [`ExpressionAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
+- [`FunctionAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
+- [`VariableAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
 
-## Character class (semantic action)
+## Character class (additional semantic actions for character ranges)
 
 - [`CharClass`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_class.dart)
 - [`CharClasses`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_classes.dart)
 - [`NotCharClass`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/not_char_class.dart)
+
+## Projects using parser builder
+
+- [fast_csv](https://pub.dev/packages/fast_csv)
 
 ## How to start write your parser?
 
@@ -153,14 +156,15 @@ import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
-import 'package:parser_builder/transformers.dart';
+import 'package:parser_builder/char_class.dart';
 
 import 'hex_color_parser_helper.dart';
 
 Future<void> main(List<String> args) async {
   final context = Context();
   final filename = 'example/hex_color_parser.g.dart';
-  await fastBuild(context, [_parse], filename, partOf: 'hex_color_parser.dart');
+  await fastBuild(context, [_parse], filename,
+      partOf: 'hex_color_parser.dart', publish: {'parseString': _parse});
 }
 
 const _hexColor = Named(
@@ -171,20 +175,20 @@ const _hexColor = Named(
             _hexPrimary,
             _hexPrimary,
             _hexPrimary,
-            ExprTransformer<Color>(
+            ExpressionAction<Color>(
                 ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
 
 const _hexPrimary = Named(
     '_hexPrimary',
     Map1(TakeWhileMN(2, 2, CharClass('[0-9A-Fa-f]')),
-        ExprTransformer<int>(['x'], 'int.parse({{x}}, radix: 16)')));
+        ExpressionAction<int>(['x'], 'int.parse({{x}}, radix: 16)')));
 
 const _parse = Named('_parse', _hexColor);
 
 ```
 
 Function `fastBuild` performs the following operations:  
-- Building of the parser and code generation
+- Building specified parsers
 - Combining of the parser code from different parts (header + code + footer)
 - Write code to file
 - Code formatting
@@ -195,7 +199,7 @@ The rest of the code includes the following elements:
 The generated source code can be found here:  
 https://github.com/mezoni/parser_builder/blob/master/example/hex_color_parser.g.dart
 
-To get started, you need to copy 3 files:  
+To get started, you may to copy 3 files:  
 https://github.com/mezoni/parser_builder/blob/master/example/hex_color_parser_builder.dart  
 https://github.com/mezoni/parser_builder/blob/master/example/hex_color_parser_helper.dart  
 https://github.com/mezoni/parser_builder/blob/master/example/hex_color_parser.dart  

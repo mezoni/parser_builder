@@ -6,13 +6,13 @@ var {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
 final {{log}} = state.log;
 while (true) {
-  state.log = {{list}}.isEmpty;
   {{var1}}
   {{p1}}
   if (!state.ok) {
     state.pos = {{pos}};
     break;
   }
+  state.log = false;
   {{list}}.add({{val1}});
   {{pos}} = state.pos;
   {{p2}}
@@ -31,13 +31,13 @@ var {{pos}} = state.pos;
 var {{ok}} = false;
 final {{log}} = state.log;
 while (true) {
-  state.log = !{{ok}};
   {{var1}}
   {{p1}}
   if (!state.ok) {
     state.pos = {{pos}};
     break;
   }
+  state.log = false;
   {{ok}} = true;
   {{pos}} = state.pos;
   {{p2}}

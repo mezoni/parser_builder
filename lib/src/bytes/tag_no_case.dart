@@ -9,32 +9,34 @@ part of '../../bytes.dart';
 /// ```
 class TagNoCase extends ParserBuilder<String, String> {
   static const _template = '''
-state.ok = false;
-if (state.pos + {{length}} <= source.length) {
-  final v1 = source.substring(state.pos, state.pos + {{length}});
-  final v2 = v1.toLowerCase();
-  if (v2 == {{tag}}) {
-    state.ok = true;
-    state.pos += {{length}};
-    {{res0}} = v1;
+final {{start}} = state.pos;
+final {{end}} = {{start}} + {{length}};
+state.ok = {{end}} <= source.length;
+if (state.ok) {
+  final v = source.substring({{start}}, {{end}});
+  state.ok = v.toLowerCase() == {{tag}};
+  if (state.ok) {
+    state.pos = {{end}};
+    {{res0}} = v;
   }
 }
 if (!state.ok && state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+  state.error = ErrExpected.tag({{start}}, const Tag({{tag}}));
 }''';
 
   static const _templateFast = '''
-state.ok = false;
-if (state.pos + {{length}} <= source.length) {
-  final v1 = source.substring(state.pos, state.pos + {{length}});
-  final v2 = v1.toLowerCase();
-  if (v2 == {{tag}}) {
-    state.ok = true;
-    state.pos += {{length}};
+final {{start}} = state.pos;
+final {{end}} = {{start}} + {{length}};
+state.ok = {{end}} <= source.length;
+if (state.ok) {
+  final v = source.substring({{start}}, {{end}});
+  state.ok = v.toLowerCase() == {{tag}};
+  if (state.ok) {
+    state.pos = {{end}};
   }
 }
 if (!state.ok && state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+  state.error = ErrExpected.tag({{start}}, const Tag({{tag}}));
 }''';
 
   final String tag;
@@ -45,11 +47,12 @@ if (!state.ok && state.log) {
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
     final fast = result == null;
-    final values = {
+    final values = context.allocateLocals(['end', 'start']);
+    values.addAll({
       'length': '${tag.length}',
       'lowerCase': helper.escapeString(tag.toLowerCase()),
       'tag': helper.escapeString(tag),
-    };
+    });
     return render2(fast, _templateFast, _template, values, [result]);
   }
 }

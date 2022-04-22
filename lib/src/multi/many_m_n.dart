@@ -4,20 +4,18 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
-var {{count}} = 0;
 final {{log}} = state.log;
-while ({{count}} < {{n}}) {
-  state.log = {{count}} <= {{m}} ? {{log}} : false;
+while ({{list}}.length < {{n}}) {
+  state.log = {{list}}.length < {{m}} ? {{log}} : false;
   {{var1}}
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{list}}.add({{val1}});
-  {{count}}++;
 }
 state.log = {{log}};
-state.ok = {{count}} >= {{m}};
+state.ok = {{list}}.length >= {{m}};
 if (state.ok) {
   {{res0}} = {{list}};
 } else {

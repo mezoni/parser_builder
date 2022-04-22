@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_cast
-
 import 'package:tuple/tuple.dart';
 
 String? alpha0(State<String> state) {
@@ -193,13 +191,13 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   final $list = <String>[];
   final $log = state.log;
   while (true) {
-    state.log = $list.isEmpty;
     String? $2;
     $2 = tagAbc(state);
     if (!state.ok) {
       state.pos = $pos1;
       break;
     }
+    state.log = false;
     $list.add($2!);
     $pos1 = state.pos;
     char32(state);
@@ -501,12 +499,12 @@ List<int>? many1C32(State<String> state) {
   var $list = <int>[];
   final $log = state.log;
   while (true) {
-    state.log = $list.isEmpty;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
       break;
     }
+    state.log = false;
     $list.add($1!);
   }
   state.log = $log;
@@ -522,11 +520,11 @@ int? many1CountC32(State<String> state) {
   var $count = 0;
   final $log = state.log;
   while (true) {
-    state.log = $count == 0;
     char32(state);
     if (!state.ok) {
       break;
     }
+    state.log = false;
     $count++;
   }
   state.log = $log;
@@ -541,20 +539,18 @@ List<int>? manyMNC32_2_3(State<String> state) {
   List<int>? $0;
   final $pos = state.pos;
   final $list = <int>[];
-  var $count = 0;
   final $log = state.log;
-  while ($count < 3) {
-    state.log = $count <= 2 ? $log : false;
+  while ($list.length < 3) {
+    state.log = $list.length < 2 ? $log : false;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
       break;
     }
     $list.add($1!);
-    $count++;
   }
   state.log = $log;
-  state.ok = $count >= 2;
+  state.ok = $list.length >= 2;
   if (state.ok) {
     $0 = $list;
   } else {
@@ -1112,7 +1108,6 @@ List<int>? separatedList1C32Abc(State<String> state) {
   final $list = <int>[];
   final $log = state.log;
   while (true) {
-    state.log = $list.isEmpty;
     int? $1;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
     if (state.ok) {
@@ -1125,6 +1120,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
       state.pos = $pos;
       break;
     }
+    state.log = false;
     $list.add($1!);
     $pos = state.pos;
     state.ok = state.pos < source.length &&
@@ -1195,11 +1191,10 @@ void skipWhile1C16(State<String> state) {
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     final ok = c == 80;
-    if (ok) {
-      state.pos++;
-      continue;
+    if (!ok) {
+      break;
     }
-    break;
+    state.pos++;
   }
   state.ok = state.pos != $pos;
   if (!state.ok && state.log) {
@@ -1215,11 +1210,10 @@ void skipWhile1C32(State<String> state) {
     final pos = state.pos;
     $c = source.readRune(state);
     final ok = $c == 119296;
-    if (ok) {
-      continue;
+    if (!ok) {
+      state.pos = pos;
+      break;
     }
-    state.pos = pos;
-    break;
   }
   state.ok = state.pos != $pos;
   if (!state.ok && state.log) {
@@ -1416,18 +1410,19 @@ String? tagOfFoo(State<String> state) {
 String? tagNoCaseAbc(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = false;
-  if (state.pos + 3 <= source.length) {
-    final v1 = source.substring(state.pos, state.pos + 3);
-    final v2 = v1.toLowerCase();
-    if (v2 == 'abc') {
-      state.ok = true;
-      state.pos += 3;
-      $0 = v1;
+  final $start = state.pos;
+  final $end = $start + 3;
+  state.ok = $end <= source.length;
+  if (state.ok) {
+    final v = source.substring($start, $end);
+    state.ok = v.toLowerCase() == 'abc';
+    if (state.ok) {
+      state.pos = $end;
+      $0 = v;
     }
   }
   if (!state.ok && state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    state.error = ErrExpected.tag($start, const Tag('abc'));
   }
   return $0;
 }

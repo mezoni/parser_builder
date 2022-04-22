@@ -13,11 +13,10 @@ final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   final ok = {{test}};
-  if (ok) {
-    state.pos++;
-    continue;
+  if (!ok) {
+    break;
   }
-  break;
+  state.pos++;
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok && state.log) {
@@ -31,11 +30,10 @@ while (state.pos < source.length) {
   final pos = state.pos;
   {{c}} = source.readRune(state);
   final ok = {{test}};
-  if (ok) {
-    continue;
+  if (!ok) {
+    state.pos = pos;
+    break;
   }
-  state.pos = pos;
-  break;
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok && state.log) {

@@ -29,8 +29,7 @@ while (true) {
   }
 }
 state.log = {{log}};
-state.ok = true;
-''';
+state.ok = true;''';
 
   final ParserBuilder<I, O> parser;
 
