@@ -88,7 +88,7 @@ if (!state.ok && state.log) {
     final isUnicode = predicate.isUnicode;
     final c = isUnicode ? values['c']! : 'c';
     values.addAll({
-      'test': fast ? '' : predicate.build(context, 'test', [c]),
+      'test': predicate.build(context, 'test', [c]),
     });
     final String template;
     if (isUnicode) {

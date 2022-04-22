@@ -81,7 +81,7 @@ if (state.ok) {
     final fast = result == null;
     final values = context.allocateLocals(['pos']);
     values.addAll({
-      'test': fast ? '' : predicate.build(context, 'test', ['c']),
+      'test': predicate.build(context, 'test', ['c']),
     });
     final isUnicode = predicate.isUnicode;
     final String template;

@@ -36,6 +36,6 @@ if (state.ok) {
       'p1': parser.build(context, r1),
       'verify': verify.build(context, 'verify', ['v']),
     };
-    return render2(fast, _templateFast, _template, values, [result]);
+    return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }
