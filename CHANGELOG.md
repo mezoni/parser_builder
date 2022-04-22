@@ -1,7 +1,7 @@
 ## 1.0.1
 
 - Minor changes in `README.md` file
-- Fixed bugs in some parsers that use (require) semantic actions even in `fast` mode (for verification and so on). Bugs were found with the following parsers `Satisfy`, `TakeWhile`, `TakeWhile1`, `Verify`
+- Fixed bugs in some parsers that use (require) semantic actions even in `fast` mode (for verification and so on). Bugs were found with the following parsers `Satisfy`, `TakeWhile`, `TakeWhile1`, `Verify`. This error did not result in parsing errors, but did result in the generation of uncompilable (not a valid) source code of parsers
 
 ## 1.0.0
 
