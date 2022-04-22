@@ -493,15 +493,7 @@ String {{name}}(String source, List<Err> errors,
 }
 ''';
 
-  static const _functionUnwrap = '''
-@pragma('vm:prefer-inline')
-T _unwrap<T>(T? value) => value!;
-''';
-
-  static const _functionWrap = '''
-@pragma('vm:prefer-inline')
-T? _wrap<T>(T? value) => value;
-''';
+  
 
   static List<String> getClasses() {
     return const [
@@ -532,12 +524,5 @@ T? _wrap<T>(T? value) => value;
     var result = _functionErrorMessage;
     result = result.replaceAll('{{name}}', name);
     return result;
-  }
-
-  static List<String> getFunctions() {
-    return const [
-      _functionUnwrap,
-      _functionWrap,
-    ];
   }
 }

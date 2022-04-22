@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_cast
-
 import 'package:source_span/source_span.dart';
 
 void main() {
@@ -23,21 +21,12 @@ num? parse(String s) {
 
 void _ws(State<String> state) {
   final source = state.source;
-  while (true) {
-    final $pos = state.pos;
-    int? $3;
-    state.ok = state.pos < source.length;
-    if (state.ok) {
-      $3 = _wrap(source.readRune(state));
-    }
-    if (state.ok) {
-      final $v = _unwrap($3);
-      state.ok = $v == 0x9 || $v == 0xa || $v == 0xd || $v == 0x20;
-    }
-    if (!state.ok) {
-      state.pos = $pos;
-    }
-    if (!state.ok) {
+  while (state.pos < source.length) {
+    final pos = state.pos;
+    final c = source.readRune(state);
+    final ok = c == 0x9 || c == 0xa || c == 0xd || c == 0x20;
+    if (!ok) {
+      state.pos = pos;
       break;
     }
   }
@@ -47,11 +36,14 @@ void _ws(State<String> state) {
 num? number(State<String> state) {
   num? $0;
   final source = state.source;
-  num? $parseNumber() {
+  final $pos = state.pos;
+  _ws(state);
+  if (state.ok) {
+    final $pos1 = state.pos;
     state.ok = true;
-    final pos1 = state.pos;
-    num? res;
-    for (;;) {
+    final $pos2 = state.pos;
+    num? $v;
+    while (true) {
       //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
       const eof = 0x110000;
       const mask = 0x30;
@@ -242,7 +234,7 @@ num? number(State<String> state) {
         }
         if (expPartLen > 18) {
           state.pos = pos;
-          res = double.parse(source.substring(pos1, pos));
+          $v = double.parse(source.substring($pos2, pos));
           break;
         }
         if (hasExpSign) {
@@ -252,7 +244,7 @@ num? number(State<String> state) {
       state.pos = pos;
       final singlePart = !hasDot && !hasExp;
       if (singlePart && intPartLen <= 18) {
-        res = hasSign ? -intValue : intValue;
+        $v = hasSign ? -intValue : intValue;
         break;
       }
       if (singlePart && intPartLen == 19) {
@@ -260,7 +252,7 @@ num? number(State<String> state) {
           final digit = source.codeUnitAt(intPartPos + 18) - 0x30;
           if (digit <= 7) {
             intValue = intValue * 10 + digit;
-            res = hasSign ? -intValue : intValue;
+            $v = hasSign ? -intValue : intValue;
             break;
           }
         }
@@ -272,7 +264,7 @@ num? number(State<String> state) {
       final modExp = exp < 0 ? -exp : exp;
       if (modExp > 22) {
         state.pos = pos;
-        res = double.parse(source.substring(pos1, pos));
+        $v = double.parse(source.substring($pos2, pos));
         break;
       }
       final k = powersOfTen[modExp];
@@ -302,10 +294,12 @@ num? number(State<String> state) {
         }
         doubleValue += value;
       }
-      res = hasSign ? -doubleValue : doubleValue;
+      $v = hasSign ? -doubleValue : doubleValue;
       break;
     }
-    if (!state.ok) {
+    if (state.ok) {
+      $0 = $v;
+    } else {
       if (state.pos < source.length) {
         var c = source.codeUnitAt(state.pos);
         if (c > 0xd7ff) {
@@ -315,37 +309,24 @@ num? number(State<String> state) {
       } else {
         state.error = ErrUnexpected.eof(state.pos);
       }
-      state.pos = pos1;
+      state.pos = $pos2;
     }
-    return res;
-  }
-
-  final $pos = state.pos;
-  _ws(state);
-  if (state.ok) {
-    num? $2;
-    final $pos1 = state.pos;
-    num? $3;
-    $3 = _wrap($parseNumber());
     if (state.ok) {
       _ws(state);
-      if (state.ok) {
-        $2 = $3;
-      } else {
-        state.pos = $pos1;
-      }
+    }
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos1;
     }
     if (state.ok) {
       state.ok = state.pos >= source.length;
-      if (!state.ok) {
+      if (!state.ok && state.log) {
         state.error = ErrExpected.eof(state.pos);
-      }
-      if (state.ok) {
-        $0 = $2;
       }
     }
   }
   if (!state.ok) {
+    $0 = null;
     state.pos = $pos;
   }
   return $0;
@@ -380,12 +361,6 @@ String _errorMessage(String source, List<Err> errors,
 
   return sb.toString();
 }
-
-@pragma('vm:prefer-inline')
-T _unwrap<T>(T? value) => value!;
-
-@pragma('vm:prefer-inline')
-T? _wrap<T>(T? value) => value;
 
 /// Represents the `char` used in parsing errors.
 class Char {

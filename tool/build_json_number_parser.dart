@@ -1,5 +1,4 @@
 import 'package:parser_builder/bytes.dart';
-import 'package:parser_builder/codegen/code_gen.dart';
 import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
@@ -14,8 +13,6 @@ Future<void> main(List<String> args) async {
 const parser = Number();
 
 const __header = '''
-// ignore_for_file: unnecessary_cast
-
 import 'package:source_span/source_span.dart';
 
 void main() {
@@ -37,7 +34,7 @@ num? parse(String s) {
   return r!;
 }''';
 
-const _isWhitespace = ExprAction<bool>(
+const _isWhitespace = ExpressionAction<bool>(
     ['x'], '{{x}} == 0x9 || {{x}} == 0xa || {{x}} == 0xd || {{x}} == 0x20');
 
 const _number = Terminated(parser, _ws);
@@ -46,12 +43,44 @@ const _parser = Named<String, num>('number', Delimited(_ws, _number, Eof()));
 
 const _ws = Named('_ws', SkipWhile(_isWhitespace));
 
-class Number extends StringParserBuilder<num> {
-  static const _body = '''
+class Number extends ParserBuilder<String, num> {
+  static const _template = '''
+{{parse}}
+if (state.ok) {
+  {{res0}} = {{v}};
+} else {
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    if (c > 0xd7ff) {
+      c = source.runeAt(state.pos);
+    }
+    state.error = ErrUnexpected.char(state.pos, Char(c));
+  } else {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
+  state.pos = {{pos}};
+}''';
+
+  static const _templateFast = '''
+{{parse}}
+if (!state.ok) {
+  if (state.pos < source.length) {
+    var c = source.codeUnitAt(state.pos);
+    if (c > 0xd7ff) {
+      c = source.runeAt(state.pos);
+    }
+    state.error = ErrUnexpected.char(state.pos, Char(c));
+  } else {
+    state.error = ErrUnexpected.eof(state.pos);
+  }
+  state.pos = {{pos}};
+}''';
+
+  static const _templateParseNumber = '''
     state.ok = true;
-    final pos1 = state.pos;
-    num? res;
-    for (;;) {
+    final {{pos}} = state.pos;
+    num? {{v}};
+    while (true) {
       //  '-'?('0'|[1-9][0-9]*)('.'[0-9]+)?([eE][+-]?[0-9]+)?
       const eof = 0x110000;
       const mask = 0x30;
@@ -242,7 +271,7 @@ class Number extends StringParserBuilder<num> {
         }
         if (expPartLen > 18) {
           state.pos = pos;
-          res = double.parse(source.substring(pos1, pos));
+          {{v}} = double.parse(source.substring({{pos}}, pos));
           break;
         }
         if (hasExpSign) {
@@ -252,7 +281,7 @@ class Number extends StringParserBuilder<num> {
       state.pos = pos;
       final singlePart = !hasDot && !hasExp;
       if (singlePart && intPartLen <= 18) {
-        res = hasSign ? -intValue : intValue;
+        {{v}} = hasSign ? -intValue : intValue;
         break;
       }
       if (singlePart && intPartLen == 19) {
@@ -260,7 +289,7 @@ class Number extends StringParserBuilder<num> {
           final digit = source.codeUnitAt(intPartPos + 18) - 0x30;
           if (digit <= 7) {
             intValue = intValue * 10 + digit;
-            res = hasSign ? -intValue : intValue;
+            {{v}} = hasSign ? -intValue : intValue;
             break;
           }
         }
@@ -272,7 +301,7 @@ class Number extends StringParserBuilder<num> {
       final modExp = exp < 0 ? -exp : exp;
       if (modExp > 22) {
         state.pos = pos;
-        res = double.parse(source.substring(pos1, pos));
+        {{v}} = double.parse(source.substring({{pos}}, pos));
         break;
       }
       final k = powersOfTen[modExp];
@@ -302,29 +331,21 @@ class Number extends StringParserBuilder<num> {
         }
         doubleValue += value;
       }
-      res = hasSign ? -doubleValue : doubleValue;
+      {{v}} = hasSign ? -doubleValue : doubleValue;
       break;
-    }
-    if (!state.ok) {
-      if (state.pos < source.length) {
-        var c = source.codeUnitAt(state.pos);
-        if (c > 0xd7ff) {
-          c = source.runeAt(state.pos);
-        }
-        state.error = ErrUnexpected.char(state.pos, Char(c));
-      } else {
-        state.error = ErrUnexpected.eof(state.pos);
-      }
-      state.pos = pos1;
-    }
-    return res;''';
+    }''';
 
   const Number();
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    final parseNumber = FuncAction<num?>([], _body);
-    code.setResult(parseNumber.build(context, 'parseNumber', []));
+    final fast = result == null;
+    final values = context.allocateLocals(['pos', 'v']);
+    final templateParseNumber = render(_templateParseNumber, values);
+    values.addAll({
+      'parse': templateParseNumber,
+    });
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

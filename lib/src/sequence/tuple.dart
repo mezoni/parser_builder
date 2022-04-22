@@ -149,12 +149,18 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
 }
 
 abstract class _Tuple<I, O> extends _Sequence<I, O> {
+  static const _template = '''
+{{res0}} = Tuple{{size}}({{values}});''';
+
   const _Tuple();
 
   @override
-  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
-    final values = results.map((e) => e.value).join(', ');
+  String _setResult(Context context, List<ParserResult> results) {
     final size = results.length;
-    code.setResult('Tuple$size($values)');
+    final values = {
+      'size': '$size',
+      'values': results.map((e) => e.value).join(', '),
+    };
+    return render(_template, values);
   }
 }

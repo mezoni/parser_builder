@@ -1,18 +1,30 @@
 part of '../../combinator.dart';
 
 class Not<I> extends ParserBuilder<I, void> {
+  static const _template = '''
+final {{pos}} = state.pos;
+final {{log}} = state.log;
+state.log = false;
+{{p1}}
+state.log = {{log}};
+state.ok = !state.ok;
+if (!state.ok) {
+  state.pos = {{pos}};
+  if ({{log}}) {
+    state.error = ErrUnknown(state.pos);
+  }
+}''';
+
   final ParserBuilder<I, dynamic> parser;
 
   const Not(this.parser);
 
   @override
-  void build(Context context, CodeGen code) {
-    final pos = code.savePos();
-    helper.build(context, code, parser, fast: true, silent: true, pos: pos);
-    code.negateState();
-    code.ifFailure((code) {
-      code.setPos(pos);
-      code.setError('ErrUnknown(state.pos)');
+  String build(Context context, ParserResult? result) {
+    final values = context.allocateLocals(['log', 'pos']);
+    values.addAll({
+      'p1': parser.build(context, null),
     });
+    return render(_template, values, [result]);
   }
 }

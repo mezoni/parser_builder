@@ -1,30 +1,13 @@
 part of '../../parser_builder.dart';
 
-class ClosureAction<T> extends SemanticAction<T> {
+class ExpressionAction<T> extends SemanticAction<T> {
   final String expression;
 
   final List<String> parameters;
 
-  const ClosureAction(this.parameters, this.expression);
+  const ExpressionAction(this.parameters, this.expression);
 
-  @override
-  String build(Context context, String name, List<String> arguments) {
-    name = context.allocateLocal(name);
-    final declaration = 'final $name = $expression;';
-    addLocalDeclaration(context, name, declaration);
-    final args = checkArguments(parameters, arguments, expression);
-    return '$name($args)';
-  }
-}
-
-class ExprAction<T> extends SemanticAction<T> {
-  final String expression;
-
-  final List<String> parameters;
-
-  const ExprAction(this.parameters, this.expression);
-
-  const ExprAction.value(this.expression) : parameters = const [];
+  const ExpressionAction.value(this.expression) : parameters = const [];
 
   @override
   String build(Context context, String name, List<String> arguments) {
@@ -32,12 +15,12 @@ class ExprAction<T> extends SemanticAction<T> {
   }
 }
 
-class FuncAction<T> extends SemanticAction<T> {
+class FunctionAction<T> extends SemanticAction<T> {
   final String body;
 
   final List<String> parameters;
 
-  const FuncAction(this.parameters, this.body);
+  const FunctionAction(this.parameters, this.body);
 
   @override
   String build(Context context, String name, List<String> arguments) {
@@ -45,23 +28,6 @@ class FuncAction<T> extends SemanticAction<T> {
     final declaration = '$T $name(${parameters.join(' ,')}) { $body }';
     addLocalDeclaration(context, name, declaration);
     final args = checkArguments(parameters, arguments, body);
-    return '$name($args)';
-  }
-}
-
-class FuncExprAction<T> extends SemanticAction<T> {
-  final String expression;
-
-  final List<String> parameters;
-
-  const FuncExprAction(this.parameters, this.expression);
-
-  @override
-  String build(Context context, String name, List<String> arguments) {
-    name = context.allocateLocal(name);
-    final declaration = '$T $name(${parameters.join(', ')}) => $expression;';
-    addLocalDeclaration(context, name, declaration);
-    final args = checkArguments(parameters, arguments, expression);
     return '$name($args)';
   }
 }
@@ -107,7 +73,7 @@ abstract class SemanticAction<T> {
   }
 }
 
-class VarAction<T> extends SemanticAction<T> {
+class VariableAction<T> extends SemanticAction<T> {
   final String expression;
 
   final String init;
@@ -116,7 +82,7 @@ class VarAction<T> extends SemanticAction<T> {
 
   final List<String> parameters;
 
-  const VarAction(this.parameters, this.expression,
+  const VariableAction(this.parameters, this.expression,
       {required this.init, required this.key});
 
   @override

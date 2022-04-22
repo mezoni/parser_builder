@@ -11,7 +11,7 @@ class HexDigit0 extends _Chars0 {
   const HexDigit0();
 
   @override
-  SemanticAction<bool> _getCharacterPredicate() {
+  SemanticAction<bool> _getPredicate() {
     return CharClass('[#x30-#x39] | [#x41-#x46] | [#x61-#x66]');
   }
 }

@@ -406,24 +406,14 @@ void _testAnd() {
       parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(
-          state.error,
-          ErrCombined(0, [
-            ErrExpected.char(0, Char(c32)),
-            ErrExpected.char(0, Char(c16)),
-          ]));
+      expect(state.error, ErrUnknown(0));
     }
     {
       final state = State(' ');
       parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(
-          state.error,
-          ErrCombined(0, [
-            ErrExpected.char(0, Char(c32)),
-            ErrExpected.char(0, Char(c16)),
-          ]));
+      expect(state.error, ErrUnknown(0));
     }
   });
 }
@@ -1749,10 +1739,8 @@ void _testSatisfy() {
 void _testSemanticActions() {
   final parsers = {
     'CharClasss': transformersCharClassIsDigit,
-    'ClosureAction': transformersClosureIsDigit,
-    'ExprAction': transformersExprIsDigit,
-    'FuncExprAction': transformersFuncExprIsDigit,
-    'FuncAction': transformersFuncIsDigit,
+    'ExpressionAction': transformersExprIsDigit,
+    'FunctionAction': transformersFuncIsDigit,
     'NotCharClasss': transformersNotCharClassIsDigit,
   };
   for (final key in parsers.keys) {
@@ -1788,7 +1776,7 @@ void _testSemanticActions() {
       }
     });
 
-    test('Semantic action VarAction', () {
+    test('Semantic action VariableAction', () {
       final parser = transformersVarIsNotDigit;
       {
         final state = State('a');
@@ -2519,8 +2507,7 @@ void _testTakeUntil1() {
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
-      expect(state.error,
-          ErrMessage(0, 0, "Expected at least one character before 'abc'"));
+      expect(state.error, ErrUnexpected.tag(0, Tag('abc')));
     }
     {
       final state = State('');

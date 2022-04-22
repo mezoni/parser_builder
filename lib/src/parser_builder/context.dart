@@ -3,8 +3,6 @@ part of '../../parser_builder.dart';
 class Context {
   final Map<Object, Object?> context = {};
 
-  bool diagnose = false;
-
   final List<String> globalDeclarations = [];
 
   Allocator globalAllocator = Allocator('_\$');
@@ -23,5 +21,25 @@ class Context {
   String allocateLocal([String name = '']) {
     final result = localAllocator.allocate(name);
     return result;
+  }
+
+  Map<String, String> allocateLocals(Iterable names) {
+    final result = <String, String>{};
+    for (final name in names) {
+      result[name] = allocateLocal(name);
+    }
+
+    return result;
+  }
+
+  ParserResult? getResult(ParserBuilder parser, bool condition) {
+    if (!condition) {
+      return null;
+    }
+
+    final name = allocateLocal();
+    final type = parser.getResultType();
+    final value = parser.getResultValue(name);
+    return ParserResult(name, type, value);
   }
 }

@@ -1,6 +1,27 @@
 part of '../../sequence.dart';
 
-class Preceded<I, O> extends _Sequence<I, O> {
+class Preceded<I, O> extends ParserBuilder<I, O> {
+  static const _template = '''
+final {{pos}} = state.pos;
+{{p1}}
+if (state.ok) {
+  {{p2}}
+}
+if (!state.ok) {
+  {{res0}} = null;
+  state.pos = {{pos}};
+}''';
+
+  static const _templateFast = '''
+final {{pos}} = state.pos;
+{{p1}}
+if (state.ok) {
+  {{p2}}
+}
+if (!state.ok) {
+  state.pos = {{pos}};
+}''';
+
   final ParserBuilder<I, dynamic> precede;
 
   final ParserBuilder<I, O> parser;
@@ -8,21 +29,13 @@ class Preceded<I, O> extends _Sequence<I, O> {
   const Preceded(this.precede, this.parser);
 
   @override
-  List<ParserBuilder<I, dynamic>> _getParsers() {
-    return [
-      precede,
-      parser,
-    ];
-  }
-
-  @override
-  bool _isVoidResult(int index) {
-    return index == 0;
-  }
-
-  @override
-  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
-    final result1 = results[1];
-    code.setResult(result1.name, false);
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = context.allocateLocals(['pos']);
+    values.addAll({
+      'p1': precede.build(context, null),
+      'p2': parser.build(context, result),
+    });
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

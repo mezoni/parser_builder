@@ -6,18 +6,36 @@ part of '../../bytes.dart';
 /// ```dart
 /// Tag('{')
 /// ```
-class Tag extends StringParserBuilder<String> {
+class Tag extends ParserBuilder<String, String> {
+  static const _template = '''
+state.ok = {{test}};
+if (state.ok) {
+  state.pos += {{length}};
+  {{res0}} = {{tag}};
+} else if (state.log) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
+  static const _templateFast = '''
+state.ok = {{test}};
+if (state.ok) {
+  state.pos += {{length}};
+} else if (state.log) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
   final String tag;
 
   const Tag(this.tag);
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     if (this.tag.isEmpty) {
       throw ArgumentError.value(this.tag, 'tag', 'The tag must not be empty');
     }
 
     context.refersToStateSource = true;
+    final fast = result == null;
     final cc = this.tag.codeUnitAt(0).toString();
     final tag = helper.escapeString(this.tag);
     final length = this.tag.length;
@@ -37,12 +55,11 @@ class Tag extends StringParserBuilder<String> {
             'state.pos < source.length && source.codeUnitAt(state.pos) == $cc && source.startsWith($tag, state.pos)';
     }
 
-    code.setState(test);
-    code.ifSuccess((code) {
-      code.addToPos(length);
-      code.setResult(tag);
-    }, else_: (code) {
-      code.setError('ErrExpected.tag(state.pos, const Tag($tag))');
-    });
+    final values = {
+      'length': '$length',
+      'tag': helper.escapeString(this.tag),
+      'test': test,
+    };
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

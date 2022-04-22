@@ -1,14 +1,17 @@
 part of '../../combinator.dart';
 
 class Eof<I> extends ParserBuilder<I, void> {
+  static const _template = '''
+state.ok = state.pos >= source.length;
+if (!state.ok && state.log) {
+  state.error = ErrExpected.eof(state.pos);
+}''';
+
   const Eof();
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    code.setStateToEof();
-    code.ifFailure((code) {
-      code.setError('ErrExpected.eof(state.pos)');
-    });
+    return render(_template, {});
   }
 }

@@ -7,16 +7,48 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeUntil1('{{')
 /// ```
-class TakeUntil1 extends Redirect<String, String> {
+class TakeUntil1 extends ParserBuilder<String, String> {
+  static const _template = '''
+final {{pos}} = state.pos;
+final {{index}} = source.indexOf({{tag}}, {{pos}});
+state.ok = {{index}} > {{pos}};
+if (state.ok) {
+  state.pos = {{index}};
+  {{res0}} = source.substring({{pos}}, {{index}});
+} else if (state.log) {
+  if ({{index}} == -1) {
+    state.error = ErrExpected.tag(source.length, const Tag({{tag}}));
+  } else {
+    state.error = ErrUnexpected.tag({{pos}}, const Tag({{tag}}));
+  }
+}''';
+
+  static const _templateFast = '''
+final {{pos}} = state.pos;
+final {{index}} = source.indexOf({{tag}}, {{pos}});
+state.ok = {{index}} > {{pos}};
+if (state.ok) {
+  state.pos = {{index}};
+} else if (state.log) {
+  if ({{index}} == -1) {
+    state.error = ErrExpected.tag(source.length, const Tag({{tag}}));
+  } else {
+    state.error = ErrUnexpected.tag({{pos}}, const Tag({{tag}}));
+  }
+}''';
+
   final String tag;
 
   const TakeUntil1(this.tag);
 
   @override
-  ParserBuilder<String, String> getRedirectParser() {
-    final tag = helper.escapeString(this.tag);
-    final message = 'Expected at least one character before $tag';
-    final verify = ExprAction<bool>(['index'], '{{index}} > state.pos');
-    return Recognize(MoveTo(Verify(message, FindTag(this.tag), verify)));
+  String build(Context context, ParserResult? result) {
+    context.refersToStateSource = true;
+    final fast = result == null;
+    final values = context.allocateLocals(['index', 'pos']);
+    values.addAll({
+      'tag': helper.escapeString(tag),
+    });
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

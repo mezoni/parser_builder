@@ -1,27 +1,51 @@
 part of '../../multi.dart';
 
 class Many1<I, O> extends ParserBuilder<I, List<O>> {
+  static const _template = '''
+var {{list}} = <{{O}}>[];
+final {{log}} = state.log;
+while (true) {
+  state.log = {{list}}.isEmpty;
+  {{var1}}
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{list}}.add({{val1}});
+}
+state.log = {{log}};
+state.ok = {{list}}.isNotEmpty;
+if (state.ok) {
+  {{res0}} = {{list}};
+}''';
+
+  static const _templateFast = '''
+var {{ok}} = false;
+final {{log}} = state.log;
+while (true) {
+  state.log = !{{ok}};
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{ok}} = true;
+}
+state.log = {{log}};
+state.ok = {{ok}};''';
+
   final ParserBuilder<I, O> parser;
 
   const Many1(this.parser);
 
   @override
-  void build(Context context, CodeGen code) {
-    final list = code.val('list', '<$O>[]', false);
-    final ok = code.local('var', 'ok', 'false', true);
-    code.while$('true', (code) {
-      final result = helper.build(context, code, parser);
-      code.ifSuccess((code) {
-        code.add('$list.add(${result.value});', false);
-        code.assign(ok, 'true', true);
-      }, else_: (code) {
-        code.break$();
-      });
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = context.allocateLocals(['list', 'log', 'ok']);
+    final r1 = context.getResult(parser, !fast);
+    values.addAll({
+      'O': '$O',
+      'p1': parser.build(context, r1),
     });
-    code.setState('$list.isNotEmpty', false);
-    code.setState(ok, true);
-    code.ifSuccess((code) {
-      code.setResult(list);
-    });
+    return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }

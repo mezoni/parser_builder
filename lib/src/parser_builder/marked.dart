@@ -1,6 +1,7 @@
 part of '../../parser_builder.dart';
 
-class Marked<I, O> extends Redirect<I, O> {
+@experimental
+class Marked<I, O> extends ParserBuilder<I, O> {
   final String name;
 
   final ParserBuilder<I, O> parser;
@@ -8,7 +9,7 @@ class Marked<I, O> extends Redirect<I, O> {
   const Marked(this.name, this.parser);
 
   @override
-  ParserBuilder<I, O> getRedirectParser() {
-    return parser;
+  String build(Context context, ParserResult? result) {
+    return parser.build(context, result);
   }
 }

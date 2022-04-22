@@ -1,8 +1,8 @@
 # parser_builder
 
-Lightweight parser build system. Simple prototyping. Comfortable debugging. Effective developing.
+Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 0.17.0
+Version: 0.18.0
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -13,9 +13,10 @@ The build system is already implemented and ready to use and you can try it out 
 Attention, the generated combinations of parsers are very small and very efficient.  
 Ask questions if something is not clear.  
 
-## Advantage
+## First advantage
 
 - `Very simple and clear` build and code generation system
+- `Templates-based` (visually intuitive) definition of parser builders
 - Parser declaration based on `combinations of parsers`
 - Allows to build parsers to `parse any kind of data` (binary data, tokens, etc.)
 - Support for generating parsers `into functions or into statements` (inlined parser code)
@@ -34,6 +35,16 @@ Ask questions if something is not clear.
 - Includes high-performance, most common `built-in parser builders`
 - Support for `32 bit Unicode characters` out of the box (no need to worry about that)
 
+## Second advantage
+
+Another advantage is that the build system is very simple and straightforward. Any programmer will understand it without much difficulty.  
+This means that an ordinary programmer can keep this software up to date.  
+You do not need to be a man of seven spans in the forehead for this.  
+The author of this software is also not such and is a simple person.  
+It's just a simple but handy thing.  
+Use it and don't worry about it stopping working.  
+This software is already so simple that it couldn't be easier.
+
 ## Included parser builders
 
 built-in:
@@ -43,11 +54,9 @@ built-in:
 [`branch`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch):
 - [`Alt`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/alt.dart)
 - [`Alt2..Alt7`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/alt.dart)
-- [`SwitchTag`](https://github.com/mezoni/parser_builder/blob/master/lib/src/branch/switch_tag.dart)
 
 [`bytes`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes):
 - [`NoneOfTags`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/none_of_tags.dart)
-- [`Skip`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip.dart)
 - [`SkipWhile`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip_while.dart)
 - [`SkipWhile1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/skip_while1.dart)
 - [`Tag`](https://github.com/mezoni/parser_builder/blob/master/lib/src/bytes/tag.dart)
@@ -72,11 +81,13 @@ built-in:
 - [`HexDigit0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/character/hex_digit0.dart)
 - [`HexDigit1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/character/hex_digit1.dart)
 - [`NoneOf`](https://github.com/mezoni/parser_builder/blob/master/lib/src/character/none_of.dart)
-- [`NoneOfEx`](https://github.com/mezoni/parser_builder/blob/master/lib/src/character/none_of_ex.dart)
+- [`NoneOfOf`](https://github.com/mezoni/parser_builder/blob/master/lib/src/character/none_of_of.dart)
 - [`OneOf`](https://github.com/mezoni/parser_builder/blob/master/lib/src/character/one_of.dart)
 - [`Satisfy`](https://github.com/mezoni/parser_builder/blob/master/lib/src/character/satisfy.dart)
 
 [`combinator`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator):
+- [`And`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/and.dart) (not tested yet)
+- [`Calculate`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/calculate.dart) (not tested yet)
 - [`Consumed`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/consumed.dart)
 - [`Eof`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/eof.dart)
 - [`Fast`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/fast.dart)
@@ -93,7 +104,7 @@ built-in:
 - [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart) (not fully tested)
 
 [`multi`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi):
-- `FoldMany0` (not implenented yet)
+- [`FoldMany0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/fold_many0.dart)
 - `FoldMany1` (not implenented yet)
 - [`Many0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/many0.dart)
 - [`Many0Count`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/many0_count.dart)
@@ -110,7 +121,6 @@ built-in:
 - [`Pair`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/pair.dart)
 - [`Preceded`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/preceded.dart)
 - [`SeparatedPair`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/separated_pair.dart)
-- [`Skip`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/skip.dart)
 - [`SkipMany0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/skip_many0.dart)
 - [`Terminated`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/terminated.dart)
 - [`Tuple1..Tuple7`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/tuple.dart)
@@ -127,7 +137,7 @@ built-in:
 - [`FuncAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
 - [`VarAction`](https://github.com/mezoni/parser_builder/blob/master/lib/src/parser_builder/semantic_action.dart)
 
-## Character class
+## Character class (semantic action)
 
 - [`CharClass`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_class.dart)
 - [`CharClasses`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_classes.dart)
@@ -245,37 +255,35 @@ Color? _hexColor(State<String> state) {
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
-    state.pos++;
-  } else {
+    state.pos += 1;
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
-    Color? $2;
     final $pos1 = state.pos;
-    int? $3;
-    $3 = _hexPrimary(state);
+    int? $1;
+    $1 = _hexPrimary(state);
     if (state.ok) {
-      int? $4;
-      $4 = _hexPrimary(state);
+      int? $2;
+      $2 = _hexPrimary(state);
       if (state.ok) {
-        int? $5;
-        $5 = _hexPrimary(state);
+        int? $3;
+        $3 = _hexPrimary(state);
         if (state.ok) {
-          final $v = _unwrap($3);
-          final $v1 = _unwrap($4);
-          final $v2 = _unwrap($5);
-          $2 = _wrap(Color($v, $v1, $v2));
+          final v1 = $1!;
+          final v2 = $2!;
+          final v3 = $3!;
+          $0 = Color(v1, v2, v3);
         }
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
     }
-    if (state.ok) {
-      $0 = $2;
-    } else {
-      state.pos = $pos;
-    }
+  }
+  if (!state.ok) {
+    $0 = null;
+    state.pos = $pos;
   }
   return $0;
 }
@@ -293,7 +301,7 @@ const _hexColor = Named(
             _hexPrimary,
             _hexPrimary,
             _hexPrimary,
-            ExprTransformer<Color>(
+            ExpressionAction<Color>(
                 ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
 ```
 
@@ -387,26 +395,52 @@ This is an implementation of the well-known parsing expression called `optional`
 part of '../../multi.dart';
 
 class Many0<I, O> extends ParserBuilder<I, List<O>> {
+  static const _template = '''
+final {{list}} = <{{O}}>[];
+final {{log}} = state.log;
+state.log = false;
+while (true) {
+  {{var1}}
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{list}}.add({{val1}});
+}
+state.log = {{log}};
+state.ok = true;
+if (state.ok) {
+  {{res0}} = {{list}};
+}''';
+
+  static const _templateFast = '''
+final {{log}} = state.log;
+state.log = false;
+while (true) {
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+}
+state.log = {{log}};
+state.ok = true;''';
+
   final ParserBuilder<I, O> parser;
 
   const Many0(this.parser);
 
   @override
-  void build(Context context, CodeGen code) {
-    final list = code.val('list', '<$O>[]', false);
-    code.while$('true', (code) {
-      final result = helper.build(context, code, parser, silent: true);
-      code.ifSuccess((code) {
-        code.add('$list.add(${result.value});', false);
-      }, else_: (code) {
-        code.break$();
-      });
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = context.allocateLocals(['list', 'log']);
+    final r1 = context.getResult(parser, !fast);
+    values.addAll({
+      'O': '$O',
+      'p1': parser.build(context, r1),
     });
-    code.setSuccess();
-    code.setResult(list);
+    return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }
-
 
 ```
 

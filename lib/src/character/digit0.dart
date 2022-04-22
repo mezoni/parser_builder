@@ -11,7 +11,7 @@ class Digit0 extends _Chars0 {
   const Digit0();
 
   @override
-  SemanticAction<bool> _getCharacterPredicate() {
+  SemanticAction<bool> _getPredicate() {
     return CharClass('[#x30-#x39]');
   }
 }

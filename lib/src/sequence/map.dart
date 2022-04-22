@@ -163,29 +163,45 @@ class Map7<I, O1, O2, O3, O4, O5, O6, O7, O> extends _Map<I, O> {
 }
 
 abstract class _Map<I, O> extends _Sequence<I, O> {
+  static const _template = '''
+{{arguments}}
+{{res0}} = {{map}};''';
+
+  static const _templateArgument = '''
+final {{name}} = {{value}};''';
+
   const _Map();
 
   SemanticAction<O> get map;
 
   @override
-  bool _isVoidResult(int index) {
-    final parsers = _getParsers();
-    RangeError.checkValidRange(index, parsers.length, parsers.length);
-    final parser = parsers[index];
-    return parser.getResultType() == 'void';
-  }
-
-  @override
-  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
+  String _setResult(Context context, List<ParserResult> results) {
+    final code = <String>[];
     final arguments = <String>[];
-    for (var i = 0; i < results.length; i++) {
+    for (var i = 0, j = 1; i < results.length; i++, j++) {
       final result = results[i];
-      if (!result.isVoid) {
-        final v = code.val('v', result.value);
-        arguments.add(v);
+      if (result.type != 'void') {
+        final argument = 'v$j';
+        final value = '{{val$j}}';
+        arguments.add(argument);
+        final values = {
+          'name': argument,
+          'value': value,
+        };
+        final template = render(_templateArgument, values);
+        code.add(template);
       }
     }
 
-    code.setResult(map.build(context, 'map', arguments));
+    final values = {
+      'arguments': code.join('\n'),
+      'map': map.build(context, 'map', arguments),
+    };
+    return render(_template, values);
+  }
+
+  @override
+  bool _useResultsOfFastParsers() {
+    return false;
   }
 }

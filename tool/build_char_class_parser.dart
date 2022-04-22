@@ -60,7 +60,7 @@ const _char = Named('_char', Delimited(Tag('"'), _charCode, Tag('"')));
 
 const _charCode = Named('_charCode', Satisfy(_isAscii));
 
-const _flatten = ExprAction<List<_t.Tuple2<int, int>>>(
+const _flatten = ExpressionAction<List<_t.Tuple2<int, int>>>(
     ['x'], '_flatten({{x}}, <Tuple2<int, int>>[])');
 
 const _hex = Named('_hex', Preceded(Tag('#x'), _hexVal));
@@ -70,15 +70,15 @@ const _hexOrRangeChar = Named('_hexOrRangeChar', Alt([_hex, _rangeChar]));
 const _hexVal = Named('_hexVal', Map1(TakeWhile1(_isHexDigit), _toHexValue));
 
 const _intToTuple2 =
-    ExprAction<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
+    ExpressionAction<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
 
-const _isAscii = ExprAction<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
+const _isAscii = ExpressionAction<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
 
-const _isHexDigit = ExprAction<bool>([
+const _isHexDigit = ExpressionAction<bool>([
   'x'
 ], '{{x}} >= 0x30 && {{x}} <= 0x39 || {{x}} >= 0x41 && {{x}} <= 0x46 || {{x}} >= 0x61 && {{x}}<= 0x66');
 
-const _isWhiteSpace = ExprAction<bool>(
+const _isWhiteSpace = ExpressionAction<bool>(
     ['x'], '{{x}} == 0x09 || {{x}} == 0xA || {{x}} == 0xD || {{x}} == 0x20');
 
 const _parse = Named('parse', Delimited(_ws, _ranges, Eof<String>()));
@@ -87,7 +87,8 @@ const _range = Named(
     '_range',
     Alt<String, List<_t.Tuple2<int, int>>>([
       Delimited(Tag('['), Many1(_rangeBody), Tag(']')),
-      Map1(Alt([_char, _hex]), ExprAction(['x'], ('[Tuple2({{x}}, {{x}})]'))),
+      Map1(Alt([_char, _hex]),
+          ExpressionAction(['x'], ('[Tuple2({{x}}, {{x}})]'))),
     ]));
 
 const _rangeBody = Named(
@@ -104,7 +105,7 @@ const _rangeChar =
 const _ranges = Named('_ranges',
     Map1(SeparatedList1(Terminated(_range, _ws), _verbar), _flatten));
 
-const _toHexValue = ExprAction<int>(['x'], '_toHexValue({{x}})');
+const _toHexValue = ExpressionAction<int>(['x'], '_toHexValue({{x}})');
 
 const _verbar = Named('_verbar', Terminated(Tag('|'), _ws));
 

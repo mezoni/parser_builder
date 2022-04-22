@@ -1,14 +1,22 @@
 part of '../../parser_builder.dart';
 
 class Ref<I, O> extends ParserBuilder<I, O> {
+  static const _template = '''
+{{res0}} = {{name}}(state);''';
+
+  static const _templateFast = '''
+{{name}}(statae);''';
+
   final String name;
 
   const Ref(this.name);
 
   @override
-  BuidlResult build(Context context, CodeGen code) {
-    final key = BuidlResult();
-    code.callParse(name, code.result);
-    return key;
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = {
+      'name': name,
+    };
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

@@ -6,21 +6,30 @@ part of '../../character.dart';
 /// ```dart
 /// AnyChar()
 /// ```
-class AnyChar extends StringParserBuilder<int> {
+class AnyChar extends ParserBuilder<String, int> {
+  static const _template = '''
+state.ok = state.pos < source.length;
+if (state.ok) {
+  {{res0}} = source.readRune(state);
+} else if (state.log) {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
+  static const _templateFast = '''
+state.ok = state.pos < source.length;
+if (state.ok) {
+  source.readRune(state);
+} else if (state.log) {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
   const AnyChar();
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    code.setStateToNotEof();
-    code.ifSuccess((code) {
-      if (code.fast) {
-        code.add('source.readRune(state);');
-      } else {
-        code.setResult('source.readRune(state)');
-      }
-    }, else_: ((code) {
-      code.errorUnexpectedEof();
-    }));
+    final fast = result == null;
+    final values = <String, String>{};
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

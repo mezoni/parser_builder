@@ -85,9 +85,7 @@ Future<void> main(List<String> args) async {
     _valueAbcToTrueValue,
     _valueTrue,
     _transformersCharClassIsDigit,
-    _transformersClosureIsDigit,
     _transformersExprIsDigit,
-    _transformersFuncExprIsDigit,
     _transformersFuncIsDigit,
     _transformersNotCharClassIsDigit,
     _transformersVarIsNotDigit
@@ -152,8 +150,11 @@ const _escapeSequence32 = Named('escapeSequence32',
 
 const _foldMany0Digit = Named(
     'foldMany0Digit',
-    FoldMany0(Satisfy(CharClass('[0-9]')), ExprAction.value('0'),
-        ExprAction(['acc', 'v'], '{{acc}} = {{acc}} * 10 + {{v}} - 0x30')));
+    FoldMany0(
+        Satisfy(CharClass('[0-9]')),
+        ExpressionAction.value('0'),
+        ExpressionAction(
+            ['acc', 'v'], '{{acc}} = {{acc}} * 10 + {{v}} - 0x30')));
 
 const _hexDigit0 = Named('hexDigit0', HexDigit0());
 
@@ -187,15 +188,17 @@ const _map4Digits = Named(
         Satisfy(_isDigit),
         Satisfy(_isDigit),
         Satisfy(_isDigit),
-        ExprAction([
+        ExpressionAction([
           'a',
           'b',
           'c',
           'd'
         ], '({{a}} - 0x30) * 1000 + ({{b}} - 0x30) * 100 + ({{c}} - 0x30) * 10 + {{d}} - 0x30')));
 
-const _mapC32ToStr = Named('mapC32ToStr',
-    Map1(Char(c32), ExprAction<String>(['c'], 'String.fromCharCode({{c}})')));
+const _mapC32ToStr = Named(
+    'mapC32ToStr',
+    Map1(Char(c32),
+        ExpressionAction<String>(['c'], 'String.fromCharCode({{c}})')));
 
 const _noneOfC16 = Named('noneOfC16', NoneOf([c16]));
 
@@ -203,7 +206,7 @@ const _noneOfC32 = Named('noneOfC32', NoneOf([c32]));
 
 const _noneOfOfC16OrC32 = Named(
     'noneOfOfC16OrC32',
-    NoneOfOf(Calculate(VarAction([], '{{name}}',
+    NoneOfOf(Calculate(VariableAction([], '{{name}}',
         init: 'state.context.listOfC16AndC32 as List<int>', key: 'name'))));
 
 const _noneOfTagsAbcAbdDefDegXXY = Named('noneOfTagsAbcAbdDefDegXXY',
@@ -252,7 +255,7 @@ const _skipWhileC32 = Named('skipWhileC32', SkipWhile(_isC32));
 const _stringValue = Named(
     'stringValue',
     StringValue(
-        ExprAction<bool>(
+        ExpressionAction<bool>(
             ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c'),
         0x5c,
         EscapeSequence({0x6e: 0xa})));
@@ -271,7 +274,7 @@ const _tagNoCaseAbc = Named('tagNoCaseAbc', TagNoCase(abc));
 
 const _tagOfFoo = Named(
     'tagOfFoo',
-    TagOf(Calculate(VarAction([], '{{foo}}',
+    TagOf(Calculate(VariableAction([], '{{foo}}',
         key: 'foo', init: 'state.context.foo as String'))));
 
 const _tagsAbcAbdDefDegXXY =
@@ -302,17 +305,11 @@ const _testRef_ = Named('testRef', _ref);
 const _transformersCharClassIsDigit =
     Named('transformersCharClassIsDigit', TakeWhile(CharClass('[#x30-#x39]')));
 
-const _transformersClosureIsDigit = Named('transformersClosureIsDigit',
-    TakeWhile(ClosureAction(['int x'], '(int x) => x >= 0x30 && x <= 0x39')));
-
 const _transformersExprIsDigit = Named('transformersExprIsDigit',
-    TakeWhile(ExprAction(['x'], '{{x}} >= 0x30 && {{x}} <= 0x39')));
-
-const _transformersFuncExprIsDigit = Named('transformersFuncExprIsDigit',
-    TakeWhile(FuncExprAction(['int x'], 'x >= 0x30 && x <= 0x39')));
+    TakeWhile(ExpressionAction(['x'], '{{x}} >= 0x30 && {{x}} <= 0x39')));
 
 const _transformersFuncIsDigit = Named('transformersFuncIsDigit',
-    TakeWhile(FuncAction(['int x'], 'return x >= 0x30 && x <= 0x39;')));
+    TakeWhile(FunctionAction(['int x'], 'return x >= 0x30 && x <= 0x39;')));
 
 const _transformersNotCharClassIsDigit = Named(
     'transformersNotCharClassIsDigit',
@@ -320,7 +317,7 @@ const _transformersNotCharClassIsDigit = Named(
 
 const _transformersVarIsNotDigit = Named(
     'transformersVarIsNotDigit',
-    NoneOfOf(Calculate(VarAction([], '{{digits}}',
+    NoneOfOf(Calculate(VariableAction([], '{{digits}}',
         key: 'digits',
         init:
             'const [0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]'))));

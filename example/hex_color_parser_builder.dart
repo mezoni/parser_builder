@@ -18,12 +18,16 @@ const _hexColor = Named(
     '_hexColor',
     Preceded(
         Tag('#'),
-        Map3(_hexPrimary, _hexPrimary, _hexPrimary,
-            ExprAction<Color>(['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
+        Map3(
+            _hexPrimary,
+            _hexPrimary,
+            _hexPrimary,
+            ExpressionAction<Color>(
+                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
 
 const _hexPrimary = Named(
     '_hexPrimary',
     Map1(TakeWhileMN(2, 2, CharClass('[0-9A-Fa-f]')),
-        ExprAction<int>(['x'], 'int.parse({{x}}, radix: 16)')));
+        ExpressionAction<int>(['x'], 'int.parse({{x}}, radix: 16)')));
 
 const _parse = Named('_parse', _hexColor);

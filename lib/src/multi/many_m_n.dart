@@ -1,6 +1,48 @@
 part of '../../multi.dart';
 
 class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
+  static const _template = '''
+final {{pos}} = state.pos;
+final {{list}} = <{{O}}>[];
+var {{count}} = 0;
+final {{log}} = state.log;
+while ({{count}} < {{n}}) {
+  state.log = {{count}} <= {{m}} ? {{log}} : false;
+  {{var1}}
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{list}}.add({{val1}});
+  {{count}}++;
+}
+state.log = {{log}};
+state.ok = {{count}} >= {{m}};
+if (state.ok) {
+  {{res0}} = {{list}};
+} else {
+  state.pos = {{pos}};
+}''';
+
+  static const _templateFast = '''
+final {{pos}} = state.pos;
+var {{count}} = 0;
+final {{log}} = state.log;
+while ({{count}} < {{n}}) {
+  state.log = {{count}} <= {{m}} ? {{log}} : false;
+  {{var1}}
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{count}}++;
+}
+state.log = {{log}};
+state.ok = {{count}} >= {{m}};
+if (!state.ok) {
+  state.pos = {{pos}};
+}''';
+
   final int m;
 
   final int n;
@@ -10,7 +52,7 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
   const ManyMN(this.m, this.n, this.parser);
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     if (m < 0) {
       throw RangeError.value(m, 'm', 'Must be equal to or greater than 0');
     }
@@ -24,24 +66,15 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
-    final pos = code.savePos();
-    final list = code.val('list', '<$O>[]', false);
-    final count = code.local('var', 'count', '0');
-    code.while$('$count < $n', (code) {
-      final silent = code.silent ? true : m == 0;
-      final result = helper.build(context, code, parser, silent: silent);
-      code.ifSuccess((code) {
-        code.add('$list.add(${result.value});', false);
-        code.addTo(count, 1);
-      }, else_: (code) {
-        code.break$();
-      });
+    final fast = result == null;
+    final values = context.allocateLocals(['count', 'list', 'log', 'pos']);
+    final r1 = context.getResult(parser, !fast);
+    values.addAll({
+      'm': '$m',
+      'n': '$n',
+      'O': '$O',
+      'p1': parser.build(context, r1),
     });
-    code.setState('$count >= $m');
-    code.ifSuccess((code) {
-      code.setResult(list);
-    }, else_: (code) {
-      code.setPos(pos);
-    });
+    return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }

@@ -1,11 +1,7 @@
 import 'builder_helper.dart' as helper;
 import 'bytes.dart';
 import 'char_class.dart';
-import 'codegen/code_gen.dart';
-import 'combinator.dart';
 import 'parser_builder.dart';
-import 'src/internal/check.dart';
-import 'src/internal/code_unit.dart';
 
 part 'src/character/alpha0.dart';
 part 'src/character/alpha1.dart';

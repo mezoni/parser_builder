@@ -1,6 +1,33 @@
 part of '../../sequence.dart';
 
-class Delimited<I, O> extends _Sequence<I, O> {
+class Delimited<I, O> extends ParserBuilder<I, O> {
+  static const _template = '''
+final {{pos}} = state.pos;
+{{p1}}
+if (state.ok) {
+  {{p2}}
+  if (state.ok) {
+    {{p3}}
+  }
+}
+if (!state.ok) {
+  {{res0}} = null;
+  state.pos = {{pos}};
+}''';
+
+  static const _templateFast = '''
+final {{pos}} = state.pos;
+{{p1}}
+if (state.ok) {
+  {{p2}}
+  if (state.ok) {
+    {{p3}}
+  }
+}
+if (!state.ok) {
+  state.pos = {{pos}};
+}''';
+
   final ParserBuilder<I, dynamic> after;
 
   final ParserBuilder<I, dynamic> before;
@@ -10,22 +37,14 @@ class Delimited<I, O> extends _Sequence<I, O> {
   const Delimited(this.before, this.parser, this.after);
 
   @override
-  List<ParserBuilder<I, dynamic>> _getParsers() {
-    return [
-      before,
-      parser,
-      after,
-    ];
-  }
-
-  @override
-  bool _isVoidResult(int index) {
-    return index == 0 || index == 2;
-  }
-
-  @override
-  void _setResult(Context context, CodeGen code, List<ParserResult> results) {
-    final result2 = results[1];
-    code.setResult(result2.name, false);
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = context.allocateLocals(['pos']);
+    values.addAll({
+      'p1': before.build(context, null),
+      'p2': parser.build(context, result),
+      'p3': after.build(context, null),
+    });
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

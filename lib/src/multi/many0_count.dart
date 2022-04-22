@@ -1,22 +1,46 @@
 part of '../../multi.dart';
 
 class Many0Count<I> extends ParserBuilder<I, int> {
+  static const _template = '''
+var {{count}} = 0;
+final {{log}} = state.log;
+state.log = false;
+while (true) {
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{count}}++;
+}
+state.log = {{log}};
+state.ok = true;
+if (state.ok) {
+  {{res0}} = {{count}};
+}''';
+
+  static const _templateFast = '''
+final {{log}} = state.log;
+state.log = false;
+while (true) {
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+}
+state.log = {{log}};
+state.ok = true;''';
+
   final ParserBuilder<I, dynamic> parser;
 
   const Many0Count(this.parser);
 
   @override
-  void build(Context context, CodeGen code) {
-    final count = code.local('var', 'count', '0', false);
-    code.while$('true', (code) {
-      helper.build(context, code, parser, fast: true, silent: true);
-      code.ifSuccess((code) {
-        code.addTo(count, 1, false);
-      }, else_: (code) {
-        code.break$();
-      });
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = context.allocateLocals(['count', 'log']);
+    values.addAll({
+      'p1': parser.build(context, null),
     });
-    code.setSuccess();
-    code.setResult(count);
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

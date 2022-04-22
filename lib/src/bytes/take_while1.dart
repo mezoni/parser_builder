@@ -7,13 +7,104 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhile1(CharClass('[A-Z] | [a-z] |  "_"'))
 /// ```
-class TakeWhile1 extends Redirect<String, String> {
+class TakeWhile1 extends ParserBuilder<String, String> {
+  static const _template16 = '''
+final {{pos}} = state.pos;
+while (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
+  final ok = {{test}};
+  if (!ok) {
+    break;
+  }
+  state.pos++;
+}
+state.ok = state.pos != {{pos}};
+if (state.ok) {
+  {{res0}} = source.substring({{pos}}, state.pos);
+} else if (state.log) {
+  state.error = ErrUnexpected.charOrEof(state.pos, source);
+}''';
+
+  static const _template16Fast = '''
+final {{pos}} = state.pos;
+while (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
+  final ok = {{test}};
+  if (!ok) {
+    break;
+  }
+  state.pos++;
+}
+state.ok = state.pos != {{pos}};
+if (!state.ok && state.log) {
+  state.error = ErrUnexpected.charOrEof(state.pos, source);
+}''';
+
+  static const _template32 = '''
+final {{pos}} = state.pos;
+int? {{c}};
+while (state.pos < source.length) {
+  final pos = state.pos;
+  {{c}} = source.readRune(state);
+  final ok = {{test}};
+  if (!ok) {
+    state.pos = pos;
+    break;
+  }
+}
+state.ok = state.pos != {{pos}};
+if (state.ok) {
+  {{res0}} = source.substring({{pos}}, state.pos);
+} else if (state.log) {
+  state.error = ErrUnexpected.charOrEof({{pos}}, source, {{c}});
+}''';
+
+  static const _template32Fast = '''
+final {{pos}} = state.pos;
+int? {{c}};
+while (state.pos < source.length) {
+  final pos = state.pos;
+  {{c}} = source.readRune(state);
+  final ok = {{test}};
+  if (!ok) {
+    state.pos = pos;
+    break;
+  }
+}
+state.ok = state.pos != {{pos}};
+if (!state.ok && state.log) {
+  state.error = ErrUnexpected.charOrEof({{pos}}, source, {{c}});
+}''';
+
   final SemanticAction<bool> predicate;
 
   const TakeWhile1(this.predicate);
 
   @override
-  ParserBuilder<String, String> getRedirectParser() {
-    return Recognize(Many1(Satisfy(predicate)));
+  String build(Context context, ParserResult? result) {
+    context.refersToStateSource = true;
+    final fast = result == null;
+    final values = context.allocateLocals(['c', 'pos']);
+    final isUnicode = predicate.isUnicode;
+    final c = isUnicode ? values['c']! : 'c';
+    values.addAll({
+      'test': fast ? '' : predicate.build(context, 'test', [c]),
+    });
+    final String template;
+    if (isUnicode) {
+      if (fast) {
+        template = _template32Fast;
+      } else {
+        template = _template32;
+      }
+    } else {
+      if (fast) {
+        template = _template16Fast;
+      } else {
+        template = _template16;
+      }
+    }
+
+    return render(template, values, [result]);
   }
 }

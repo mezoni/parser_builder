@@ -7,13 +7,91 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhile(CharClass('[#x21-#x7e]'))
 /// ```
-class TakeWhile extends Redirect<String, String> {
+class TakeWhile extends ParserBuilder<String, String> {
+  static const _template16 = '''
+final {{pos}} = state.pos;
+while (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
+  final ok = {{test}};
+  if (!ok) {
+    break;
+  }
+  state.pos++;
+}
+state.ok = true;
+if (state.ok) {
+  {{res0}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
+}''';
+
+  static const _template16Fast = '''
+final {{pos}} = state.pos;
+while (state.pos < source.length) {
+  final c = source.codeUnitAt(state.pos);
+  final ok = {{test}};
+  if (!ok) {
+    break;
+  }
+  state.pos++;
+}
+state.ok = true;''';
+
+  static const _template32 = '''
+final {{pos}} = state.pos;
+while (state.pos < source.length) {
+  final pos = state.pos;
+  var c = source.readRune(state);
+  final ok = {{test}};
+  if (!ok) {
+    state.pos = pos;
+    break;
+  }
+}
+state.ok = true;
+if (state.ok) {
+  {{res0}} = {{pos}} == state.pos ? '' : source.substring({{pos}}, state.pos);
+}''';
+
+  static const _template32Fast = '''
+final {{pos}} = state.pos;
+while (state.pos < source.length) {
+  final pos = state.pos;
+  var c = source.readRune(state);
+  final ok = {{test}};
+  if (!ok) {
+    state.pos = pos;
+    break;
+  }
+}
+state.ok = true;''';
+
   final SemanticAction<bool> predicate;
 
   const TakeWhile(this.predicate);
 
   @override
-  ParserBuilder<String, String> getRedirectParser() {
-    return Recognize(Many0(Satisfy(predicate)));
+  String build(Context context, ParserResult? result) {
+    context.refersToStateSource = true;
+    final fast = result == null;
+    final values = context.allocateLocals(['pos']);
+    values.addAll({
+      'test': fast ? '' : predicate.build(context, 'test', ['c']),
+    });
+    final isUnicode = predicate.isUnicode;
+    final String template;
+    if (isUnicode) {
+      if (fast) {
+        template = _template32Fast;
+      } else {
+        template = _template32;
+      }
+    } else {
+      if (fast) {
+        template = _template16Fast;
+      } else {
+        template = _template16;
+      }
+    }
+
+    return render(template, values, [result]);
   }
 }

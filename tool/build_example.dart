@@ -13,7 +13,6 @@ import 'build_json_number_parser.dart' as _json_number;
 
 Future<void> main(List<String> args) async {
   final context = Context();
-  context.diagnose = true;
   await fastBuild(context, [_json, _value_], 'example/example.dart',
       footer: __footer, header: __header, publish: {'parse': _json});
 }
@@ -43,8 +42,6 @@ int _toHexValue(String s) {
 }''';
 
 const __header = r'''
-// ignore_for_file: unnecessary_cast
-
 import 'package:source_span/source_span.dart';
 
 ''';
@@ -68,7 +65,7 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 const _escapeHex = Named(
     '_escapeHex',
     Map2(Fast(Tag('u')), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
-        ExprAction<int>(['s'], '_toHexValue({{s}})')),
+        ExpressionAction<int>(['s'], '_toHexValue({{s}})')),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({
@@ -86,8 +83,8 @@ const _false = Named('_false', Value(false, Tag('false')));
 
 const _inline = '@pragma(\'vm:prefer-inline\')';
 
-const _isNormalChar =
-    ExprAction<bool>(['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
+const _isNormalChar = ExpressionAction<bool>(
+    ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 
@@ -99,7 +96,7 @@ const _keyValue = Named(
         _string,
         _colon,
         _value,
-        ExprAction<MapEntry<String, dynamic>>(
+        ExpressionAction<MapEntry<String, dynamic>>(
             ['k', 'v'], 'MapEntry({{k}}, {{v}})')));
 
 const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
@@ -112,7 +109,7 @@ const _number =
 const _object = Named(
     '_object',
     Map3(_openBrace, _keyValues, _closeBrace,
-        ExprAction(['kv'], 'Map.fromEntries({{kv}})')));
+        ExpressionAction(['kv'], 'Map.fromEntries({{kv}})')));
 
 const _openBrace =
     Named('_openBrace', Fast(Terminated(Tag('{'), _ws)), [_inline]);

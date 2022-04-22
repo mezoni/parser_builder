@@ -1,27 +1,48 @@
 part of '../../multi.dart';
 
 class Many1Count<I> extends ParserBuilder<I, int> {
+  static const _template = '''
+var {{count}} = 0;
+final {{log}} = state.log;
+while (true) {
+  state.log = {{count}} == 0;
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{count}}++;
+}
+state.log = {{log}};
+state.ok = {{count}} != 0;
+if (state.ok) {
+  {{res0}} = {{count}};
+}''';
+
+  static const _templateFast = '''
+var {{ok}} = false;
+final {{log}} = state.log;
+while (true) {
+  state.log = !ok;
+  {{p1}}
+  if (!state.ok) {
+    break;
+  }
+  {{ok}} = true;
+}
+state.log = {{log}};
+state.ok = {{ok}};''';
+
   final ParserBuilder<I, dynamic> parser;
 
   const Many1Count(this.parser);
 
   @override
-  void build(Context context, CodeGen code) {
-    final count = code.local('var', 'count', '0', false);
-    final ok = code.local('var', 'ok', 'false', true);
-    code.while$('true', (code) {
-      helper.build(context, code, parser, fast: true);
-      code.ifSuccess((code) {
-        code.addTo(count, 1, false);
-        code.assign(ok, 'true', true);
-      }, else_: (code) {
-        code.break$();
-      });
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = context.allocateLocals(['count', 'log']);
+    values.addAll({
+      'p1': parser.build(context, null),
     });
-    code.setState('$count != 0', false);
-    code.setState(ok, true);
-    code.ifSuccess((code) {
-      code.setResult(count);
-    });
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 }

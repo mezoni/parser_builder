@@ -7,14 +7,15 @@ part of '../../character.dart';
 /// ```dart
 /// OneOf([0x22, 0x27])
 /// ```
-class OneOf extends Redirect<String, int> {
+class OneOf extends ParserBuilder<String, int> {
   final List<int> characters;
 
   const OneOf(this.characters);
 
   @override
-  ParserBuilder<String, int> getRedirectParser() {
+  String build(Context context, ParserResult? result) {
     final predicate = CharClass.fromList(characters);
-    return Satisfy(predicate);
+    final parser = Satisfy(predicate);
+    return parser.build(context, result);
   }
 }

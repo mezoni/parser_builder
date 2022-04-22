@@ -1,17 +1,6 @@
-import 'package:parser_builder/codegen/statements.dart';
-
 import 'builder_helper.dart' as helper;
-import 'character.dart';
-import 'codegen/code_gen.dart';
-import 'combinator.dart';
-import 'multi.dart';
 import 'parser_builder.dart';
-import 'src/internal/check.dart';
-import 'src/internal/find_tag.dart';
-import 'src/internal/move_to.dart';
-import 'src/internal/skip.dart';
 
-part 'src/bytes/_tags.dart';
 part 'src/bytes/none_of_tags.dart';
 part 'src/bytes/skip_while.dart';
 part 'src/bytes/skip_while1.dart';

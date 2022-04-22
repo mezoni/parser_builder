@@ -1,28 +1,19 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'codegen/code_gen.dart';
-import 'codegen/statements.dart';
 import 'parser_builder.dart';
 
-Future<void> fastBuild(Context context, List<Named> builders, String filename,
+Future<void> fastBuild(Context context, List<Named> parsers, String filename,
     {bool addErrorMessageProcessor = true,
     String? footer,
     bool format = true,
     String? header,
     String? partOf,
     Map<String, Named> publish = const {}}) async {
-  for (final builder in builders) {
+  for (final parser in parsers) {
     context.localAllocator = context.localAllocator.clone();
-    final statements = LinkedList<Statement>();
-    final name = '\$0';
-    final type = builder.getResultType();
-    final value = builder.getResultValue(name);
-    final result = ParserResult(name, type, value);
-    final code = CodeGen(statements,
-        allocator: context.localAllocator, fast: result.isVoid, result: result);
-    builder.build(context, code);
+    final result = context.getResult(parser, true);
+    parser.build(context, result);
   }
 
   final declarations = context.globalDeclarations;
@@ -35,7 +26,6 @@ Future<void> fastBuild(Context context, List<Named> builders, String filename,
     declarations.add(ParseRuntime.getErrorMessageProcessor());
   }
 
-  declarations.addAll(ParseRuntime.getFunctions());
   declarations.addAll(ParseRuntime.getClasses());
   var code = declarations.join('\n\n');
   if (partOf != null) {

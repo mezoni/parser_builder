@@ -18,40 +18,28 @@ int? _hexPrimary(State<String> state) {
   String? $1;
   final $pos = state.pos;
   var $count = 0;
-  while ($count < 2) {
-    final $pos1 = state.pos;
-    int? $4;
-    state.ok = state.pos < source.length;
-    if (state.ok) {
-      $4 = _wrap(source.codeUnitAt(state.pos++));
-    }
-    if (state.ok) {
-      final $v = _unwrap($4);
-      state.ok = $v <= 102 &&
-          ($v >= 48 && $v <= 57 ||
-              $v >= 65 && $v <= 70 ||
-              $v >= 97 && $v <= 102);
-    }
-    if (!state.ok) {
-      state.pos = $pos1;
-      state.error = ErrUnexpected.charOrEof(state.pos, source);
-    }
-    if (state.ok) {
-      $count++;
-    } else {
+  while ($count < 2 && state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c <= 102 &&
+        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
+    if (!ok) {
       break;
     }
+    state.pos++;
+    $count++;
   }
   state.ok = $count >= 2;
-  if (!state.ok) {
+  if (state.ok) {
+    $1 = source.substring($pos, state.pos);
+  } else {
+    if (state.log) {
+      state.error = ErrUnexpected.charOrEof(state.pos, source);
+    }
     state.pos = $pos;
   }
   if (state.ok) {
-    $1 = _wrap(source.slice($pos, state.pos));
-  }
-  if (state.ok) {
-    final $v1 = _unwrap($1);
-    $0 = _wrap(int.parse($v1, radix: 16));
+    final v = $1!;
+    $0 = int.parse(v, radix: 16);
   }
   return $0;
 }
@@ -62,37 +50,35 @@ Color? _hexColor(State<String> state) {
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
-    state.pos++;
-  } else {
+    state.pos += 1;
+  } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('#'));
   }
   if (state.ok) {
-    Color? $2;
     final $pos1 = state.pos;
-    int? $3;
-    $3 = _hexPrimary(state);
+    int? $1;
+    $1 = _hexPrimary(state);
     if (state.ok) {
-      int? $4;
-      $4 = _hexPrimary(state);
+      int? $2;
+      $2 = _hexPrimary(state);
       if (state.ok) {
-        int? $5;
-        $5 = _hexPrimary(state);
+        int? $3;
+        $3 = _hexPrimary(state);
         if (state.ok) {
-          final $v = _unwrap($3);
-          final $v1 = _unwrap($4);
-          final $v2 = _unwrap($5);
-          $2 = _wrap(Color($v, $v1, $v2));
+          final v1 = $1!;
+          final v2 = $2!;
+          final v3 = $3!;
+          $0 = Color(v1, v2, v3);
         }
       }
     }
     if (!state.ok) {
       state.pos = $pos1;
     }
-    if (state.ok) {
-      $0 = $2;
-    } else {
-      state.pos = $pos;
-    }
+  }
+  if (!state.ok) {
+    $0 = null;
+    state.pos = $pos;
   }
   return $0;
 }
@@ -132,12 +118,6 @@ String _errorMessage(String source, List<Err> errors,
 
   return sb.toString();
 }
-
-@pragma('vm:prefer-inline')
-T _unwrap<T>(T? value) => value!;
-
-@pragma('vm:prefer-inline')
-T? _wrap<T>(T? value) => value;
 
 /// Represents the `char` used in parsing errors.
 class Char {

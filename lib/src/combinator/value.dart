@@ -1,6 +1,24 @@
 part of '../../combinator.dart';
 
 class Value<I, O> extends ParserBuilder<I, O> {
+  static const _template = '''
+state.ok = true;
+if (state.ok) {
+  {{res0}} = {{value}};
+}''';
+
+  static const _templateFast = '''
+state.ok = true;''';
+
+  static const _templateParser = '''
+{{p1}}
+if (state.ok) {
+  {{res0}} = {{value}};
+}''';
+
+  static const _templateParserFast = '''
+{{p1}}''';
+
   final ParserBuilder<I, dynamic>? parser;
 
   final O value;
@@ -8,23 +26,29 @@ class Value<I, O> extends ParserBuilder<I, O> {
   const Value(this.value, [this.parser]);
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     if (parser != null) {
-      _buildWithParser(context, code);
+      return _buildWithParser(context, result);
     } else {
-      _build(context, code);
+      return _build(context, result);
     }
   }
 
-  void _build(Context context, CodeGen code) {
-    code.setSuccess();
-    code.setResult(helper.getAsCode(value));
+  String _build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = {
+      'value': helper.getAsCode(value),
+    };
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 
-  void _buildWithParser(Context context, CodeGen code) {
-    helper.build(context, code, parser!, fast: true);
-    code.ifSuccess((code) {
-      code.setResult(helper.getAsCode(value));
-    });
+  String _buildWithParser(Context context, ParserResult? result) {
+    final fast = result == null;
+    final values = {
+      'p1': parser!.build(context, null),
+      'value': helper.getAsCode(value),
+    };
+    return render2(
+        fast, _templateParserFast, _templateParser, values, [result]);
   }
 }

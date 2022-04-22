@@ -42,24 +42,6 @@
             "type": "dart",
             "request": "launch",
             "program": "test/test_chars_parser.dart"
-        },
-        {
-            "name": "_test.dart",
-            "type": "dart",
-            "request": "launch",
-            "program": "test/_test.dart"
-        },
-        {
-            "name": "test_code_optimizer.dart",
-            "type": "dart",
-            "request": "launch",
-            "program": "test/test_code_optimizer.dart"
-        },
-        {
-            "name": "test_data_flow.dart",
-            "type": "dart",
-            "request": "launch",
-            "program": "test/test_data_flow.dart"
         }
     ]
 }

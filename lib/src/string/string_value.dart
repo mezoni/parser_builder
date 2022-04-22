@@ -9,7 +9,102 @@ part of '../../string.dart';
 /// ```dart
 /// StringValue(_isNormalChar, 0x5c, _escaped);
 /// ```
-class StringValue extends StringParserBuilder<String> {
+class StringValue extends ParserBuilder<String, String> {
+  static const _template = '''
+state.ok = true;
+final {{pos}} = state.pos;
+final {{list}} = [];
+var {{str}} = '';
+while (state.pos < source.length) {
+  final {{start}} = state.pos;
+  var {{c}} = 0;
+  while (state.pos < source.length) {
+    final pos = state.pos;
+    {{c}} = source.readRune(state);
+    final ok = {{test}};
+    if (ok) {
+      continue;
+    }
+    state.pos = pos;
+    break;
+  }
+  {{str}} = state.pos == {{start}} ? '' : source.substring({{start}}, state.pos);
+  if ({{str}} != '' && {{list}}.isNotEmpty) {
+    {{list}}.add({{str}});
+  }
+  if ({{c}} != {{controlChar}}) {
+    break;
+  }
+  state.pos += {{size}};
+  {{var1}}
+  {{p1}}
+  if (!state.ok) {
+    state.pos = {{pos}};
+    break;
+  }
+  if ({{list}}.isEmpty && {{str}} != '') {
+    {{list}}.add({{str}});
+  }
+  {{list}}.add({{val1}});
+}
+if (state.ok) {
+  if ({{list}}.isEmpty) {
+    {{res0}} = {{str}};
+  } else if ({{list}}.length == 1) {
+    final c = {{list}}[0] as int;
+    {{res0}} = String.fromCharCode(c);
+  } else {
+    final buffer = StringBuffer();
+    for (var i = 0; i < {{list}}.length; i++) {
+      final obj = {{list}}[i];
+      if (obj is int) {
+        buffer.writeCharCode(obj);
+      } else {
+        buffer.write(obj);
+      }
+    }
+    {{res0}} = buffer.toString();
+  }
+}''';
+
+  static const _templateFast = '''
+state.ok = true;
+final {{pos}} = state.pos;
+final {{list}} = [];
+var {{str}} = '';
+while (state.pos < source.length) {
+  final {{start}} = state.pos;
+  var {{c}} = 0;
+  while (state.pos < source.length) {
+    final pos = state.pos;
+    {{c}} = source.readRune(state);
+    final ok = {{test}};
+    if (ok) {
+      continue;
+    }
+    state.pos = pos;
+    break;
+  }
+  {{str}} = state.pos == {{start}} ? '' : source.substring({{start}}, state.pos);
+  if ({{str}} != '' && {{list}}.isNotEmpty) {
+    {{list}}.add({{str}});
+  }
+  if ({{c}} != {{controlChar}}) {
+    break;
+  }
+  state.pos += {{size}};
+  {{var1}}
+  {{p1}}
+  if (!state.ok) {
+    state.pos = {{pos}};
+    break;
+  }
+  if ({{list}}.isEmpty && {{str}} != '') {
+    {{list}}.add({{str}});
+  }
+  {{list}}.add({{val1}});
+}''';
+
   final int controlChar;
 
   final ParserBuilder<String, int> escape;
@@ -19,65 +114,18 @@ class StringValue extends StringParserBuilder<String> {
   const StringValue(this.normalChar, this.controlChar, this.escape);
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
+    context.refersToStateSource = true;
+    final fast = result == null;
+    final values = context.allocateLocals(['c', 'list', 'pos', 'start', 'str']);
     final size = controlChar > 0xffff ? 2 : 1;
-    code.setSuccess();
-    final pos = code.savePos();
-    final list = code.val('list', '[]');
-    final str = code.local('var', 'str', '\'\'');
-    code.while$('state.pos < source.length', (code) {
-      final start = code.val('start', 'state.pos');
-      final c = code.local('var', 'c', '0');
-      code.while$('state.pos < source.length', (code) {
-        final pos = code.val('pos', 'state.pos');
-        code.assign(c, 'source.readRune(state)');
-        final ok = code.val('ok', normalChar.build(context, 'normalChar', [c]));
-        code.if_(ok, (code) {
-          code.continue$();
-        });
-        code.setPos(pos);
-        code.break$();
-      });
-      code +
-          "$str = state.pos == $start ? '' : source.substring($start, state.pos);";
-      code.if_("$str != '' && $list.isNotEmpty", (code) {
-        code + '$list.add($str);';
-      });
-      code.if_('$c != $controlChar', (code) {
-        code.break$();
-      });
-      code.addToPos(size);
-      final result = helper.build(context, code, escape, fast: false);
-      code.ifSuccess((code) {
-        code.if_("$list.isEmpty && $str != ''", (code) {
-          code + '$list.add($str);';
-        });
-        code + '$list.add(${result.value});';
-      }, else_: (code) {
-        code.setPos(pos);
-        code.break$();
-      });
+    final r1 = context.getResult(escape, !fast);
+    values.addAll({
+      'controlChar': '$controlChar',
+      'p1': escape.build(context, r1),
+      'size': '$size',
+      'test': normalChar.build(context, 'test', [values['c']!]),
     });
-    code.ifSuccess((code) {
-      code.if_('$list.isEmpty', (code) {
-        code.setResult(str);
-      }, else_: (code) {
-        code.if_('$list.length == 1', (code) {
-          final c = code.val('c', '$list[0] as int');
-          code.setResult('String.fromCharCode($c)');
-        }, else_: (code) {
-          final buffer = code.val('buffer', 'StringBuffer()');
-          code.iteration('for (var i = 0; i < $list.length; i++)', (code) {
-            final obj = code.val('obj', '$list[i]');
-            code.if_('$obj is int', (code) {
-              code + '$buffer.writeCharCode($obj);';
-            }, else_: (code) {
-              code + '$buffer.write($obj);';
-            });
-          });
-          code.setResult('$buffer.toString()');
-        });
-      });
-    });
+    return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }

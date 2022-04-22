@@ -1,6 +1,21 @@
 part of '../../error.dart';
 
 class Expected<I, O> extends ParserBuilder<I, O> {
+  static const _template = '''
+{{var1}}
+{{p1}}
+if (state.ok) {
+  {{res0}} = {{res1}};
+} else if (state.log) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
+  static const _templateFast = '''
+{{p1}}
+if (!state.ok && state.log) {
+  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+}''';
+
   final ParserBuilder<I, O> parser;
 
   final String tag;
@@ -8,11 +23,12 @@ class Expected<I, O> extends ParserBuilder<I, O> {
   const Expected(this.tag, this.parser);
 
   @override
-  void build(Context context, CodeGen code) {
-    final tag = helper.escapeString(this.tag);
-    helper.build(context, code, parser, result: code.result, silent: true);
-    code.ifFailure((code) {
-      code.setError('ErrExpected.tag(state.pos, const Tag($tag))');
-    });
+  String build(Context context, ParserResult? result) {
+    final fast = result == null;
+    final r1 = context.getResult(parser, !fast);
+    final values = {
+      'p1': parser.build(context, r1),
+    };
+    return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }

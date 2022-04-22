@@ -7,7 +7,7 @@ class Alt<I, O> extends _Alt<I, O> {
   const Alt(this.parsers);
 
   @override
-  List<ParserBuilder<I, O>> getChildren() {
+  List<ParserBuilder<I, O>> _getParsers() {
     return parsers;
   }
 }
@@ -21,7 +21,7 @@ class Alt2<I, O> extends _Alt<I, O> {
   const Alt2(this.parser1, this.parser2);
 
   @override
-  List<ParserBuilder<I, O>> getChildren() {
+  List<ParserBuilder<I, O>> _getParsers() {
     return [parser1, parser2];
   }
 }
@@ -37,7 +37,7 @@ class Alt3<I, O> extends _Alt<I, O> {
   const Alt3(this.parser1, this.parser2, this.parser3);
 
   @override
-  List<ParserBuilder<I, O>> getChildren() {
+  List<ParserBuilder<I, O>> _getParsers() {
     return [parser1, parser2, parser3];
   }
 }
@@ -55,7 +55,7 @@ class Alt4<I, O> extends _Alt<I, O> {
   const Alt4(this.parser1, this.parser2, this.parser3, this.parser4);
 
   @override
-  List<ParserBuilder<I, O>> getChildren() {
+  List<ParserBuilder<I, O>> _getParsers() {
     return [parser1, parser2, parser3, parser4];
   }
 }
@@ -76,7 +76,7 @@ class Alt5<I, O> extends _Alt<I, O> {
       this.parser1, this.parser2, this.parser3, this.parser4, this.parser5);
 
   @override
-  List<ParserBuilder<I, O>> getChildren() {
+  List<ParserBuilder<I, O>> _getParsers() {
     return [parser1, parser2, parser3, parser4, parser5];
   }
 }
@@ -99,7 +99,7 @@ class Alt6<I, O> extends _Alt<I, O> {
       this.parser5, this.parser6);
 
   @override
-  List<ParserBuilder<I, O>> getChildren() {
+  List<ParserBuilder<I, O>> _getParsers() {
     return [parser1, parser2, parser3, parser4, parser5, parser6];
   }
 }
@@ -124,43 +124,61 @@ class Alt7<I, O> extends _Alt<I, O> {
       this.parser5, this.parser6, this.parser7);
 
   @override
-  List<ParserBuilder<I, O>> getChildren() {
+  List<ParserBuilder<I, O>> _getParsers() {
     return [parser1, parser2, parser3, parser4, parser5, parser6, parser7];
   }
 }
 
 abstract class _Alt<I, O> extends ParserBuilder<I, O> {
+  static const _templateFailure = '''
+if (state.log) {
+  state.error = ErrCombined(state.pos, [{{errors}}]);
+}''';
+
+  static const _templateParser = '''
+{{p1}}
+if (!state.ok) {
+  final {{error}} = state.error;
+  {{body}}
+}''';
+
   const _Alt();
 
   @override
-  void build(Context context, CodeGen code) {
-    final parsers = getChildren();
+  String build(Context context, ParserResult? result) {
+    final parsers = _getParsers();
     if (parsers.length < 2) {
       throw StateError('The list of parsers must contain at least 2 elements');
     }
 
+    var template = '{{body}}';
     final errors = <String>[];
-    var silent = code.silent;
-    void plunge(int index) {
-      final parser = parsers[index];
-      helper.build(context, code, parser, result: code.result);
-      code.ifFailure((code) {
-        if (index < parsers.length - 1) {
-          if (!silent) {
-            final error = code.val('error', 'state.error');
-            errors.add(error);
-          }
-
-          plunge(++index);
-        } else {
-          final list = errors.join(', ');
-          code.setError('ErrCombined(state.pos, [$list, state.error])');
-        }
+    for (var i = 0; i < parsers.length; i++) {
+      final error = context.allocateLocal();
+      errors.add(error);
+      final parser = parsers[i];
+      final values = {
+        'error': error,
+        'p1': parser.build(context, result),
+      };
+      final templateParser = render(_templateParser, values);
+      values.clear();
+      values.addAll({
+        'body': templateParser,
       });
+      template = render(template, values);
     }
 
-    plunge(0);
+    final values = {
+      'errors': errors.join(', '),
+    };
+    final templateFailure = render(_templateFailure, values);
+    values.clear();
+    values.addAll({
+      'body': templateFailure,
+    });
+    return render(template, values);
   }
 
-  List<ParserBuilder<I, O>> getChildren();
+  List<ParserBuilder<I, O>> _getParsers();
 }

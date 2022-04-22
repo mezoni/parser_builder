@@ -1,6 +1,12 @@
 part of '../../parser_builder.dart';
 
 class Named<I, O> extends ParserBuilder<I, O> {
+  static const _template = '''
+{{res0}} = {{name}}(state);''';
+
+  static const _templateFast = '''
+{{name}}(state);''';
+
   final List<String> annotaions;
 
   final String name;
@@ -10,42 +16,28 @@ class Named<I, O> extends ParserBuilder<I, O> {
   const Named(this.name, this.parser, [this.annotaions = const []]);
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     if (!context.context.containsKey(this)) {
       context.context[this] = null;
-      _buildDeclaration(context, code.silent);
+      _buildDeclaration(context);
     }
 
-    final result = code.result;
-    final fast = result.isVoid;
-    if (fast) {
-      code + '$name(state);';
-    } else {
-      code.setResult('$name(state)', false);
-    }
+    final fast = result == null;
+    final values = {
+      'name': name,
+    };
+    return render2(fast, _templateFast, _template, values, [result]);
   }
 
-  void _buildDeclaration(Context context, bool silent) {
+  void _buildDeclaration(Context context) {
     final localAllocator = context.localAllocator;
     final localDeclarations = context.localDeclarations;
     final refersToStateSource = context.refersToStateSource;
     context.localAllocator = localAllocator.clone();
     context.localDeclarations = {};
     context.refersToStateSource = false;
-    final type = parser.getResultType();
-    final ident = context.allocateLocal();
-    final value = parser.getResultValue(ident);
-    final fast = type == 'void';
-    var result = ParserResult(ident, type, value);
-    final statements = LinkedList<Statement>();
-    final code = CodeGen(statements,
-        allocator: context.localAllocator,
-        fast: fast,
-        result: result,
-        silent: silent);
-    result = helper.build(context, code, parser, result: result);
-    final codeOptimizer = CodeOptimizer();
-    codeOptimizer.optimize(statements);
+    final result = context.getResult(parser, true)!;
+    final code = parser.build(context, result);
     final buffer = StringBuffer();
     if (annotaions.isNotEmpty) {
       buffer.writeln(annotaions.join('\n'));
@@ -57,8 +49,8 @@ class Named<I, O> extends ParserBuilder<I, O> {
     buffer.write('(State<');
     buffer.write(I);
     buffer.writeln('> state) {');
-    if (!result.isVoid) {
-      buffer.write(type);
+    if (result.type != 'void') {
+      buffer.write(result.type);
       buffer.write(' ');
       buffer.write(result.name);
       buffer.write(';');
@@ -70,13 +62,8 @@ class Named<I, O> extends ParserBuilder<I, O> {
       buffer.writeln(declaration);
     }
 
-    final printer = Printer();
-    for (final statement in statements) {
-      printer.print(statement, buffer);
-      buffer.writeln();
-    }
-
-    if (!result.isVoid) {
+    buffer.writeln(code);
+    if (result.type != 'void') {
       buffer.write('return ');
       buffer.write(result.name);
       buffer.write(';');

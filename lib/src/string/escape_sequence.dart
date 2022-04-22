@@ -15,84 +15,144 @@ part of '../../string.dart';
 ///   0x74: 0x09
 /// }));
 /// ```
-class EscapeSequence extends StringParserBuilder<int> {
+class EscapeSequence extends ParserBuilder<String, int> {
+  static const _template16 = '''
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  int? v;
+  switch (c) {
+    {{cases}}
+  }
+  state.ok = v != null;
+  if (state.ok) {
+    state.pos++;
+    {{res0}} = v;
+  } else if (state.log) {
+    state.error = ErrUnexpected.charAt(state.pos, source);
+  }
+} else if (state.log) {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
+  static const _template16Fast = '''
+state.ok = false;
+if (state.pos < source.length) {
+  var c = source.codeUnitAt(state.pos);
+  int? v;
+  switch (c) {
+    {{cases}}
+  }
+  state.ok = v != null;
+  if (state.ok) {
+    state.pos++;
+    state.ok = true;
+  } else if (state.log) {
+    state.error = ErrUnexpected.charAt(state.pos, source);
+  }
+} else if (state.log) {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
+  static const _template32 = '''
+state.ok = false;
+if (state.pos < source.length) {
+  final pos = state.pos;
+  var c = source.readRune(state);
+  int? v;
+  switch (c) {
+    {{cases}}
+  }
+  state.ok = v != null;
+  if (state.ok) {
+    {{res0}} = v;
+  } else {
+    state.pos = pos;
+    if (state.log) {
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
+  }
+} else if (state.log) {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
+  static const _template32Fast = '''
+state.ok = false;
+if (state.pos < source.length) {
+  final pos = state.pos;
+  var c = source.readRune(state);
+  int? v;
+  switch (c) {
+    {{cases}}
+  }
+  state.ok = v != null;
+  if (!state.ok) {
+    state.pos = pos;
+    if (state.log) {
+      state.error = ErrUnexpected.char(state.pos, Char(c));
+    }
+  }
+} else if (state.log) {
+  state.error = ErrUnexpected.eof(state.pos);
+}''';
+
   final Map<int, int> table;
 
   const EscapeSequence(this.table);
 
   @override
-  void build(Context context, CodeGen code) {
+  String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
+    final fast = result == null;
     final isUnicode = table.keys.any((e) => e > 0xffff);
+    final String template;
     if (isUnicode) {
-      _build32(context, code);
+      if (fast) {
+        template = _template32Fast;
+      } else {
+        template = _template32;
+      }
     } else {
-      _build16(context, code);
+      if (fast) {
+        template = _template16Fast;
+      } else {
+        template = _template16;
+      }
     }
+
+    final values = {
+      'cases': _buildCases(),
+    };
+    return render(template, values, [result]);
   }
 
-  void _build16(Context context, CodeGen code) {
-    final c = code.local('int?', 'c');
-    code.setFailure();
-    code.ifNotEof((code) {
-      code.assign(c, 'source.codeUnitAt(state.pos)');
-      final v = code.local('int?', 'v');
-      final sw = code.switch_(c);
-      _buildCases(code, sw, c, v);
-      code.if_('$v != null', (code) {
-        code.addToPos(1);
-        code.setSuccess();
-        code.setResult(v);
-      });
-    });
-    code.ifFailure((code) {
-      code.setError(
-          '$c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.charAt(state.pos, source)');
-    });
-  }
-
-  void _build32(Context context, CodeGen code) {
-    final pos = code.savePos();
-    final c = code.local('int?', 'c');
-    code.setFailure();
-    code.ifNotEof((code) {
-      code.assign(c, 'source.readRune(state)');
-      final v = code.local('int?', 'v');
-      final sw = code.switch_(c);
-      _buildCases(code, sw, c, v);
-      code.if_('$v != null', (code) {
-        code.setSuccess();
-        code.setResult(v);
-      });
-    });
-    code.ifFailure((code) {
-      code.setPos(pos);
-      code.setError(
-          '$c == null ? ErrUnexpected.eof(state.pos) : ErrUnexpected.char(state.pos, Char($c))');
-    });
-  }
-
-  void _buildCases(CodeGen code, SwitchStatement sw, String c, String v) {
+  String _buildCases() {
+    final cases = <String>[];
     final entries = table.entries;
     final direct = entries.where((e) => e.key == e.value).map((e) => e.key);
     if (direct.isNotEmpty) {
-      code.addCase(sw, direct, (code) {
-        code.assign(v, c);
-        code.break$();
-      });
+      final sink = StringBuffer();
+      for (final key in direct) {
+        sink.writeln('case $key:');
+      }
+
+      sink.writeln('v = c;');
+      sink.write('break;');
+      cases.add(sink.toString());
     }
 
     final exclude = direct.toSet();
     for (final key in table.keys) {
-      if (exclude.contains(key)) {
-        continue;
+      if (!exclude.contains(key)) {
+        final sink = StringBuffer();
+        final value = table[key]!;
+        sink.writeln('case $key:');
+        sink.writeln('v = $value;');
+        sink.write('break;');
+        cases.add(sink.toString());
       }
-
-      final value = table[key]!;
-      code.addCase(sw, [key], (code) {
-        code.assign(v, '$value');
-        code.break$();
-      });
     }
+
+    return cases.join('\n');
   }
 }

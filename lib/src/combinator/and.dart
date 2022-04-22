@@ -1,12 +1,30 @@
 part of '../../combinator.dart';
 
-class And<I> extends Redirect<I, void> {
+class And<I> extends ParserBuilder<I, void> {
+  static const _template = '''
+final {{pos}} = state.pos;
+final {{log}} = state.log;
+state.log = false;
+{{p1}}
+state.log = {{log}};
+if (state.ok) {
+  state.pos = {{pos}};
+  if ({{log}}) {
+    state.error = ErrUnknown(state.pos);
+  }
+}''';
+
   final ParserBuilder<I, dynamic> parser;
 
   const And(this.parser);
 
   @override
-  ParserBuilder<I, void> getRedirectParser() {
-    return Peek(Fast(parser));
+  String build(Context context, ParserResult? result) {
+    final values = context.allocateLocals(['log', 'pos']);
+    final r1 = context.getResult(parser, false);
+    values.addAll({
+      'p1': parser.build(context, r1),
+    });
+    return render(_template, values);
   }
 }
