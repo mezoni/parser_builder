@@ -1430,8 +1430,8 @@ String? tagNoCaseAbc(State<String> state) {
 String? tagsAbcAbdDefDegXXY(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = false;
-  if (state.pos < source.length) {
+  state.ok = state.pos < source.length;
+  if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
     String? v;
@@ -1883,6 +1883,68 @@ int? transformersVarIsNotDigit(State<String> state) {
     state.ok = false;
   }
   return $0;
+}
+
+String? verifyIs3Digit(State<String> state) {
+  String? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  String? $1;
+  final $pos1 = state.pos;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c >= 48 && c <= 57;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = true;
+  if (state.ok) {
+    $1 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
+  }
+  if (state.ok) {
+    final v = $1!;
+    state.ok = v.length == 3;
+    if (state.ok) {
+      $0 = v;
+    } else {
+      if (state.log) {
+        state.error = ErrMessage($pos, state.pos - $pos, 'Message');
+      }
+      state.pos = $pos;
+    }
+  }
+  return $0;
+}
+
+void verifyIs3DigitFast(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  String? $1;
+  final $pos1 = state.pos;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c >= 48 && c <= 57;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = true;
+  if (state.ok) {
+    $1 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
+  }
+  if (state.ok) {
+    final v = $1!;
+    state.ok = v.length == 3;
+    if (!state.ok) {
+      if (state.log) {
+        state.error = ErrMessage($pos, state.pos - $pos, 'Message');
+      }
+      state.pos = $pos;
+    }
+  }
 }
 
 /// Represents the `char` used in parsing errors.

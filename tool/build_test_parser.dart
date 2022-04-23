@@ -88,7 +88,9 @@ Future<void> main(List<String> args) async {
     _transformersExprIsDigit,
     _transformersFuncIsDigit,
     _transformersNotCharClassIsDigit,
-    _transformersVarIsNotDigit
+    _transformersVarIsNotDigit,
+    _verifyIs3Digit,
+    _verifyIs3DigitFast,
   ];
 
   final filename = 'test/_test_parser.dart';
@@ -329,3 +331,13 @@ const _valueAbcToTrueValue =
     Named('valueAbcToTrueValue', Value(true, Tag(abc)));
 
 const _valueTrue = Named('valueTrue', Value(true));
+
+const _verifyIs3Digit = Named(
+    'verifyIs3Digit',
+    Verify('Message', TakeWhile(_isDigit),
+        ExpressionAction(['x'], '{{x}}.length == 3')));
+
+const _verifyIs3DigitFast = Named(
+    'verifyIs3DigitFast',
+    Fast(Verify('Message', TakeWhile(_isDigit),
+        ExpressionAction(['x'], '{{x}}.length == 3'))));

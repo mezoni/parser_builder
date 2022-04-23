@@ -77,6 +77,7 @@ void _test() {
   _testTuple();
   _testValue();
   _testSemanticActions();
+  _testVerify();
 }
 
 void _testAlpha0() {
@@ -2842,6 +2843,56 @@ void _testValue() {
       expect(state.ok, true);
       expect(r, true);
       expect(state.pos, 0);
+    }
+  });
+}
+
+void _testVerify() {
+  test('Verify', () {
+    final parser = verifyIs3Digit;
+    {
+      final state = State('123');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, '123');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrMessage(0, 0, 'Message'));
+    }
+    {
+      final state = State('12');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrMessage(0, 2, 'Message'));
+    }
+    final parserFast = verifyIs3DigitFast;
+    {
+      final state = State('123');
+      parserFast(state);
+      expect(state.ok, true);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      parserFast(state);
+      expect(state.ok, false);
+      expect(state.pos, 0);
+      expect(state.error, ErrMessage(0, 0, 'Message'));
+    }
+    {
+      final state = State('12');
+      parserFast(state);
+      expect(state.ok, false);
+      expect(state.pos, 0);
+      expect(state.error, ErrMessage(0, 2, 'Message'));
     }
   });
 }
