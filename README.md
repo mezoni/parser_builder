@@ -33,6 +33,7 @@ Ask questions if something is not clear.
 - `Fully customizable` (according to your needs) error reporting procedures
 - Error messages `can be easily localized` (translated into another language) before being output
 - Includes high-performance, most common `built-in parser builders`
+- Includes built-in parser builders to simplify `parsing expressions`
 - Support for `32 bit Unicode characters` out of the box (no need to worry about that)
 - Included built-in simple script for `fast building of parsers`
 
