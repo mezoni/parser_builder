@@ -3,6 +3,7 @@ import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/char_class.dart';
 import 'package:parser_builder/character.dart';
 import 'package:parser_builder/combinator.dart';
+import 'package:parser_builder/expression.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
@@ -19,6 +20,7 @@ Future<void> main(List<String> args) async {
     _altC16OrC32,
     _andC32OrC16,
     _anyChar,
+    _binaryExpressionAdd,
     _char16,
     _char32,
     _consumedSeparatedAbcC32,
@@ -111,7 +113,20 @@ const s32 = '𝈀';
 const __header = r'''
 import 'package:tuple/tuple.dart';
 
-''';
+int _toBinary(int left, String operator, int right) {
+  switch (operator) {
+    case '+':
+      return left + right;
+    case '-':
+      return left - right;
+    case '*':
+      return left * right;
+    case '/':
+      return left ~/ right;
+    default:
+      throw StateError('Unknown operator: $operator');
+  }
+}''';
 
 const _alpha0 = Named('alpha0', Alpha0());
 
@@ -126,6 +141,27 @@ const _altC16OrC32 = Named('altC16OrC32', Alt([_char16, Char(c32)]));
 const _andC32OrC16 = Named('andC32OrC16', And(Alt2(_char32, _char16)));
 
 const _anyChar = Named('anyChar', AnyChar());
+
+const _binaryExpressionAdd = Named(
+    'binaryExpressionAdd',
+    BinaryExpression(
+        _binaryExpressionMul,
+        Tags(['+', '-']),
+        _binaryExpressionMul,
+        ExpressionAction(['left', 'op', 'right'],
+            '_toBinary({{left}}, {{op}}, {{right}})')));
+
+const _binaryExpressionMul = Named(
+    '_binaryExpressionMul',
+    BinaryExpression(
+        _binaryExpressionPrimary,
+        Tags(['*', '~/']),
+        _binaryExpressionPrimary,
+        ExpressionAction(['left', 'op', 'right'],
+            '_toBinary({{left}}, {{op}}, {{right}})')));
+
+const _binaryExpressionPrimary = Named('_binaryExpressionPrimary',
+    Map1(Digit1(), ExpressionAction(['x'], 'int.parse({{x}})')));
 
 const _char16 = Named('char16', Char(c16));
 

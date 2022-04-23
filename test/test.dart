@@ -27,6 +27,7 @@ void _test() {
   _testAlt();
   _testAnd();
   _testAnyChar();
+  _testBinaryExpression();
   _testChar();
   _testConsumed();
   _testDelimited();
@@ -443,6 +444,47 @@ void _testAnyChar() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrUnexpected.eof(0));
+    }
+  });
+}
+
+void _testBinaryExpression() {
+  test('BinaryExpression', () {
+    final parser = binaryExpressionAdd;
+    {
+      final state = State('1');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 1);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('1+2');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 3);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('1+2*3');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 7);
+      expect(state.pos, 5);
+    }
+    {
+      final state = State('1+2*3+4');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 11);
+      expect(state.pos, 7);
+    }
+    {
+      final state = State('1*2-3');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, -1);
+      expect(state.pos, 5);
     }
   });
 }

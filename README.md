@@ -104,6 +104,9 @@ built-in:
 - [`Expected`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/expected.dart) (not tested yet)
 - [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart) (not fully tested)
 
+[`expression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression):
+- [`BinaryExpression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression/binary_expression.dart)
+
 [`multi`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi):
 - [`FoldMany0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/fold_many0.dart)
 - `FoldMany1` (not implenented yet)

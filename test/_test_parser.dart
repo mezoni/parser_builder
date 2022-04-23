@@ -1,5 +1,20 @@
 import 'package:tuple/tuple.dart';
 
+int _toBinary(int left, String operator, int right) {
+  switch (operator) {
+    case '+':
+      return left + right;
+    case '-':
+      return left - right;
+    case '*':
+      return left * right;
+    case '/':
+      return left ~/ right;
+    default:
+      throw StateError('Unknown operator: $operator');
+  }
+}
+
 String? alpha0(State<String> state) {
   String? $0;
   final source = state.source;
@@ -163,6 +178,159 @@ int? anyChar(State<String> state) {
     $0 = source.readRune(state);
   } else if (state.log) {
     state.error = ErrUnexpected.eof(state.pos);
+  }
+  return $0;
+}
+
+dynamic _binaryExpressionPrimary(State<String> state) {
+  dynamic $0;
+  final source = state.source;
+  String? $1;
+  final $pos = state.pos;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c >= 48 && c <= 57;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = state.pos != $pos;
+  if (state.ok) {
+    $1 = source.substring($pos, state.pos);
+  } else if (state.log) {
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  }
+  if (state.ok) {
+    final v = $1!;
+    $0 = int.parse(v);
+  }
+  return $0;
+}
+
+dynamic _binaryExpressionMul(State<String> state) {
+  dynamic $0;
+  final source = state.source;
+  final $list = <Tuple2<String, dynamic>>[];
+  var $ok = false;
+  dynamic $1;
+  $1 = _binaryExpressionPrimary(state);
+  if (state.ok) {
+    $ok = true;
+    while (true) {
+      final $pos = state.pos;
+      String? $2;
+      state.ok = state.pos < source.length;
+      if (state.ok) {
+        final pos = state.pos;
+        final c = source.codeUnitAt(pos);
+        String? v;
+        switch (c) {
+          case 42:
+            state.pos++;
+            v = '*';
+            break;
+          case 126:
+            if (source.startsWith('~/', pos)) {
+              state.pos += 2;
+              v = '~/';
+              break;
+            }
+            break;
+        }
+        state.ok = v != null;
+        if (state.ok) {
+          $2 = v;
+        }
+      }
+      if (!state.ok && state.log) {
+        state.error = ErrCombined(state.pos, [
+          ErrExpected.tag(state.pos, const Tag('*')),
+          ErrExpected.tag(state.pos, const Tag('~/'))
+        ]);
+      }
+      if (!state.ok) {
+        break;
+      }
+      dynamic $3;
+      $3 = _binaryExpressionPrimary(state);
+      if (!state.ok) {
+        state.pos = $pos;
+        break;
+      }
+      $list.add(Tuple2($2!, $3));
+    }
+  }
+  state.ok = $ok;
+  if (state.ok) {
+    var left = $1;
+    for (var i = 0; i < $list.length; i++) {
+      final v = $list[i];
+      left = _toBinary(left, v.item1, v.item2);
+    }
+    $0 = left;
+  }
+  return $0;
+}
+
+dynamic binaryExpressionAdd(State<String> state) {
+  dynamic $0;
+  final source = state.source;
+  final $list = <Tuple2<String, dynamic>>[];
+  var $ok = false;
+  dynamic $1;
+  $1 = _binaryExpressionMul(state);
+  if (state.ok) {
+    $ok = true;
+    while (true) {
+      final $pos = state.pos;
+      String? $2;
+      state.ok = state.pos < source.length;
+      if (state.ok) {
+        final pos = state.pos;
+        final c = source.codeUnitAt(pos);
+        String? v;
+        switch (c) {
+          case 43:
+            state.pos++;
+            v = '+';
+            break;
+          case 45:
+            state.pos++;
+            v = '-';
+            break;
+        }
+        state.ok = v != null;
+        if (state.ok) {
+          $2 = v;
+        }
+      }
+      if (!state.ok && state.log) {
+        state.error = ErrCombined(state.pos, [
+          ErrExpected.tag(state.pos, const Tag('+')),
+          ErrExpected.tag(state.pos, const Tag('-'))
+        ]);
+      }
+      if (!state.ok) {
+        break;
+      }
+      dynamic $3;
+      $3 = _binaryExpressionMul(state);
+      if (!state.ok) {
+        state.pos = $pos;
+        break;
+      }
+      $list.add(Tuple2($2!, $3));
+    }
+  }
+  state.ok = $ok;
+  if (state.ok) {
+    var left = $1;
+    for (var i = 0; i < $list.length; i++) {
+      final v = $list[i];
+      left = _toBinary(left, v.item1, v.item2);
+    }
+    $0 = left;
   }
   return $0;
 }
