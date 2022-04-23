@@ -1,6 +1,7 @@
 ## 1.0.3
 
 - Added and tested parser builder `BinaryExpression`
+- Added simple calculator parser example
 
 ## 1.0.2
 
