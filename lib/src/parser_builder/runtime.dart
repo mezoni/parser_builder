@@ -493,8 +493,6 @@ String {{name}}(String source, List<Err> errors,
 }
 ''';
 
-  
-
   static List<String> getClasses() {
     return const [
       _classChar,
