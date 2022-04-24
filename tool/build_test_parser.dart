@@ -59,6 +59,7 @@ Future<void> main(List<String> args) async {
     _satisfyC32,
     _separatedList0C32Abc,
     _separatedList1C32Abc,
+    _separatedListN_2C32Abc,
     _separatedPairC16AbcC32,
     _skipWhile1C16,
     _skipWhile1C32,
@@ -279,6 +280,9 @@ const _separatedList0C32Abc =
 
 const _separatedList1C32Abc =
     Named('separatedList1C32Abc', SeparatedList1(Char(c32), Tag(abc)));
+
+const _separatedListN_2C32Abc =
+    Named('separatedListN_2C32Abc', SeparatedListN(2, Char(c32), Tag(abc)));
 
 const _separatedPairC16AbcC32 = Named(
     'separatedPairC16AbcC32', SeparatedPair(Char(c16), Tag(abc), Char(c32)));

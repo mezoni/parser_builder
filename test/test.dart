@@ -63,6 +63,7 @@ void _test() {
   _testSeparatedPair();
   _testSeparatedList0();
   _testSeparatedList1();
+  _testSeparatedListN();
   _testSkipWhile();
   _testSkipWhile1();
   _testStringValue();
@@ -1967,6 +1968,65 @@ void _testSeparatedList1() {
     }
     {
       final state = State('$s32$abc$s32$abc');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, [c32, c32]);
+      expect(state.pos, 7);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(0, Char(c32)));
+    }
+    {
+      final state = State('$s16');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(0, Char(c32)));
+    }
+  });
+}
+
+void _testSeparatedListN() {
+  test('SeparatedListN', () {
+    final parser = separatedListN_2C32Abc;
+    {
+      final state = State('$s32');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(2, Tag(abc)));
+    }
+    {
+      final state = State('$s32$abc');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(5, Char(c32)));
+    }
+    {
+      final state = State('$s32$abc$s32');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, [c32, c32]);
+      expect(state.pos, 7);
+    }
+    {
+      final state = State('$s32$abc$s32$abc');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, [c32, c32]);
+      expect(state.pos, 7);
+    }
+    {
+      final state = State('$s32$abc$s32$abc$s32');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [c32, c32]);

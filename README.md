@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 1.0.4
+Version: 1.0.5
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -120,6 +120,7 @@ built-in:
 - [`ManyTill`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/many_till.dart)
 - [`SeparatedList0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/separated_list0.dart)
 - [`SeparatedList1`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/separated_list1.dart)
+- [`SeparatedListN`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/separated_list_n.dart)
 
 [`sequence`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence):
 - [`Delimited`](https://github.com/mezoni/parser_builder/blob/master/lib/src/sequence/delimited.dart)

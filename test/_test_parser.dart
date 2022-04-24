@@ -1336,6 +1336,51 @@ List<int>? separatedList1C32Abc(State<String> state) {
   return $0;
 }
 
+List<int>? separatedListN_2C32Abc(State<String> state) {
+  List<int>? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  var $last = $pos;
+  final $list = <int>[];
+  while (true) {
+    int? $1;
+    state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
+    if (state.ok) {
+      state.pos += 2;
+      $1 = 119296;
+    } else if (state.log) {
+      state.error = ErrExpected.char(state.pos, const Char(119296));
+    }
+    if (!state.ok) {
+      state.pos = $last;
+      break;
+    }
+    $list.add($1!);
+    if ($list.length == 2) {
+      break;
+    }
+    $last = state.pos;
+    state.ok = state.pos < source.length &&
+        source.codeUnitAt(state.pos) == 97 &&
+        source.startsWith('abc', state.pos);
+    if (state.ok) {
+      state.pos += 3;
+    } else if (state.log) {
+      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    }
+    if (!state.ok) {
+      break;
+    }
+  }
+  state.ok = $list.length == 2;
+  if (state.ok) {
+    $0 = $list;
+  } else {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
 Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
   Tuple2<int, int>? $0;
   final source = state.source;

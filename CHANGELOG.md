@@ -1,3 +1,7 @@
+## 1.0.5
+
+- Added and tested parser builder `SeparatedListN`
+
 ## 1.0.4
 
 - Added and tested parser builder `ManyN`
