@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Added and tested parser builder `ManyN`
+
 ## 1.0.3
 
 - Added and tested parser builder `BinaryExpression`

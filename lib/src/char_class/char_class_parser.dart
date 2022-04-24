@@ -88,8 +88,8 @@ int? _rangeChar(State<String> state) {
   final $pos1 = state.pos;
   final $log = state.log;
   state.log = false;
-  state.ok = false;
-  if (state.pos < source.length) {
+  state.ok = state.pos < source.length;
+  if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
     String? v;

@@ -453,8 +453,8 @@ void eof(State<String> state) {
 int? escapeSequence16(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = false;
-  if (state.pos < source.length) {
+  state.ok = state.pos < source.length;
+  if (state.ok) {
     var c = source.codeUnitAt(state.pos);
     int? v;
     switch (c) {
@@ -484,8 +484,8 @@ int? escapeSequence16(State<String> state) {
 int? escapeSequence32(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = false;
-  if (state.pos < source.length) {
+  state.ok = state.pos < source.length;
+  if (state.ok) {
     final pos = state.pos;
     var c = source.readRune(state);
     int? v;
@@ -709,7 +709,11 @@ List<int>? manyMNC32_2_3(State<String> state) {
   final $list = <int>[];
   final $log = state.log;
   while ($list.length < 3) {
-    state.log = $list.length < 2 ? $log : false;
+    if (state.log) {
+      if ($list.length >= 2) {
+        state.log = false;
+      }
+    }
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -719,6 +723,27 @@ List<int>? manyMNC32_2_3(State<String> state) {
   }
   state.log = $log;
   state.ok = $list.length >= 2;
+  if (state.ok) {
+    $0 = $list;
+  } else {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+List<int>? manyNC32_2(State<String> state) {
+  List<int>? $0;
+  final $pos = state.pos;
+  final $list = <int>[];
+  while ($list.length < 2) {
+    int? $1;
+    $1 = char32(state);
+    if (!state.ok) {
+      break;
+    }
+    $list.add($1!);
+  }
+  state.ok = $list.length == 2;
   if (state.ok) {
     $0 = $list;
   } else {
@@ -1421,7 +1446,7 @@ String? stringValue(State<String> state) {
   final source = state.source;
   state.ok = true;
   final $pos = state.pos;
-  final $list = [];
+  final $list = <String>[];
   var $str = '';
   while (state.pos < source.length) {
     final $start = state.pos;
@@ -1445,8 +1470,8 @@ String? stringValue(State<String> state) {
     }
     state.pos += 1;
     int? $1;
-    state.ok = false;
-    if (state.pos < source.length) {
+    state.ok = state.pos < source.length;
+    if (state.ok) {
       var c = source.codeUnitAt(state.pos);
       int? v;
       switch (c) {
@@ -1471,25 +1496,13 @@ String? stringValue(State<String> state) {
     if ($list.isEmpty && $str != '') {
       $list.add($str);
     }
-    $list.add($1!);
+    $list.add(String.fromCharCode($1!));
   }
   if (state.ok) {
     if ($list.isEmpty) {
       $0 = $str;
-    } else if ($list.length == 1) {
-      final c = $list[0] as int;
-      $0 = String.fromCharCode(c);
     } else {
-      final buffer = StringBuffer();
-      for (var i = 0; i < $list.length; i++) {
-        final obj = $list[i];
-        if (obj is int) {
-          buffer.writeCharCode(obj);
-        } else {
-          buffer.write(obj);
-        }
-      }
-      $0 = buffer.toString();
+      $0 = $list.join();
     }
   }
   return $0;

@@ -2,7 +2,7 @@ import 'package:source_span/source_span.dart';
 import 'package:tuple/tuple.dart';
 
 void main() {
-  final source = '1 + 2 * 3 * (1 + 2)';
+  final source = '1 + 2 * 3 * (1 + 2.0)';
   final result = parse(source);
   print(result);
 }
@@ -65,6 +65,72 @@ void _ws(State<String> state) {
     state.pos++;
   }
   state.ok = true;
+}
+
+num? _decimal(State<String> state) {
+  num? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  String? $1;
+  final $pos1 = state.pos;
+  final $pos2 = state.pos;
+  final $pos3 = state.pos;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c >= 48 && c <= 57;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = state.pos != $pos3;
+  if (!state.ok && state.log) {
+    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  }
+  if (state.ok) {
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 46;
+    if (state.ok) {
+      state.pos += 1;
+    } else if (state.log) {
+      state.error = ErrExpected.tag(state.pos, const Tag('.'));
+    }
+    if (state.ok) {
+      final $pos4 = state.pos;
+      while (state.pos < source.length) {
+        final c = source.codeUnitAt(state.pos);
+        final ok = c >= 48 && c <= 57;
+        if (!ok) {
+          break;
+        }
+        state.pos++;
+      }
+      state.ok = state.pos != $pos4;
+      if (!state.ok && state.log) {
+        state.error = ErrUnexpected.charOrEof(state.pos, source);
+      }
+      if (state.ok) {
+        //
+      }
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos2;
+  }
+  if (state.ok) {
+    $1 = source.slice($pos1, state.pos);
+  }
+  if (state.ok) {
+    final v = $1!;
+    $0 = num.parse(v);
+  }
+  if (state.ok) {
+    _ws(state);
+  }
+  if (!state.ok) {
+    $0 = null;
+    state.pos = $pos;
+  }
+  return $0;
 }
 
 num? _integer(State<String> state) {
@@ -145,25 +211,29 @@ String? _closeParen(State<String> state) {
 
 num? _primary(State<String> state) {
   num? $0;
-  $0 = _integer(state);
+  $0 = _decimal(state);
   if (!state.ok) {
     final $1 = state.error;
-    final $pos = state.pos;
-    _openParen(state);
-    if (state.ok) {
-      $0 = _expression(state);
-      if (state.ok) {
-        _closeParen(state);
-      }
-    }
-    if (!state.ok) {
-      $0 = null;
-      state.pos = $pos;
-    }
+    $0 = _integer(state);
     if (!state.ok) {
       final $2 = state.error;
-      if (state.log) {
-        state.error = ErrCombined(state.pos, [$1, $2]);
+      final $pos = state.pos;
+      _openParen(state);
+      if (state.ok) {
+        $0 = _expression(state);
+        if (state.ok) {
+          _closeParen(state);
+        }
+      }
+      if (!state.ok) {
+        $0 = null;
+        state.pos = $pos;
+      }
+      if (!state.ok) {
+        final $3 = state.error;
+        if (state.log) {
+          state.error = ErrCombined(state.pos, [$1, $2, $3]);
+        }
       }
     }
   }

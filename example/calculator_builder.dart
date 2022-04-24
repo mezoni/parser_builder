@@ -19,7 +19,7 @@ import 'package:source_span/source_span.dart';
 import 'package:tuple/tuple.dart';
 
 void main() {
-  final source = '1 + 2 * 3 * (1 + 2)';
+  final source = '1 + 2 * 3 * (1 + 2.0)';
   final result = parse(source);
   print(result);
 }
@@ -55,6 +55,16 @@ const _calculate = ExpressionAction<num>(
 
 const _closeParen = Named('_closeParen', Terminated(Tag(')'), _ws));
 
+const _decimal = Named(
+    '_decimal',
+    Terminated(
+        Map1(
+            Recognize(
+              Tuple3(Digit1(), Tag('.'), Digit1()),
+            ),
+            ExpressionAction<num>(['x'], 'num.parse({{x}})')),
+        _ws));
+
 const _expression = Ref<String, num>('_expression');
 
 const _expression_ = Named('_expression', _additive);
@@ -78,7 +88,8 @@ const _parse = Named('_parse', Terminated(_expression, Eof<String>()));
 
 const _primary = Named(
     '_primary',
-    Alt2(
+    Alt3(
+      _decimal,
       _integer,
       Delimited(_openParen, _expression, _closeParen),
     ));

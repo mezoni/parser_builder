@@ -44,6 +44,7 @@ void _test() {
   _testMany1();
   _testMany1Count();
   _testManyMN();
+  _testManyN();
   _testManyTill();
   _testMap();
   _testMap1();
@@ -1071,10 +1072,10 @@ void _testMany1Count() {
 
 void _testManyMN() {
   test('ManyMN', () {
-    final parser = manyMNC32_2_3;
+    final parser2_3 = manyMNC32_2_3;
     {
       final state = State('');
-      final r = parser(state);
+      final r = parser2_3(state);
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
@@ -1082,7 +1083,7 @@ void _testManyMN() {
     }
     {
       final state = State('$s32');
-      final r = parser(state);
+      final r = parser2_3(state);
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
@@ -1090,28 +1091,72 @@ void _testManyMN() {
     }
     {
       final state = State('$s32$s32');
-      final r = parser(state);
+      final r = parser2_3(state);
       expect(state.ok, true);
       expect(r, [c32, c32]);
       expect(state.pos, 4);
     }
     {
       final state = State('$s32$s32$s32');
-      final r = parser(state);
+      final r = parser2_3(state);
       expect(state.ok, true);
       expect(r, [c32, c32, c32]);
       expect(state.pos, 6);
     }
     {
       final state = State('$s32$s32$s32$s32');
-      final r = parser(state);
+      final r = parser2_3(state);
       expect(state.ok, true);
       expect(r, [c32, c32, c32]);
       expect(state.pos, 6);
     }
     {
       final state = State('$s16');
-      final r = parser(state);
+      final r = parser2_3(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(0, Char(c32)));
+    }
+  });
+}
+
+void _testManyN() {
+  test('ManyN', () {
+    final parser2 = manyNC32_2;
+    {
+      final state = State('');
+      final r = parser2(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(0, Char(c32)));
+    }
+    {
+      final state = State('$s32');
+      final r = parser2(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.char(2, Char(c32)));
+    }
+    {
+      final state = State('$s32$s32');
+      final r = parser2(state);
+      expect(state.ok, true);
+      expect(r, [c32, c32]);
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('$s32$s32$s32');
+      final r = parser2(state);
+      expect(state.ok, true);
+      expect(r, [c32, c32]);
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('$s16');
+      final r = parser2(state);
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
@@ -1781,10 +1826,10 @@ void _testSatisfy() {
 
 void _testSemanticActions() {
   final parsers = {
-    'CharClasss': transformersCharClassIsDigit,
+    'CharClass': transformersCharClassIsDigit,
     'ExpressionAction': transformersExprIsDigit,
     'FunctionAction': transformersFuncIsDigit,
-    'NotCharClasss': transformersNotCharClassIsDigit,
+    'NotCharClass': transformersNotCharClassIsDigit,
   };
   for (final key in parsers.keys) {
     test('Semantic action $key', () {

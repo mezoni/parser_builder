@@ -39,6 +39,7 @@ Future<void> main(List<String> args) async {
     _many1C32,
     _many1CountC32,
     _manyMNC32_2_3,
+    _manyNC32_2,
     _manyTillAOrBTillAbc,
     _map4Digits,
     _mapC32ToStr,
@@ -213,6 +214,8 @@ const _many1C32 = Named('many1C32', Many1(_char32));
 const _many1CountC32 = Named('many1CountC32', Many1Count(_char32));
 
 const _manyMNC32_2_3 = Named('manyMNC32_2_3', ManyMN(2, 3, _char32));
+
+const _manyNC32_2 = Named('manyNC32_2', ManyN(2, _char32));
 
 const _manyTillAOrBTillAbc =
     Named('manyTillAOrBTillAbc', ManyTill(Alt2(Tag('a'), Tag('b')), Tag(abc)));

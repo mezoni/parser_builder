@@ -1,16 +1,10 @@
 part of '../../multi.dart';
 
-class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
+class ManyN<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
-final {{log}} = state.log;
 while ({{list}}.length < {{n}}) {
-  if (state.log) {
-    if ({{list}}.length >= {{m}}) {
-      state.log = false;
-    }
-  }
   {{var1}}
   {{p1}}
   if (!state.ok) {
@@ -18,8 +12,7 @@ while ({{list}}.length < {{n}}) {
   }
   {{list}}.add({{val1}});
 }
-state.log = {{log}};
-state.ok = {{list}}.length >= {{m}};
+state.ok = {{list}}.length == {{n}};
 if (state.ok) {
   {{res0}} = {{list}};
 } else {
@@ -29,13 +22,7 @@ if (state.ok) {
   static const _templateFast = '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
-final {{log}} = state.log;
 while ({{count}} < {{n}}) {
-  if (state.log) {
-    if ({{count}} >= {{m}}) {
-      state.log = false;
-    }
-  }
   {{var1}}
   {{p1}}
   if (!state.ok) {
@@ -43,44 +30,38 @@ while ({{count}} < {{n}}) {
   }
   {{count}}++;
 }
-state.log = {{log}};
-state.ok = {{count}} >= {{m}};
+state.ok = {{count}} == {{n}};
 if (!state.ok) {
   state.pos = {{pos}};
 }''';
-
-  final int m;
 
   final int n;
 
   final ParserBuilder<I, O> parser;
 
-  const ManyMN(this.m, this.n, this.parser);
+  const ManyN(this.n, this.parser);
 
   @override
   String build(Context context, ParserResult? result) {
-    if (m < 0) {
-      throw RangeError.value(m, 'm', 'Must be equal to or greater than 0');
-    }
-
-    if (n < m) {
-      throw RangeError.value(
-          n, 'n', 'Must be equal to or greater than \'m\' ($m)');
-    }
-
-    if (n == 0) {
+    if (n < 1) {
       throw RangeError.value(n, 'n', 'Must be greater than 0');
     }
 
     final fast = result == null;
-    final values = context.allocateLocals(['count', 'list', 'log', 'pos']);
+    final values = context.allocateLocals(['count', 'list', 'pos']);
     final r1 = context.getResult(parser, !fast);
     values.addAll({
-      'm': '$m',
       'n': '$n',
       'O': '$O',
       'p1': parser.build(context, r1),
     });
-    return render2(fast, _templateFast, _template, values, [result, r1]);
+    final String template;
+    if (fast) {
+      template = _templateFast;
+    } else {
+      template = _template;
+    }
+
+    return render(template, values, [result, r1]);
   }
 }

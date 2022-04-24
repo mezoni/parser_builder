@@ -94,8 +94,8 @@ int? _escapeHex(State<String> state) {
 int? _escaped(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = false;
-  if (state.pos < source.length) {
+  state.ok = state.pos < source.length;
+  if (state.ok) {
     var c = source.codeUnitAt(state.pos);
     int? v;
     switch (c) {
@@ -176,7 +176,7 @@ String? _string(State<String> state) {
   if (state.ok) {
     state.ok = true;
     final $pos2 = state.pos;
-    final $list = [];
+    final $list = <String>[];
     var $str = '';
     while (state.pos < source.length) {
       final $start = state.pos;
@@ -208,25 +208,13 @@ String? _string(State<String> state) {
       if ($list.isEmpty && $str != '') {
         $list.add($str);
       }
-      $list.add($2!);
+      $list.add(String.fromCharCode($2!));
     }
     if (state.ok) {
       if ($list.isEmpty) {
         $1 = $str;
-      } else if ($list.length == 1) {
-        final c = $list[0] as int;
-        $1 = String.fromCharCode(c);
       } else {
-        final buffer = StringBuffer();
-        for (var i = 0; i < $list.length; i++) {
-          final obj = $list[i];
-          if (obj is int) {
-            buffer.writeCharCode(obj);
-          } else {
-            buffer.write(obj);
-          }
-        }
-        $1 = buffer.toString();
+        $1 = $list.join();
       }
     }
     if (state.ok) {

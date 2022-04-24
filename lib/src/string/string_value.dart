@@ -13,7 +13,7 @@ class StringValue extends ParserBuilder<String, String> {
   static const _template = '''
 state.ok = true;
 final {{pos}} = state.pos;
-final {{list}} = [];
+final {{list}} = <String>[];
 var {{str}} = '';
 while (state.pos < source.length) {
   final {{start}} = state.pos;
@@ -45,32 +45,20 @@ while (state.pos < source.length) {
   if ({{list}}.isEmpty && {{str}} != '') {
     {{list}}.add({{str}});
   }
-  {{list}}.add({{val1}});
+  {{list}}.add(String.fromCharCode({{val1}}));
 }
 if (state.ok) {
   if ({{list}}.isEmpty) {
     {{res0}} = {{str}};
-  } else if ({{list}}.length == 1) {
-    final c = {{list}}[0] as int;
-    {{res0}} = String.fromCharCode(c);
   } else {
-    final buffer = StringBuffer();
-    for (var i = 0; i < {{list}}.length; i++) {
-      final obj = {{list}}[i];
-      if (obj is int) {
-        buffer.writeCharCode(obj);
-      } else {
-        buffer.write(obj);
-      }
-    }
-    {{res0}} = buffer.toString();
+    {{res0}} = {{list}}.join();
   }
 }''';
 
   static const _templateFast = '''
 state.ok = true;
 final {{pos}} = state.pos;
-final {{list}} = [];
+final {{list}} = <String>[];
 var {{str}} = '';
 while (state.pos < source.length) {
   final {{start}} = state.pos;
@@ -102,7 +90,7 @@ while (state.pos < source.length) {
   if ({{list}}.isEmpty && {{str}} != '') {
     {{list}}.add({{str}});
   }
-  {{list}}.add({{val1}});
+  {{list}}.add(String.fromCharCode({{val1}}));
 }''';
 
   final int controlChar;
