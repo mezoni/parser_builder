@@ -11,6 +11,10 @@ class Context {
 
   Allocator localAllocator = Allocator('\$');
 
+  bool optimizeFastParsers = true;
+
+  int pass = 0;
+
   bool refersToStateSource = false;
 
   String allocateGlobal([String name = '']) {
