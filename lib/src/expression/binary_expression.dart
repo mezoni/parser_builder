@@ -2,12 +2,13 @@ part of '../../expression.dart';
 
 class BinaryExpression<I, O1, O> extends ParserBuilder<I, O> {
   static const _template = '''
-final {{list}} = <Tuple2<{{O1}}, {{O}}>>[];
+{{O}} {{left}};
 var {{ok}} = false;
 {{var1}}
 {{p1}}
 if (state.ok) {
   {{ok}} = true;
+  {{left}} = {{res1}};
   while (true) {
     final {{pos}} = state.pos;
     {{var2}}
@@ -21,26 +22,24 @@ if (state.ok) {
       state.pos = {{pos}};
       break;
     }
-    {{list}}.add(Tuple2({{val2}}, {{val3}}));
+    final {{op}} = {{val2}};
+    final {{right}} = {{val3}};
+    {{left}} = {{calculate}};
   }
 }
 state.ok = {{ok}};
 if (state.ok) {
-  var left = {{val1}};
-  for (var i = 0; i < {{list}}.length; i++) {
-    final v = {{list}}[i];
-    left = {{reduce}};
-  }
-  {{res0}} = left;
+  {{res0}} = {{left}};
 }''';
 
   static const _templateFast = '''
-final {{list}} = <Tuple2<{{O1}}, {{O}}>>[];
+{{O}} {{left}};
 var {{ok}} = false;
 {{var1}}
 {{p1}}
 if (state.ok) {
   {{ok}} = true;
+  {{left}} = {{res1}};
   while (true) {
     final {{pos}} = state.pos;
     {{var2}}
@@ -54,17 +53,12 @@ if (state.ok) {
       state.pos = {{pos}};
       break;
     }
-    {{list}}.add(Tuple2({{val2}}, {{val3}}));
+    final {{op}} = {{val2}};
+    final {{right}} = {{val3}};
+    {{left}} = {{calculate}};
   }
 }
-state.ok = {{ok}};
-if (state.ok) {
-  var left = {{val1}};
-  for (var i = 0; i < {{list}}.length; i++) {
-    final v = {{list}}[i];
-    left = {{reduce}};
-  }
-}''';
+state.ok = {{ok}};''';
 
   final SemanticAction<O> calculate;
 
@@ -79,18 +73,20 @@ if (state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['list', 'ok', 'pos']);
+    final values = context.allocateLocals(['left', 'ok', 'op', 'pos', 'right']);
     final r1 = context.getResult(left, !fast);
     final r2 = context.getResult(operator, !fast);
     final r3 = context.getResult(right, !fast);
     values.addAll({
-      'O': '$O',
-      'O1': '$O1',
+      'calculate': calculate.build(context, 'calculate', [
+        left.getResultValue(values['left']!),
+        values['op']!,
+        values['right']!,
+      ]),
+      'O': left.getResultType(),
       'p1': left.build(context, r1),
       'p2': operator.build(context, r2),
       'p3': right.build(context, r3),
-      'reduce':
-          calculate.build(context, 'calculate', ['left', 'v.item1', 'v.item2']),
     });
     return render2(
         fast, _templateFast, _template, values, [result, r1, r2, r3]);

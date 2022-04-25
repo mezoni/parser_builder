@@ -16,7 +16,6 @@ Future<void> main(List<String> args) async {
 
 const __header = '''
 import 'package:source_span/source_span.dart';
-import 'package:tuple/tuple.dart';
 
 void main() {
   final source = '1 + 2 * 3 * (1 + 2.0)';

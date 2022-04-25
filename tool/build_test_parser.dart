@@ -151,7 +151,7 @@ const _binaryExpressionAdd = Named(
         _binaryExpressionMul,
         Tags(['+', '-']),
         _binaryExpressionMul,
-        ExpressionAction(['left', 'op', 'right'],
+        ExpressionAction<int>(['left', 'op', 'right'],
             '_toBinary({{left}}, {{op}}, {{right}})')));
 
 const _binaryExpressionMul = Named(
@@ -160,11 +160,11 @@ const _binaryExpressionMul = Named(
         _binaryExpressionPrimary,
         Tags(['*', '~/']),
         _binaryExpressionPrimary,
-        ExpressionAction(['left', 'op', 'right'],
+        ExpressionAction<int>(['left', 'op', 'right'],
             '_toBinary({{left}}, {{op}}, {{right}})')));
 
 const _binaryExpressionPrimary = Named('_binaryExpressionPrimary',
-    Map1(Digit1(), ExpressionAction(['x'], 'int.parse({{x}})')));
+    Map1(Digit1(), ExpressionAction<int>(['x'], 'int.parse({{x}})')));
 
 const _char16 = Named('char16', Char(c16));
 

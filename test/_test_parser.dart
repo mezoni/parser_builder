@@ -182,8 +182,8 @@ int? anyChar(State<String> state) {
   return $0;
 }
 
-dynamic _binaryExpressionPrimary(State<String> state) {
-  dynamic $0;
+int? _binaryExpressionPrimary(State<String> state) {
+  int? $0;
   final source = state.source;
   String? $1;
   final $pos = state.pos;
@@ -208,15 +208,16 @@ dynamic _binaryExpressionPrimary(State<String> state) {
   return $0;
 }
 
-dynamic _binaryExpressionMul(State<String> state) {
-  dynamic $0;
+int? _binaryExpressionMul(State<String> state) {
+  int? $0;
   final source = state.source;
-  final $list = <Tuple2<String, dynamic>>[];
+  int? $left;
   var $ok = false;
-  dynamic $1;
+  int? $1;
   $1 = _binaryExpressionPrimary(state);
   if (state.ok) {
     $ok = true;
+    $left = $1;
     while (true) {
       final $pos = state.pos;
       String? $2;
@@ -252,36 +253,34 @@ dynamic _binaryExpressionMul(State<String> state) {
       if (!state.ok) {
         break;
       }
-      dynamic $3;
+      int? $3;
       $3 = _binaryExpressionPrimary(state);
       if (!state.ok) {
         state.pos = $pos;
         break;
       }
-      $list.add(Tuple2($2!, $3));
+      final $op = $2!;
+      final $right = $3!;
+      $left = _toBinary($left!, $op, $right);
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    var left = $1;
-    for (var i = 0; i < $list.length; i++) {
-      final v = $list[i];
-      left = _toBinary(left, v.item1, v.item2);
-    }
-    $0 = left;
+    $0 = $left;
   }
   return $0;
 }
 
-dynamic binaryExpressionAdd(State<String> state) {
-  dynamic $0;
+int? binaryExpressionAdd(State<String> state) {
+  int? $0;
   final source = state.source;
-  final $list = <Tuple2<String, dynamic>>[];
+  int? $left;
   var $ok = false;
-  dynamic $1;
+  int? $1;
   $1 = _binaryExpressionMul(state);
   if (state.ok) {
     $ok = true;
+    $left = $1;
     while (true) {
       final $pos = state.pos;
       String? $2;
@@ -314,23 +313,20 @@ dynamic binaryExpressionAdd(State<String> state) {
       if (!state.ok) {
         break;
       }
-      dynamic $3;
+      int? $3;
       $3 = _binaryExpressionMul(state);
       if (!state.ok) {
         state.pos = $pos;
         break;
       }
-      $list.add(Tuple2($2!, $3));
+      final $op = $2!;
+      final $right = $3!;
+      $left = _toBinary($left!, $op, $right);
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    var left = $1;
-    for (var i = 0; i < $list.length; i++) {
-      final v = $list[i];
-      left = _toBinary(left, v.item1, v.item2);
-    }
-    $0 = left;
+    $0 = $left;
   }
   return $0;
 }

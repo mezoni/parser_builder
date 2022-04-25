@@ -1,3 +1,7 @@
+## 1.0.8
+
+- Improved parser builder `BinaryExpression`. The generated parser is now smaller, faster and uses less memory (does not use list and tuples)
+
 ## 1.0.7
 
 - Added and tested parser builder `IdentifierExpression`

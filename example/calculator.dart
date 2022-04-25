@@ -1,5 +1,4 @@
 import 'package:source_span/source_span.dart';
-import 'package:tuple/tuple.dart';
 
 void main() {
   final source = '1 + 2 * 3 * (1 + 2.0)';
@@ -282,12 +281,13 @@ String? _multiplicativeOperator(State<String> state) {
 
 num? _multiplicative(State<String> state) {
   num? $0;
-  final $list = <Tuple2<String, num>>[];
+  num? $left;
   var $ok = false;
   num? $1;
   $1 = _primary(state);
   if (state.ok) {
     $ok = true;
+    $left = $1;
     while (true) {
       final $pos = state.pos;
       String? $2;
@@ -301,17 +301,14 @@ num? _multiplicative(State<String> state) {
         state.pos = $pos;
         break;
       }
-      $list.add(Tuple2($2!, $3!));
+      final $op = $2!;
+      final $right = $3!;
+      $left = _calculate($left!, $op, $right);
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    var left = $1!;
-    for (var i = 0; i < $list.length; i++) {
-      final v = $list[i];
-      left = _calculate(left, v.item1, v.item2);
-    }
-    $0 = left;
+    $0 = $left;
   }
   return $0;
 }
@@ -358,12 +355,13 @@ String? _additiveOperator(State<String> state) {
 
 num? _additive(State<String> state) {
   num? $0;
-  final $list = <Tuple2<String, num>>[];
+  num? $left;
   var $ok = false;
   num? $1;
   $1 = _multiplicative(state);
   if (state.ok) {
     $ok = true;
+    $left = $1;
     while (true) {
       final $pos = state.pos;
       String? $2;
@@ -377,17 +375,14 @@ num? _additive(State<String> state) {
         state.pos = $pos;
         break;
       }
-      $list.add(Tuple2($2!, $3!));
+      final $op = $2!;
+      final $right = $3!;
+      $left = _calculate($left!, $op, $right);
     }
   }
   state.ok = $ok;
   if (state.ok) {
-    var left = $1!;
-    for (var i = 0; i < $list.length; i++) {
-      final v = $list[i];
-      left = _calculate(left, v.item1, v.item2);
-    }
-    $0 = left;
+    $0 = $left;
   }
   return $0;
 }
