@@ -1,7 +1,7 @@
 ## 1.0.6
 
 - Added the ability to optimize fast parsers at the global level. This is achieved by building in two passes. During the first pass, information is collected about the use of the parsing results returned by the functions. If the return result is never used, then the parser function is built as a fast (non-resulting, `void`) function (on the next pass)
-- Breaking change: Removed `Context.contex`. Instead, added the concept of the registry. Adde new metod `T getRegistry<T>(owner, String name, T defaultValue)` to class `Context`. Currently, this has an internal use when generating parsers
+- Breaking change: Removed `Context.contex`. Instead, added the concept of the registry. Added new metod `T getRegistry<T>(owner, String name, T defaultValue)` to class `Context`. Currently, this has an internal use when generating parsers
 
 ## 1.0.5
 
