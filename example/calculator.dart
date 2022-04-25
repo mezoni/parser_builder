@@ -167,14 +167,12 @@ num? _integer(State<String> state) {
   return $0;
 }
 
-String? _openParen(State<String> state) {
-  String? $0;
+void _openParen(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 40;
   if (state.ok) {
     state.pos += 1;
-    $0 = '(';
   } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('('));
   }
@@ -182,20 +180,16 @@ String? _openParen(State<String> state) {
     _ws(state);
   }
   if (!state.ok) {
-    $0 = null;
     state.pos = $pos;
   }
-  return $0;
 }
 
-String? _closeParen(State<String> state) {
-  String? $0;
+void _closeParen(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 41;
   if (state.ok) {
     state.pos += 1;
-    $0 = ')';
   } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag(')'));
   }
@@ -203,10 +197,8 @@ String? _closeParen(State<String> state) {
     _ws(state);
   }
   if (!state.ok) {
-    $0 = null;
     state.pos = $pos;
   }
-  return $0;
 }
 
 num? _primary(State<String> state) {

@@ -17,23 +17,23 @@ class Named<I, O> extends ParserBuilder<I, O> {
 
   @override
   String build(Context context, ParserResult? result) {
-    if (!context.context.containsKey(this)) {
-      context.context[this] = {};
-      var fast = false;
-      if (context.pass != 0) {
-        if (context.optimizeFastParsers) {
-          final modes = _getParserModes(context);
-          if (modes.length == 1) {
-            fast = modes.first;
-          }
-        }
-      }
-
+    final fast = result == null;
+    if (context.pass == 0) {
+      _registerParserMode(context, fast);
       _buildDeclaration(context, fast);
+    } else {
+      final processed = _getProcessed(context);
+      if (processed.add(this)) {
+        final modes = _getParserModes(context);
+        var newFast = false;
+        if (modes.length == 1) {
+          newFast = modes.first;
+        }
+
+        _buildDeclaration(context, newFast);
+      }
     }
 
-    final fast = result == null;
-    _registerParserMode(context, fast);
     final values = {
       'name': name,
     };
@@ -90,23 +90,12 @@ class Named<I, O> extends ParserBuilder<I, O> {
   }
 
   Set<bool> _getParserModes(Context context) {
-    final registry = _getParserModesRegistry(context);
-    var result = registry[parser];
-    if (result == null) {
-      result = {};
-      registry[this] = result;
-    }
-
+    final result = context.getRegistry(this, 'modes', <bool>{});
     return result;
   }
 
-  Map<Named, Set<bool>> _getParserModesRegistry(Context context) {
-    var result = context.context[Named] as Map<Named, Set<bool>>?;
-    if (result == null) {
-      result = {};
-      context.context[Named] = result;
-    }
-
+  Set<Named> _getProcessed(Context context) {
+    final result = context.getRegistry(Named, 'processed', <Named>{});
     return result;
   }
 

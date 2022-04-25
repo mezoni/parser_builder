@@ -17,6 +17,8 @@ class Context {
 
   bool refersToStateSource = false;
 
+  final Map<dynamic, Map<String, dynamic>> _registry = {};
+
   String allocateGlobal([String name = '']) {
     final result = globalAllocator.allocate(name);
     return result;
@@ -34,6 +36,21 @@ class Context {
     }
 
     return result;
+  }
+
+  T getRegistry<T>(owner, String name, T defaultValue) {
+    var registry = _registry[owner];
+    if (registry == null) {
+      registry = <String, T>{};
+      _registry[owner] = registry;
+    }
+
+    if (!registry.containsKey(name)) {
+      registry[name] = defaultValue;
+      return defaultValue;
+    } else {
+      return registry[name] as T;
+    }
   }
 
   ParserResult? getResult(ParserBuilder parser, bool condition) {

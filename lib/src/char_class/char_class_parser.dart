@@ -331,14 +331,12 @@ List<Tuple2<int, int>>? _range(State<String> state) {
   return $0;
 }
 
-String? _verbar(State<String> state) {
-  String? $0;
+void _verbar(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 124;
   if (state.ok) {
     state.pos += 1;
-    $0 = '|';
   } else if (state.log) {
     state.error = ErrExpected.tag(state.pos, const Tag('|'));
   }
@@ -346,10 +344,8 @@ String? _verbar(State<String> state) {
     _ws(state);
   }
   if (!state.ok) {
-    $0 = null;
     state.pos = $pos;
   }
-  return $0;
 }
 
 List<Tuple2<int, int>>? _ranges(State<String> state) {
