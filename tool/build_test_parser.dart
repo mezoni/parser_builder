@@ -33,6 +33,7 @@ Future<void> main(List<String> args) async {
     _foldMany0Digit,
     _hexDigit0,
     _hexDigit1,
+    _identifier,
     _many0C16,
     _many0C32,
     _many0CountC32,
@@ -197,6 +198,11 @@ const _foldMany0Digit = Named(
 const _hexDigit0 = Named('hexDigit0', HexDigit0());
 
 const _hexDigit1 = Named('hexDigit1', HexDigit1());
+
+const _identifier = Named(
+    'identifier',
+    IdentifierExpression(
+        ['if', 'else'], CharClass('[a-zA-Z0-9_]'), CharClass('[a-zA-Z0-9]')));
 
 const _isC16 = CharClass('#x50');
 

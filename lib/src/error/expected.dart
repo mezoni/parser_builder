@@ -28,6 +28,7 @@ if (!state.ok && state.log) {
     final r1 = context.getResult(parser, !fast);
     final values = {
       'p1': parser.build(context, r1),
+      'tag': helper.escapeString(tag),
     };
     return render2(fast, _templateFast, _template, values, [result, r1]);
   }

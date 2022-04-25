@@ -24,7 +24,6 @@ if (state.ok) {
 }''';
 
   static const _template16Fast = '''
-final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   final ok = {{test}};
@@ -52,7 +51,6 @@ if (state.ok) {
 }''';
 
   static const _template32Fast = '''
-final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final pos = state.pos;
   var c = source.readRune(state);

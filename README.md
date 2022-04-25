@@ -107,6 +107,7 @@ built-in:
 
 [`expression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression):
 - [`BinaryExpression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression/binary_expression.dart)
+- [`IdentifierExpression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression/identifier_expression.dart)
 
 [`multi`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi):
 - [`FoldMany0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/fold_many0.dart)
