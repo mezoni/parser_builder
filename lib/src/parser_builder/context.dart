@@ -1,8 +1,6 @@
 part of '../../parser_builder.dart';
 
 class Context {
-  final Map<Object, Object?> context = {};
-
   final List<String> globalDeclarations = [];
 
   Allocator globalAllocator = Allocator('_\$');
