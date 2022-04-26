@@ -491,6 +491,22 @@ void _testBinaryExpression() {
       expect(r, -1);
       expect(state.pos, 5);
     }
+    {
+      final state = State('1+2-a');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(4, Char(97)));
+    }
+    {
+      final state = State('1+2-');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(4));
+    }
   });
 }
 

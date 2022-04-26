@@ -2,6 +2,7 @@ part of '../../expression.dart';
 
 class BinaryExpression<I, O1, O> extends ParserBuilder<I, O> {
   static const _template = '''
+final {{pos}} = state.pos;
 {{O}} {{left}};
 var {{ok}} = false;
 {{var1}}
@@ -10,7 +11,6 @@ if (state.ok) {
   {{ok}} = true;
   {{left}} = {{res1}};
   while (true) {
-    final {{pos}} = state.pos;
     {{var2}}
     {{p2}}
     if (!state.ok) {
@@ -34,6 +34,7 @@ if (state.ok) {
 }''';
 
   static const _templateFast = '''
+final {{pos}} = state.pos;
 {{O}} {{left}};
 var {{ok}} = false;
 {{var1}}
@@ -42,7 +43,6 @@ if (state.ok) {
   {{ok}} = true;
   {{left}} = {{res1}};
   while (true) {
-    final {{pos}} = state.pos;
     {{var2}}
     {{p2}}
     if (!state.ok) {
