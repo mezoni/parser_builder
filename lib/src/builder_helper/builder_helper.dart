@@ -57,7 +57,13 @@ String? tryGetAsCode(value) {
   } else if (value == null) {
     return '$value';
   } else if (value is List) {
-    return '[${value.join(', ')}]';
+    final values = [];
+    for (var item in value) {
+      final code = tryGetAsCode(item);
+      values.add(code);
+    }
+
+    return '[${values.join(', ')}]';
   }
 
   return null;

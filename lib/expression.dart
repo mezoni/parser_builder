@@ -1,9 +1,5 @@
-import 'bytes.dart';
-import 'character.dart';
-import 'combinator.dart';
-import 'error.dart';
+import 'builder_helper.dart' as helper;
 import 'parser_builder.dart';
-import 'sequence.dart';
 
 part 'src/expression/binary_expression.dart';
 part 'src/expression/identifier_expression.dart';

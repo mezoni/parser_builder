@@ -907,21 +907,42 @@ void _testIdentifierExpression() {
   test('IdentifierExpression', () {
     final parser = identifier;
     {
-      final state = State('if1');
+      final state = State('a ');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 'a');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('z ');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 'z');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('if1 ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, 'if1');
       expect(state.pos, 3);
     }
     {
-      final state = State('i');
+      final state = State('i ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, 'i');
       expect(state.pos, 1);
     }
     {
-      final state = State('if');
+      final state = State('for1 ');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 'for1');
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('if ');
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);
@@ -929,7 +950,15 @@ void _testIdentifierExpression() {
       expect(state.error, ErrExpected.tag(0, Tag('identifier')));
     }
     {
-      final state = State('else');
+      final state = State('while ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrExpected.tag(0, Tag('identifier')));
+    }
+    {
+      final state = State('else ');
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);

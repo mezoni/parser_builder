@@ -201,8 +201,8 @@ const _hexDigit1 = Named('hexDigit1', HexDigit1());
 
 const _identifier = Named(
     'identifier',
-    IdentifierExpression(
-        ['if', 'else'], CharClass('[a-zA-Z0-9_]'), CharClass('[a-zA-Z0-9]')));
+    IdentifierExpression(['if', 'int', 'for', 'foreach', 'else', 'in', 'while'],
+        CharClass('[a-zA-Z0-9_]'), CharClass('[a-zA-Z0-9]')));
 
 const _isC16 = CharClass('#x50');
 

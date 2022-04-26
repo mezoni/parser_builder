@@ -592,123 +592,78 @@ String? hexDigit1(State<String> state) {
 String? identifier(State<String> state) {
   String? $0;
   final source = state.source;
-  String? $1;
   final $pos = state.pos;
-  final $pos1 = state.pos;
-  final $pos2 = state.pos;
-  final $log = state.log;
-  state.log = false;
-  final $pos3 = state.pos;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    String? v;
-    switch (c) {
-      case 105:
-        if (source.startsWith('if', pos)) {
-          state.pos += 2;
-          v = 'if';
-          break;
-        }
-        break;
-      case 101:
-        if (source.startsWith('else', pos)) {
-          state.pos += 4;
-          v = 'else';
-          break;
-        }
-        break;
-    }
-    state.ok = v != null;
-  }
-  if (!state.ok && state.log) {
-    state.error = ErrCombined(state.pos, [
-      ErrExpected.tag(state.pos, const Tag('if')),
-      ErrExpected.tag(state.pos, const Tag('else'))
-    ]);
-  }
-  if (state.ok) {
-    final $pos5 = state.pos;
-    final $log1 = state.log;
-    state.log = false;
-    state.ok = state.pos < source.length;
-    if (state.ok) {
-      final c = source.codeUnitAt(state.pos);
-      state.ok = c <= 122 &&
-          (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
-      if (state.ok) {
-        state.pos++;
-      } else if (state.log) {
-        state.error = ErrUnexpected.charAt(state.pos, source);
-      }
-    } else if (state.log) {
-      state.error = ErrUnexpected.eof(state.pos);
-    }
-    state.log = $log1;
-    state.ok = !state.ok;
-    if (!state.ok) {
-      state.pos = $pos5;
-      if ($log1) {
-        state.error = ErrUnknown(state.pos);
-      }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos3;
-  }
-  state.log = $log;
-  state.ok = !state.ok;
-  if (!state.ok) {
-    state.pos = $pos2;
-    if ($log) {
-      state.error = ErrUnknown(state.pos);
-    }
-  }
-  if (state.ok) {
-    final $pos7 = state.pos;
-    while (state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      final ok = c <= 122 &&
-          (c >= 48 && c <= 57 ||
-              c >= 65 && c <= 90 ||
-              c == 95 ||
-              c >= 97 && c <= 122);
-      if (!ok) {
-        break;
-      }
-      state.pos++;
-    }
-    state.ok = state.pos != $pos7;
-    if (!state.ok && state.log) {
-      state.error = ErrUnexpected.charOrEof(state.pos, source);
-    }
+    final c = source.codeUnitAt(state.pos++);
+    state.ok = c <= 122 &&
+        (c >= 48 && c <= 57 ||
+            c >= 65 && c <= 90 ||
+            c == 95 ||
+            c >= 97 && c <= 122);
     if (state.ok) {
       while (state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        final ok = c <= 122 &&
+        final pos = state.pos;
+        final c = source.codeUnitAt(state.pos++);
+        state.ok = c <= 122 &&
             (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
-        if (!ok) {
+        if (!state.ok) {
+          state.pos = pos;
           break;
         }
-        state.pos++;
       }
       state.ok = true;
+      final text = source.slice($pos, state.pos);
+      final length = text.length;
+      final c = text.codeUnitAt(0);
+      final words = const [
+        ['else'],
+        ['for', 'foreach'],
+        ['if', 'in', 'int'],
+        ['while']
+      ];
+      var index = -1;
+      var min = 0;
+      var max = words.length - 1;
+      while (min <= max) {
+        final mid = min + (max - min) ~/ 2;
+        final x = words[mid][0].codeUnitAt(0);
+        if (x == c) {
+          index = mid;
+          break;
+        }
+        if (x < c) {
+          min = mid + 1;
+        } else {
+          max = mid - 1;
+        }
+      }
+      if (index != -1) {
+        final list = words[index];
+        for (var i = list.length - 1; i >= 0; i--) {
+          final v = list[i];
+          if (length > v.length) {
+            break;
+          }
+          if (length != v.length) {
+            continue;
+          }
+          if (text == v) {
+            state.ok = false;
+            break;
+          }
+        }
+      }
       if (state.ok) {
-        //
+        $0 = text;
       }
     }
   }
   if (!state.ok) {
-    state.pos = $pos1;
-  }
-  if (state.ok) {
-    $1 = source.slice($pos, state.pos);
-  }
-  if (state.ok) {
-    $0 = $1;
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('identifier'));
+    state.pos = $pos;
+    if (state.log) {
+      state.error = ErrExpected.tag(state.pos, const Tag('identifier'));
+    }
   }
   return $0;
 }
