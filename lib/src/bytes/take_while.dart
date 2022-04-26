@@ -38,7 +38,7 @@ state.ok = true;''';
 final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.readRune(state);
+  final c = source.readRune(state);
   final ok = {{test}};
   if (!ok) {
     state.pos = pos;
@@ -53,7 +53,7 @@ if (state.ok) {
   static const _template32Fast = '''
 while (state.pos < source.length) {
   final pos = state.pos;
-  var c = source.readRune(state);
+  final c = source.readRune(state);
   final ok = {{test}};
   if (!ok) {
     state.pos = pos;

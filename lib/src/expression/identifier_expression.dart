@@ -45,10 +45,7 @@ if (state.ok) {
         if (length > v.length) {
           break;
         }
-        if (length != v.length) {
-          continue;
-        }
-        if (text == v) {
+        if (length == v.length && text == v) {
           state.ok = false;
           break;
         }
@@ -110,10 +107,7 @@ if (state.ok) {
         if (length > v.length) {
           break;
         }
-        if (length != v.length) {
-          continue;
-        }
-        if (text == v) {
+        if (length == v.length && text == v) {
           state.ok = false;
           break;
         }

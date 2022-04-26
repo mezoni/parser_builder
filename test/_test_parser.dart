@@ -645,10 +645,7 @@ String? identifier(State<String> state) {
           if (length > v.length) {
             break;
           }
-          if (length != v.length) {
-            continue;
-          }
-          if (text == v) {
+          if (length == v.length && text == v) {
             state.ok = false;
             break;
           }
@@ -1575,11 +1572,10 @@ String? stringValue(State<String> state) {
       final pos = state.pos;
       $c = source.readRune(state);
       final ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
-      if (ok) {
-        continue;
+      if (!ok) {
+        state.pos = pos;
+        break;
       }
-      state.pos = pos;
-      break;
     }
     $str = state.pos == $start ? '' : source.substring($start, state.pos);
     if ($str != '' && $list.isNotEmpty) {
@@ -1892,7 +1888,7 @@ String? takeWhileC32(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final ok = c == 119296;
     if (!ok) {
       state.pos = pos;
@@ -2079,7 +2075,7 @@ String? transformersExprIsDigit(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final ok = c >= 0x30 && c <= 0x39;
     if (!ok) {
       state.pos = pos;
@@ -2103,7 +2099,7 @@ String? transformersFuncIsDigit(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final ok = $test(c);
     if (!ok) {
       state.pos = pos;
@@ -2123,7 +2119,7 @@ String? transformersNotCharClassIsDigit(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final ok = c > 1114111 || !(c >= 0 && c <= 47 || c >= 58 && c <= 1114111);
     if (!ok) {
       state.pos = pos;

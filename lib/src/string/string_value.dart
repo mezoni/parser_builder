@@ -22,11 +22,10 @@ while (state.pos < source.length) {
     final pos = state.pos;
     {{c}} = source.readRune(state);
     final ok = {{test}};
-    if (ok) {
-      continue;
+    if (!ok) {
+      state.pos = pos;
+      break;
     }
-    state.pos = pos;
-    break;
   }
   {{str}} = state.pos == {{start}} ? '' : source.substring({{start}}, state.pos);
   if ({{str}} != '' && {{list}}.isNotEmpty) {
@@ -67,11 +66,10 @@ while (state.pos < source.length) {
     final pos = state.pos;
     {{c}} = source.readRune(state);
     final ok = {{test}};
-    if (ok) {
-      continue;
+    if (!ok) {
+      state.pos = pos;
+      break;
     }
-    state.pos = pos;
-    break;
   }
   {{str}} = state.pos == {{start}} ? '' : source.substring({{start}}, state.pos);
   if ({{str}} != '' && {{list}}.isNotEmpty) {

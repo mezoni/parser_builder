@@ -185,11 +185,10 @@ String? _string(State<String> state) {
         final pos = state.pos;
         $c = source.readRune(state);
         final ok = $c >= 0x20 && $c != 0x22 && $c != 0x5c;
-        if (ok) {
-          continue;
+        if (!ok) {
+          state.pos = pos;
+          break;
         }
-        state.pos = pos;
-        break;
       }
       $str = state.pos == $start ? '' : source.substring($start, state.pos);
       if ($str != '' && $list.isNotEmpty) {
