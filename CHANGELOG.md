@@ -2,7 +2,7 @@
 
 - Added and tested parser builder `PostfixExpression`
 - Added and tested parser builder `PrefixExpression`
-- Fixed bug in parser builder `BinaryExpression`.
+- Fixed bug in parser builder `BinaryExpression`
 
 ## 1.0.8
 
