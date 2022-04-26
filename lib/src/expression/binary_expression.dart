@@ -19,6 +19,7 @@ if (state.ok) {
     {{var3}}
     {{p3}}
     if (!state.ok) {
+      {{ok}} = false;
       state.pos = {{pos}};
       break;
     }
@@ -50,6 +51,7 @@ if (state.ok) {
     {{var3}}
     {{p3}}
     if (!state.ok) {
+      {{ok}} = false;
       state.pos = {{pos}};
       break;
     }
