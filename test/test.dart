@@ -57,7 +57,9 @@ void _test() {
   _testOpt();
   _testPair();
   _testPeek();
+  _testPostfixExpression();
   _testPreceded();
+  _testPrefixExpression();
   _testRecognize();
   _testRef();
   _testSatisfy();
@@ -1729,6 +1731,49 @@ void _testPeek() {
   });
 }
 
+void _testPostfixExpression() {
+  test('PostfixExpression', () {
+    final parser = postfixExpression;
+    {
+      final state = State('1');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 1);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('1++');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 2);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('1+++');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 2);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(0));
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(32)));
+    }
+  });
+}
+
 void _testPreceded() {
   test('Preceded', () {
     final parser = precededC16C32;
@@ -1762,6 +1807,56 @@ void _testPreceded() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.error, ErrExpected.char(1, Char(c32)));
+    }
+  });
+}
+
+void _testPrefixExpression() {
+  test('PrefixExpression', () {
+    final parser = prefixExpression;
+    {
+      final state = State('1');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 1);
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('++1');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 2);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('--1');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 0);
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('-1');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, -1);
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.eof(0));
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.error, ErrUnexpected.char(0, Char(32)));
     }
   });
 }

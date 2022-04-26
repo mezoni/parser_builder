@@ -54,6 +54,8 @@ Future<void> main(List<String> args) async {
     _optAbc,
     _pairC16C32,
     _peekC32,
+    _postfixExpression,
+    _prefixExpression,
     _precededC16C32,
     _recognize3C32AbcC16,
     _satisfyC16,
@@ -129,7 +131,32 @@ int _toBinary(int left, String operator, int right) {
     default:
       throw StateError('Unknown operator: $operator');
   }
-}''';
+}
+
+int _toPostfix(int expression, String operator) {
+  switch (operator) {
+    case '--':
+      return --expression;
+    case '++':
+      return ++expression;
+    default:
+      throw StateError('Unknown operator: $operator');
+  }
+}
+
+int _toPrefix(String operator, int expression) {
+  switch (operator) {
+    case '-':
+      return -expression;
+    case '--':
+      return --expression;
+    case '++':
+      return ++expression;
+    default:
+      throw StateError('Unknown operator: $operator');
+  }
+}
+''';
 
 const _alpha0 = Named('alpha0', Alpha0());
 
@@ -157,14 +184,11 @@ const _binaryExpressionAdd = Named(
 const _binaryExpressionMul = Named(
     '_binaryExpressionMul',
     BinaryExpression(
-        _binaryExpressionPrimary,
+        _primaryExpression,
         Tags(['*', '~/']),
-        _binaryExpressionPrimary,
+        _primaryExpression,
         ExpressionAction<int>(['left', 'op', 'right'],
             '_toBinary({{left}}, {{op}}, {{right}})')));
-
-const _binaryExpressionPrimary = Named('_binaryExpressionPrimary',
-    Map1(Digit1(), ExpressionAction<int>(['x'], 'int.parse({{x}})')));
 
 const _char16 = Named('char16', Char(c16));
 
@@ -270,7 +294,20 @@ const _pairC16C32 = Named('pairC16C32', Pair(_char16, _char32));
 
 const _peekC32 = Named('peekC32', Peek(_char32));
 
+const _postfixExpression = Named(
+    'postfixExpression',
+    PostfixExpression(_primaryExpression, Tags(['--', '++']),
+        ExpressionAction<int>(['op', 'expr'], '_toPostfix({{op}}, {{expr}})')));
+
 const _precededC16C32 = Named('precededC16C32', Preceded(_char16, Char(c32)));
+
+const _prefixExpression = Named(
+    'prefixExpression',
+    PrefixExpression(Tags(['-', '--', '++']), _primaryExpression,
+        ExpressionAction<int>(['op', 'expr'], '_toPrefix({{op}}, {{expr}})')));
+
+const _primaryExpression = Named('_primaryExpression',
+    Map1(Digit1(), ExpressionAction<int>(['x'], 'int.parse({{x}})')));
 
 const _recognize3C32AbcC16 =
     Named('recognize3C32AbcC16', Recognize(Tuple3(_char32, _tagAbc, _char16)));

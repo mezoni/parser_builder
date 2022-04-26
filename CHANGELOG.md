@@ -1,3 +1,8 @@
+## 1.0.9
+
+- Added and tested parser builder `PostfixExpression`
+- Added and tested parser builder `PrefixExpression`
+
 ## 1.0.8
 
 - Improved parser builder `BinaryExpression`. The generated parser is now smaller, faster and uses less memory (does not use list and tuples)

@@ -15,6 +15,30 @@ int _toBinary(int left, String operator, int right) {
   }
 }
 
+int _toPostfix(int expression, String operator) {
+  switch (operator) {
+    case '--':
+      return --expression;
+    case '++':
+      return ++expression;
+    default:
+      throw StateError('Unknown operator: $operator');
+  }
+}
+
+int _toPrefix(String operator, int expression) {
+  switch (operator) {
+    case '-':
+      return -expression;
+    case '--':
+      return --expression;
+    case '++':
+      return ++expression;
+    default:
+      throw StateError('Unknown operator: $operator');
+  }
+}
+
 String? alpha0(State<String> state) {
   String? $0;
   final source = state.source;
@@ -182,7 +206,7 @@ int? anyChar(State<String> state) {
   return $0;
 }
 
-int? _binaryExpressionPrimary(State<String> state) {
+int? _primaryExpression(State<String> state) {
   int? $0;
   final source = state.source;
   String? $1;
@@ -214,7 +238,7 @@ int? _binaryExpressionMul(State<String> state) {
   int? $left;
   var $ok = false;
   int? $1;
-  $1 = _binaryExpressionPrimary(state);
+  $1 = _primaryExpression(state);
   if (state.ok) {
     $ok = true;
     $left = $1;
@@ -254,7 +278,7 @@ int? _binaryExpressionMul(State<String> state) {
         break;
       }
       int? $3;
-      $3 = _binaryExpressionPrimary(state);
+      $3 = _primaryExpression(state);
       if (!state.ok) {
         state.pos = $pos;
         break;
@@ -1234,6 +1258,121 @@ int? peekC32(State<String> state) {
   if (state.ok) {
     state.pos = $pos;
     $0 = $1!;
+  }
+  return $0;
+}
+
+int? postfixExpression(State<String> state) {
+  int? $0;
+  final source = state.source;
+  int? $1;
+  $1 = _primaryExpression(state);
+  if (state.ok) {
+    String? $2;
+    final $log = state.log;
+    state.log = false;
+    state.ok = state.pos < source.length;
+    if (state.ok) {
+      final pos = state.pos;
+      final c = source.codeUnitAt(pos);
+      String? v;
+      switch (c) {
+        case 45:
+          if (source.startsWith('--', pos)) {
+            state.pos += 2;
+            v = '--';
+            break;
+          }
+          break;
+        case 43:
+          if (source.startsWith('++', pos)) {
+            state.pos += 2;
+            v = '++';
+            break;
+          }
+          break;
+      }
+      state.ok = v != null;
+      if (state.ok) {
+        $2 = v;
+      }
+    }
+    if (!state.ok && state.log) {
+      state.error = ErrCombined(state.pos, [
+        ErrExpected.tag(state.pos, const Tag('--')),
+        ErrExpected.tag(state.pos, const Tag('++'))
+      ]);
+    }
+    state.log = $log;
+    if (!state.ok) {
+      state.ok = true;
+    }
+    if ($2 != null) {
+      final v1 = $1!;
+      final v2 = $2;
+      $0 = _toPostfix(v1, v2);
+    } else {
+      $0 = $1!;
+    }
+  }
+  return $0;
+}
+
+int? prefixExpression(State<String> state) {
+  int? $0;
+  final source = state.source;
+  String? $1;
+  final $log = state.log;
+  state.log = false;
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    String? v;
+    switch (c) {
+      case 45:
+        if (source.startsWith('--', pos)) {
+          state.pos += 2;
+          v = '--';
+          break;
+        }
+        state.pos++;
+        v = '-';
+        break;
+      case 43:
+        if (source.startsWith('++', pos)) {
+          state.pos += 2;
+          v = '++';
+          break;
+        }
+        break;
+    }
+    state.ok = v != null;
+    if (state.ok) {
+      $1 = v;
+    }
+  }
+  if (!state.ok && state.log) {
+    state.error = ErrCombined(state.pos, [
+      ErrExpected.tag(state.pos, const Tag('-')),
+      ErrExpected.tag(state.pos, const Tag('--')),
+      ErrExpected.tag(state.pos, const Tag('++'))
+    ]);
+  }
+  state.log = $log;
+  if (!state.ok) {
+    state.ok = true;
+  }
+  int? $2;
+  $2 = _primaryExpression(state);
+  if (state.ok) {
+    if ($1 != null) {
+      final v1 = $1;
+      final v2 = $2!;
+      $0 = _toPrefix(v1, v2);
+    } else {
+      $0 = $2!;
+    }
   }
   return $0;
 }
