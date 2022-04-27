@@ -4,22 +4,20 @@ class BinaryExpression<I, O1, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{O}} {{left}};
-var {{ok}} = false;
 {{var1}}
 {{p1}}
 if (state.ok) {
-  {{ok}} = true;
   {{left}} = {{res1}};
   while (true) {
     {{var2}}
     {{p2}}
     if (!state.ok) {
+      state.ok = true;
       break;
     }
     {{var3}}
     {{p3}}
     if (!state.ok) {
-      {{ok}} = false;
       state.pos = {{pos}};
       break;
     }
@@ -28,7 +26,6 @@ if (state.ok) {
     {{left}} = {{calculate}};
   }
 }
-state.ok = {{ok}};
 if (state.ok) {
   {{res0}} = {{left}};
 }''';
@@ -36,22 +33,20 @@ if (state.ok) {
   static const _templateFast = '''
 final {{pos}} = state.pos;
 {{O}} {{left}};
-var {{ok}} = false;
 {{var1}}
 {{p1}}
 if (state.ok) {
-  {{ok}} = true;
   {{left}} = {{res1}};
   while (true) {
     {{var2}}
     {{p2}}
     if (!state.ok) {
+      state.ok = true;
       break;
     }
     {{var3}}
     {{p3}}
     if (!state.ok) {
-      {{ok}} = false;
       state.pos = {{pos}};
       break;
     }
@@ -59,8 +54,7 @@ if (state.ok) {
     final {{right}} = {{val3}};
     {{left}} = {{calculate}};
   }
-}
-state.ok = {{ok}};''';
+}''';
 
   final SemanticAction<O> calculate;
 
@@ -75,7 +69,7 @@ state.ok = {{ok}};''';
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['left', 'ok', 'op', 'pos', 'right']);
+    final values = context.allocateLocals(['left', 'op', 'pos', 'right']);
     final r1 = context.getResult(left, !fast);
     final r2 = context.getResult(operator, !fast);
     final r3 = context.getResult(right, !fast);

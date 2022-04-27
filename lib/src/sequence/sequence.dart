@@ -12,13 +12,13 @@ if (!state.ok) {
 {{var1}}
 {{p1}}
 if (state.ok) {
-  {{body}}
+  {{next}}
 }''';
 
   static const _templateParserFast = '''
 {{p1}}
 if (state.ok) {
-  {{body}}
+  {{next}}
 }''';
 
   const _Sequence();
@@ -34,7 +34,7 @@ if (state.ok) {
     final ignoreVoid = !_useResultsOfFastParsers();
     final values = context.allocateLocals(['pos']);
     final results = <ParserResult>[];
-    var templateParsers = '{{body}}';
+    var templateParsers = '{{next}}';
     for (var i = 0; i < parsers.length; i++) {
       final parser = parsers[i];
       final type = parser.getResultType();
@@ -53,18 +53,18 @@ if (state.ok) {
           render2(isVoid, _templateParserFast, _templateParser, values);
       values.clear();
       values.addAll({
-        'body': templateParser,
+        'next': templateParser,
       });
       templateParsers = render(templateParsers, values);
     }
 
     if (!fast) {
       values.addAll({
-        'body': _setResult(context, results),
+        'next': _setResult(context, results),
       });
     } else {
       values.addAll({
-        'body': ' //',
+        'next': ' //',
       });
     }
 

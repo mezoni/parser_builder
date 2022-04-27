@@ -139,7 +139,7 @@ if (state.log) {
 {{p1}}
 if (!state.ok) {
   final {{error}} = state.error;
-  {{body}}
+  {{next}}
 }''';
 
   const _Alt();
@@ -151,7 +151,7 @@ if (!state.ok) {
       throw StateError('The list of parsers must contain at least 2 elements');
     }
 
-    var template = '{{body}}';
+    var template = '{{next}}';
     final errors = <String>[];
     for (var i = 0; i < parsers.length; i++) {
       final error = context.allocateLocal();
@@ -164,7 +164,7 @@ if (!state.ok) {
       final templateParser = render(_templateParser, values);
       values.clear();
       values.addAll({
-        'body': templateParser,
+        'next': templateParser,
       });
       template = render(template, values);
     }
@@ -175,7 +175,7 @@ if (!state.ok) {
     final templateFailure = render(_templateFailure, values);
     values.clear();
     values.addAll({
-      'body': templateFailure,
+      'next': templateFailure,
     });
     return render(template, values);
   }

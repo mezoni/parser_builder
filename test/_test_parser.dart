@@ -237,11 +237,9 @@ int? _binaryExpressionMul(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $left;
-  var $ok = false;
   int? $1;
   $1 = _primaryExpression(state);
   if (state.ok) {
-    $ok = true;
     $left = $1;
     while (true) {
       String? $2;
@@ -275,12 +273,12 @@ int? _binaryExpressionMul(State<String> state) {
         ]);
       }
       if (!state.ok) {
+        state.ok = true;
         break;
       }
       int? $3;
       $3 = _primaryExpression(state);
       if (!state.ok) {
-        $ok = false;
         state.pos = $pos;
         break;
       }
@@ -289,7 +287,6 @@ int? _binaryExpressionMul(State<String> state) {
       $left = _toBinary($left!, $op, $right);
     }
   }
-  state.ok = $ok;
   if (state.ok) {
     $0 = $left;
   }
@@ -301,11 +298,9 @@ int? binaryExpressionAdd(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $left;
-  var $ok = false;
   int? $1;
   $1 = _binaryExpressionMul(state);
   if (state.ok) {
-    $ok = true;
     $left = $1;
     while (true) {
       String? $2;
@@ -336,12 +331,12 @@ int? binaryExpressionAdd(State<String> state) {
         ]);
       }
       if (!state.ok) {
+        state.ok = true;
         break;
       }
       int? $3;
       $3 = _binaryExpressionMul(state);
       if (!state.ok) {
-        $ok = false;
         state.pos = $pos;
         break;
       }
@@ -350,7 +345,6 @@ int? binaryExpressionAdd(State<String> state) {
       $left = _toBinary($left!, $op, $right);
     }
   }
-  state.ok = $ok;
   if (state.ok) {
     $0 = $left;
   }
