@@ -1,9 +1,12 @@
+## 1.0.10
+
+- The size of the generated source code of the parser `BinaryExpression` has been slightly reduced
+
 ## 1.0.9
 
 - Added and tested parser builder `PostfixExpression`
 - Added and tested parser builder `PrefixExpression`
 - Fixed bug in parser builder `BinaryExpression`. In case of failure, the position was restored incorrectly, not to the very beginning of the binary expression. The position is now restored to the very first left-hand operand
-- The size of the generated source code of the parser `BinaryExpression` has been slightly reduced
 
 ## 1.0.8
 
