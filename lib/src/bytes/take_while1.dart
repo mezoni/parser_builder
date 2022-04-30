@@ -21,8 +21,13 @@ while (state.pos < source.length) {
 state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
-} else if (state.log) {
-  state.error = ErrUnexpected.charOrEof(state.pos, source);
+} else {
+  if ({{pos}} < source.length) {
+    final c = source.runeAt({{pos}});
+    state.error = ParseError.unexpected({{pos}}, 0, c);
+  } else {
+    state.error = ParseError.unexpected({{pos}}, 0, 'EOF');
+  }
 }''';
 
   static const _template16Fast = '''
@@ -36,8 +41,13 @@ while (state.pos < source.length) {
   state.pos++;
 }
 state.ok = state.pos != {{pos}};
-if (!state.ok && state.log) {
-  state.error = ErrUnexpected.charOrEof(state.pos, source);
+if (!state.ok) {
+  if ({{pos}} < source.length) {
+    final c = source.runeAt({{pos}});
+    state.error = ParseError.unexpected({{pos}}, 0, c);
+  } else {
+    state.error = ParseError.unexpected({{pos}}, 0, 'EOF');
+  }
 }''';
 
   static const _template32 = '''
@@ -55,8 +65,12 @@ while (state.pos < source.length) {
 state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
-} else if (state.log) {
-  state.error = ErrUnexpected.charOrEof({{pos}}, source, {{c}});
+} else {
+  if ({{pos}} < source.length) {
+    state.error = ParseError.unexpected({{pos}}, 0, {{c}}!);
+  } else {
+    state.error = ParseError.unexpected({{pos}}, 0, 'EOF');
+  }
 }''';
 
   static const _template32Fast = '''
@@ -72,8 +86,12 @@ while (state.pos < source.length) {
   }
 }
 state.ok = state.pos != {{pos}};
-if (!state.ok && state.log) {
-  state.error = ErrUnexpected.charOrEof({{pos}}, source, {{c}});
+if (!state.ok) {
+  if ({{pos}} < source.length) {
+    state.error = ParseError.unexpected({{pos}}, 0, {{c}}!);
+  } else {
+    state.error = ParseError.unexpected({{pos}}, 0, 'EOF');
+  }
 }''';
 
   final SemanticAction<bool> predicate;

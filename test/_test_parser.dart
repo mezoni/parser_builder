@@ -73,8 +73,13 @@ String? alpha1(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  } else {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
   return $0;
 }
@@ -115,8 +120,13 @@ String? alphanumeric1(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  } else {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
   return $0;
 }
@@ -128,8 +138,8 @@ int? char16(State<String> state) {
   if (state.ok) {
     state.pos++;
     $0 = 80;
-  } else if (state.log) {
-    state.error = ErrExpected.char(state.pos, const Char(80));
+  } else {
+    state.error = ParseError.expected(state.pos, 80);
   }
   return $0;
 }
@@ -139,19 +149,12 @@ int? altC16OrC32(State<String> state) {
   final source = state.source;
   $0 = char16(state);
   if (!state.ok) {
-    final $1 = state.error;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
     if (state.ok) {
       state.pos += 2;
       $0 = 119296;
-    } else if (state.log) {
-      state.error = ErrExpected.char(state.pos, const Char(119296));
-    }
-    if (!state.ok) {
-      final $2 = state.error;
-      if (state.log) {
-        state.error = ErrCombined(state.pos, [$1, $2]);
-      }
+    } else {
+      state.error = ParseError.expected(state.pos, 119296);
     }
   }
   return $0;
@@ -164,8 +167,8 @@ int? char32(State<String> state) {
   if (state.ok) {
     state.pos += 2;
     $0 = 119296;
-  } else if (state.log) {
-    state.error = ErrExpected.char(state.pos, const Char(119296));
+  } else {
+    state.error = ParseError.expected(state.pos, 119296);
   }
   return $0;
 }
@@ -176,20 +179,14 @@ void andC32OrC16(State<String> state) {
   state.log = false;
   char32(state);
   if (!state.ok) {
-    final $1 = state.error;
     char16(state);
-    if (!state.ok) {
-      final $2 = state.error;
-      if (state.log) {
-        state.error = ErrCombined(state.pos, [$1, $2]);
-      }
-    }
   }
   state.log = $log;
   if (state.ok) {
     state.pos = $pos;
+  } else {
     if ($log) {
-      state.error = ErrUnknown(state.pos);
+      state.error = ParseError.message(state.pos, 0, 'Unknown error');
     }
   }
 }
@@ -200,8 +197,8 @@ int? anyChar(State<String> state) {
   state.ok = state.pos < source.length;
   if (state.ok) {
     $0 = source.readRune(state);
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -222,8 +219,13 @@ int? _primaryExpression(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
-  } else if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  } else {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
   if (state.ok) {
     final v = $1!;
@@ -266,11 +268,9 @@ int? _binaryExpressionMul(State<String> state) {
           $2 = v;
         }
       }
-      if (!state.ok && state.log) {
-        state.error = ErrCombined(state.pos, [
-          ErrExpected.tag(state.pos, const Tag('*')),
-          ErrExpected.tag(state.pos, const Tag('~/'))
-        ]);
+      if (!state.ok) {
+        state.error = ParseError.expected(state.pos, '*');
+        state.error = ParseError.expected(state.pos, '~/');
       }
       if (!state.ok) {
         state.ok = true;
@@ -324,11 +324,9 @@ int? binaryExpressionAdd(State<String> state) {
           $2 = v;
         }
       }
-      if (!state.ok && state.log) {
-        state.error = ErrCombined(state.pos, [
-          ErrExpected.tag(state.pos, const Tag('+')),
-          ErrExpected.tag(state.pos, const Tag('-'))
-        ]);
+      if (!state.ok) {
+        state.error = ParseError.expected(state.pos, '+');
+        state.error = ParseError.expected(state.pos, '-');
       }
       if (!state.ok) {
         state.ok = true;
@@ -360,8 +358,8 @@ String? tagAbc(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $0 = 'abc';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+  } else {
+    state.error = ParseError.expected(state.pos, 'abc');
   }
   return $0;
 }
@@ -373,7 +371,6 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   List<String>? $1;
   var $pos1 = state.pos;
   final $list = <String>[];
-  final $log = state.log;
   while (true) {
     String? $2;
     $2 = tagAbc(state);
@@ -381,7 +378,6 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
       state.pos = $pos1;
       break;
     }
-    state.log = false;
     $list.add($2!);
     $pos1 = state.pos;
     char32(state);
@@ -389,7 +385,6 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
       break;
     }
   }
-  state.log = $log;
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $1 = $list;
@@ -452,8 +447,13 @@ String? digit1(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  } else {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
   return $0;
 }
@@ -461,8 +461,8 @@ String? digit1(State<String> state) {
 void eof(State<String> state) {
   final source = state.source;
   state.ok = state.pos >= source.length;
-  if (!state.ok && state.log) {
-    state.error = ErrExpected.eof(state.pos);
+  if (!state.ok) {
+    state.error = ParseError.expected(state.pos, 'EOF');
   }
 }
 
@@ -471,7 +471,7 @@ int? escapeSequence16(State<String> state) {
   final source = state.source;
   state.ok = state.pos < source.length;
   if (state.ok) {
-    var c = source.codeUnitAt(state.pos);
+    final c = source.codeUnitAt(state.pos);
     int? v;
     switch (c) {
       case 80:
@@ -488,11 +488,12 @@ int? escapeSequence16(State<String> state) {
     if (state.ok) {
       state.pos++;
       $0 = v;
-    } else if (state.log) {
-      state.error = ErrUnexpected.charAt(state.pos, source);
+    } else {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -503,7 +504,7 @@ int? escapeSequence32(State<String> state) {
   state.ok = state.pos < source.length;
   if (state.ok) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     int? v;
     switch (c) {
       case 80:
@@ -522,12 +523,10 @@ int? escapeSequence32(State<String> state) {
       $0 = v;
     } else {
       state.pos = pos;
-      if (state.log) {
-        state.error = ErrUnexpected.char(state.pos, Char(c));
-      }
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -536,8 +535,6 @@ dynamic foldMany0Digit(State<String> state) {
   dynamic $0;
   final source = state.source;
   var $acc = 0;
-  final $log = state.log;
-  state.log = false;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length;
@@ -547,11 +544,12 @@ dynamic foldMany0Digit(State<String> state) {
       if (state.ok) {
         state.pos++;
         $1 = c;
-      } else if (state.log) {
-        state.error = ErrUnexpected.charAt(state.pos, source);
+      } else {
+        final c = source.runeAt(state.pos);
+        state.error = ParseError.unexpected(state.pos, 0, c);
       }
-    } else if (state.log) {
-      state.error = ErrUnexpected.eof(state.pos);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
     }
     if (!state.ok) {
       break;
@@ -559,7 +557,6 @@ dynamic foldMany0Digit(State<String> state) {
     final $v = $1!;
     $acc = $acc * 10 + $v - 0x30;
   }
-  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $acc;
@@ -603,8 +600,13 @@ String? hexDigit1(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  } else {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
   return $0;
 }
@@ -678,9 +680,7 @@ String? identifier(State<String> state) {
   }
   if (!state.ok) {
     state.pos = $pos;
-    if (state.log) {
-      state.error = ErrExpected.tag(state.pos, const Tag('identifier'));
-    }
+    state.error = ParseError.expected(state.pos, 'identifier');
   }
   return $0;
 }
@@ -689,23 +689,20 @@ List<int>? many0C16(State<String> state) {
   List<int>? $0;
   final source = state.source;
   final $list = <int>[];
-  final $log = state.log;
-  state.log = false;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
     if (state.ok) {
       state.pos++;
       $1 = 80;
-    } else if (state.log) {
-      state.error = ErrExpected.char(state.pos, const Char(80));
+    } else {
+      state.error = ParseError.expected(state.pos, 80);
     }
     if (!state.ok) {
       break;
     }
     $list.add($1!);
   }
-  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -716,8 +713,6 @@ List<int>? many0C16(State<String> state) {
 List<int>? many0C32(State<String> state) {
   List<int>? $0;
   final $list = <int>[];
-  final $log = state.log;
-  state.log = false;
   while (true) {
     int? $1;
     $1 = char32(state);
@@ -726,7 +721,6 @@ List<int>? many0C32(State<String> state) {
     }
     $list.add($1!);
   }
-  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -737,8 +731,6 @@ List<int>? many0C32(State<String> state) {
 int? many0CountC32(State<String> state) {
   int? $0;
   var $count = 0;
-  final $log = state.log;
-  state.log = false;
   while (true) {
     char32(state);
     if (!state.ok) {
@@ -746,7 +738,6 @@ int? many0CountC32(State<String> state) {
     }
     $count++;
   }
-  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $count;
@@ -757,17 +748,14 @@ int? many0CountC32(State<String> state) {
 List<int>? many1C32(State<String> state) {
   List<int>? $0;
   var $list = <int>[];
-  final $log = state.log;
   while (true) {
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
       break;
     }
-    state.log = false;
     $list.add($1!);
   }
-  state.log = $log;
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $0 = $list;
@@ -778,16 +766,13 @@ List<int>? many1C32(State<String> state) {
 int? many1CountC32(State<String> state) {
   int? $0;
   var $count = 0;
-  final $log = state.log;
   while (true) {
     char32(state);
     if (!state.ok) {
       break;
     }
-    state.log = false;
     $count++;
   }
-  state.log = $log;
   state.ok = $count != 0;
   if (state.ok) {
     $0 = $count;
@@ -799,13 +784,7 @@ List<int>? manyMNC32_2_3(State<String> state) {
   List<int>? $0;
   final $pos = state.pos;
   final $list = <int>[];
-  final $log = state.log;
   while ($list.length < 3) {
-    if (state.log) {
-      if ($list.length >= 2) {
-        state.log = false;
-      }
-    }
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -813,7 +792,6 @@ List<int>? manyMNC32_2_3(State<String> state) {
     }
     $list.add($1!);
   }
-  state.log = $log;
   state.ok = $list.length >= 2;
   if (state.ok) {
     $0 = $list;
@@ -857,43 +835,32 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
     if (state.ok) {
       state.pos += 3;
       $1 = 'abc';
-    } else if (state.log) {
-      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    } else {
+      state.error = ParseError.expected(state.pos, 'abc');
     }
     if (state.ok) {
       $0 = Tuple2($list, $1!);
       break;
     }
-    final $error = state.error;
     String? $2;
     state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 97;
     if (state.ok) {
       state.pos += 1;
       $2 = 'a';
-    } else if (state.log) {
-      state.error = ErrExpected.tag(state.pos, const Tag('a'));
+    } else {
+      state.error = ParseError.expected(state.pos, 'a');
     }
     if (!state.ok) {
-      final $3 = state.error;
       state.ok =
           state.pos < source.length && source.codeUnitAt(state.pos) == 98;
       if (state.ok) {
         state.pos += 1;
         $2 = 'b';
-      } else if (state.log) {
-        state.error = ErrExpected.tag(state.pos, const Tag('b'));
-      }
-      if (!state.ok) {
-        final $4 = state.error;
-        if (state.log) {
-          state.error = ErrCombined(state.pos, [$3, $4]);
-        }
+      } else {
+        state.error = ParseError.expected(state.pos, 'b');
       }
     }
     if (!state.ok) {
-      if (state.log) {
-        state.error = ErrCombined(state.pos, [$error, state.error]);
-      }
       state.pos = $pos;
       break;
     }
@@ -914,11 +881,12 @@ dynamic map4Digits(State<String> state) {
     if (state.ok) {
       state.pos++;
       $1 = c;
-    } else if (state.log) {
-      state.error = ErrUnexpected.charAt(state.pos, source);
+    } else {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   if (state.ok) {
     int? $2;
@@ -929,11 +897,12 @@ dynamic map4Digits(State<String> state) {
       if (state.ok) {
         state.pos++;
         $2 = c;
-      } else if (state.log) {
-        state.error = ErrUnexpected.charAt(state.pos, source);
+      } else {
+        final c = source.runeAt(state.pos);
+        state.error = ParseError.unexpected(state.pos, 0, c);
       }
-    } else if (state.log) {
-      state.error = ErrUnexpected.eof(state.pos);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
     }
     if (state.ok) {
       int? $3;
@@ -944,11 +913,12 @@ dynamic map4Digits(State<String> state) {
         if (state.ok) {
           state.pos++;
           $3 = c;
-        } else if (state.log) {
-          state.error = ErrUnexpected.charAt(state.pos, source);
+        } else {
+          final c = source.runeAt(state.pos);
+          state.error = ParseError.unexpected(state.pos, 0, c);
         }
-      } else if (state.log) {
-        state.error = ErrUnexpected.eof(state.pos);
+      } else {
+        state.error = ParseError.unexpected(state.pos, 0, 'EOF');
       }
       if (state.ok) {
         int? $4;
@@ -959,11 +929,12 @@ dynamic map4Digits(State<String> state) {
           if (state.ok) {
             state.pos++;
             $4 = c;
-          } else if (state.log) {
-            state.error = ErrUnexpected.charAt(state.pos, source);
+          } else {
+            final c = source.runeAt(state.pos);
+            state.error = ParseError.unexpected(state.pos, 0, c);
           }
-        } else if (state.log) {
-          state.error = ErrUnexpected.eof(state.pos);
+        } else {
+          state.error = ParseError.unexpected(state.pos, 0, 'EOF');
         }
         if (state.ok) {
           final v1 = $1!;
@@ -993,12 +964,54 @@ String? mapC32ToStr(State<String> state) {
   if (state.ok) {
     state.pos += 2;
     $1 = 119296;
-  } else if (state.log) {
-    state.error = ErrExpected.char(state.pos, const Char(119296));
+  } else {
+    state.error = ParseError.expected(state.pos, 119296);
   }
   if (state.ok) {
     final v = $1!;
     $0 = String.fromCharCode(v);
+  }
+  return $0;
+}
+
+Object? nestedC16OrTake2C32(State<String> state) {
+  Object? $0;
+  final source = state.source;
+  final $nested = state.nested;
+  state.nested = state.pos;
+  Object? $1;
+  $1 = char16(state);
+  if (!state.ok) {
+    final $pos = state.pos;
+    int? $c;
+    var $count = 0;
+    while ($count < 2 && state.pos < source.length) {
+      final pos = state.pos;
+      $c = source.readRune(state);
+      final ok = $c == 119296;
+      if (!ok) {
+        state.pos = pos;
+        break;
+      }
+      $count++;
+    }
+    state.ok = $count >= 2;
+    if (state.ok) {
+      $1 = source.substring($pos, state.pos);
+    } else {
+      if (state.pos < source.length) {
+        state.error = ParseError.unexpected(state.pos, 0, $c!);
+      } else {
+        state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+      }
+      state.pos = $pos;
+    }
+  }
+  state.nested = $nested;
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    state.error = ParseError.expected(state.pos, 'nested');
   }
   return $0;
 }
@@ -1015,12 +1028,10 @@ int? noneOfC16(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (state.log) {
-        state.error = ErrUnexpected.char(state.pos, Char(c));
-      }
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -1044,9 +1055,7 @@ int? noneOfOfC16OrC32(State<String> state) {
         if (c == ch) {
           state.pos = pos;
           state.ok = false;
-          if (state.log) {
-            state.error = ErrUnexpected.char(state.pos, Char(c));
-          }
+          state.error = ParseError.unexpected(state.pos, 0, c);
           break;
         }
       }
@@ -1055,9 +1064,7 @@ int? noneOfOfC16OrC32(State<String> state) {
       }
     }
   } else {
-    if (state.log) {
-      state.error = ErrUnexpected.eof(state.pos);
-    }
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
     state.ok = false;
   }
   return $0;
@@ -1075,12 +1082,10 @@ int? noneOfC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (state.log) {
-        state.error = ErrUnexpected.char(state.pos, Char(c));
-      }
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -1095,47 +1100,35 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
       case 97:
         if (source.startsWith('abc', pos)) {
           state.ok = false;
-          if (state.log) {
-            state.error = ErrUnexpected.tag(pos, const Tag('abc'));
-          }
+          state.error = ParseError.unexpected(pos, 0, 'abc');
           break;
         }
         if (source.startsWith('abd', pos)) {
           state.ok = false;
-          if (state.log) {
-            state.error = ErrUnexpected.tag(pos, const Tag('abd'));
-          }
+          state.error = ParseError.unexpected(pos, 0, 'abd');
           break;
         }
         break;
       case 100:
         if (source.startsWith('def', pos)) {
           state.ok = false;
-          if (state.log) {
-            state.error = ErrUnexpected.tag(pos, const Tag('def'));
-          }
+          state.error = ParseError.unexpected(pos, 0, 'def');
           break;
         }
         if (source.startsWith('deg', pos)) {
           state.ok = false;
-          if (state.log) {
-            state.error = ErrUnexpected.tag(pos, const Tag('deg'));
-          }
+          state.error = ParseError.unexpected(pos, 0, 'deg');
           break;
         }
         break;
       case 120:
         if (source.startsWith('xy', pos)) {
           state.ok = false;
-          if (state.log) {
-            state.error = ErrUnexpected.tag(pos, const Tag('xy'));
-          }
+          state.error = ParseError.unexpected(pos, 0, 'xy');
           break;
         }
         state.ok = false;
-        if (state.log) {
-          state.error = ErrUnexpected.tag(pos, const Tag('x'));
-        }
+        state.error = ParseError.unexpected(pos, 0, 'x');
         break;
     }
   }
@@ -1147,21 +1140,14 @@ void notC32OrC16(State<String> state) {
   state.log = false;
   char16(state);
   if (!state.ok) {
-    final $1 = state.error;
     char32(state);
-    if (!state.ok) {
-      final $2 = state.error;
-      if (state.log) {
-        state.error = ErrCombined(state.pos, [$1, $2]);
-      }
-    }
   }
   state.log = $log;
   state.ok = !state.ok;
   if (!state.ok) {
     state.pos = $pos;
     if ($log) {
-      state.error = ErrUnknown(state.pos);
+      state.error = ParseError.message(state.pos, 0, 'Unknown error');
     }
   }
 }
@@ -1176,11 +1162,12 @@ int? oneOfC16(State<String> state) {
     if (state.ok) {
       state.pos++;
       $0 = c;
-    } else if (state.log) {
-      state.error = ErrUnexpected.charAt(state.pos, source);
+    } else {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -1197,12 +1184,10 @@ int? oneOfC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (state.log) {
-        state.error = ErrUnexpected.char(state.pos, Char(c));
-      }
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -1210,18 +1195,15 @@ int? oneOfC32(State<String> state) {
 String? optAbc(State<String> state) {
   String? $0;
   final source = state.source;
-  final $log = state.log;
-  state.log = false;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
       source.startsWith('abc', state.pos);
   if (state.ok) {
     state.pos += 3;
     $0 = 'abc';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+  } else {
+    state.error = ParseError.expected(state.pos, 'abc');
   }
-  state.log = $log;
   if (!state.ok) {
     state.ok = true;
   }
@@ -1265,8 +1247,6 @@ int? postfixExpression(State<String> state) {
   $1 = _primaryExpression(state);
   if (state.ok) {
     String? $2;
-    final $log = state.log;
-    state.log = false;
     state.ok = state.pos < source.length;
     if (state.ok) {
       final pos = state.pos;
@@ -1293,13 +1273,10 @@ int? postfixExpression(State<String> state) {
         $2 = v;
       }
     }
-    if (!state.ok && state.log) {
-      state.error = ErrCombined(state.pos, [
-        ErrExpected.tag(state.pos, const Tag('--')),
-        ErrExpected.tag(state.pos, const Tag('++'))
-      ]);
+    if (!state.ok) {
+      state.error = ParseError.expected(state.pos, '--');
+      state.error = ParseError.expected(state.pos, '++');
     }
-    state.log = $log;
     if (!state.ok) {
       state.ok = true;
     }
@@ -1318,8 +1295,6 @@ int? prefixExpression(State<String> state) {
   int? $0;
   final source = state.source;
   String? $1;
-  final $log = state.log;
-  state.log = false;
   state.ok = state.pos < source.length;
   if (state.ok) {
     final pos = state.pos;
@@ -1348,14 +1323,11 @@ int? prefixExpression(State<String> state) {
       $1 = v;
     }
   }
-  if (!state.ok && state.log) {
-    state.error = ErrCombined(state.pos, [
-      ErrExpected.tag(state.pos, const Tag('-')),
-      ErrExpected.tag(state.pos, const Tag('--')),
-      ErrExpected.tag(state.pos, const Tag('++'))
-    ]);
+  if (!state.ok) {
+    state.error = ParseError.expected(state.pos, '-');
+    state.error = ParseError.expected(state.pos, '--');
+    state.error = ParseError.expected(state.pos, '++');
   }
-  state.log = $log;
   if (!state.ok) {
     state.ok = true;
   }
@@ -1383,8 +1355,8 @@ int? precededC16C32(State<String> state) {
     if (state.ok) {
       state.pos += 2;
       $0 = 119296;
-    } else if (state.log) {
-      state.error = ErrExpected.char(state.pos, const Char(119296));
+    } else {
+      state.error = ParseError.expected(state.pos, 119296);
     }
   }
   if (!state.ok) {
@@ -1428,11 +1400,12 @@ int? satisfyC16(State<String> state) {
     if (state.ok) {
       state.pos++;
       $0 = c;
-    } else if (state.log) {
-      state.error = ErrUnexpected.charAt(state.pos, source);
+    } else {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -1449,12 +1422,10 @@ int? satisfyC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      if (state.log) {
-        state.error = ErrUnexpected.char(state.pos, Char(c));
-      }
+      state.error = ParseError.unexpected(state.pos, 0, c);
     }
-  } else if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   return $0;
 }
@@ -1464,16 +1435,14 @@ List<int>? separatedList0C32Abc(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <int>[];
-  final $log = state.log;
-  state.log = false;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
     if (state.ok) {
       state.pos += 2;
       $1 = 119296;
-    } else if (state.log) {
-      state.error = ErrExpected.char(state.pos, const Char(119296));
+    } else {
+      state.error = ParseError.expected(state.pos, 119296);
     }
     if (!state.ok) {
       state.pos = $pos;
@@ -1486,14 +1455,13 @@ List<int>? separatedList0C32Abc(State<String> state) {
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-    } else if (state.log) {
-      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    } else {
+      state.error = ParseError.expected(state.pos, 'abc');
     }
     if (!state.ok) {
       break;
     }
   }
-  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -1506,21 +1474,19 @@ List<int>? separatedList1C32Abc(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <int>[];
-  final $log = state.log;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
     if (state.ok) {
       state.pos += 2;
       $1 = 119296;
-    } else if (state.log) {
-      state.error = ErrExpected.char(state.pos, const Char(119296));
+    } else {
+      state.error = ParseError.expected(state.pos, 119296);
     }
     if (!state.ok) {
       state.pos = $pos;
       break;
     }
-    state.log = false;
     $list.add($1!);
     $pos = state.pos;
     state.ok = state.pos < source.length &&
@@ -1528,14 +1494,13 @@ List<int>? separatedList1C32Abc(State<String> state) {
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-    } else if (state.log) {
-      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    } else {
+      state.error = ParseError.expected(state.pos, 'abc');
     }
     if (!state.ok) {
       break;
     }
   }
-  state.log = $log;
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $0 = $list;
@@ -1555,8 +1520,8 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
     if (state.ok) {
       state.pos += 2;
       $1 = 119296;
-    } else if (state.log) {
-      state.error = ErrExpected.char(state.pos, const Char(119296));
+    } else {
+      state.error = ParseError.expected(state.pos, 119296);
     }
     if (!state.ok) {
       state.pos = $last;
@@ -1572,8 +1537,8 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-    } else if (state.log) {
-      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    } else {
+      state.error = ParseError.expected(state.pos, 'abc');
     }
     if (!state.ok) {
       break;
@@ -1597,8 +1562,8 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
   if (state.ok) {
     state.pos++;
     $1 = 80;
-  } else if (state.log) {
-    state.error = ErrExpected.char(state.pos, const Char(80));
+  } else {
+    state.error = ParseError.expected(state.pos, 80);
   }
   if (state.ok) {
     state.ok = state.pos < source.length &&
@@ -1606,8 +1571,8 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
         source.startsWith('abc', state.pos);
     if (state.ok) {
       state.pos += 3;
-    } else if (state.log) {
-      state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+    } else {
+      state.error = ParseError.expected(state.pos, 'abc');
     }
     if (state.ok) {
       int? $2;
@@ -1616,8 +1581,8 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
       if (state.ok) {
         state.pos += 2;
         $2 = 119296;
-      } else if (state.log) {
-        state.error = ErrExpected.char(state.pos, const Char(119296));
+      } else {
+        state.error = ParseError.expected(state.pos, 119296);
       }
       if (state.ok) {
         $0 = Tuple2($1!, $2!);
@@ -1642,8 +1607,13 @@ void skipWhile1C16(State<String> state) {
     state.pos++;
   }
   state.ok = state.pos != $pos;
-  if (!state.ok && state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  if (!state.ok) {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
 }
 
@@ -1661,8 +1631,12 @@ void skipWhile1C32(State<String> state) {
     }
   }
   state.ok = state.pos != $pos;
-  if (!state.ok && state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
+  if (!state.ok) {
+    if ($pos < source.length) {
+      state.error = ParseError.unexpected($pos, 0, $c!);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
 }
 
@@ -1723,7 +1697,7 @@ String? stringValue(State<String> state) {
     int? $1;
     state.ok = state.pos < source.length;
     if (state.ok) {
-      var c = source.codeUnitAt(state.pos);
+      final c = source.codeUnitAt(state.pos);
       int? v;
       switch (c) {
         case 110:
@@ -1734,11 +1708,12 @@ String? stringValue(State<String> state) {
       if (state.ok) {
         state.pos++;
         $1 = v;
-      } else if (state.log) {
-        state.error = ErrUnexpected.charAt(state.pos, source);
+      } else {
+        final c = source.runeAt(state.pos);
+        state.error = ParseError.unexpected(state.pos, 0, c);
       }
-    } else if (state.log) {
-      state.error = ErrUnexpected.eof(state.pos);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
     }
     if (!state.ok) {
       state.pos = $pos;
@@ -1766,8 +1741,8 @@ String? tagC16(State<String> state) {
   if (state.ok) {
     state.pos += 1;
     $0 = 'P';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('P'));
+  } else {
+    state.error = ParseError.expected(state.pos, 'P');
   }
   return $0;
 }
@@ -1781,8 +1756,8 @@ String? tagC16C32(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $0 = 'P𝈀';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('P𝈀'));
+  } else {
+    state.error = ParseError.expected(state.pos, 'P𝈀');
   }
   return $0;
 }
@@ -1796,8 +1771,8 @@ String? tagC32(State<String> state) {
   if (state.ok) {
     state.pos += 2;
     $0 = '𝈀';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('𝈀'));
+  } else {
+    state.error = ParseError.expected(state.pos, '𝈀');
   }
   return $0;
 }
@@ -1811,8 +1786,8 @@ String? tagC32C16(State<String> state) {
   if (state.ok) {
     state.pos += 3;
     $0 = '𝈀P';
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('𝈀P'));
+  } else {
+    state.error = ParseError.expected(state.pos, '𝈀P');
   }
   return $0;
 }
@@ -1832,8 +1807,8 @@ String? tagOfFoo(State<String> state) {
     if (state.ok) {
       state.pos += tag.length;
       $0 = tag;
-    } else if (state.log) {
-      state.error = ErrExpected.tag(state.pos, Tag(tag));
+    } else {
+      state.error = ParseError.expected(state.pos, tag);
     }
   }
   return $0;
@@ -1853,8 +1828,8 @@ String? tagNoCaseAbc(State<String> state) {
       $0 = v;
     }
   }
-  if (!state.ok && state.log) {
-    state.error = ErrExpected.tag($start, const Tag('abc'));
+  if (!state.ok) {
+    state.error = ParseError.expected($start, 'abc');
   }
   return $0;
 }
@@ -1907,15 +1882,13 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
       $0 = v;
     }
   }
-  if (!state.ok && state.log) {
-    state.error = ErrCombined(state.pos, [
-      ErrExpected.tag(state.pos, const Tag('abc')),
-      ErrExpected.tag(state.pos, const Tag('abd')),
-      ErrExpected.tag(state.pos, const Tag('def')),
-      ErrExpected.tag(state.pos, const Tag('deg')),
-      ErrExpected.tag(state.pos, const Tag('x')),
-      ErrExpected.tag(state.pos, const Tag('xy'))
-    ]);
+  if (!state.ok) {
+    state.error = ParseError.expected(state.pos, 'abc');
+    state.error = ParseError.expected(state.pos, 'abd');
+    state.error = ParseError.expected(state.pos, 'def');
+    state.error = ParseError.expected(state.pos, 'deg');
+    state.error = ParseError.expected(state.pos, 'x');
+    state.error = ParseError.expected(state.pos, 'xy');
   }
   return $0;
 }
@@ -1929,8 +1902,8 @@ String? takeUntilAbc(State<String> state) {
   if (state.ok) {
     state.pos = $index;
     $0 = source.substring($pos, $index);
-  } else if (state.log) {
-    state.error = ErrExpected.tag($pos, const Tag('abc'));
+  } else {
+    state.error = ParseError.expected($pos, 'abc');
   }
   return $0;
 }
@@ -1944,11 +1917,11 @@ String? takeUntil1Abc(State<String> state) {
   if (state.ok) {
     state.pos = $index;
     $0 = source.substring($pos, $index);
-  } else if (state.log) {
+  } else {
     if ($index == -1) {
-      state.error = ErrExpected.tag(source.length, const Tag('abc'));
+      state.error = ParseError.expected(source.length, 'abc');
     } else {
-      state.error = ErrUnexpected.tag($pos, const Tag('abc'));
+      state.error = ParseError.unexpected($pos, 0, 'abc');
     }
   }
   return $0;
@@ -1969,8 +1942,13 @@ String? takeWhile1C16(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  } else {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
   return $0;
 }
@@ -1992,8 +1970,12 @@ String? takeWhile1C32(State<String> state) {
   state.ok = state.pos != $pos;
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
-  } else if (state.log) {
-    state.error = ErrUnexpected.charOrEof($pos, source, $c);
+  } else {
+    if ($pos < source.length) {
+      state.error = ParseError.unexpected($pos, 0, $c!);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
   }
   return $0;
 }
@@ -2055,8 +2037,11 @@ String? takeWhileMN_2_4C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    if (state.log) {
-      state.error = ErrUnexpected.charOrEof(state.pos, source);
+    if (state.pos < source.length) {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
     }
     state.pos = $pos;
   }
@@ -2083,8 +2068,10 @@ String? takeWhileMN_2_4C32(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    if (state.log) {
-      state.error = ErrUnexpected.charOrEof(state.pos, source, $c);
+    if (state.pos < source.length) {
+      state.error = ParseError.unexpected(state.pos, 0, $c!);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
     }
     state.pos = $pos;
   }
@@ -2145,8 +2132,8 @@ Tuple3<int, String, int>? tuple3C32AbcC16(State<String> state) {
       if (state.ok) {
         state.pos++;
         $3 = 80;
-      } else if (state.log) {
-        state.error = ErrExpected.char(state.pos, const Char(80));
+      } else {
+        state.error = ParseError.expected(state.pos, 80);
       }
       if (state.ok) {
         $0 = Tuple3($1!, $2!, $3!);
@@ -2167,8 +2154,8 @@ bool? valueAbcToTrueValue(State<String> state) {
       source.startsWith('abc', state.pos);
   if (state.ok) {
     state.pos += 3;
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('abc'));
+  } else {
+    state.error = ParseError.expected(state.pos, 'abc');
   }
   if (state.ok) {
     $0 = true;
@@ -2298,9 +2285,7 @@ int? transformersVarIsNotDigit(State<String> state) {
         if (c == ch) {
           state.pos = pos;
           state.ok = false;
-          if (state.log) {
-            state.error = ErrUnexpected.char(state.pos, Char(c));
-          }
+          state.error = ParseError.unexpected(state.pos, 0, c);
           break;
         }
       }
@@ -2309,9 +2294,7 @@ int? transformersVarIsNotDigit(State<String> state) {
       }
     }
   } else {
-    if (state.log) {
-      state.error = ErrUnexpected.eof(state.pos);
-    }
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
     state.ok = false;
   }
   return $0;
@@ -2341,9 +2324,7 @@ String? verifyIs3Digit(State<String> state) {
     if (state.ok) {
       $0 = v;
     } else {
-      if (state.log) {
-        state.error = ErrMessage($pos, state.pos - $pos, 'Message');
-      }
+      state.error = ParseError.message($pos, state.pos - $pos, 'Message');
       state.pos = $pos;
     }
   }
@@ -2371,350 +2352,127 @@ void verifyIs3DigitFast(State<String> state) {
     final v = $1!;
     state.ok = v.length == 3;
     if (!state.ok) {
-      if (state.log) {
-        state.error = ErrMessage($pos, state.pos - $pos, 'Message');
-      }
+      state.error = ParseError.message($pos, state.pos - $pos, 'Message');
       state.pos = $pos;
     }
   }
 }
 
-/// Represents the `char` used in parsing errors.
-class Char {
-  final int charCode;
+class ParseError {
+  final ParseErrorKind kind;
 
-  const Char(this.charCode);
+  final int length;
+
+  final int offset;
+
+  final Object? value;
+
+  ParseError.expected(this.offset, this.value)
+      : kind = ParseErrorKind.expected,
+        length = 0;
+
+  ParseError.message(this.offset, this.length, String message)
+      : kind = ParseErrorKind.message,
+        value = message;
+
+  ParseError.unexpected(this.offset, this.length, this.value)
+      : kind = ParseErrorKind.unexpected;
 
   @override
-  int get hashCode => charCode.hashCode;
+  int get hashCode =>
+      kind.hashCode ^ length.hashCode ^ offset.hashCode ^ value.hashCode;
 
   @override
-  operator ==(other) {
-    return other is Char && other.charCode == charCode;
+  bool operator ==(other) {
+    return other is ParseError &&
+        other.kind == kind &&
+        other.length == length &&
+        other.offset == offset &&
+        other.value == value;
   }
 
   @override
   String toString() {
-    final s = String.fromCharCode(charCode)._escape();
-    return '\'$s\'';
-  }
-}
-
-abstract class Err {
-  int failure = 0;
-
-  @override
-  int get hashCode => length.hashCode ^ offset.hashCode;
-
-  int get length;
-
-  int get offset;
-
-  @override
-  bool operator ==(other) {
-    return other is Err && other.length == length && other.offset == offset;
-  }
-
-  int getFailurePosition() => _max(failure, offset);
-
-  static List<Err> errorReport(Err error) {
-    var result = _preprocess(error);
-    result = _postprocess(result);
-    return result;
-  }
-
-  static void _flatten(Err error, List<Err> result) {
-    if (error is ErrCombined) {
-      for (final error in error.errors) {
-        _flatten(error, result);
-      }
-    } else if (error is ErrNested) {
-      final errors = <Err>[];
-      _flatten(error.error, errors);
-      final furthest = errors.map((e) => e.getFailurePosition()).reduce(_max);
-      errors.removeWhere((e) => e.getFailurePosition() < furthest);
-      final maxEnd = errors.map((e) => e.offset + e.length).reduce(_max);
-      final offset = error.offset;
-      final expected = ErrExpected.tag(offset, error.tag);
-      expected.failure = furthest;
-      result.add(expected);
-      if (furthest > offset) {
-        final message = ErrMessage(offset, maxEnd - offset, error.message);
-        message.failure = furthest;
-        result.add(message);
-        result.addAll(errors);
-      }
-    } else {
-      result.add(error);
+    switch (kind) {
+      case ParseErrorKind.expected:
+        return 'Expected: $value';
+      case ParseErrorKind.message:
+        return '$value';
+      case ParseErrorKind.unexpected:
+        return 'Unexpected: $value';
     }
   }
 
-  static int _max(int x, int y) {
-    if (x > y) {
-      return x;
-    }
-    return y > x ? y : x;
-  }
-
-  static List<Err> _postprocess(List<Err> errors) {
-    final result = errors.toList();
-    final furthest = result.isEmpty
-        ? -1
-        : result.map((e) => e.getFailurePosition()).reduce(_max);
-    result.removeWhere((e) => e.getFailurePosition() < furthest);
-    final map = <int, List<ErrExpected>>{};
-    for (final error in result.whereType<ErrExpected>()) {
+  static List<ParseError> errorReport(List<ParseError> errors) {
+    final result = errors.toSet().toList();
+    final expected = <int, List<ParseError>>{};
+    for (final error
+        in result.where((e) => e.kind == ParseErrorKind.expected)) {
       final offset = error.offset;
-      var list = map[offset];
+      var list = expected[offset];
       if (list == null) {
         list = [];
-        map[offset] = list;
+        expected[offset] = list;
       }
 
       list.add(error);
     }
 
-    result.removeWhere((e) => e is ErrExpected);
-    for (var offset in map.keys) {
-      final list = map[offset]!;
-      final values = list.map((e) => e.value).join(', ');
-      result.add(ErrMessage(offset, 0, 'Expected: $values'));
-    }
-
-    return result;
-  }
-
-  static List<Err> _preprocess(Err error) {
-    final result = <Err>[];
-    _flatten(error, result);
-    return result.toSet().toList();
-  }
-}
-
-class ErrCombined extends Err {
-  final List<Err> errors;
-
-  @override
-  final int offset;
-
-  ErrCombined(this.offset, this.errors);
-
-  @override
-  int get hashCode {
-    var result = super.hashCode;
-    for (final error in errors) {
-      result ^= error.hashCode;
-    }
-
-    return result;
-  }
-
-  @override
-  int get length => 1;
-
-  @override
-  bool operator ==(other) {
-    if (super == other) {
-      if (other is ErrCombined) {
-        final otherErrors = other.errors;
-        if (otherErrors.length == errors.length) {
-          for (var i = 0; i < errors.length; i++) {
-            final error = errors[i];
-            final otherError = otherErrors[i];
-            if (otherError != error) {
-              return false;
-            }
-          }
-
-          return true;
-        }
+    result.removeWhere((e) => e.kind == ParseErrorKind.expected);
+    for (var i = 0; i < result.length; i++) {
+      final error = result[i];
+      if (error.kind == ParseErrorKind.unexpected) {
+        result[i] = ParseError.unexpected(
+            error.offset, error.length, _escape(error.value));
       }
     }
 
-    return false;
-  }
+    for (var offset in expected.keys) {
+      final list = expected[offset]!;
+      final values = list.map((e) => _escape(e.value)).join(', ');
+      result.add(ParseError.message(offset, 0, 'Expected: $values'));
+    }
 
-  @override
-  String toString() {
-    final list = errors.join(', ');
-    final result = '[$list]';
     return result;
   }
-}
 
-class ErrExpected extends Err {
-  @override
-  final int offset;
+  static String _escape(value) {
+    if (value is int) {
+      if (value >= 0 && value <= 0xd7ff ||
+          value >= 0xe000 && value <= 0x10ffff) {
+        value = String.fromCharCode(value);
+      } else {
+        return value.toString();
+      }
+    } else if (value is! String) {
+      return value.toString();
+    }
 
-  final Object? value;
+    final map = {
+      '\b': '\\b',
+      '\f': '\\f',
+      '\n': '\\n',
+      '\r': '\\t',
+      '\t': '\\t',
+      '\v': '\\v',
+    };
+    var result = value.toString();
+    for (final key in map.keys) {
+      result = result.replaceAll(key, map[key]!);
+    }
 
-  ErrExpected(this.offset, this.value);
-
-  ErrExpected.char(this.offset, Char value) : value = value;
-
-  ErrExpected.eof(this.offset) : value = const Tag('EOF');
-
-  ErrExpected.label(this.offset, String value) : value = value;
-
-  ErrExpected.tag(this.offset, Tag value) : value = value;
-
-  @override
-  int get hashCode => super.hashCode ^ value.hashCode;
-
-  @override
-  int get length => 0;
-
-  @override
-  bool operator ==(other) {
-    return super == other && other is ErrExpected && other.value == value;
-  }
-
-  @override
-  String toString() {
-    final result = 'Expected: $value';
-    return result;
+    return '\'$result\'';
   }
 }
 
-class ErrMessage extends Err {
-  @override
-  final int length;
-
-  final String message;
-
-  @override
-  final int offset;
-
-  ErrMessage(this.offset, this.length, this.message);
-
-  @override
-  int get hashCode => super.hashCode ^ message.hashCode;
-
-  @override
-  bool operator ==(other) {
-    return super == other && other is ErrMessage && other.message == message;
-  }
-
-  @override
-  String toString() {
-    return message;
-  }
-}
-
-class ErrNested extends Err {
-  final Err error;
-
-  final String message;
-
-  @override
-  final int offset;
-
-  final Tag tag;
-
-  ErrNested(this.offset, this.message, this.tag, this.error);
-
-  @override
-  int get hashCode =>
-      super.hashCode ^ error.hashCode ^ message.hashCode ^ tag.hashCode;
-
-  @override
-  int get length => 0;
-
-  @override
-  bool operator ==(other) {
-    return super == other &&
-        other is ErrNested &&
-        other.error == error &&
-        other.message == message &&
-        other.tag == tag;
-  }
-
-  @override
-  String toString() {
-    return message;
-  }
-}
-
-class ErrUnexpected extends Err {
-  @override
-  final int length;
-
-  @override
-  final int offset;
-
-  final Object? value;
-
-  ErrUnexpected(this.offset, this.length, this.value);
-
-  ErrUnexpected.char(this.offset, Char value)
-      : length = 1,
-        value = value;
-
-  ErrUnexpected.charAt(this.offset, String source)
-      : length = 1,
-        value = Char(source.runeAt(offset));
-
-  ErrUnexpected.charOrEof(this.offset, String source, [int? c])
-      : length = offset < source.length ? 1 : 0,
-        value = offset < source.length
-            ? Char(c ?? source.runeAt(offset))
-            : const Tag('EOF');
-
-  ErrUnexpected.eof(this.offset)
-      : length = 0,
-        value = const Tag('EOF');
-
-  ErrUnexpected.label(this.offset, String value)
-      : length = value.length,
-        value = value;
-
-  ErrUnexpected.tag(this.offset, Tag value)
-      : length = value.name.length,
-        value = value;
-
-  @override
-  int get hashCode => super.hashCode ^ value.hashCode;
-
-  @override
-  bool operator ==(other) {
-    return super == other && other is ErrUnexpected && other.value == value;
-  }
-
-  @override
-  String toString() {
-    final result = 'Unexpected: $value';
-    return result;
-  }
-}
-
-class ErrUnknown extends Err {
-  @override
-  final int offset;
-
-  ErrUnknown(this.offset);
-
-  @override
-  int get length => 0;
-
-  @override
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return super == other && other is ErrUnknown;
-  }
-
-  @override
-  String toString() {
-    final result = 'Unknown error';
-    return result;
-  }
-}
+enum ParseErrorKind { expected, message, unexpected }
 
 class State<T> {
   dynamic context;
 
-  Err error = ErrUnknown(0);
-
   bool log = true;
+
+  int nested = -1;
 
   bool ok = false;
 
@@ -2722,7 +2480,42 @@ class State<T> {
 
   final T source;
 
+  ParseError? _error;
+
+  int _errorPos = -1;
+
+  int _length = 0;
+
+  final List _list = List.filled(100, null);
+
   State(this.source);
+
+  set error(ParseError error) {
+    final offset = error.offset;
+    if (offset > nested && log) {
+      if (_errorPos < offset) {
+        _errorPos = offset;
+        _length = 1;
+        _error = error;
+      } else if (_errorPos == offset) {
+        if (_length == 1) {
+          _list[0] = _error;
+        }
+
+        if (_length < _list.length) {
+          _list[_length++] = error;
+        }
+      }
+    }
+  }
+
+  List<ParseError> get errors {
+    if (_length == 1) {
+      return [_error!];
+    } else {
+      return List.generate(_length, (i) => _list[i] as ParseError);
+    }
+  }
 
   @override
   String toString() {
@@ -2739,27 +2532,6 @@ class State<T> {
     } else {
       return super.toString();
     }
-  }
-}
-
-/// Represents the `tag` (symbol) used in parsing errors.
-class Tag {
-  final String name;
-
-  const Tag(this.name);
-
-  @override
-  int get hashCode => name.hashCode;
-
-  @override
-  operator ==(other) {
-    return other is Tag && other.name == name;
-  }
-
-  @override
-  String toString() {
-    final s = name._escape();
-    return '\'$s\'';
   }
 }
 
@@ -2807,23 +2579,5 @@ extension on String {
   // ignore: unused_element
   String slice(int start, int end) {
     return substring(start, end);
-  }
-
-  String _escape() {
-    final map = {
-      '\b': '\\b',
-      '\f': '\\f',
-      '\n': '\\n',
-      '\r': '\\t',
-      '\t': '\\t',
-      '\v': '\\v',
-    };
-
-    var s = this;
-    for (final key in map.keys) {
-      s = s.replaceAll(key, map[key]!);
-    }
-
-    return s;
   }
 }

@@ -24,8 +24,11 @@ state.ok = {{count}} >= {{m}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  if (state.pos < source.length) {
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   state.pos = {{pos}};
 }''';
@@ -44,8 +47,11 @@ while ({{count}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{count}} >= {{m}};
 if (!state.ok) {
-  if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source);
+  if (state.pos < source.length) {
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   state.pos = {{pos}};
 }''';
@@ -68,8 +74,10 @@ state.ok = {{count}} >= {{m}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source, {{c}});
+  if (state.pos < source.length) {
+    state.error = ParseError.unexpected(state.pos, 0, {{c}}!);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   state.pos = {{pos}};
 }''';
@@ -90,8 +98,10 @@ while ({{count}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{count}} >= {{m}};
 if (!state.ok) {
-  if (state.log) {
-    state.error = ErrUnexpected.charOrEof(state.pos, source, {{c}});
+  if (state.pos < source.length) {
+    state.error = ParseError.unexpected(state.pos, 0, {{c}}!);
+  } else {
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   state.pos = {{pos}};
 }''';
@@ -106,6 +116,19 @@ if (!state.ok) {
 
   @override
   String build(Context context, ParserResult? result) {
+    if (m < 0) {
+      throw RangeError.value(m, 'm', 'Must be equal to or greater than 0');
+    }
+
+    if (n < m) {
+      throw RangeError.value(
+          n, 'n', 'Must be equal to or greater than \'m\' ($m)');
+    }
+
+    if (n == 0) {
+      throw RangeError.value(n, 'n', 'Must be greater than 0');
+    }
+
     context.refersToStateSource = true;
     final fast = result == null;
     final values = context.allocateLocals(['c', 'count', 'pos']);

@@ -3,6 +3,7 @@ import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/char_class.dart';
 import 'package:parser_builder/character.dart';
 import 'package:parser_builder/combinator.dart';
+import 'package:parser_builder/error.dart';
 import 'package:parser_builder/expression.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
@@ -44,6 +45,7 @@ Future<void> main(List<String> args) async {
     _manyTillAOrBTillAbc,
     _map4Digits,
     _mapC32ToStr,
+    _nestedC16OrTake2C32,
     _noneOfC16,
     _noneOfOfC16OrC32,
     _noneOfC32,
@@ -269,6 +271,9 @@ const _mapC32ToStr = Named(
     'mapC32ToStr',
     Map1(Char(c32),
         ExpressionAction<String>(['c'], 'String.fromCharCode({{c}})')));
+
+const _nestedC16OrTake2C32 = Named('nestedC16OrTake2C32',
+    Nested('nested', Alt2(_char16, TakeWhileMN(2, 2, _isC32))));
 
 const _noneOfC16 = Named('noneOfC16', NoneOf([c16]));
 

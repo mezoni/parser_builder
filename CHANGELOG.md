@@ -1,3 +1,17 @@
+## 2.0.0
+
+- Breaking change.
+Does not affect end users (parser definitions). The changes concern the development of parser builders.
+As practice has shown, the current error registration system turned out to be a system of the registration of the local errors in relation to the current alternative choice parser. In other words, if one of the alternatives was successfully parsed, all other registered errors were discarded (despite the fact that these errors could have the farthest positions).
+This led to the fact that information about real (the farthest in position) parsing errors was lost forever. In some cases it did not matter because each choice from the alternative did not have the same grammar symbols at the beginning and, accordingly, there are no problems with determining the exact position of the error. But, in the case when the first grammar symbols in different choices is the same, then the absence of this information would lead to a less accurate interpretation of the exact location of the parse error. This is especially true for parsing expressions of grammars of high-level programming languages (or even complex expression calculators).
+The new error system registers and saves errors until new errors are found in the next (far) positions.
+Thus, the new system is devoid of this shortcoming.
+These changes cause the generated parsers to be slightly slower (about 10%), smaller in size, and much more accurate in determining the real location of a parsing error.
+Now the principle of operation is closest to `PEG` parsers, where each parser can be considered as a parsing expression
+- Breaking change. Removed classes `Char`, `Tag`. They were used solely for registering errors
+- Breaking change. Removed class `Err` and its descendants
+- Added new class `ParseError`. All errors are registered through this class. There are 3 kind of errors in total. These are `expected`, `message` and `unexpected`
+
 ## 1.0.10
 
 - The size of the generated source code of the parser `BinaryExpression` has been slightly reduced

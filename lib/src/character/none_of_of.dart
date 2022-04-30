@@ -21,9 +21,7 @@ if (state.pos < source.length) {
       if (c == ch) {
         state.pos = pos;
         state.ok = false;
-        if (state.log) {
-          state.error = ErrUnexpected.char(state.pos, Char(c));
-        }
+        state.error = ParseError.unexpected(state.pos, 0, c);
         break;
       }
     }
@@ -32,9 +30,7 @@ if (state.pos < source.length) {
     }
   }
 } else {
-  if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
-  }
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   state.ok = false;
 }''';
 
@@ -51,17 +47,13 @@ if (state.pos < source.length) {
       if (c == ch) {
         state.pos = pos;
         state.ok = false;
-        if (state.log) {
-          state.error = ErrUnexpected.char(state.pos, Char(c));
-        }
+        state.error = ParseError.unexpected(state.pos, 0, c);
         break;
       }
     }
   }
 } else {
-  if (state.log) {
-    state.error = ErrUnexpected.eof(state.pos);
-  }
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   state.ok = false;
 }''';
 

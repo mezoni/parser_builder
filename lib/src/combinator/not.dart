@@ -11,7 +11,7 @@ state.ok = !state.ok;
 if (!state.ok) {
   state.pos = {{pos}};
   if ({{log}}) {
-    state.error = ErrUnknown(state.pos);
+    state.error = ParseError.message(state.pos, 0, 'Unknown error');
   }
 }''';
 

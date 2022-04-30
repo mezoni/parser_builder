@@ -19,7 +19,7 @@ class EscapeSequence extends ParserBuilder<String, int> {
   static const _template16 = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
-  var c = source.codeUnitAt(state.pos);
+  final c = source.codeUnitAt(state.pos);
   int? v;
   switch (c) {
     {{cases}}
@@ -28,17 +28,18 @@ if (state.ok) {
   if (state.ok) {
     state.pos++;
     {{res0}} = v;
-  } else if (state.log) {
-    state.error = ErrUnexpected.charAt(state.pos, source);
+  } else {
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   static const _template16Fast = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
-  var c = source.codeUnitAt(state.pos);
+  final c = source.codeUnitAt(state.pos);
   int? v;
   switch (c) {
     {{cases}}
@@ -47,18 +48,19 @@ if (state.ok) {
   if (state.ok) {
     state.pos++;
     state.ok = true;
-  } else if (state.log) {
-    state.error = ErrUnexpected.charAt(state.pos, source);
+  } else {
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   static const _template32 = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
   final pos = state.pos;
-  var c = source.readRune(state);
+  final c = source.readRune(state);
   int? v;
   switch (c) {
     {{cases}}
@@ -68,19 +70,17 @@ if (state.ok) {
     {{res0}} = v;
   } else {
     state.pos = pos;
-    if (state.log) {
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    }
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   static const _template32Fast = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
   final pos = state.pos;
-  var c = source.readRune(state);
+  final c = source.readRune(state);
   int? v;
   switch (c) {
     {{cases}}
@@ -88,12 +88,10 @@ if (state.ok) {
   state.ok = v != null;
   if (!state.ok) {
     state.pos = pos;
-    if (state.log) {
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    }
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   final Map<int, int> table;

@@ -15,8 +15,8 @@ state.ok = {{index}} >= 0;
 if (state.ok) {
   state.pos = {{index}};
   {{res0}} = source.substring({{pos}}, {{index}});
-} else if (state.log) {
-  state.error = ErrExpected.tag({{pos}}, const Tag({{tag}}));
+} else {
+  state.error = ParseError.expected({{pos}}, {{tag}});
 }''';
 
   static const _templateFast = '''
@@ -25,8 +25,8 @@ final {{index}} = source.indexOf({{tag}}, {{pos}});
 state.ok = {{index}} >= 0;
 if (state.ok) {
   state.pos = {{index}};
-} else if (state.log) {
-  state.error = ErrExpected.tag({{pos}}, const Tag({{tag}}));
+} else {
+  state.error = ParseError.expected({{pos}}, {{tag}});
 }''';
 
   final String tag;

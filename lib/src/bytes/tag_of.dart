@@ -10,8 +10,8 @@ if (state.ok) {
   if (state.ok) {
     state.pos += tag.length;
     {{res0}} = tag;
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, Tag(tag));
+  } else {
+    state.error = ParseError.expected(state.pos, tag);
   }
 }''';
 
@@ -23,8 +23,8 @@ if (state.ok) {
   state.ok = source.startsWith(tag, state.pos);
   if (state.ok) {
     state.pos += tag.length;
-  } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, Tag(tag));
+  } else {
+    state.error = ParseError.expected(state.pos, tag);
   }
 }''';
 

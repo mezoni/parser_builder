@@ -28,7 +28,7 @@ num? parse(String s) {
   final state = State(s);
   final r = number(state);
   if (!state.ok) {
-    final errors = Err.errorReport(state.error);
+    final errors = ParseError.errorReport(state.errors);
     throw _errorMessage(state.source, errors);
   }
   return r!;
@@ -50,13 +50,10 @@ if (state.ok) {
   {{res0}} = {{v}};
 } else {
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    if (c > 0xd7ff) {
-      c = source.runeAt(state.pos);
-    }
-    state.error = ErrUnexpected.char(state.pos, Char(c));
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
   } else {
-    state.error = ErrUnexpected.eof(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   state.pos = {{pos}};
 }''';
@@ -65,13 +62,10 @@ if (state.ok) {
 {{parse}}
 if (!state.ok) {
   if (state.pos < source.length) {
-    var c = source.codeUnitAt(state.pos);
-    if (c > 0xd7ff) {
-      c = source.runeAt(state.pos);
-    }
-    state.error = ErrUnexpected.char(state.pos, Char(c));
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
   } else {
-    state.error = ErrUnexpected.eof(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
   }
   state.pos = {{pos}};
 }''';

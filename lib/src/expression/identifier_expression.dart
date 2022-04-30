@@ -58,9 +58,7 @@ if (state.ok) {
 }
 if (!state.ok) {
   state.pos = {{pos}};
-  if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('identifier'));
-  }
+  state.error = ParseError.expected(state.pos, 'identifier');
 }''';
 
   static const _templateFast = '''
@@ -117,9 +115,7 @@ if (state.ok) {
 }
 if (!state.ok) {
   state.pos = {{pos}};
-  if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('identifier'));
-  }
+  state.error = ParseError.expected(state.pos, 'identifier');
 }''';
 
   final SemanticAction<bool> identCont;

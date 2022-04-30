@@ -21,8 +21,8 @@ if (state.ok) {
     {{res0}} = v;
   }
 }
-if (!state.ok && state.log) {
-  state.error = ErrCombined(state.pos, [{{errors}}]);
+if (!state.ok) {
+  {{errors}}
 }''';
 
   static const _templateFast = '''
@@ -36,8 +36,8 @@ if (state.ok) {
   }
   state.ok = v != null;
 }
-if (!state.ok && state.log) {
-  state.error = ErrCombined(state.pos, [{{errors}}]);
+if (!state.ok) {
+  {{errors}}
 }''';
 
   static const _templateCase = '''
@@ -87,7 +87,7 @@ v = {{tag}};''';
 
       list.add(tag);
       final escaped = helper.escapeString(tag);
-      errors.add('ErrExpected.tag(state.pos, const Tag($escaped))');
+      errors.add('state.error = ParseError.expected(state.pos, $escaped);');
     }
 
     final cases = <String>[];
@@ -119,7 +119,7 @@ v = {{tag}};''';
 
     values.addAll({
       'cases': cases.join('\n'),
-      'errors': errors.join(','),
+      'errors': errors.join('\n'),
     });
     return render2(fast, _templateFast, _template, values, [result]);
   }

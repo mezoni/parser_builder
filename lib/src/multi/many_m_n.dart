@@ -4,13 +4,7 @@ class ManyMN<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
-final {{log}} = state.log;
 while ({{list}}.length < {{n}}) {
-  if (state.log) {
-    if ({{list}}.length >= {{m}}) {
-      state.log = false;
-    }
-  }
   {{var1}}
   {{p1}}
   if (!state.ok) {
@@ -18,7 +12,6 @@ while ({{list}}.length < {{n}}) {
   }
   {{list}}.add({{val1}});
 }
-state.log = {{log}};
 state.ok = {{list}}.length >= {{m}};
 if (state.ok) {
   {{res0}} = {{list}};
@@ -29,13 +22,7 @@ if (state.ok) {
   static const _templateFast = '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
-final {{log}} = state.log;
 while ({{count}} < {{n}}) {
-  if (state.log) {
-    if ({{count}} >= {{m}}) {
-      state.log = false;
-    }
-  }
   {{var1}}
   {{p1}}
   if (!state.ok) {
@@ -43,7 +30,6 @@ while ({{count}} < {{n}}) {
   }
   {{count}}++;
 }
-state.log = {{log}};
 state.ok = {{count}} >= {{m}};
 if (!state.ok) {
   state.pos = {{pos}};
@@ -73,7 +59,7 @@ if (!state.ok) {
     }
 
     final fast = result == null;
-    final values = context.allocateLocals(['count', 'list', 'log', 'pos']);
+    final values = context.allocateLocals(['count', 'list', 'pos']);
     final r1 = context.getResult(parser, !fast);
     values.addAll({
       'm': '$m',

@@ -9,8 +9,9 @@ state.log = false;
 state.log = {{log}};
 if (state.ok) {
   state.pos = {{pos}};
+} else {
   if ({{log}}) {
-    state.error = ErrUnknown(state.pos);
+    state.error = ParseError.message(state.pos, 0, 'Unknown error');
   }
 }''';
 

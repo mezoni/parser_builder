@@ -12,16 +12,16 @@ state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos++;
   {{res0}} = {{cc}};
-} else if (state.log) {
-  state.error = ErrExpected.char(state.pos, const Char({{cc}}));
+} else {
+  state.error = ParseError.expected(state.pos, {{cc}});
 }''';
 
   static const _template16Fast = '''
 state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos++;
-} else if (state.log) {
-  state.error = ErrExpected.char(state.pos, const Char({{cc}}));
+} else {
+  state.error = ParseError.expected(state.pos, {{cc}});
 }''';
 
   static const _template32 = '''
@@ -29,16 +29,16 @@ state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos += 2;
   {{res0}} = {{cc}};
-} else if (state.log) {
-  state.error = ErrExpected.char(state.pos, const Char({{cc}}));
+} else {
+  state.error = ParseError.expected(state.pos, {{cc}});
 }''';
 
   static const _template32Fast = '''
 state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos += 2;
-} else if (state.log) {
-  state.error = ErrExpected.char(state.pos, const Char({{cc}}));
+} else {
+  state.error = ParseError.expected(state.pos, {{cc}});
 }''';
 
   final int char;
@@ -47,6 +47,10 @@ if (state.ok) {
 
   @override
   String build(Context context, ParserResult? result) {
+    if (!(char >= 0 && char <= 0xd7ff || char >= 0xe000 && char <= 0x10ffff)) {
+      throw ArgumentError.value(char, 'char', 'Invalid character code');
+    }
+
     context.refersToStateSource = true;
     final fast = result == null;
     final values = {

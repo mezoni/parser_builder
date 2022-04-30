@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 1.0.10
+Version: 2.0.0
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -28,7 +28,7 @@ Ask questions if something is not clear.
 - The generated source code of the parsers is `human-friendly` as if you wrote it by hand
 - Very `handy debugging` and setting breakpoints to any place of parsing
 - An `elegant way to implement your own tracing` which can easily be turned off
-- Very `flexible error handling` system (with support for nested errors)
+- Very `flexible error handling` system
 - Built-in `error preprocessing` procedures (grouping and flattening errors)
 - `Fully customizable` (according to your needs) error reporting procedures
 - Error messages `can be easily localized` (translated into another language) before being output
@@ -103,7 +103,7 @@ built-in:
 
 [`error`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error):
 - [`Expected`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/expected.dart) (not tested yet)
-- [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart) (not fully tested)
+- [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart)
 
 [`expression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression):
 - [`BinaryExpression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression/binary_expression.dart)
@@ -270,7 +270,7 @@ Color? _hexColor(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else if (state.log) {
-    state.error = ErrExpected.tag(state.pos, const Tag('#'));
+    state.error = ErrExpected(state.pos, const Tag('#'));
   }
   if (state.ok) {
     final $pos1 = state.pos;
@@ -364,39 +364,6 @@ This code was generated from this declaration:
 ```dart
 const _json = Named('_json', Delimited(_ws, _value, _eof));
 ```
-
-## Example of error reporting
-
-```
-Unhandled exception:
-FormatException:
-line 1, column 1: Expected: [, {, ", string, number, false, null, true
-  ╷
-1 │ 123.`
-  │ ^
-  ╵
-line 1, column 1: Malformed number
-  ╷
-1 │ 123.`
-  │ ^^^^^
-  ╵
-line 1, column 5: Unexpected: '`'
-  ╷
-1 │ 123.`
-  │     ^
-  ╵
-```
-
-Such an error will be generated, for example, by such a parser:
-
-```dart
-const _number =
-    Named('_number', Malformed('number', Terminated(Number(), _ws)));
-```
-
-This parser (`Malformed`) is not required to know anything about the data format, its task is to correctly handle parsing errors.  
-If parsing eventually fails, then the appropriate error post-processing procedure translates all nested errors correctly into other errors, and the output will be such an error message.  
-During parsing, errors are generated on the fly, but they are not translated on the fly, but stored only in a form convenient for the parser (in fact, as they are).
 
 ## How to declare a parser builder
 

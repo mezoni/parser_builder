@@ -12,16 +12,16 @@ state.ok = {{test}};
 if (state.ok) {
   state.pos += {{length}};
   {{res0}} = {{tag}};
-} else if (state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+} else {
+  state.error = ParseError.expected(state.pos, {{tag}});
 }''';
 
   static const _templateFast = '''
 state.ok = {{test}};
 if (state.ok) {
   state.pos += {{length}};
-} else if (state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+} else {
+  state.error = ParseError.expected(state.pos, {{tag}});
 }''';
 
   final String tag;

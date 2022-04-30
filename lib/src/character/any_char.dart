@@ -11,16 +11,16 @@ class AnyChar extends ParserBuilder<String, int> {
 state.ok = state.pos < source.length;
 if (state.ok) {
   {{res0}} = source.readRune(state);
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   static const _templateFast = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
   source.readRune(state);
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   const AnyChar();

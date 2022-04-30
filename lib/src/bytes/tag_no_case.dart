@@ -20,8 +20,8 @@ if (state.ok) {
     {{res0}} = v;
   }
 }
-if (!state.ok && state.log) {
-  state.error = ErrExpected.tag({{start}}, const Tag({{tag}}));
+if (!state.ok) {
+  state.error = ParseError.expected({{start}}, {{tag}});
 }''';
 
   static const _templateFast = '''
@@ -35,8 +35,8 @@ if (state.ok) {
     state.pos = {{end}};
   }
 }
-if (!state.ok && state.log) {
-  state.error = ErrExpected.tag({{start}}, const Tag({{tag}}));
+if (!state.ok) {
+  state.error = ParseError.expected({{start}}, {{tag}});
 }''';
 
   final String tag;

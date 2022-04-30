@@ -11,13 +11,9 @@ while (true) {
     {{res0}} = Tuple2({{list}}, {{val1}});
     break;
   }
-  final {{error}} = state.error;
   {{var2}}
   {{p2}}
   if (!state.ok) {
-    if (state.log) {
-      state.error = ErrCombined(state.pos, [{{error}}, state.error]);
-    }
     state.pos = {{pos}};
     break;
   }
@@ -31,12 +27,8 @@ while (true) {
   if (state.ok) {
     break;
   }
-  final {{error}} = state.error;
   {{p2}}
   if (!state.ok) {
-    if (state.log) {
-      state.error = ErrCombined(state.pos, [{{error}}, state.error]);
-    }
     state.pos = {{pos}};
     break;
   }
@@ -51,7 +43,7 @@ while (true) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['error', 'list', 'log', 'pos']);
+    final values = context.allocateLocals(['list', 'pos']);
     final r1 = context.getResult(end, !fast);
     final r2 = context.getResult(parser, !fast);
     values.addAll({

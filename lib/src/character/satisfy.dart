@@ -16,11 +16,12 @@ if (state.ok) {
   if (state.ok) {
     state.pos++;
     {{res0}} = c;
-  } else if (state.log) {
-    state.error = ErrUnexpected.charAt(state.pos, source);
+  } else {
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   static const _template16Fast = '''
@@ -30,11 +31,12 @@ if (state.ok) {
   state.ok = {{test}};
   if (state.ok) {
     state.pos++;
-  } else if (state.log) {
-    state.error = ErrUnexpected.charAt(state.pos, source);
+  } else {
+    final c = source.runeAt(state.pos);
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   static const _template32 = '''
@@ -47,12 +49,10 @@ if (state.ok) {
     {{res0}} = c;
   } else {
     state.pos = pos;
-    if (state.log) {
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    }
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   static const _template32Fast = '''
@@ -63,12 +63,10 @@ if (state.ok) {
   state.ok = {{test}};
   if (!state.ok) {
     state.pos = pos;
-    if (state.log) {
-      state.error = ErrUnexpected.char(state.pos, Char(c));
-    }
+    state.error = ParseError.unexpected(state.pos, 0, c);
   }
-} else if (state.log) {
-  state.error = ErrUnexpected.eof(state.pos);
+} else {
+  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
 }''';
 
   final SemanticAction<bool> predicate;

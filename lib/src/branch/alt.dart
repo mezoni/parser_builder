@@ -130,15 +130,12 @@ class Alt7<I, O> extends _Alt<I, O> {
 }
 
 abstract class _Alt<I, O> extends ParserBuilder<I, O> {
-  static const _templateFailure = '''
-if (state.log) {
-  state.error = ErrCombined(state.pos, [{{errors}}]);
-}''';
+  static const _templateLast = '''
+{{p1}}''';
 
   static const _templateParser = '''
 {{p1}}
 if (!state.ok) {
-  final {{error}} = state.error;
   {{next}}
 }''';
 
@@ -152,16 +149,14 @@ if (!state.ok) {
     }
 
     var template = '{{next}}';
-    final errors = <String>[];
     for (var i = 0; i < parsers.length; i++) {
-      final error = context.allocateLocal();
-      errors.add(error);
       final parser = parsers[i];
       final values = {
-        'error': error,
         'p1': parser.build(context, result),
       };
-      final templateParser = render(_templateParser, values);
+      final isLast = i == parsers.length - 1;
+      final templateParser =
+          render2(isLast, _templateLast, _templateParser, values);
       values.clear();
       values.addAll({
         'next': templateParser,
@@ -169,15 +164,7 @@ if (!state.ok) {
       template = render(template, values);
     }
 
-    final values = {
-      'errors': errors.join(', '),
-    };
-    final templateFailure = render(_templateFailure, values);
-    values.clear();
-    values.addAll({
-      'next': templateFailure,
-    });
-    return render(template, values);
+    return render(template, {});
   }
 
   List<ParserBuilder<I, O>> _getParsers();

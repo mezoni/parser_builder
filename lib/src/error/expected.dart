@@ -6,14 +6,14 @@ class Expected<I, O> extends ParserBuilder<I, O> {
 {{p1}}
 if (state.ok) {
   {{res0}} = {{res1}};
-} else if (state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+} else {
+  state.error = ParseError.expected(state.pos, {{tag}});
 }''';
 
   static const _templateFast = '''
 {{p1}}
-if (!state.ok && state.log) {
-  state.error = ErrExpected.tag(state.pos, const Tag({{tag}}));
+if (!state.ok) {
+  state.error = ParseError.expected(state.pos, {{tag}});
 }''';
 
   final ParserBuilder<I, O> parser;

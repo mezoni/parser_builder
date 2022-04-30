@@ -15,11 +15,11 @@ state.ok = {{index}} > {{pos}};
 if (state.ok) {
   state.pos = {{index}};
   {{res0}} = source.substring({{pos}}, {{index}});
-} else if (state.log) {
+} else {
   if ({{index}} == -1) {
-    state.error = ErrExpected.tag(source.length, const Tag({{tag}}));
+    state.error = ParseError.expected(source.length, {{tag}});
   } else {
-    state.error = ErrUnexpected.tag({{pos}}, const Tag({{tag}}));
+    state.error = ParseError.unexpected({{pos}}, 0, {{tag}});
   }
 }''';
 
@@ -29,11 +29,11 @@ final {{index}} = source.indexOf({{tag}}, {{pos}});
 state.ok = {{index}} > {{pos}};
 if (state.ok) {
   state.pos = {{index}};
-} else if (state.log) {
+} else {
   if ({{index}} == -1) {
-    state.error = ErrExpected.tag(source.length, const Tag({{tag}}));
+    state.error = ParseError.expected(source.length, {{tag}});
   } else {
-    state.error = ErrUnexpected.tag({{pos}}, const Tag({{tag}}));
+    state.error = ParseError.unexpected({{pos}}, 0, {{tag}});
   }
 }''';
 
