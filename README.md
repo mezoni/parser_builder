@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 2.0.0
+Version: 2.0.1
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -23,7 +23,7 @@ Ask questions if something is not clear.
 - The performance of the generated parsers is `quite high`
 - The generated parsers `does not wrap the values` of the parse results
 - The parser builder generates `fully strongly typed` parsers
-- Small size of the embedded `runtime code (about 11 Kb)` to support the work of the parser
+- Small size of the embedded `runtime code (about 6 Kb)` to support the work of the parser
 - The size of generated parser rules `starts from 350 bytes` (without runtime code)
 - The generated source code of the parsers is `human-friendly` as if you wrote it by hand
 - Very `handy debugging` and setting breakpoints to any place of parsing
