@@ -1,8 +1,7 @@
 part of '../../parser_builder.dart';
 
 class ParseRuntime {
-  static const _classParseError =
-      r'''
+  static const _classParseError = r'''
 class ParseError {
   final ParseErrorKind kind;
 
@@ -110,8 +109,7 @@ class ParseError {
   }
 }''';
 
-  static const _classState =
-      r'''
+  static const _classState = r'''
 class State<T> {
   dynamic context;
 
@@ -180,12 +178,10 @@ class State<T> {
   }
 }''';
 
-  static const _enumParseErrorKind =
-      '''
+  static const _enumParseErrorKind = '''
 enum ParseErrorKind { expected, message, unexpected }''';
 
-  static const _extensionString =
-      r'''
+  static const _extensionString = r'''
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
@@ -233,8 +229,7 @@ extension on String {
   }
 }''';
 
-  static const _functionErrorMessage =
-      r'''
+  static const _functionErrorMessage = r'''
 String {{name}}(String source, List<ParseError> errors,
     [color, int maxCount = 10, String? url]) {
   final sb = StringBuffer();
