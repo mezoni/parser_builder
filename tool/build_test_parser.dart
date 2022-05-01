@@ -31,10 +31,12 @@ Future<void> main(List<String> args) async {
     _eof,
     _escapeSequence16,
     _escapeSequence32,
+    _expected2C16,
     _foldMany0Digit,
     _hexDigit0,
     _hexDigit1,
     _identifier,
+    _malformedTake2C16,
     _many0C16,
     _many0C32,
     _many0CountC32,
@@ -213,6 +215,9 @@ const _escapeSequence16 =
 const _escapeSequence32 = Named('escapeSequence32',
     EscapeSequence({0x6e: 0xa, 0x72: 0xd, c16: c16, c32: c32}));
 
+const _expected2C16 =
+    Named('expected2C16', Expected('c16c16', TakeWhileMN(2, 2, _isC16)));
+
 const _foldMany0Digit = Named(
     'foldMany0Digit',
     FoldMany0(
@@ -235,6 +240,9 @@ const _isC16 = CharClass('#x50');
 const _isC32 = CharClass('#x1d200');
 
 const _isDigit = CharClass('[0-9]');
+
+const _malformedTake2C16 = Named('malformedTake2C16',
+    Malformed('tag', 'message', TakeWhileMN(2, 2, _isC16)));
 
 const _many0C16 = Named('many0C16', Many0(Char(c16)));
 

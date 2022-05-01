@@ -1,5 +1,6 @@
 import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/combinator.dart';
+import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
@@ -11,19 +12,22 @@ Future<void> main(List<String> args) async {
   final context = Context();
   final filename = 'example/hex_color_parser.g.dart';
   await fastBuild(context, [_parse], filename,
-      partOf: 'hex_color_parser.dart', publish: {'parseString': _parse});
+      partOf: 'hex_color_parser.dart', publish: {'parse': _parse});
 }
 
 const _hexColor = Named(
     '_hexColor',
-    Preceded(
-        Tag('#'),
-        Map3(
-            _hexPrimary,
-            _hexPrimary,
-            _hexPrimary,
-            ExpressionAction<Color>(
-                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
+    Malformed(
+        'hexadecimal color',
+        'Malformed hexadecimal color',
+        Preceded(
+            Tag('#'),
+            Map3(
+                _hexPrimary,
+                _hexPrimary,
+                _hexPrimary,
+                ExpressionAction<Color>(
+                    ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})')))));
 
 const _hexPrimary = Named(
     '_hexPrimary',

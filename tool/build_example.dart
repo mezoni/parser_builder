@@ -64,8 +64,9 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
 const _escapeHex = Named(
     '_escapeHex',
-    Map2(Fast(Tag('u')), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
-        ExpressionAction<int>(['s'], '_toHexValue({{s}})')),
+    Indicate(
+        r"An escape sequence starting with '\u' must be followed by 4 hexadecimal digits",
+        Map2(Fast(Tag('u')), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')), ExpressionAction<int>(['s'], '_toHexValue({{s}})'))),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({
@@ -103,7 +104,8 @@ const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
 
 const _null = Named('_null', Value(null as dynamic, Tag('null')));
 
-const _number = Named('_number', Nested('number', _json_number.parser));
+const _number = Named(
+    '_number', Malformed('number', 'Malformed number', _json_number.parser));
 
 const _object = Named(
     '_object',

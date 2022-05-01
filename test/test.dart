@@ -36,10 +36,12 @@ void _test() {
   _testEof();
   _testEscapeSequence();
   // EscapedTransform
+  _testExpected();
   _testFoldMany0();
   _testHexDigit0();
   _testHexDigit1();
   _testIdentifierExpression();
+  _testMalformed();
   _testMany0();
   _testMany0Count();
   _testMany1();
@@ -805,6 +807,43 @@ void _testEscapeSequence() {
   });
 }
 
+void _testExpected() {
+  test('Expected', () {
+    final parser = expected2C16;
+    {
+      final state = State('$s16$s16');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, '$s16$s16');
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('$s16');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError.expected(0, 'c16c16')]);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError.expected(0, 'c16c16')]);
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError.expected(0, 'c16c16')]);
+    }
+  });
+}
+
 void _testFoldMany0() {
   test('Many0Fold', () {
     final parser = foldMany0Digit;
@@ -985,6 +1024,61 @@ void _testIdentifierExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errors, [ParseError.expected(0, 'identifier')]);
+    }
+  });
+}
+
+void _testMalformed() {
+  test('Malformed', () {
+    final parser = malformedTake2C16;
+    {
+      final state = State('$s16$s16');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, '$s16$s16');
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('$s16');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [
+        ParseError.unexpected(1, 0, 'EOF'),
+        ParseError.message(1, -1, 'message'),
+      ]);
+    }
+    {
+      final state = State('$s16 ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [
+        ParseError.unexpected(1, 0, 0x20),
+        ParseError.message(1, -1, 'message'),
+      ]);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [
+        ParseError.expected(0, 'tag'),
+      ]);
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [
+        ParseError.expected(0, 'tag'),
+      ]);
     }
   });
 }

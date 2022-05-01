@@ -1,6 +1,6 @@
 part of 'hex_color_parser.dart';
 
-Color parseString(String source) {
+Color parse(String source) {
   final state = State(source);
   final result = _parse(state);
   if (!state.ok) {
@@ -50,6 +50,11 @@ int? _hexPrimary(State<String> state) {
 Color? _hexColor(State<String> state) {
   Color? $0;
   final source = state.source;
+  final $minErrorPos = state.minErrorPos;
+  final $newErrorPos = state.newErrorPos;
+  state.minErrorPos = state.pos + 1;
+  state.newErrorPos = -1;
+  Color? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
@@ -59,19 +64,19 @@ Color? _hexColor(State<String> state) {
   }
   if (state.ok) {
     final $pos1 = state.pos;
-    int? $1;
-    $1 = _hexPrimary(state);
+    int? $2;
+    $2 = _hexPrimary(state);
     if (state.ok) {
-      int? $2;
-      $2 = _hexPrimary(state);
+      int? $3;
+      $3 = _hexPrimary(state);
       if (state.ok) {
-        int? $3;
-        $3 = _hexPrimary(state);
+        int? $4;
+        $4 = _hexPrimary(state);
         if (state.ok) {
-          final v1 = $1!;
-          final v2 = $2!;
-          final v3 = $3!;
-          $0 = Color(v1, v2, v3);
+          final v1 = $2!;
+          final v2 = $3!;
+          final v3 = $4!;
+          $1 = Color(v1, v2, v3);
         }
       }
     }
@@ -80,9 +85,23 @@ Color? _hexColor(State<String> state) {
     }
   }
   if (!state.ok) {
-    $0 = null;
+    $1 = null;
     state.pos = $pos;
   }
+  state.minErrorPos = $minErrorPos;
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    if (state.newErrorPos > state.pos) {
+      final length = state.pos - state.newErrorPos;
+      state.error = ParseError.message(
+          state.newErrorPos, length, 'Malformed hexadecimal color');
+    } else {
+      state.error = ParseError.expected(state.pos, 'hexadecimal color');
+    }
+  }
+  state.newErrorPos =
+      $newErrorPos > state.newErrorPos ? $newErrorPos : state.newErrorPos;
   return $0;
 }
 
@@ -142,6 +161,8 @@ class ParseError {
   ParseError.unexpected(this.offset, this.length, this.value)
       : kind = ParseErrorKind.unexpected;
 
+  ParseError._(this.kind, this.offset, this.length, this.value);
+
   @override
   int get hashCode =>
       kind.hashCode ^ length.hashCode ^ offset.hashCode ^ value.hashCode;
@@ -153,6 +174,14 @@ class ParseError {
         other.length == length &&
         other.offset == offset &&
         other.value == value;
+  }
+
+  ParseError normalize() {
+    if (length >= 0) {
+      return this;
+    }
+
+    return ParseError._(kind, offset + length, -length, value);
   }
 
   @override
@@ -168,36 +197,36 @@ class ParseError {
   }
 
   static List<ParseError> errorReport(List<ParseError> errors) {
-    final result = errors.toSet().toList();
-    final expected = <int, List<ParseError>>{};
-    for (final error
-        in result.where((e) => e.kind == ParseErrorKind.expected)) {
+    errors = errors.toSet().map((e) => e.normalize()).toList();
+    final grouped = <int, List<ParseError>>{};
+    final expected = errors.where((e) => e.kind == ParseErrorKind.expected);
+    for (final error in expected) {
       final offset = error.offset;
-      var list = expected[offset];
+      var list = grouped[offset];
       if (list == null) {
         list = [];
-        expected[offset] = list;
+        grouped[offset] = list;
       }
 
       list.add(error);
     }
 
-    result.removeWhere((e) => e.kind == ParseErrorKind.expected);
-    for (var i = 0; i < result.length; i++) {
-      final error = result[i];
+    errors.removeWhere((e) => e.kind == ParseErrorKind.expected);
+    for (var offset in grouped.keys) {
+      final list = grouped[offset]!;
+      final values = list.map((e) => '\'${_escape(e.value)}\'').join(', ');
+      errors.add(ParseError.message(offset, 0, 'Expected: $values'));
+    }
+
+    for (var i = 0; i < errors.length; i++) {
+      final error = errors[i];
       if (error.kind == ParseErrorKind.unexpected) {
-        result[i] = ParseError.unexpected(
-            error.offset, error.length, _escape(error.value));
+        errors[i] = ParseError.unexpected(
+            error.offset, error.length, '\'${_escape(error.value)}\'');
       }
     }
 
-    for (var offset in expected.keys) {
-      final list = expected[offset]!;
-      final values = list.map((e) => _escape(e.value)).join(', ');
-      result.add(ParseError.message(offset, 0, 'Expected: $values'));
-    }
-
-    return result;
+    return errors;
   }
 
   static String _escape(value) {
@@ -225,7 +254,7 @@ class ParseError {
       result = result.replaceAll(key, map[key]!);
     }
 
-    return '\'$result\'';
+    return result;
   }
 }
 
@@ -234,9 +263,9 @@ enum ParseErrorKind { expected, message, unexpected }
 class State<T> {
   dynamic context;
 
-  bool log = true;
+  int minErrorPos = -1;
 
-  int nested = -1;
+  int newErrorPos = -1;
 
   bool ok = false;
 
@@ -246,38 +275,41 @@ class State<T> {
 
   ParseError? _error;
 
+  final List _errors = List.filled(100, null);
+
   int _errorPos = -1;
 
   int _length = 0;
-
-  final List _list = List.filled(100, null);
 
   State(this.source);
 
   set error(ParseError error) {
     final offset = error.offset;
-    if (offset > nested && log) {
+    if (offset >= minErrorPos) {
       if (_errorPos < offset) {
         _errorPos = offset;
         _length = 1;
         _error = error;
+        newErrorPos = offset;
       } else if (_errorPos == offset) {
-        if (_length == 1) {
-          _list[0] = _error;
-        }
-
-        if (_length < _list.length) {
-          _list[_length++] = error;
+        newErrorPos = offset;
+        if (_length < _errors.length) {
+          _errors[_length++] = error;
         }
       }
     }
   }
 
   List<ParseError> get errors {
-    if (_length == 1) {
+    if (_length == 0) {
+      return [];
+    } else if (_length == 1) {
       return [_error!];
     } else {
-      return List.generate(_length, (i) => _list[i] as ParseError);
+      return [
+        _error!,
+        ...List.generate(_length - 1, (i) => _errors[i + 1] as ParseError)
+      ];
     }
   }
 

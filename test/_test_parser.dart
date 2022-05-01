@@ -175,19 +175,17 @@ int? char32(State<String> state) {
 
 void andC32OrC16(State<String> state) {
   final $pos = state.pos;
-  final $log = state.log;
-  state.log = false;
+  final $minErrorPos = state.minErrorPos;
+  state.minErrorPos = 0x7fffffff;
   char32(state);
   if (!state.ok) {
     char16(state);
   }
-  state.log = $log;
+  state.minErrorPos = $minErrorPos;
   if (state.ok) {
     state.pos = $pos;
   } else {
-    if ($log) {
-      state.error = ParseError.message(state.pos, 0, 'Unknown error');
-    }
+    state.error = ParseError.message(state.pos, 0, 'Unknown error');
   }
 }
 
@@ -531,6 +529,44 @@ int? escapeSequence32(State<String> state) {
   return $0;
 }
 
+String? expected2C16(State<String> state) {
+  String? $0;
+  final source = state.source;
+  final $minErrorPos = state.minErrorPos;
+  state.minErrorPos = 0x7fffffff;
+  String? $1;
+  final $pos = state.pos;
+  var $count = 0;
+  while ($count < 2 && state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c == 80;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+    $count++;
+  }
+  state.ok = $count >= 2;
+  if (state.ok) {
+    $1 = source.substring($pos, state.pos);
+  } else {
+    if (state.pos < source.length) {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+    }
+    state.pos = $pos;
+  }
+  state.minErrorPos = $minErrorPos;
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    state.error = ParseError.expected(state.pos, 'c16c16');
+  }
+  return $0;
+}
+
 dynamic foldMany0Digit(State<String> state) {
   dynamic $0;
   final source = state.source;
@@ -682,6 +718,53 @@ String? identifier(State<String> state) {
     state.pos = $pos;
     state.error = ParseError.expected(state.pos, 'identifier');
   }
+  return $0;
+}
+
+String? malformedTake2C16(State<String> state) {
+  String? $0;
+  final source = state.source;
+  final $minErrorPos = state.minErrorPos;
+  final $newErrorPos = state.newErrorPos;
+  state.minErrorPos = state.pos + 1;
+  state.newErrorPos = -1;
+  String? $1;
+  final $pos = state.pos;
+  var $count = 0;
+  while ($count < 2 && state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c == 80;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+    $count++;
+  }
+  state.ok = $count >= 2;
+  if (state.ok) {
+    $1 = source.substring($pos, state.pos);
+  } else {
+    if (state.pos < source.length) {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+    }
+    state.pos = $pos;
+  }
+  state.minErrorPos = $minErrorPos;
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    if (state.newErrorPos > state.pos) {
+      final length = state.pos - state.newErrorPos;
+      state.error = ParseError.message(state.newErrorPos, length, 'message');
+    } else {
+      state.error = ParseError.expected(state.pos, 'tag');
+    }
+  }
+  state.newErrorPos =
+      $newErrorPos > state.newErrorPos ? $newErrorPos : state.newErrorPos;
   return $0;
 }
 
@@ -977,8 +1060,8 @@ String? mapC32ToStr(State<String> state) {
 Object? nestedC16OrTake2C32(State<String> state) {
   Object? $0;
   final source = state.source;
-  final $nested = state.nested;
-  state.nested = state.pos;
+  final $minErrorPos = state.minErrorPos;
+  state.minErrorPos = state.pos + 1;
   Object? $1;
   $1 = char16(state);
   if (!state.ok) {
@@ -1007,7 +1090,7 @@ Object? nestedC16OrTake2C32(State<String> state) {
       state.pos = $pos;
     }
   }
-  state.nested = $nested;
+  state.minErrorPos = $minErrorPos;
   if (state.ok) {
     $0 = $1;
   } else {
@@ -1136,19 +1219,17 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
 
 void notC32OrC16(State<String> state) {
   final $pos = state.pos;
-  final $log = state.log;
-  state.log = false;
+  final $minErrorPos = state.minErrorPos;
+  state.minErrorPos = 0x7fffffff;
   char16(state);
   if (!state.ok) {
     char32(state);
   }
-  state.log = $log;
+  state.minErrorPos = $minErrorPos;
   state.ok = !state.ok;
   if (!state.ok) {
     state.pos = $pos;
-    if ($log) {
-      state.error = ParseError.message(state.pos, 0, 'Unknown error');
-    }
+    state.error = ParseError.message(state.pos, 0, 'Unknown error');
   }
 }
 
@@ -2378,6 +2459,8 @@ class ParseError {
   ParseError.unexpected(this.offset, this.length, this.value)
       : kind = ParseErrorKind.unexpected;
 
+  ParseError._(this.kind, this.offset, this.length, this.value);
+
   @override
   int get hashCode =>
       kind.hashCode ^ length.hashCode ^ offset.hashCode ^ value.hashCode;
@@ -2389,6 +2472,14 @@ class ParseError {
         other.length == length &&
         other.offset == offset &&
         other.value == value;
+  }
+
+  ParseError normalize() {
+    if (length >= 0) {
+      return this;
+    }
+
+    return ParseError._(kind, offset + length, -length, value);
   }
 
   @override
@@ -2404,36 +2495,36 @@ class ParseError {
   }
 
   static List<ParseError> errorReport(List<ParseError> errors) {
-    final result = errors.toSet().toList();
-    final expected = <int, List<ParseError>>{};
-    for (final error
-        in result.where((e) => e.kind == ParseErrorKind.expected)) {
+    errors = errors.toSet().map((e) => e.normalize()).toList();
+    final grouped = <int, List<ParseError>>{};
+    final expected = errors.where((e) => e.kind == ParseErrorKind.expected);
+    for (final error in expected) {
       final offset = error.offset;
-      var list = expected[offset];
+      var list = grouped[offset];
       if (list == null) {
         list = [];
-        expected[offset] = list;
+        grouped[offset] = list;
       }
 
       list.add(error);
     }
 
-    result.removeWhere((e) => e.kind == ParseErrorKind.expected);
-    for (var i = 0; i < result.length; i++) {
-      final error = result[i];
+    errors.removeWhere((e) => e.kind == ParseErrorKind.expected);
+    for (var offset in grouped.keys) {
+      final list = grouped[offset]!;
+      final values = list.map((e) => '\'${_escape(e.value)}\'').join(', ');
+      errors.add(ParseError.message(offset, 0, 'Expected: $values'));
+    }
+
+    for (var i = 0; i < errors.length; i++) {
+      final error = errors[i];
       if (error.kind == ParseErrorKind.unexpected) {
-        result[i] = ParseError.unexpected(
-            error.offset, error.length, _escape(error.value));
+        errors[i] = ParseError.unexpected(
+            error.offset, error.length, '\'${_escape(error.value)}\'');
       }
     }
 
-    for (var offset in expected.keys) {
-      final list = expected[offset]!;
-      final values = list.map((e) => _escape(e.value)).join(', ');
-      result.add(ParseError.message(offset, 0, 'Expected: $values'));
-    }
-
-    return result;
+    return errors;
   }
 
   static String _escape(value) {
@@ -2461,7 +2552,7 @@ class ParseError {
       result = result.replaceAll(key, map[key]!);
     }
 
-    return '\'$result\'';
+    return result;
   }
 }
 
@@ -2470,9 +2561,9 @@ enum ParseErrorKind { expected, message, unexpected }
 class State<T> {
   dynamic context;
 
-  bool log = true;
+  int minErrorPos = -1;
 
-  int nested = -1;
+  int newErrorPos = -1;
 
   bool ok = false;
 
@@ -2482,38 +2573,41 @@ class State<T> {
 
   ParseError? _error;
 
+  final List _errors = List.filled(100, null);
+
   int _errorPos = -1;
 
   int _length = 0;
-
-  final List _list = List.filled(100, null);
 
   State(this.source);
 
   set error(ParseError error) {
     final offset = error.offset;
-    if (offset > nested && log) {
+    if (offset >= minErrorPos) {
       if (_errorPos < offset) {
         _errorPos = offset;
         _length = 1;
         _error = error;
+        newErrorPos = offset;
       } else if (_errorPos == offset) {
-        if (_length == 1) {
-          _list[0] = _error;
-        }
-
-        if (_length < _list.length) {
-          _list[_length++] = error;
+        newErrorPos = offset;
+        if (_length < _errors.length) {
+          _errors[_length++] = error;
         }
       }
     }
   }
 
   List<ParseError> get errors {
-    if (_length == 1) {
+    if (_length == 0) {
+      return [];
+    } else if (_length == 1) {
       return [_error!];
     } else {
-      return List.generate(_length, (i) => _list[i] as ParseError);
+      return [
+        _error!,
+        ...List.generate(_length - 1, (i) => _errors[i + 1] as ParseError)
+      ];
     }
   }
 

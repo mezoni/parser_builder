@@ -3,6 +3,7 @@ import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/char_class.dart';
 import 'package:parser_builder/character.dart';
 import 'package:parser_builder/combinator.dart';
+import 'package:parser_builder/error.dart';
 import 'package:parser_builder/expression.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
@@ -46,8 +47,8 @@ const _additive = Named(
     BinaryExpression(
         _multiplicative, _additiveOperator, _multiplicative, _calculate));
 
-const _additiveOperator =
-    Named('_additiveOperator', Terminated(Tags(['+', '-']), _ws));
+const _additiveOperator = Named(
+    '_additiveOperator', Nested(_operator, Terminated(Tags(['+', '-']), _ws)));
 
 const _calculate = ExpressionAction<num>(
     ['left', 'op', 'right'], '_calculate({{left}}, {{op}}, {{right}})');
@@ -56,41 +57,52 @@ const _closeParen = Named('_closeParen', Terminated(Tag(')'), _ws));
 
 const _decimal = Named(
     '_decimal',
-    Terminated(
-        Map1(
-            Recognize(
-              Tuple3(Digit1(), Tag('.'), Digit1()),
-            ),
-            ExpressionAction<num>(['x'], 'num.parse({{x}})')),
-        _ws));
+    Malformed(
+        'decimal',
+        'Malformed decimal',
+        Terminated(
+            Map1(
+                Recognize(
+                  Tuple3(Digit1(), Tag('.'), Digit1()),
+                ),
+                ExpressionAction<num>(['x'], 'num.parse({{x}})')),
+            _ws)));
 
 const _expression = Ref<String, num>('_expression');
 
-const _expression_ = Named('_expression', _additive);
+const _expression_ = Named('_expression', Nested('expression', _additive));
 
 const _integer = Named(
     '_integer',
-    Terminated(
-        Map1(Digit1(), ExpressionAction<num>(['x'], 'int.parse({{x}})')), _ws));
+    Malformed(
+        'integer',
+        'Malformed integer',
+        Terminated(
+            Map1(Digit1(), ExpressionAction<num>(['x'], 'int.parse({{x}})')),
+            _ws)));
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 
 const _multiplicative = Named('_multiplicative',
     BinaryExpression(_primary, _multiplicativeOperator, _primary, _calculate));
 
-const _multiplicativeOperator =
-    Named('_multiplicativeOperator', Terminated(Tags(['*', '/', '~/']), _ws));
+const _multiplicativeOperator = Named('_multiplicativeOperator',
+    Nested(_operator, Terminated(Tags(['*', '/', '~/']), _ws)));
 
 const _openParen = Named('_openParen', Terminated(Tag('('), _ws));
+
+const _operator = 'operator';
 
 const _parse = Named('_parse', Terminated(_expression, Eof<String>()));
 
 const _primary = Named(
     '_primary',
-    Alt3(
-      _decimal,
-      _integer,
-      Delimited(_openParen, _expression, _closeParen),
-    ));
+    Nested(
+        'expression',
+        Alt3(
+          _decimal,
+          _integer,
+          Delimited(_openParen, _expression, _closeParen),
+        )));
 
 const _ws = Named('_ws', SkipWhile(_isWhitespace));

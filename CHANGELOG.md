@@ -1,3 +1,10 @@
+## 2.0.1
+
+- Tested and documented parser builder `Expected`
+- Documented parser builder `Nested`
+- Implemented, tested and documented parser builder `Malformed`
+- Implemented (but not tested) and documented experimental parser builder `Indicate`
+
 ## 2.0.0
 
 - Breaking change.
@@ -18,8 +25,8 @@ Now the principle of operation is closest to `PEG` parsers, where each parser ca
 
 ## 1.0.9
 
-- Added and tested parser builder `PostfixExpression`
-- Added and tested parser builder `PrefixExpression`
+- Implemented and tested parser builder `PostfixExpression`
+- Implemented and tested parser builder `PrefixExpression`
 - Fixed bug in parser builder `BinaryExpression`. In case of failure, the position was restored incorrectly, not to the very beginning of the binary expression. The position is now restored to the very first left-hand operand
 
 ## 1.0.8
@@ -29,7 +36,7 @@ Now the principle of operation is closest to `PEG` parsers, where each parser ca
 
 ## 1.0.7
 
-- Added and tested parser builder `IdentifierExpression`
+- Implemented and tested parser builder `IdentifierExpression`
 
 ## 1.0.6
 
@@ -38,15 +45,15 @@ Now the principle of operation is closest to `PEG` parsers, where each parser ca
 
 ## 1.0.5
 
-- Added and tested parser builder `SeparatedListN`
+- Implemented and tested parser builder `SeparatedListN`
 
 ## 1.0.4
 
-- Added and tested parser builder `ManyN`
+- Implemented and tested parser builder `ManyN`
 
 ## 1.0.3
 
-- Added and tested parser builder `BinaryExpression`
+- Implemented and tested parser builder `BinaryExpression`
 - Added simple calculator parser example
 
 ## 1.0.2

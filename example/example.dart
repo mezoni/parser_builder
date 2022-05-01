@@ -50,6 +50,9 @@ dynamic _json(State<String> state) {
 int? _escapeHex(State<String> state) {
   int? $0;
   final source = state.source;
+  final $newErrorPos = state.newErrorPos;
+  state.newErrorPos = -1;
+  int? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 117;
   if (state.ok) {
@@ -58,7 +61,7 @@ int? _escapeHex(State<String> state) {
     state.error = ParseError.expected(state.pos, 'u');
   }
   if (state.ok) {
-    String? $1;
+    String? $2;
     final $pos1 = state.pos;
     var $count = 0;
     while ($count < 4 && state.pos < source.length) {
@@ -73,7 +76,7 @@ int? _escapeHex(State<String> state) {
     }
     state.ok = $count >= 4;
     if (state.ok) {
-      $1 = source.substring($pos1, state.pos);
+      $2 = source.substring($pos1, state.pos);
     } else {
       if (state.pos < source.length) {
         final c = source.runeAt(state.pos);
@@ -84,13 +87,22 @@ int? _escapeHex(State<String> state) {
       state.pos = $pos1;
     }
     if (state.ok) {
-      final v1 = $1!;
-      $0 = _toHexValue(v1);
+      final v1 = $2!;
+      $1 = _toHexValue(v1);
     }
   }
   if (!state.ok) {
     state.pos = $pos;
   }
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    final length = state.pos - state.newErrorPos;
+    state.error = ParseError.message(state.newErrorPos, length,
+        'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits');
+  }
+  state.newErrorPos =
+      $newErrorPos > state.newErrorPos ? $newErrorPos : state.newErrorPos;
   return $0;
 }
 
@@ -161,8 +173,8 @@ void _quote(State<String> state) {
 String? _string(State<String> state) {
   String? $0;
   final source = state.source;
-  final $nested = state.nested;
-  state.nested = state.pos;
+  final $minErrorPos = state.minErrorPos;
+  state.minErrorPos = state.pos + 1;
   String? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
@@ -222,7 +234,7 @@ String? _string(State<String> state) {
     $1 = null;
     state.pos = $pos;
   }
-  state.nested = $nested;
+  state.minErrorPos = $minErrorPos;
   if (state.ok) {
     $0 = $1;
   } else {
@@ -234,8 +246,10 @@ String? _string(State<String> state) {
 num? _number(State<String> state) {
   num? $0;
   final source = state.source;
-  final $nested = state.nested;
-  state.nested = state.pos;
+  final $minErrorPos = state.minErrorPos;
+  final $newErrorPos = state.newErrorPos;
+  state.minErrorPos = state.pos + 1;
+  state.newErrorPos = -1;
   num? $1;
   state.ok = true;
   final $pos = state.pos;
@@ -505,12 +519,20 @@ num? _number(State<String> state) {
     }
     state.pos = $pos;
   }
-  state.nested = $nested;
+  state.minErrorPos = $minErrorPos;
   if (state.ok) {
     $0 = $1;
   } else {
-    state.error = ParseError.expected(state.pos, 'number');
+    if (state.newErrorPos > state.pos) {
+      final length = state.pos - state.newErrorPos;
+      state.error =
+          ParseError.message(state.newErrorPos, length, 'Malformed number');
+    } else {
+      state.error = ParseError.expected(state.pos, 'number');
+    }
   }
+  state.newErrorPos =
+      $newErrorPos > state.newErrorPos ? $newErrorPos : state.newErrorPos;
   return $0;
 }
 
@@ -869,6 +891,8 @@ class ParseError {
   ParseError.unexpected(this.offset, this.length, this.value)
       : kind = ParseErrorKind.unexpected;
 
+  ParseError._(this.kind, this.offset, this.length, this.value);
+
   @override
   int get hashCode =>
       kind.hashCode ^ length.hashCode ^ offset.hashCode ^ value.hashCode;
@@ -880,6 +904,14 @@ class ParseError {
         other.length == length &&
         other.offset == offset &&
         other.value == value;
+  }
+
+  ParseError normalize() {
+    if (length >= 0) {
+      return this;
+    }
+
+    return ParseError._(kind, offset + length, -length, value);
   }
 
   @override
@@ -895,36 +927,36 @@ class ParseError {
   }
 
   static List<ParseError> errorReport(List<ParseError> errors) {
-    final result = errors.toSet().toList();
-    final expected = <int, List<ParseError>>{};
-    for (final error
-        in result.where((e) => e.kind == ParseErrorKind.expected)) {
+    errors = errors.toSet().map((e) => e.normalize()).toList();
+    final grouped = <int, List<ParseError>>{};
+    final expected = errors.where((e) => e.kind == ParseErrorKind.expected);
+    for (final error in expected) {
       final offset = error.offset;
-      var list = expected[offset];
+      var list = grouped[offset];
       if (list == null) {
         list = [];
-        expected[offset] = list;
+        grouped[offset] = list;
       }
 
       list.add(error);
     }
 
-    result.removeWhere((e) => e.kind == ParseErrorKind.expected);
-    for (var i = 0; i < result.length; i++) {
-      final error = result[i];
+    errors.removeWhere((e) => e.kind == ParseErrorKind.expected);
+    for (var offset in grouped.keys) {
+      final list = grouped[offset]!;
+      final values = list.map((e) => '\'${_escape(e.value)}\'').join(', ');
+      errors.add(ParseError.message(offset, 0, 'Expected: $values'));
+    }
+
+    for (var i = 0; i < errors.length; i++) {
+      final error = errors[i];
       if (error.kind == ParseErrorKind.unexpected) {
-        result[i] = ParseError.unexpected(
-            error.offset, error.length, _escape(error.value));
+        errors[i] = ParseError.unexpected(
+            error.offset, error.length, '\'${_escape(error.value)}\'');
       }
     }
 
-    for (var offset in expected.keys) {
-      final list = expected[offset]!;
-      final values = list.map((e) => _escape(e.value)).join(', ');
-      result.add(ParseError.message(offset, 0, 'Expected: $values'));
-    }
-
-    return result;
+    return errors;
   }
 
   static String _escape(value) {
@@ -952,7 +984,7 @@ class ParseError {
       result = result.replaceAll(key, map[key]!);
     }
 
-    return '\'$result\'';
+    return result;
   }
 }
 
@@ -961,9 +993,9 @@ enum ParseErrorKind { expected, message, unexpected }
 class State<T> {
   dynamic context;
 
-  bool log = true;
+  int minErrorPos = -1;
 
-  int nested = -1;
+  int newErrorPos = -1;
 
   bool ok = false;
 
@@ -973,38 +1005,41 @@ class State<T> {
 
   ParseError? _error;
 
+  final List _errors = List.filled(100, null);
+
   int _errorPos = -1;
 
   int _length = 0;
-
-  final List _list = List.filled(100, null);
 
   State(this.source);
 
   set error(ParseError error) {
     final offset = error.offset;
-    if (offset > nested && log) {
+    if (offset >= minErrorPos) {
       if (_errorPos < offset) {
         _errorPos = offset;
         _length = 1;
         _error = error;
+        newErrorPos = offset;
       } else if (_errorPos == offset) {
-        if (_length == 1) {
-          _list[0] = _error;
-        }
-
-        if (_length < _list.length) {
-          _list[_length++] = error;
+        newErrorPos = offset;
+        if (_length < _errors.length) {
+          _errors[_length++] = error;
         }
       }
     }
   }
 
   List<ParseError> get errors {
-    if (_length == 1) {
+    if (_length == 0) {
+      return [];
+    } else if (_length == 1) {
       return [_error!];
     } else {
-      return List.generate(_length, (i) => _list[i] as ParseError);
+      return [
+        _error!,
+        ...List.generate(_length - 1, (i) => _errors[i + 1] as ParseError)
+      ];
     }
   }
 

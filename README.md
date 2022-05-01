@@ -102,7 +102,8 @@ built-in:
 - [`Verify`](https://github.com/mezoni/parser_builder/blob/master/lib/src/combinator/verify.dart)
 
 [`error`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error):
-- [`Expected`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/expected.dart) (not tested yet)
+- [`Expected`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/expected.dart)
+- [`Malformed`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/malformed.dart)
 - [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart)
 
 [`expression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression):
@@ -162,6 +163,7 @@ Take look  at this very simple example of hex color parser builder:
 ```dart
 import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/combinator.dart';
+import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
@@ -173,19 +175,22 @@ Future<void> main(List<String> args) async {
   final context = Context();
   final filename = 'example/hex_color_parser.g.dart';
   await fastBuild(context, [_parse], filename,
-      partOf: 'hex_color_parser.dart', publish: {'parseString': _parse});
+      partOf: 'hex_color_parser.dart', publish: {'parse': _parse});
 }
 
 const _hexColor = Named(
     '_hexColor',
-    Preceded(
-        Tag('#'),
-        Map3(
-            _hexPrimary,
-            _hexPrimary,
-            _hexPrimary,
-            ExpressionAction<Color>(
-                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
+    Malformed(
+        'hexadecimal color',
+        'Malformed hexadecimal color',
+        Preceded(
+            Tag('#'),
+            Map3(
+                _hexPrimary,
+                _hexPrimary,
+                _hexPrimary,
+                ExpressionAction<Color>(
+                    ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})')))));
 
 const _hexPrimary = Named(
     '_hexPrimary',
@@ -231,16 +236,17 @@ Well, of course, you will have to write a small macro for building (with code li
 ## Example of parser declaration
 
 ```dart
-const _comma = Named('_comma', Terminated(Tag(','), _ws), [_inline]);
+const _comma = Terminated(Tag(','), _ws);
 
-const _eof = Named('_eof', Eof<String>());
+const _eof = Eof<String>();
 
-const _escaped = Named('_escaped', Alt([_escapeSeq, _escapeHex]));
+const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
 const _escapeHex = Named(
     '_escapeHex',
-    Map2(Tag('u'), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
-        ExprTransformer<int>(['_', 's'], '_toHexValue({{s}})')),
+    Indicate(
+        r"An escape sequence starting with '\u' must be followed by 4 hexadecimal digits",
+        Map2(Fast(Tag('u')), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')), ExpressionAction<int>(['s'], '_toHexValue({{s}})'))),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({
@@ -254,49 +260,46 @@ const _escapeSeq = EscapeSequence({
   0x74: 0x09
 });
 
-const _false = Named('_false', Value(false, Tag('false')), [_inline]);
+const _false = Named('_false', Value(false, Tag('false')));
 
 const _inline = '@pragma(\'vm:prefer-inline\')';
+
 ```
 
 ## Example of generated code
 
 ```dart
-Color? _hexColor(State<String> state) {
-  Color? $0;
+int? _hexPrimary(State<String> state) {
+  int? $0;
   final source = state.source;
+  String? $1;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
-  if (state.ok) {
-    state.pos += 1;
-  } else if (state.log) {
-    state.error = ErrExpected(state.pos, const Tag('#'));
-  }
-  if (state.ok) {
-    final $pos1 = state.pos;
-    int? $1;
-    $1 = _hexPrimary(state);
-    if (state.ok) {
-      int? $2;
-      $2 = _hexPrimary(state);
-      if (state.ok) {
-        int? $3;
-        $3 = _hexPrimary(state);
-        if (state.ok) {
-          final v1 = $1!;
-          final v2 = $2!;
-          final v3 = $3!;
-          $0 = Color(v1, v2, v3);
-        }
-      }
+  var $count = 0;
+  while ($count < 2 && state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c <= 102 &&
+        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
+    if (!ok) {
+      break;
     }
-    if (!state.ok) {
-      state.pos = $pos1;
-    }
+    state.pos++;
+    $count++;
   }
-  if (!state.ok) {
-    $0 = null;
+  state.ok = $count >= 2;
+  if (state.ok) {
+    $1 = source.substring($pos, state.pos);
+  } else {
+    if (state.pos < source.length) {
+      final c = source.runeAt(state.pos);
+      state.error = ParseError.unexpected(state.pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+    }
     state.pos = $pos;
+  }
+  if (state.ok) {
+    final v = $1!;
+    $0 = int.parse(v, radix: 16);
   }
   return $0;
 }
@@ -306,16 +309,10 @@ Color? _hexColor(State<String> state) {
 This code was generated from this declaration:
 
 ```dart
-const _hexColor = Named(
-    '_hexColor',
-    Preceded(
-        Tag('#'),
-        Map3(
-            _hexPrimary,
-            _hexPrimary,
-            _hexPrimary,
-            ExpressionAction<Color>(
-                ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))));
+const _hexPrimary = Named(
+    '_hexPrimary',
+    Map1(TakeWhileMN(2, 2, CharClass('[0-9A-Fa-f]')),
+        ExpressionAction<int>(['x'], 'int.parse({{x}}, radix: 16)')));
 ```
 
 ## Inlining code example
@@ -339,19 +336,16 @@ dynamic _json(State<String> state) {
   final $pos = state.pos;
   _ws(state);
   if (state.ok) {
-    dynamic $2;
-    $2 = _value(state);
+    $0 = _value(state);
     if (state.ok) {
       state.ok = state.pos >= source.length;
       if (!state.ok) {
-        state.error = ErrExpected.eof(state.pos);
-      }
-      if (state.ok) {
-        $0 = $2;
+        state.error = ParseError.expected(state.pos, 'EOF');
       }
     }
   }
   if (!state.ok) {
+    $0 = null;
     state.pos = $pos;
   }
   return $0;
@@ -362,7 +356,7 @@ dynamic _json(State<String> state) {
 This code was generated from this declaration:
 
 ```dart
-const _json = Named('_json', Delimited(_ws, _value, _eof));
+const _json = Named<String, dynamic>('_json', Delimited(_ws, _value, _eof));
 ```
 
 ## How to declare a parser builder
@@ -376,10 +370,7 @@ part of '../../combinator.dart';
 
 class Opt<I, O> extends ParserBuilder<I, O?> {
   static const _template = '''
-final {{log}} = state.log;
-state.log = false;
 {{p1}}
-state.log = {{log}};
 if (!state.ok) {
   state.ok = true;
 }''';
@@ -390,10 +381,9 @@ if (!state.ok) {
 
   @override
   String build(Context context, ParserResult? result) {
-    final values = context.allocateLocals(['log']);
-    values.addAll({
+    final values = {
       'p1': parser.build(context, result),
-    });
+    };
     return render(_template, values);
   }
 }
@@ -406,7 +396,7 @@ An updated version of this section will be added later...
 
 Current performance of the generated JSON parser.  
 
-The performance is about 1.17-1.33 times lower than that of a hand-written high-quality specialized state machine based JSON parser from the Dart SDK.
+The performance is about 1.30-1.45 times lower than that of a hand-written high-quality specialized state machine based JSON parser from the Dart SDK.
 
 Better results in many cases are obtained in AOT mode. If the Dart SDK compiler had made more efficient use placement of (short lifetime) local variables in registers, the results could have been slightly better. At the moment, the generated parser code is not optimized for using machine registers, because performance tests, unfortunately, do not show a gain from this kind of optimization.
 
@@ -419,11 +409,11 @@ Simple JSON NEW 2: k: 1.00, 86.01 MB/s, 249.60 ms (48.48%),
 
 Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json
 Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (85.71%),
-Simple JSON NEW 2: k: 1.17, 75.41 MB/s, 218.40 ms (100.00%),
+Simple JSON NEW 2: k: 1.43, 75.41 MB/s, 218.40 ms (100.00%),
 
 Parse 10 times: E:\prj\test_json\bin\data\twitter.json
 Dart SDK JSON    : k: 1.00, 57.86 MB/s, 93.60 ms (85.72%),
-Simple JSON NEW 2: k: 1.17, 49.60 MB/s, 109.20 ms (100.00%),
+Simple JSON NEW 2: k: 1.30, 49.60 MB/s, 109.20 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601
@@ -439,11 +429,11 @@ Simple JSON NEW 2: k: 1.00, 105.86 MB/s, 202.80 ms (41.94%),
 
 Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json
 Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (75.00%),
-Simple JSON NEW 2: k: 1.33, 65.99 MB/s, 249.60 ms (100.00%),
+Simple JSON NEW 2: k: 1.43, 65.99 MB/s, 249.60 ms (100.00%),
 
 Parse 10 times: E:\prj\test_json\bin\data\twitter.json
 Dart SDK JSON    : k: 1.00, 57.87 MB/s, 93.60 ms (75.00%),
-Simple JSON NEW 2: k: 1.33, 43.40 MB/s, 124.80 ms (100.00%),
+Simple JSON NEW 2: k: 1.32, 43.40 MB/s, 124.80 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601
