@@ -1,3 +1,7 @@
+## 2.0.2
+
+- Optimization of parser builders for generating errors (`Expected`, `Malformed`, `Nested`). Creating a way for a simple and optimal way to implement them, optimizing the implementation of the class `State`
+
 ## 2.0.1
 
 - Tested and documented parser builder `Expected`

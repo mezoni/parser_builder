@@ -69,9 +69,7 @@ void _ws(State<String> state) {
 num? _decimal(State<String> state) {
   num? $0;
   final source = state.source;
-  final $minErrorPos = state.minErrorPos;
-  final $newErrorPos = state.newErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   state.newErrorPos = -1;
   num? $1;
   final $pos = state.pos;
@@ -144,29 +142,25 @@ num? _decimal(State<String> state) {
     $1 = null;
     state.pos = $pos;
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
-    if (state.newErrorPos > state.pos) {
-      final length = state.pos - state.newErrorPos;
-      state.error =
-          ParseError.message(state.newErrorPos, length, 'Malformed decimal');
+    final pos = state.newErrorPos;
+    if (pos > state.pos) {
+      final length = state.pos - pos;
+      state.error = ParseError.message(pos, length, 'Malformed decimal');
     } else {
       state.error = ParseError.expected(state.pos, 'decimal');
     }
   }
-  state.newErrorPos =
-      $newErrorPos > state.newErrorPos ? $newErrorPos : state.newErrorPos;
   return $0;
 }
 
 num? _integer(State<String> state) {
   num? $0;
   final source = state.source;
-  final $minErrorPos = state.minErrorPos;
-  final $newErrorPos = state.newErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   state.newErrorPos = -1;
   num? $1;
   final $pos = state.pos;
@@ -202,20 +196,18 @@ num? _integer(State<String> state) {
     $1 = null;
     state.pos = $pos;
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
-    if (state.newErrorPos > state.pos) {
-      final length = state.pos - state.newErrorPos;
-      state.error =
-          ParseError.message(state.newErrorPos, length, 'Malformed integer');
+    final pos = state.newErrorPos;
+    if (pos > state.pos) {
+      final length = state.pos - pos;
+      state.error = ParseError.message(pos, length, 'Malformed integer');
     } else {
       state.error = ParseError.expected(state.pos, 'integer');
     }
   }
-  state.newErrorPos =
-      $newErrorPos > state.newErrorPos ? $newErrorPos : state.newErrorPos;
   return $0;
 }
 
@@ -255,8 +247,7 @@ void _closeParen(State<String> state) {
 
 num? _primary(State<String> state) {
   num? $0;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   num? $1;
   $1 = _decimal(state);
   if (!state.ok) {
@@ -276,7 +267,7 @@ num? _primary(State<String> state) {
       }
     }
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
@@ -288,8 +279,7 @@ num? _primary(State<String> state) {
 String? _multiplicativeOperator(State<String> state) {
   String? $0;
   final source = state.source;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   String? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length;
@@ -331,7 +321,7 @@ String? _multiplicativeOperator(State<String> state) {
     $1 = null;
     state.pos = $pos;
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
@@ -375,8 +365,7 @@ num? _multiplicative(State<String> state) {
 String? _additiveOperator(State<String> state) {
   String? $0;
   final source = state.source;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   String? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length;
@@ -410,7 +399,7 @@ String? _additiveOperator(State<String> state) {
     $1 = null;
     state.pos = $pos;
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
@@ -453,11 +442,10 @@ num? _additive(State<String> state) {
 
 num? _expression(State<String> state) {
   num? $0;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   num? $1;
   $1 = _additive(state);
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
@@ -566,22 +554,25 @@ class ParseError {
       list.add(error);
     }
 
-    errors.removeWhere((e) => e.kind == ParseErrorKind.expected);
-    for (var offset in grouped.keys) {
-      final list = grouped[offset]!;
+    final result = <ParseError>[];
+    for (final key in grouped.keys) {
+      final list = grouped[key]!;
       final values = list.map((e) => '\'${_escape(e.value)}\'').join(', ');
-      errors.add(ParseError.message(offset, 0, 'Expected: $values'));
+      result.add(ParseError.message(key, 0, 'Expected: $values'));
     }
 
     for (var i = 0; i < errors.length; i++) {
-      final error = errors[i];
-      if (error.kind == ParseErrorKind.unexpected) {
-        errors[i] = ParseError.unexpected(
-            error.offset, error.length, '\'${_escape(error.value)}\'');
+      var error = errors[i];
+      if (error.kind != ParseErrorKind.expected) {
+        if (error.kind == ParseErrorKind.unexpected) {
+          error = ParseError.unexpected(
+              error.offset, error.length, '\'${_escape(error.value)}\'');
+        }
+        result.add(error);
       }
     }
 
-    return errors;
+    return result;
   }
 
   static String _escape(value) {
@@ -618,7 +609,7 @@ enum ParseErrorKind { expected, message, unexpected }
 class State<T> {
   dynamic context;
 
-  int minErrorPos = -1;
+  int errorPos = -1;
 
   int newErrorPos = -1;
 
@@ -628,11 +619,7 @@ class State<T> {
 
   final T source;
 
-  ParseError? _error;
-
-  final List _errors = List.filled(100, null);
-
-  int _errorPos = -1;
+  final List<ParseError?> _errors = List.filled(500, null);
 
   int _length = 0;
 
@@ -640,32 +627,23 @@ class State<T> {
 
   set error(ParseError error) {
     final offset = error.offset;
-    if (offset >= minErrorPos) {
-      if (_errorPos < offset) {
-        _errorPos = offset;
-        _length = 1;
-        _error = error;
-        newErrorPos = offset;
-      } else if (_errorPos == offset) {
-        newErrorPos = offset;
-        if (_length < _errors.length) {
-          _errors[_length++] = error;
-        }
+    if (offset >= errorPos) {
+      if (offset > errorPos) {
+        errorPos = offset;
+        _length = 0;
       }
+      newErrorPos = offset;
+      _errors[_length++] = error;
     }
   }
 
   List<ParseError> get errors {
-    if (_length == 0) {
-      return [];
-    } else if (_length == 1) {
-      return [_error!];
-    } else {
-      return [
-        _error!,
-        ...List.generate(_length - 1, (i) => _errors[i + 1] as ParseError)
-      ];
-    }
+    return List.generate(_length, (i) => _errors[i]!);
+  }
+
+  @pragma('vm:prefer-inline')
+  void restoreErrorPos() {
+    errorPos = _length == 0 ? -1 : _errors[0]!.offset;
   }
 
   @override

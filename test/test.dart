@@ -1643,28 +1643,28 @@ void _testNoneOfTags() {
       parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0, 'abc')]);
+      expect(state.errors, [ParseError.unexpected(0, 3, 'abc')]);
     }
     {
       final state = State('abd');
       parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0, 'abd')]);
+      expect(state.errors, [ParseError.unexpected(0, 3, 'abd')]);
     }
     {
       final state = State('def');
       parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0, 'def')]);
+      expect(state.errors, [ParseError.unexpected(0, 3, 'def')]);
     }
     {
       final state = State('deg');
       parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0, 'deg')]);
+      expect(state.errors, [ParseError.unexpected(0, 3, 'deg')]);
     }
     {
       final state = State('x');
@@ -1678,7 +1678,7 @@ void _testNoneOfTags() {
       parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0, 'xy')]);
+      expect(state.errors, [ParseError.unexpected(0, 2, 'xy')]);
     }
     {
       final state = State('');

@@ -8,11 +8,10 @@ part of '../../error.dart';
 /// instead of these errors.
 class Expected<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
-final {{minErrorPos}} = state.minErrorPos;
-state.minErrorPos = 0x7fffffff;
+state.errorPos = 0x7fffffff;
 {{var1}}
 {{p1}}
-state.minErrorPos = {{minErrorPos}};
+state.restoreErrorPos();
 if (state.ok) {
   {{res0}} = {{res1}};
 } else {
@@ -20,10 +19,9 @@ if (state.ok) {
 }''';
 
   static const _templateFast = '''
-final {{minErrorPos}} = state.minErrorPos;
-state.minErrorPos = 0x7fffffff;
+state.errorPos = 0x7fffffff;
 {{p1}}
-state.minErrorPos = {{minErrorPos}};
+state.restoreErrorPos();
 if (!state.ok) {
   state.error = ParseError.expected(state.pos, {{tag}});
 }''';
@@ -37,12 +35,11 @@ if (!state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['minErrorPos']);
     final r1 = context.getResult(parser, !fast);
-    values.addAll({
+    final values = {
       'p1': parser.build(context, r1),
       'tag': helper.escapeString(tag),
-    });
+    };
     return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }

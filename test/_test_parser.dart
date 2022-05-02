@@ -175,13 +175,12 @@ int? char32(State<String> state) {
 
 void andC32OrC16(State<String> state) {
   final $pos = state.pos;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = 0x7fffffff;
+  state.errorPos = 0x7fffffff;
   char32(state);
   if (!state.ok) {
     char16(state);
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     state.pos = $pos;
   } else {
@@ -532,8 +531,7 @@ int? escapeSequence32(State<String> state) {
 String? expected2C16(State<String> state) {
   String? $0;
   final source = state.source;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = 0x7fffffff;
+  state.errorPos = 0x7fffffff;
   String? $1;
   final $pos = state.pos;
   var $count = 0;
@@ -558,7 +556,7 @@ String? expected2C16(State<String> state) {
     }
     state.pos = $pos;
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
@@ -724,9 +722,7 @@ String? identifier(State<String> state) {
 String? malformedTake2C16(State<String> state) {
   String? $0;
   final source = state.source;
-  final $minErrorPos = state.minErrorPos;
-  final $newErrorPos = state.newErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   state.newErrorPos = -1;
   String? $1;
   final $pos = state.pos;
@@ -752,19 +748,18 @@ String? malformedTake2C16(State<String> state) {
     }
     state.pos = $pos;
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
-    if (state.newErrorPos > state.pos) {
-      final length = state.pos - state.newErrorPos;
-      state.error = ParseError.message(state.newErrorPos, length, 'message');
+    final pos = state.newErrorPos;
+    if (pos > state.pos) {
+      final length = state.pos - pos;
+      state.error = ParseError.message(pos, length, 'message');
     } else {
       state.error = ParseError.expected(state.pos, 'tag');
     }
   }
-  state.newErrorPos =
-      $newErrorPos > state.newErrorPos ? $newErrorPos : state.newErrorPos;
   return $0;
 }
 
@@ -1060,8 +1055,7 @@ String? mapC32ToStr(State<String> state) {
 Object? nestedC16OrTake2C32(State<String> state) {
   Object? $0;
   final source = state.source;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = state.pos + 1;
+  state.errorPos = state.pos + 1;
   Object? $1;
   $1 = char16(state);
   if (!state.ok) {
@@ -1090,7 +1084,7 @@ Object? nestedC16OrTake2C32(State<String> state) {
       state.pos = $pos;
     }
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
   } else {
@@ -1183,31 +1177,31 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
       case 97:
         if (source.startsWith('abc', pos)) {
           state.ok = false;
-          state.error = ParseError.unexpected(pos, 0, 'abc');
+          state.error = ParseError.unexpected(pos, 3, 'abc');
           break;
         }
         if (source.startsWith('abd', pos)) {
           state.ok = false;
-          state.error = ParseError.unexpected(pos, 0, 'abd');
+          state.error = ParseError.unexpected(pos, 3, 'abd');
           break;
         }
         break;
       case 100:
         if (source.startsWith('def', pos)) {
           state.ok = false;
-          state.error = ParseError.unexpected(pos, 0, 'def');
+          state.error = ParseError.unexpected(pos, 3, 'def');
           break;
         }
         if (source.startsWith('deg', pos)) {
           state.ok = false;
-          state.error = ParseError.unexpected(pos, 0, 'deg');
+          state.error = ParseError.unexpected(pos, 3, 'deg');
           break;
         }
         break;
       case 120:
         if (source.startsWith('xy', pos)) {
           state.ok = false;
-          state.error = ParseError.unexpected(pos, 0, 'xy');
+          state.error = ParseError.unexpected(pos, 2, 'xy');
           break;
         }
         state.ok = false;
@@ -1219,13 +1213,12 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
 
 void notC32OrC16(State<String> state) {
   final $pos = state.pos;
-  final $minErrorPos = state.minErrorPos;
-  state.minErrorPos = 0x7fffffff;
+  state.errorPos = 0x7fffffff;
   char16(state);
   if (!state.ok) {
     char32(state);
   }
-  state.minErrorPos = $minErrorPos;
+  state.restoreErrorPos();
   state.ok = !state.ok;
   if (!state.ok) {
     state.pos = $pos;
@@ -2509,22 +2502,25 @@ class ParseError {
       list.add(error);
     }
 
-    errors.removeWhere((e) => e.kind == ParseErrorKind.expected);
-    for (var offset in grouped.keys) {
-      final list = grouped[offset]!;
+    final result = <ParseError>[];
+    for (final key in grouped.keys) {
+      final list = grouped[key]!;
       final values = list.map((e) => '\'${_escape(e.value)}\'').join(', ');
-      errors.add(ParseError.message(offset, 0, 'Expected: $values'));
+      result.add(ParseError.message(key, 0, 'Expected: $values'));
     }
 
     for (var i = 0; i < errors.length; i++) {
-      final error = errors[i];
-      if (error.kind == ParseErrorKind.unexpected) {
-        errors[i] = ParseError.unexpected(
-            error.offset, error.length, '\'${_escape(error.value)}\'');
+      var error = errors[i];
+      if (error.kind != ParseErrorKind.expected) {
+        if (error.kind == ParseErrorKind.unexpected) {
+          error = ParseError.unexpected(
+              error.offset, error.length, '\'${_escape(error.value)}\'');
+        }
+        result.add(error);
       }
     }
 
-    return errors;
+    return result;
   }
 
   static String _escape(value) {
@@ -2561,7 +2557,7 @@ enum ParseErrorKind { expected, message, unexpected }
 class State<T> {
   dynamic context;
 
-  int minErrorPos = -1;
+  int errorPos = -1;
 
   int newErrorPos = -1;
 
@@ -2571,11 +2567,7 @@ class State<T> {
 
   final T source;
 
-  ParseError? _error;
-
-  final List _errors = List.filled(100, null);
-
-  int _errorPos = -1;
+  final List<ParseError?> _errors = List.filled(500, null);
 
   int _length = 0;
 
@@ -2583,32 +2575,23 @@ class State<T> {
 
   set error(ParseError error) {
     final offset = error.offset;
-    if (offset >= minErrorPos) {
-      if (_errorPos < offset) {
-        _errorPos = offset;
-        _length = 1;
-        _error = error;
-        newErrorPos = offset;
-      } else if (_errorPos == offset) {
-        newErrorPos = offset;
-        if (_length < _errors.length) {
-          _errors[_length++] = error;
-        }
+    if (offset >= errorPos) {
+      if (offset > errorPos) {
+        errorPos = offset;
+        _length = 0;
       }
+      newErrorPos = offset;
+      _errors[_length++] = error;
     }
   }
 
   List<ParseError> get errors {
-    if (_length == 0) {
-      return [];
-    } else if (_length == 1) {
-      return [_error!];
-    } else {
-      return [
-        _error!,
-        ...List.generate(_length - 1, (i) => _errors[i + 1] as ParseError)
-      ];
-    }
+    return List.generate(_length, (i) => _errors[i]!);
+  }
+
+  @pragma('vm:prefer-inline')
+  void restoreErrorPos() {
+    errorPos = _length == 0 ? -1 : _errors[0]!.offset;
   }
 
   @override

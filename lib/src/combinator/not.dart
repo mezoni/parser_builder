@@ -3,10 +3,9 @@ part of '../../combinator.dart';
 class Not<I> extends ParserBuilder<I, void> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{minErrorPos}} = state.minErrorPos;
-state.minErrorPos = 0x7fffffff;
+state.errorPos = 0x7fffffff;
 {{p1}}
-state.minErrorPos = {{minErrorPos}};
+state.restoreErrorPos();
 state.ok = !state.ok;
 if (!state.ok) {
   state.pos = {{pos}};
@@ -19,7 +18,7 @@ if (!state.ok) {
 
   @override
   String build(Context context, ParserResult? result) {
-    final values = context.allocateLocals(['minErrorPos', 'pos']);
+    final values = context.allocateLocals(['pos']);
     values.addAll({
       'p1': parser.build(context, null),
     });

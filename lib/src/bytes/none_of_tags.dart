@@ -25,7 +25,7 @@ case {{cc}}:
   static const _templateTestLong = '''
 if (source.startsWith({{tag}}, pos)) {
   state.ok = false;
-  state.error = ParseError.unexpected(pos, 0, {{tag}});
+  state.error = ParseError.unexpected(pos, {{length}}, {{tag}});
   break;
 }''';
 
@@ -70,7 +70,7 @@ state.error = ParseError.unexpected(pos, 0, {{tag}});''';
       final tests = <String>[];
       for (final tag in tags) {
         final values = {
-          'len': tag.length.toString(),
+          'length': tag.length.toString(),
           'tag': helper.escapeString(tag),
         };
 
