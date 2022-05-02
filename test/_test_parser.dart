@@ -1055,15 +1055,15 @@ String? mapC32ToStr(State<String> state) {
 String? memoizeC16C32OrC16(State<String> state) {
   String? $0;
   final source = state.source;
-  var $memo = _Memo<int?>();
   final $pos = state.pos;
   final $pos1 = state.pos;
-  if ($memo.isStored(state.pos, true)) {
+  final $memo = state.memoized(0, true, state.pos);
+  if ($memo != null) {
     $memo.restore(state);
   } else {
     final $pos2 = state.pos;
     char16(state);
-    $memo.store(state, true, $pos2);
+    state.memoize(0, true, $pos2);
   }
   if (state.ok) {
     char32(state);
@@ -1079,12 +1079,13 @@ String? memoizeC16C32OrC16(State<String> state) {
   }
   if (!state.ok) {
     final $pos3 = state.pos;
-    if ($memo.isStored(state.pos, true)) {
-      $memo.restore(state);
+    final $memo1 = state.memoized(0, true, state.pos);
+    if ($memo1 != null) {
+      $memo1.restore(state);
     } else {
       final $pos4 = state.pos;
       char16(state);
-      $memo.store(state, true, $pos4);
+      state.memoize(0, true, $pos4);
     }
     if (state.ok) {
       $0 = source.slice($pos3, state.pos);
@@ -2612,6 +2613,8 @@ class State<T> {
 
   int _length = 0;
 
+  final List<_Memo> _memos = [];
+
   State(this.source);
 
   set error(ParseError error) {
@@ -2628,6 +2631,39 @@ class State<T> {
 
   List<ParseError> get errors {
     return List.generate(_length, (i) => _errors[i]!);
+  }
+
+  @pragma('vm:prefer-inline')
+  void memoize<R>(int id, bool fast, int start, [R? result]) {
+    final memo = _Memo(id, fast, start, pos, ok, result);
+    var found = false;
+    for (var i = 0; i < _memos.length; i++) {
+      if (_memos[i].id == id) {
+        found = true;
+        _memos[i] = memo;
+        break;
+      }
+    }
+
+    if (!found) {
+      _memos.add(memo);
+    }
+  }
+
+  @pragma('vm:prefer-inline')
+  _Memo<R>? memoized<R>(int id, bool fast, int start) {
+    for (var i = 0; i < _memos.length; i++) {
+      final memo = _memos[i];
+      if (memo.id == id) {
+        if (memo.canRestore(start, fast)) {
+          return memo as _Memo<R>;
+        }
+
+        break;
+      }
+    }
+
+    return null;
   }
 
   @pragma('vm:prefer-inline')
@@ -2700,33 +2736,30 @@ extension on String {
   }
 }
 
-// ignore: unused_element
 class _Memo<T> {
-  int? end;
+  final int end;
 
-  bool? fast;
+  final bool fast;
 
-  bool? ok;
+  final int id;
 
-  T? result;
+  final bool ok;
 
-  int? start;
+  final T? result;
 
-  bool isStored(int pos, bool fast) {
-    return start == pos && (this.fast == fast || this.fast == false);
+  final int start;
+
+  _Memo(this.id, this.fast, this.start, this.end, this.ok, this.result);
+
+  @pragma('vm:prefer-inline')
+  bool canRestore(int start, bool fast) {
+    return this.start == start && (this.fast == fast || !this.fast);
   }
 
+  @pragma('vm:prefer-inline')
   T? restore(State state) {
-    state.ok = ok!;
-    state.pos = end!;
+    state.ok = ok;
+    state.pos = end;
     return result;
-  }
-
-  void store(State state, bool fast, int start, [T? result]) {
-    this.fast = fast;
-    this.start = start;
-    end = state.pos;
-    ok = state.ok;
-    this.result = result;
   }
 }

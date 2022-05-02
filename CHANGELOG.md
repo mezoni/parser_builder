@@ -1,6 +1,6 @@
 ## 2.0.3
 
-- Implemented, tested and documented experimental parser builder `Memoize`. This is an attempt to implement lightweight local (on demand) memoization with a short lifetime (within the function body)
+- Implemented, tested and documented experimental parser builder `Memoize`. This is an attempt to implement lightweight (on demand) memoization with saving only one state of parsing (just for a specific case)
 
 ## 2.0.2
 

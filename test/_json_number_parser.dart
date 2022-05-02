@@ -498,6 +498,8 @@ class State<T> {
 
   int _length = 0;
 
+  final List<_Memo> _memos = [];
+
   State(this.source);
 
   set error(ParseError error) {
@@ -514,6 +516,39 @@ class State<T> {
 
   List<ParseError> get errors {
     return List.generate(_length, (i) => _errors[i]!);
+  }
+
+  @pragma('vm:prefer-inline')
+  void memoize<R>(int id, bool fast, int start, [R? result]) {
+    final memo = _Memo(id, fast, start, pos, ok, result);
+    var found = false;
+    for (var i = 0; i < _memos.length; i++) {
+      if (_memos[i].id == id) {
+        found = true;
+        _memos[i] = memo;
+        break;
+      }
+    }
+
+    if (!found) {
+      _memos.add(memo);
+    }
+  }
+
+  @pragma('vm:prefer-inline')
+  _Memo<R>? memoized<R>(int id, bool fast, int start) {
+    for (var i = 0; i < _memos.length; i++) {
+      final memo = _memos[i];
+      if (memo.id == id) {
+        if (memo.canRestore(start, fast)) {
+          return memo as _Memo<R>;
+        }
+
+        break;
+      }
+    }
+
+    return null;
   }
 
   @pragma('vm:prefer-inline')
@@ -583,5 +618,33 @@ extension on String {
   // ignore: unused_element
   String slice(int start, int end) {
     return substring(start, end);
+  }
+}
+
+class _Memo<T> {
+  final int end;
+
+  final bool fast;
+
+  final int id;
+
+  final bool ok;
+
+  final T? result;
+
+  final int start;
+
+  _Memo(this.id, this.fast, this.start, this.end, this.ok, this.result);
+
+  @pragma('vm:prefer-inline')
+  bool canRestore(int start, bool fast) {
+    return this.start == start && (this.fast == fast || !this.fast);
+  }
+
+  @pragma('vm:prefer-inline')
+  T? restore(State state) {
+    state.ok = ok;
+    state.pos = end;
+    return result;
   }
 }
