@@ -192,18 +192,14 @@ class State<T> {
   @pragma('vm:prefer-inline')
   void memoize<R>(int id, bool fast, int start, [R? result]) {
     final memo = _Memo(id, fast, start, pos, ok, result);
-    var found = false;
     for (var i = 0; i < _memos.length; i++) {
       if (_memos[i].id == id) {
-        found = true;
         _memos[i] = memo;
-        break;
+        return;
       }
     }
 
-    if (!found) {
-      _memos.add(memo);
-    }
+    _memos.add(memo);
   }
 
   @pragma('vm:prefer-inline')
