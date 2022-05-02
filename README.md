@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 2.0.2
+Version: 2.0.3
 
 Early release version (not all built-in common buildres are implemented but can be used without them).  
 It is under development, but you can already play around. An example of a working JSON parser is included.  
@@ -34,6 +34,7 @@ Ask questions if something is not clear.
 - Error messages `can be easily localized` (translated into another language) before being output
 - Includes high-performance, most common `built-in parser builders`
 - Includes built-in parser builders `to simplify parsing expressions`
+- Includes built-in parser builder `for lightweight local memoization`
 - Support for `32 bit Unicode characters` out of the box (no need to worry about that)
 - Included built-in simple script for `fast building of parsers`
 
@@ -111,6 +112,9 @@ built-in:
 - [`IdentifierExpression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression/identifier_expression.dart)
 - [`PostfixExpression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression/postfix_expression.dart)
 - [`PrefixExpression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression/prefix_expression.dart)
+
+[`memoization`](https://github.com/mezoni/parser_builder/blob/master/lib/src/memoization):
+- [`Memoize`](https://github.com/mezoni/parser_builder/blob/master/lib/src/memoization/memoize.dart)
 
 [`multi`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi):
 - [`FoldMany0`](https://github.com/mezoni/parser_builder/blob/master/lib/src/multi/fold_many0.dart)

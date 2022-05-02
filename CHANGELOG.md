@@ -1,3 +1,7 @@
+## 2.0.3
+
+- Implemented, tested and documented experimental parser builder `Memoize`. This is an attempt to implement lightweight local (on demand) memoization with a short lifetime (within the function body)
+
 ## 2.0.2
 
 - Optimization of parser builders for generating errors (`Expected`, `Malformed`, `Nested`). Creating a way for a simple and optimal way to implement them, optimizing the implementation of the class `State`

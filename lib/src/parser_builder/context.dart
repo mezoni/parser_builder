@@ -5,17 +5,21 @@ class Context {
 
   Allocator globalAllocator = Allocator('_\$');
 
+  Map<dynamic, Map<String, dynamic>> globalRegistry = {};
+
   Map<String, String> localDeclarations = {};
 
   Allocator localAllocator = Allocator('\$');
+
+  Map<dynamic, Map<String, dynamic>> localRegistry = {};
 
   bool optimizeFastParsers = true;
 
   int pass = 0;
 
-  bool refersToStateSource = false;
+  final Map<dynamic, Map<String, dynamic>> registry = {};
 
-  final Map<dynamic, Map<String, dynamic>> _registry = {};
+  bool refersToStateSource = false;
 
   String allocateGlobal([String name = '']) {
     final result = globalAllocator.allocate(name);
@@ -36,21 +40,6 @@ class Context {
     return result;
   }
 
-  T getRegistry<T>(owner, String name, T defaultValue) {
-    var registry = _registry[owner];
-    if (registry == null) {
-      registry = <String, T>{};
-      _registry[owner] = registry;
-    }
-
-    if (!registry.containsKey(name)) {
-      registry[name] = defaultValue;
-      return defaultValue;
-    } else {
-      return registry[name] as T;
-    }
-  }
-
   ParserResult? getResult(ParserBuilder parser, bool condition) {
     if (!condition) {
       return null;
@@ -60,5 +49,34 @@ class Context {
     final type = parser.getResultType();
     final value = parser.getResultValue(name);
     return ParserResult(name, type, value);
+  }
+
+  T readRegistryValue<T>(Map<dynamic, Map<String, dynamic>> registry, owner,
+      String key, T Function() defaultValue) {
+    final section = _getRegistrySection(registry, owner);
+    if (!section.containsKey(key)) {
+      final value = defaultValue();
+      section[key] = value;
+      return value;
+    } else {
+      return section[key] as T;
+    }
+  }
+
+  void writeRegistryValue<T>(
+      Map<dynamic, Map<String, dynamic>> registry, owner, String key, T value) {
+    final section = _getRegistrySection(registry, owner);
+    section[key] = value;
+  }
+
+  Map<String, dynamic> _getRegistrySection(
+      Map<dynamic, Map<String, dynamic>> registry, owner) {
+    var result = registry[owner];
+    if (result == null) {
+      result = <String, dynamic>{};
+      registry[owner] = result;
+    }
+
+    return result;
   }
 }

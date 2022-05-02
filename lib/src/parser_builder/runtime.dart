@@ -1,6 +1,38 @@
 part of '../../parser_builder.dart';
 
 class ParseRuntime {
+  static const _classMemo = '''
+// ignore: unused_element
+class _Memo<T> {
+  int? end;
+
+  bool? fast;
+
+  bool? ok;
+
+  T? result;
+
+  int? start;
+
+  bool isStored(int pos, bool fast) {
+    return start == pos && (this.fast == fast || this.fast == false);
+  }
+
+  T? restore(State state) {
+    state.ok = ok!;
+    state.pos = end!;
+    return result;
+  }
+
+  void store(State state, bool fast, int start, [T? result]) {
+    this.fast = fast;
+    this.start = start;
+    end = state.pos;
+    ok = state.ok;
+    this.result = result;
+  }
+}''';
+
   static const _classParseError = r'''
 class ParseError {
   final ParseErrorKind kind;
@@ -269,7 +301,8 @@ String {{name}}(String source, List<ParseError> errors,
       _classParseError,
       _enumParseErrorKind,
       _classState,
-      _extensionString
+      _extensionString,
+      _classMemo,
     ];
   }
 

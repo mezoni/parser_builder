@@ -1052,6 +1052,47 @@ String? mapC32ToStr(State<String> state) {
   return $0;
 }
 
+String? memoizeC16C32OrC16(State<String> state) {
+  String? $0;
+  final source = state.source;
+  var $memo = _Memo<int?>();
+  final $pos = state.pos;
+  final $pos1 = state.pos;
+  if ($memo.isStored(state.pos, true)) {
+    $memo.restore(state);
+  } else {
+    final $pos2 = state.pos;
+    char16(state);
+    $memo.store(state, true, $pos2);
+  }
+  if (state.ok) {
+    char32(state);
+    if (state.ok) {
+      //
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos1;
+  }
+  if (state.ok) {
+    $0 = source.slice($pos, state.pos);
+  }
+  if (!state.ok) {
+    final $pos3 = state.pos;
+    if ($memo.isStored(state.pos, true)) {
+      $memo.restore(state);
+    } else {
+      final $pos4 = state.pos;
+      char16(state);
+      $memo.store(state, true, $pos4);
+    }
+    if (state.ok) {
+      $0 = source.slice($pos3, state.pos);
+    }
+  }
+  return $0;
+}
+
 Object? nestedC16OrTake2C32(State<String> state) {
   Object? $0;
   final source = state.source;
@@ -2656,5 +2697,36 @@ extension on String {
   // ignore: unused_element
   String slice(int start, int end) {
     return substring(start, end);
+  }
+}
+
+// ignore: unused_element
+class _Memo<T> {
+  int? end;
+
+  bool? fast;
+
+  bool? ok;
+
+  T? result;
+
+  int? start;
+
+  bool isStored(int pos, bool fast) {
+    return start == pos && (this.fast == fast || this.fast == false);
+  }
+
+  T? restore(State state) {
+    state.ok = ok!;
+    state.pos = end!;
+    return result;
+  }
+
+  void store(State state, bool fast, int start, [T? result]) {
+    this.fast = fast;
+    this.start = start;
+    end = state.pos;
+    ok = state.ok;
+    this.result = result;
   }
 }

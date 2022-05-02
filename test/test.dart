@@ -51,6 +51,7 @@ void _test() {
   _testManyTill();
   _testMap();
   _testMap1();
+  _testMemoized();
   _testNested();
   _testNoneOf();
   _testNoneOfEx();
@@ -1470,6 +1471,42 @@ void _testMap1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errors, [ParseError.expected(0, c32)]);
+    }
+  });
+}
+
+void _testMemoized() {
+  test('Memoized', () {
+    final parser = memoizeC16C32OrC16;
+    {
+      final state = State('$s16');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, '$s16');
+      expect(state.pos, 1);
+    }
+    {
+      final state = State('$s16$s32');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, '$s16$s32');
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError.expected(0, c16)]);
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError.expected(0, c16)]);
     }
   });
 }

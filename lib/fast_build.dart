@@ -13,6 +13,7 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
   for (var i = 0; i < 2; i++) {
     context.pass = i;
     context.globalDeclarations.clear();
+    context.globalRegistry.clear();
     context.globalAllocator = context.globalAllocator.clone();
     for (final parser in parsers) {
       context.localAllocator = context.localAllocator.clone();

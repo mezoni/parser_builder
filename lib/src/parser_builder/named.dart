@@ -43,9 +43,11 @@ class Named<I, O> extends ParserBuilder<I, O> {
   void _buildDeclaration(Context context, bool fast) {
     final localAllocator = context.localAllocator;
     final localDeclarations = context.localDeclarations;
+    final localRegistry = context.localRegistry;
     final refersToStateSource = context.refersToStateSource;
     context.localAllocator = localAllocator.clone();
     context.localDeclarations = {};
+    context.localRegistry = {};
     context.refersToStateSource = false;
     final result = context.getResult(parser, !fast);
     final code = parser.build(context, result);
@@ -84,18 +86,21 @@ class Named<I, O> extends ParserBuilder<I, O> {
     buffer.writeln('}');
     context.refersToStateSource = refersToStateSource;
     context.localDeclarations = localDeclarations;
+    context.localRegistry = localRegistry;
     context.localAllocator = localAllocator;
     final globalDeclarations = context.globalDeclarations;
     globalDeclarations.add(buffer.toString());
   }
 
   Set<bool> _getParserModes(Context context) {
-    final result = context.getRegistry(this, 'modes', <bool>{});
+    final result = context.readRegistryValue(
+        context.registry, this, 'modes', () => <bool>{});
     return result;
   }
 
   Set<Named> _getProcessed(Context context) {
-    final result = context.getRegistry(Named, 'processed', <Named>{});
+    final result = context.readRegistryValue(
+        context.registry, this, 'processed', () => <Named>{});
     return result;
   }
 

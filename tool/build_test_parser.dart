@@ -6,6 +6,7 @@ import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/error.dart';
 import 'package:parser_builder/expression.dart';
 import 'package:parser_builder/fast_build.dart';
+import 'package:parser_builder/memoization.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
@@ -47,6 +48,7 @@ Future<void> main(List<String> args) async {
     _manyTillAOrBTillAbc,
     _map4Digits,
     _mapC32ToStr,
+    _memoizeC16C32OrC16,
     _nestedC16OrTake2C32,
     _noneOfC16,
     _noneOfOfC16OrC32,
@@ -279,6 +281,11 @@ const _mapC32ToStr = Named(
     'mapC32ToStr',
     Map1(Char(c32),
         ExpressionAction<String>(['c'], 'String.fromCharCode({{c}})')));
+
+const _memoizeC16C32OrC16 = Named('memoizeC16C32OrC16',
+    Alt2(Recognize(Tuple2(_memoizeC16, _char32)), Recognize(_memoizeC16)));
+
+const _memoizeC16 = Memoize(_char16);
 
 const _nestedC16OrTake2C32 = Named('nestedC16OrTake2C32',
     Nested('nested', Alt2(_char16, TakeWhileMN(2, 2, _isC32))));

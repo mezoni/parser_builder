@@ -6,6 +6,96 @@ void main() {
   print(result);
 }
 
+num parse(String source) {
+  final state = State(source);
+  final result = _parse(state);
+  if (!state.ok) {
+    final errors = ParseError.errorReport(state.errors);
+    final message = _errorMessage(source, errors);
+    throw FormatException('\n$message');
+  }
+
+  return result!;
+}
+
+num? _additive(State<String> state) {
+  num? $0;
+  final $pos = state.pos;
+  num? $left;
+  num? $1;
+  $1 = _multiplicative(state);
+  if (state.ok) {
+    $left = $1;
+    while (true) {
+      String? $2;
+      $2 = _additiveOperator(state);
+      if (!state.ok) {
+        state.ok = true;
+        break;
+      }
+      num? $3;
+      $3 = _multiplicative(state);
+      if (!state.ok) {
+        state.pos = $pos;
+        break;
+      }
+      final $op = $2!;
+      final $right = $3!;
+      $left = _calculate($left!, $op, $right);
+    }
+  }
+  if (state.ok) {
+    $0 = $left;
+  }
+  return $0;
+}
+
+String? _additiveOperator(State<String> state) {
+  String? $0;
+  final source = state.source;
+  state.errorPos = state.pos + 1;
+  String? $1;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    String? v;
+    switch (c) {
+      case 43:
+        state.pos++;
+        v = '+';
+        break;
+      case 45:
+        state.pos++;
+        v = '-';
+        break;
+    }
+    state.ok = v != null;
+    if (state.ok) {
+      $1 = v;
+    }
+  }
+  if (!state.ok) {
+    state.error = ParseError.expected(state.pos, '+');
+    state.error = ParseError.expected(state.pos, '-');
+  }
+  if (state.ok) {
+    _ws(state);
+  }
+  if (!state.ok) {
+    $1 = null;
+    state.pos = $pos;
+  }
+  state.restoreErrorPos();
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    state.error = ParseError.expected(state.pos, 'operator');
+  }
+  return $0;
+}
+
 num _calculate(num left, String operator, num right) {
   switch (operator) {
     case '+':
@@ -23,47 +113,21 @@ num _calculate(num left, String operator, num right) {
   }
 }
 
-num parse(String source) {
-  final state = State(source);
-  final result = _parse(state);
-  if (!state.ok) {
-    final errors = ParseError.errorReport(state.errors);
-    final message = _errorMessage(source, errors);
-    throw FormatException('\n$message');
-  }
-
-  return result!;
-}
-
-num? _parse(State<String> state) {
-  num? $0;
+void _closeParen(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  $0 = _expression(state);
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 41;
   if (state.ok) {
-    state.ok = state.pos >= source.length;
-    if (!state.ok) {
-      state.error = ParseError.expected(state.pos, 'EOF');
-    }
+    state.pos += 1;
+  } else {
+    state.error = ParseError.expected(state.pos, ')');
+  }
+  if (state.ok) {
+    _ws(state);
   }
   if (!state.ok) {
-    $0 = null;
     state.pos = $pos;
   }
-  return $0;
-}
-
-void _ws(State<String> state) {
-  final source = state.source;
-  while (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c <= 32 && (c >= 9 && c <= 10 || c == 13 || c == 32);
-    if (!ok) {
-      break;
-    }
-    state.pos++;
-  }
-  state.ok = true;
 }
 
 num? _decimal(State<String> state) {
@@ -157,6 +221,50 @@ num? _decimal(State<String> state) {
   return $0;
 }
 
+String _errorMessage(String source, List<ParseError> errors,
+    [color, int maxCount = 10, String? url]) {
+  final sb = StringBuffer();
+  for (var i = 0; i < errors.length; i++) {
+    if (i > maxCount) {
+      break;
+    }
+
+    final error = errors[i];
+    if (error.offset + error.length > source.length) {
+      source += ' ' * (error.offset + error.length - source.length);
+    }
+
+    final file = SourceFile.fromString(source, url: url);
+    final span = file.span(error.offset, error.offset + error.length);
+    if (sb.isNotEmpty) {
+      sb.writeln();
+    }
+
+    sb.write(span.message(error.toString(), color: color));
+  }
+
+  if (errors.length > maxCount) {
+    sb.writeln();
+    sb.write('(${errors.length - maxCount} more errors...)');
+  }
+
+  return sb.toString();
+}
+
+num? _expression(State<String> state) {
+  num? $0;
+  state.errorPos = state.pos + 1;
+  num? $1;
+  $1 = _additive(state);
+  state.restoreErrorPos();
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    state.error = ParseError.expected(state.pos, 'expression');
+  }
+  return $0;
+}
+
 num? _integer(State<String> state) {
   num? $0;
   final source = state.source;
@@ -211,67 +319,34 @@ num? _integer(State<String> state) {
   return $0;
 }
 
-void _openParen(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 40;
-  if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.error = ParseError.expected(state.pos, '(');
-  }
-  if (state.ok) {
-    _ws(state);
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-}
-
-void _closeParen(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 41;
-  if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.error = ParseError.expected(state.pos, ')');
-  }
-  if (state.ok) {
-    _ws(state);
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-}
-
-num? _primary(State<String> state) {
+num? _multiplicative(State<String> state) {
   num? $0;
-  state.errorPos = state.pos + 1;
+  final $pos = state.pos;
+  num? $left;
   num? $1;
-  $1 = _decimal(state);
-  if (!state.ok) {
-    $1 = _integer(state);
-    if (!state.ok) {
-      final $pos = state.pos;
-      _openParen(state);
-      if (state.ok) {
-        $1 = _expression(state);
-        if (state.ok) {
-          _closeParen(state);
-        }
-      }
+  $1 = _primary(state);
+  if (state.ok) {
+    $left = $1;
+    while (true) {
+      String? $2;
+      $2 = _multiplicativeOperator(state);
       if (!state.ok) {
-        $1 = null;
-        state.pos = $pos;
+        state.ok = true;
+        break;
       }
+      num? $3;
+      $3 = _primary(state);
+      if (!state.ok) {
+        state.pos = $pos;
+        break;
+      }
+      final $op = $2!;
+      final $right = $3!;
+      $left = _calculate($left!, $op, $right);
     }
   }
-  state.restoreErrorPos();
   if (state.ok) {
-    $0 = $1;
-  } else {
-    state.error = ParseError.expected(state.pos, 'expression');
+    $0 = $left;
   }
   return $0;
 }
@@ -330,121 +405,63 @@ String? _multiplicativeOperator(State<String> state) {
   return $0;
 }
 
-num? _multiplicative(State<String> state) {
-  num? $0;
-  final $pos = state.pos;
-  num? $left;
-  num? $1;
-  $1 = _primary(state);
-  if (state.ok) {
-    $left = $1;
-    while (true) {
-      String? $2;
-      $2 = _multiplicativeOperator(state);
-      if (!state.ok) {
-        state.ok = true;
-        break;
-      }
-      num? $3;
-      $3 = _primary(state);
-      if (!state.ok) {
-        state.pos = $pos;
-        break;
-      }
-      final $op = $2!;
-      final $right = $3!;
-      $left = _calculate($left!, $op, $right);
-    }
-  }
-  if (state.ok) {
-    $0 = $left;
-  }
-  return $0;
-}
-
-String? _additiveOperator(State<String> state) {
-  String? $0;
+void _openParen(State<String> state) {
   final source = state.source;
-  state.errorPos = state.pos + 1;
-  String? $1;
   final $pos = state.pos;
-  state.ok = state.pos < source.length;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 40;
   if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    String? v;
-    switch (c) {
-      case 43:
-        state.pos++;
-        v = '+';
-        break;
-      case 45:
-        state.pos++;
-        v = '-';
-        break;
-    }
-    state.ok = v != null;
-    if (state.ok) {
-      $1 = v;
-    }
-  }
-  if (!state.ok) {
-    state.error = ParseError.expected(state.pos, '+');
-    state.error = ParseError.expected(state.pos, '-');
+    state.pos += 1;
+  } else {
+    state.error = ParseError.expected(state.pos, '(');
   }
   if (state.ok) {
     _ws(state);
   }
   if (!state.ok) {
-    $1 = null;
     state.pos = $pos;
   }
-  state.restoreErrorPos();
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.error = ParseError.expected(state.pos, 'operator');
-  }
-  return $0;
 }
 
-num? _additive(State<String> state) {
+num? _parse(State<String> state) {
   num? $0;
+  final source = state.source;
   final $pos = state.pos;
-  num? $left;
-  num? $1;
-  $1 = _multiplicative(state);
+  $0 = _expression(state);
   if (state.ok) {
-    $left = $1;
-    while (true) {
-      String? $2;
-      $2 = _additiveOperator(state);
-      if (!state.ok) {
-        state.ok = true;
-        break;
-      }
-      num? $3;
-      $3 = _multiplicative(state);
-      if (!state.ok) {
-        state.pos = $pos;
-        break;
-      }
-      final $op = $2!;
-      final $right = $3!;
-      $left = _calculate($left!, $op, $right);
+    state.ok = state.pos >= source.length;
+    if (!state.ok) {
+      state.error = ParseError.expected(state.pos, 'EOF');
     }
   }
-  if (state.ok) {
-    $0 = $left;
+  if (!state.ok) {
+    $0 = null;
+    state.pos = $pos;
   }
   return $0;
 }
 
-num? _expression(State<String> state) {
+num? _primary(State<String> state) {
   num? $0;
   state.errorPos = state.pos + 1;
   num? $1;
-  $1 = _additive(state);
+  $1 = _decimal(state);
+  if (!state.ok) {
+    $1 = _integer(state);
+    if (!state.ok) {
+      final $pos = state.pos;
+      _openParen(state);
+      if (state.ok) {
+        $1 = _expression(state);
+        if (state.ok) {
+          _closeParen(state);
+        }
+      }
+      if (!state.ok) {
+        $1 = null;
+        state.pos = $pos;
+      }
+    }
+  }
   state.restoreErrorPos();
   if (state.ok) {
     $0 = $1;
@@ -454,34 +471,17 @@ num? _expression(State<String> state) {
   return $0;
 }
 
-String _errorMessage(String source, List<ParseError> errors,
-    [color, int maxCount = 10, String? url]) {
-  final sb = StringBuffer();
-  for (var i = 0; i < errors.length; i++) {
-    if (i > maxCount) {
+void _ws(State<String> state) {
+  final source = state.source;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c <= 32 && (c >= 9 && c <= 10 || c == 13 || c == 32);
+    if (!ok) {
       break;
     }
-
-    final error = errors[i];
-    if (error.offset + error.length > source.length) {
-      source += ' ' * (error.offset + error.length - source.length);
-    }
-
-    final file = SourceFile.fromString(source, url: url);
-    final span = file.span(error.offset, error.offset + error.length);
-    if (sb.isNotEmpty) {
-      sb.writeln();
-    }
-
-    sb.write(span.message(error.toString(), color: color));
+    state.pos++;
   }
-
-  if (errors.length > maxCount) {
-    sb.writeln();
-    sb.write('(${errors.length - maxCount} more errors...)');
-  }
-
-  return sb.toString();
+  state.ok = true;
 }
 
 class ParseError {
@@ -661,6 +661,27 @@ class State<T> {
     } else {
       return super.toString();
     }
+  }
+}
+
+// ignore: unused_element
+class _Memo<T> {
+  int end;
+
+  bool ok;
+
+  T result;
+
+  int start;
+
+  _Memo(State state, this.start, this.result)
+      : end = state.pos,
+        ok = state.ok;
+
+  T restore(State state) {
+    state.ok = ok;
+    state.pos = end;
+    return result;
   }
 }
 
