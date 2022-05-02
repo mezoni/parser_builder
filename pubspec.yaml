@@ -1,5 +1,5 @@
 name: parser_builder
-version: 2.0.3
+version: 2.0.4
 description: Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 repository: https://github.com/mezoni/parser_builder
 environment:

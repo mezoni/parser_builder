@@ -9,27 +9,27 @@ part of '../../error.dart';
 @experimental
 class Indicate<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
-final {{newErrorPos}} = state.newErrorPos;
-state.newErrorPos = -1;
+final {{last}} = state.setLastErrorPos(-1);
 {{var1}}
 {{p1}}
 if (state.ok) {
   {{res0}} = {{res1}};
 } else {
-  final length = state.pos - state.newErrorPos;
-  state.error = ParseError.message(state.newErrorPos, length, {{message}});
+  final pos = state.lastErrorPos;
+  final length = state.pos - pos;
+  state.error = ParseError.message(pos, length, {{message}});
 }
-state.newErrorPos = {{newErrorPos}} > state.newErrorPos ? {{newErrorPos}} : state.newErrorPos;''';
+state.restoreLastErrorPos({{last}});''';
 
   static const _templateFast = '''
-final {{newErrorPos}} = state.newErrorPos;
-state.newErrorPos = -1;
+final {{last}} = state.setLastErrorPos(-1);
 {{p1}}
 if (!state.ok) {
-  final length = state.pos - state.newErrorPos;
-  state.error = ParseError.message(state.newErrorPos, length, {{message}});
+  final pos = state.lastErrorPos;
+  final length = state.pos - pos;
+  state.error = ParseError.message(pos, length, {{message}});
 }
-state.newErrorPos = {{newErrorPos}} > state.newErrorPos ? {{newErrorPos}} : state.newErrorPos;''';
+state.restoreLastErrorPos({{last}});''';
 
   final String message;
 
@@ -40,7 +40,7 @@ state.newErrorPos = {{newErrorPos}} > state.newErrorPos ? {{newErrorPos}} : stat
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['newErrorPos']);
+    final values = context.allocateLocals(['last']);
     final r1 = context.getResult(parser, !fast);
     values.addAll({
       'message': helper.escapeString(message),

@@ -527,7 +527,7 @@ class State<T> {
 
   int errorPos = -1;
 
-  int newErrorPos = -1;
+  int lastErrorPos = -1;
 
   bool ok = false;
 
@@ -550,8 +550,11 @@ class State<T> {
         errorPos = offset;
         _length = 0;
       }
-      newErrorPos = offset;
       _errors[_length++] = error;
+    }
+
+    if (lastErrorPos < offset) {
+      lastErrorPos = offset;
     }
   }
 
@@ -562,18 +565,14 @@ class State<T> {
   @pragma('vm:prefer-inline')
   void memoize<R>(int id, bool fast, int start, [R? result]) {
     final memo = _Memo(id, fast, start, pos, ok, result);
-    var found = false;
     for (var i = 0; i < _memos.length; i++) {
       if (_memos[i].id == id) {
-        found = true;
         _memos[i] = memo;
-        break;
+        return;
       }
     }
 
-    if (!found) {
-      _memos.add(memo);
-    }
+    _memos.add(memo);
   }
 
   @pragma('vm:prefer-inline')
@@ -595,6 +594,18 @@ class State<T> {
   @pragma('vm:prefer-inline')
   void restoreErrorPos() {
     errorPos = _length == 0 ? -1 : _errors[0]!.offset;
+  }
+
+  void restoreLastErrorPos(int pos) {
+    if (lastErrorPos < pos) {
+      lastErrorPos = pos;
+    }
+  }
+
+  int setLastErrorPos(int pos) {
+    final result = lastErrorPos;
+    lastErrorPos = pos;
+    return result;
   }
 
   @override

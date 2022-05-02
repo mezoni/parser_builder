@@ -722,8 +722,8 @@ String? identifier(State<String> state) {
 String? malformedTake2C16(State<String> state) {
   String? $0;
   final source = state.source;
+  final $last = state.setLastErrorPos(-1);
   state.errorPos = state.pos + 1;
-  state.newErrorPos = -1;
   String? $1;
   final $pos = state.pos;
   var $count = 0;
@@ -752,7 +752,7 @@ String? malformedTake2C16(State<String> state) {
   if (state.ok) {
     $0 = $1;
   } else {
-    final pos = state.newErrorPos;
+    final pos = state.lastErrorPos;
     if (pos > state.pos) {
       final length = state.pos - pos;
       state.error = ParseError.message(pos, length, 'message');
@@ -760,6 +760,7 @@ String? malformedTake2C16(State<String> state) {
       state.error = ParseError.expected(state.pos, 'tag');
     }
   }
+  state.restoreLastErrorPos($last);
   return $0;
 }
 
@@ -2601,7 +2602,7 @@ class State<T> {
 
   int errorPos = -1;
 
-  int newErrorPos = -1;
+  int lastErrorPos = -1;
 
   bool ok = false;
 
@@ -2624,8 +2625,11 @@ class State<T> {
         errorPos = offset;
         _length = 0;
       }
-      newErrorPos = offset;
       _errors[_length++] = error;
+    }
+
+    if (lastErrorPos < offset) {
+      lastErrorPos = offset;
     }
   }
 
@@ -2665,6 +2669,18 @@ class State<T> {
   @pragma('vm:prefer-inline')
   void restoreErrorPos() {
     errorPos = _length == 0 ? -1 : _errors[0]!.offset;
+  }
+
+  void restoreLastErrorPos(int pos) {
+    if (lastErrorPos < pos) {
+      lastErrorPos = pos;
+    }
+  }
+
+  int setLastErrorPos(int pos) {
+    final result = lastErrorPos;
+    lastErrorPos = pos;
+    return result;
   }
 
   @override

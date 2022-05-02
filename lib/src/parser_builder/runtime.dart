@@ -157,7 +157,7 @@ class State<T> {
 
   int errorPos = -1;
 
-  int newErrorPos = -1;
+  int lastErrorPos = -1;
 
   bool ok = false;
 
@@ -180,8 +180,11 @@ class State<T> {
         errorPos = offset;
         _length = 0;
       }
-      newErrorPos = offset;
       _errors[_length++] = error;
+    }
+
+    if (lastErrorPos < offset) {
+      lastErrorPos = offset;
     }
   }
 
@@ -221,6 +224,18 @@ class State<T> {
   @pragma('vm:prefer-inline')
   void restoreErrorPos() {
     errorPos = _length == 0 ? -1 : _errors[0]!.offset;
+  }
+
+  void restoreLastErrorPos(int pos) {
+    if (lastErrorPos < pos) {
+      lastErrorPos = pos;
+    }
+  }
+
+  int setLastErrorPos(int pos) {
+    final result = lastErrorPos;
+    lastErrorPos = pos;
+    return result;
   }
 
   @override

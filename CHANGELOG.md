@@ -1,3 +1,7 @@
+## 2.0.4
+
+- Improving the stability of tracking the position of the last `local` error. This feature is used, in particular, in the parser builders `Malformed` and `Indicate`
+
 ## 2.0.3
 
 - Implemented, tested and documented experimental parser builder `Memoize`. This is an attempt to implement lightweight (on demand) memoization with saving only one state of parsing (just for a specific case)
