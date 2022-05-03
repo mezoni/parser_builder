@@ -1384,11 +1384,7 @@ void _testManyTill() {
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
-      expect(state.errors, [
-        ParseError.expected(0, 'abc'),
-        ParseError.expected(0, 'a'),
-        ParseError.expected(0, 'b'),
-      ]);
+      expect(state.errors, [ParseError.expected(0, 'abc')]);
     }
     {
       final state = State('');
@@ -1396,11 +1392,7 @@ void _testManyTill() {
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
-      expect(state.errors, [
-        ParseError.expected(0, 'abc'),
-        ParseError.expected(0, 'a'),
-        ParseError.expected(0, 'b'),
-      ]);
+      expect(state.errors, [ParseError.expected(0, 'abc')]);
     }
     {
       final state = State('a');
@@ -1408,11 +1400,7 @@ void _testManyTill() {
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
-      expect(state.errors, [
-        ParseError.expected(1, 'abc'),
-        ParseError.expected(1, 'a'),
-        ParseError.expected(1, 'b'),
-      ]);
+      expect(state.errors, [ParseError.expected(1, 'abc')]);
     }
   });
 }
@@ -2029,9 +2017,6 @@ void _testPrefixExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errors, [
-        ParseError.expected(0, '-'),
-        ParseError.expected(0, '--'),
-        ParseError.expected(0, '++'),
         ParseError.unexpected(0, 0, 'EOF'),
       ]);
     }
@@ -2042,9 +2027,6 @@ void _testPrefixExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errors, [
-        ParseError.expected(0, '-'),
-        ParseError.expected(0, '--'),
-        ParseError.expected(0, '++'),
         ParseError.unexpected(0, 0, 0x20),
       ]);
     }
@@ -3373,7 +3355,7 @@ void _testVerify() {
       expect(state.ok, false);
       expect(r, null);
       expect(state.pos, 0);
-      expect(state.errors, [ParseError.message(0, 2, 'Message')]);
+      expect(state.errors, [ParseError.message(2, -2, 'Message')]);
     }
     final parserFast = verifyIs3DigitFast;
     {
@@ -3394,7 +3376,7 @@ void _testVerify() {
       parserFast(state);
       expect(state.ok, false);
       expect(state.pos, 0);
-      expect(state.errors, [ParseError.message(0, 2, 'Message')]);
+      expect(state.errors, [ParseError.message(2, -2, 'Message')]);
     }
   });
 }

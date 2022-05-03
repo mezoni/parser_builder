@@ -4,6 +4,8 @@ class SeparatedList0<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
 var {{pos}} = state.pos;
 final {{list}} = <{{O}}>[];
+final {{log}} = state.log;
+state.log = false;
 while (true) {
   {{var1}}
   {{p1}}
@@ -18,6 +20,7 @@ while (true) {
     break;
   }
 }
+state.log = {{log}};
 state.ok = true;
 if (state.ok) {
   {{res0}} = {{list}};
@@ -25,6 +28,8 @@ if (state.ok) {
 
   static const _templateFast = '''
 var {{pos}} = state.pos;
+final {{log}} = state.log;
+state.log = false;
 while (true) {
   {{var1}}
   {{p1}}
@@ -38,6 +43,7 @@ while (true) {
     break;
   }
 }
+state.log = {{log}};
 state.ok = true;''';
 
   final ParserBuilder<I, O> parser;
@@ -49,7 +55,7 @@ state.ok = true;''';
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['list', 'pos']);
+    final values = context.allocateLocals(['list', 'log', 'pos']);
     final r1 = context.getResult(parser, !fast);
     values.addAll({
       'O': '$O',

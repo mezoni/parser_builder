@@ -3,13 +3,16 @@ part of '../../multi.dart';
 class Many1Count<I> extends ParserBuilder<I, int> {
   static const _template = '''
 var {{count}} = 0;
+final {{log}} = state.log;
 while (true) {
+  state.log = {{count}} == 0;
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{count}}++;
 }
+state.log = {{log}};
 state.ok = {{count}} != 0;
 if (state.ok) {
   {{res0}} = {{count}};
@@ -17,13 +20,16 @@ if (state.ok) {
 
   static const _templateFast = '''
 var {{ok}} = false;
+final {{log}} = state.log;
 while (true) {
+  state.log = !{{ok}};
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{ok}} = true;
 }
+state.log = {{log}};
 state.ok = {{ok}};''';
 
   final ParserBuilder<I, dynamic> parser;
@@ -33,7 +39,7 @@ state.ok = {{ok}};''';
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['count']);
+    final values = context.allocateLocals(['count', 'log']);
     values.addAll({
       'p1': parser.build(context, null),
     });

@@ -554,6 +554,8 @@ List<dynamic>? _values(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <dynamic>[];
+  final $log = state.log;
+  state.log = false;
   while (true) {
     dynamic $1;
     $1 = _value(state);
@@ -580,6 +582,7 @@ List<dynamic>? _values(State<String> state) {
       break;
     }
   }
+  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -681,6 +684,8 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <MapEntry<String, dynamic>>[];
+  final $log = state.log;
+  state.log = false;
   while (true) {
     MapEntry<String, dynamic>? $1;
     $1 = _keyValue(state);
@@ -707,6 +712,7 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
       break;
     }
   }
+  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -995,6 +1001,8 @@ class State<T> {
 
   int lastErrorPos = -1;
 
+  bool log = true;
+
   bool ok = false;
 
   int pos = 0;
@@ -1010,17 +1018,19 @@ class State<T> {
   State(this.source);
 
   set error(ParseError error) {
-    final offset = error.offset;
-    if (offset >= errorPos) {
-      if (offset > errorPos) {
-        errorPos = offset;
-        _length = 0;
+    if (log) {
+      final pos = error.offset;
+      if (errorPos <= pos) {
+        if (errorPos < pos) {
+          errorPos = pos;
+          _length = 0;
+        }
+        _errors[_length++] = error;
       }
-      _errors[_length++] = error;
-    }
 
-    if (lastErrorPos < offset) {
-      lastErrorPos = offset;
+      if (lastErrorPos < pos) {
+        lastErrorPos = pos;
+      }
     }
   }
 
@@ -1062,12 +1072,14 @@ class State<T> {
     errorPos = _length == 0 ? -1 : _errors[0]!.offset;
   }
 
+  @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {
     if (lastErrorPos < pos) {
       lastErrorPos = pos;
     }
   }
 
+  @pragma('vm:prefer-inline')
   int setLastErrorPos(int pos) {
     final result = lastErrorPos;
     lastErrorPos = pos;

@@ -4,6 +4,7 @@ class ManyTill<I, O1, O2> extends ParserBuilder<I, tuple.Tuple2<List<O1>, O2>> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{list}} = <{{O1}}>[];
+final {{log}} = state.log;
 while (true) {
   {{var1}}
   {{p1}}
@@ -11,28 +12,35 @@ while (true) {
     {{res0}} = Tuple2({{list}}, {{val1}});
     break;
   }
+  state.log = false;
   {{var2}}
   {{p2}}
+  state.log = true;
   if (!state.ok) {
     state.pos = {{pos}};
     break;
   }
   {{list}}.add({{val2}});
-}''';
+}
+state.log = {{log}};''';
 
   static const _templateFast = '''
 final {{pos}} = state.pos;
+final {{log}} = state.log;
 while (true) {
   {{p1}}
   if (state.ok) {
     break;
   }
+  state.log = false;
   {{p2}}
+  state.log = true;
   if (!state.ok) {
     state.pos = {{pos}};
     break;
   }
-}''';
+}
+state.log = {{log}};''';
 
   final ParserBuilder<I, O2> end;
 
@@ -43,7 +51,7 @@ while (true) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['list', 'pos']);
+    final values = context.allocateLocals(['list', 'log', 'pos']);
     final r1 = context.getResult(end, !fast);
     final r2 = context.getResult(parser, !fast);
     values.addAll({

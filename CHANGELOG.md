@@ -1,6 +1,6 @@
 ## 2.0.4
 
-- Improving the stability of tracking the position of the last `local` error. This feature is used, in particular, in the parser builders `Malformed` and `Indicate`
+- Improving the stability of tracking the position of the last `local` error and restoring an error position. These features is used, in particular, in the parser builders `Malformed` and `Indicate`
 
 ## 2.0.3
 

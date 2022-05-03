@@ -129,10 +129,6 @@ if (!state.ok) {
 
   @override
   String build(Context context, ParserResult? result) {
-    if (reservedWords.isEmpty) {
-      throw ArgumentError('The list of reserved words must not be empty');
-    }
-
     for (final item in reservedWords) {
       if (item.isEmpty) {
         throw ArgumentError(

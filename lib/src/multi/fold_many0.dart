@@ -3,6 +3,8 @@ part of '../../multi.dart';
 class FoldMany0<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 var {{acc}} = {{initialize}};
+final {{log}} = state.log;
+state.log = false;
 while (true) {
   {{var1}}
   {{p1}}
@@ -12,18 +14,22 @@ while (true) {
   final {{v}} = {{val1}};
   {{combine}};
 }
+state.log = {{log}};
 state.ok = true;
 if (state.ok) {
   {{res0}} = {{acc}};
 }''';
 
   static const _templateFast = '''
+final {{log}} = state.log;
+state.log = false;
 while (true) {
   {{p1}}
   if (!state.ok) {
     break;
   }
 }
+state.log = {{log}};
 state.ok = true;''';
 
   final SemanticAction<O> combine;
@@ -37,7 +43,7 @@ state.ok = true;''';
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['acc', 'v']);
+    final values = context.allocateLocals(['acc', 'log', 'v']);
     final r1 = context.getResult(parser, !fast);
     values.addAll({
       'combine':

@@ -53,6 +53,78 @@ num? _parse(State<String> state) {
   return $0;
 }
 
+void _digit1(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c >= 48 && c <= 57;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = state.pos != $pos;
+  if (!state.ok) {
+    if ($pos < source.length) {
+      final c = source.runeAt($pos);
+      state.error = ParseError.unexpected($pos, 0, c);
+    } else {
+      state.error = ParseError.unexpected($pos, 0, 'EOF');
+    }
+  }
+}
+
+num? _number(State<String> state) {
+  num? $0;
+  final source = state.source;
+  final $log = state.log;
+  state.log = false;
+  num? $1;
+  String? $2;
+  final $pos = state.pos;
+  final $pos1 = state.pos;
+  _digit1(state);
+  if (state.ok) {
+    final $log1 = state.log;
+    state.log = false;
+    final $pos2 = state.pos;
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 46;
+    if (state.ok) {
+      state.pos += 1;
+    } else {
+      state.error = ParseError.expected(state.pos, '.');
+    }
+    if (state.ok) {
+      _digit1(state);
+    }
+    if (!state.ok) {
+      state.pos = $pos2;
+    }
+    state.log = $log1;
+    if (!state.ok) {
+      state.ok = true;
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos1;
+  }
+  if (state.ok) {
+    $2 = source.slice($pos, state.pos);
+  }
+  if (state.ok) {
+    final v = $2!;
+    $1 = num.parse(v);
+  }
+  state.log = $log;
+  if (state.ok) {
+    $0 = $1;
+  } else {
+    state.error = ParseError.expected(state.pos, 'number');
+  }
+  return $0;
+}
+
 void _ws(State<String> state) {
   final source = state.source;
   while (state.pos < source.length) {
@@ -64,153 +136,6 @@ void _ws(State<String> state) {
     state.pos++;
   }
   state.ok = true;
-}
-
-num? _decimal(State<String> state) {
-  num? $0;
-  final source = state.source;
-  final $last = state.setLastErrorPos(-1);
-  state.errorPos = state.pos + 1;
-  num? $1;
-  final $pos = state.pos;
-  String? $2;
-  final $pos1 = state.pos;
-  final $pos2 = state.pos;
-  final $pos3 = state.pos;
-  while (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
-    if (!ok) {
-      break;
-    }
-    state.pos++;
-  }
-  state.ok = state.pos != $pos3;
-  if (!state.ok) {
-    if ($pos3 < source.length) {
-      final c = source.runeAt($pos3);
-      state.error = ParseError.unexpected($pos3, 0, c);
-    } else {
-      state.error = ParseError.unexpected($pos3, 0, 'EOF');
-    }
-  }
-  if (state.ok) {
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 46;
-    if (state.ok) {
-      state.pos += 1;
-    } else {
-      state.error = ParseError.expected(state.pos, '.');
-    }
-    if (state.ok) {
-      final $pos4 = state.pos;
-      while (state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        final ok = c >= 48 && c <= 57;
-        if (!ok) {
-          break;
-        }
-        state.pos++;
-      }
-      state.ok = state.pos != $pos4;
-      if (!state.ok) {
-        if ($pos4 < source.length) {
-          final c = source.runeAt($pos4);
-          state.error = ParseError.unexpected($pos4, 0, c);
-        } else {
-          state.error = ParseError.unexpected($pos4, 0, 'EOF');
-        }
-      }
-      if (state.ok) {
-        //
-      }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos2;
-  }
-  if (state.ok) {
-    $2 = source.slice($pos1, state.pos);
-  }
-  if (state.ok) {
-    final v = $2!;
-    $1 = num.parse(v);
-  }
-  if (state.ok) {
-    _ws(state);
-  }
-  if (!state.ok) {
-    $1 = null;
-    state.pos = $pos;
-  }
-  state.restoreErrorPos();
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    final pos = state.lastErrorPos;
-    if (pos > state.pos) {
-      final length = state.pos - pos;
-      state.error = ParseError.message(pos, length, 'Malformed decimal');
-    } else {
-      state.error = ParseError.expected(state.pos, 'decimal');
-    }
-  }
-  state.restoreLastErrorPos($last);
-  return $0;
-}
-
-num? _integer(State<String> state) {
-  num? $0;
-  final source = state.source;
-  final $last = state.setLastErrorPos(-1);
-  state.errorPos = state.pos + 1;
-  num? $1;
-  final $pos = state.pos;
-  String? $2;
-  final $pos1 = state.pos;
-  while (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
-    if (!ok) {
-      break;
-    }
-    state.pos++;
-  }
-  state.ok = state.pos != $pos1;
-  if (state.ok) {
-    $2 = source.substring($pos1, state.pos);
-  } else {
-    if ($pos1 < source.length) {
-      final c = source.runeAt($pos1);
-      state.error = ParseError.unexpected($pos1, 0, c);
-    } else {
-      state.error = ParseError.unexpected($pos1, 0, 'EOF');
-    }
-  }
-  if (state.ok) {
-    final v = $2!;
-    $1 = int.parse(v);
-  }
-  if (state.ok) {
-    _ws(state);
-  }
-  if (!state.ok) {
-    $1 = null;
-    state.pos = $pos;
-  }
-  state.restoreErrorPos();
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    final pos = state.lastErrorPos;
-    if (pos > state.pos) {
-      final length = state.pos - pos;
-      state.error = ParseError.message(pos, length, 'Malformed integer');
-    } else {
-      state.error = ParseError.expected(state.pos, 'integer');
-    }
-  }
-  state.restoreLastErrorPos($last);
-  return $0;
 }
 
 void _openParen(State<String> state) {
@@ -249,27 +174,25 @@ void _closeParen(State<String> state) {
 
 num? _primary(State<String> state) {
   num? $0;
+  final $errorPos = state.errorPos;
   state.errorPos = state.pos + 1;
   num? $1;
-  $1 = _decimal(state);
+  $1 = _number(state);
   if (!state.ok) {
-    $1 = _integer(state);
-    if (!state.ok) {
-      final $pos = state.pos;
-      _openParen(state);
+    final $pos = state.pos;
+    _openParen(state);
+    if (state.ok) {
+      $1 = _expression(state);
       if (state.ok) {
-        $1 = _expression(state);
-        if (state.ok) {
-          _closeParen(state);
-        }
-      }
-      if (!state.ok) {
-        $1 = null;
-        state.pos = $pos;
+        _closeParen(state);
       }
     }
+    if (!state.ok) {
+      $1 = null;
+      state.pos = $pos;
+    }
   }
-  state.restoreErrorPos();
+  state.restoreErrorPos($errorPos);
   if (state.ok) {
     $0 = $1;
   } else {
@@ -281,8 +204,6 @@ num? _primary(State<String> state) {
 String? _multiplicativeOperator(State<String> state) {
   String? $0;
   final source = state.source;
-  state.errorPos = state.pos + 1;
-  String? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length;
   if (state.ok) {
@@ -308,7 +229,7 @@ String? _multiplicativeOperator(State<String> state) {
     }
     state.ok = v != null;
     if (state.ok) {
-      $1 = v;
+      $0 = v;
     }
   }
   if (!state.ok) {
@@ -320,14 +241,8 @@ String? _multiplicativeOperator(State<String> state) {
     _ws(state);
   }
   if (!state.ok) {
-    $1 = null;
+    $0 = null;
     state.pos = $pos;
-  }
-  state.restoreErrorPos();
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.error = ParseError.expected(state.pos, 'operator');
   }
   return $0;
 }
@@ -336,13 +251,16 @@ num? _multiplicative(State<String> state) {
   num? $0;
   final $pos = state.pos;
   num? $left;
+  final $log = state.log;
   num? $1;
   $1 = _primary(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      state.log = false;
       String? $2;
       $2 = _multiplicativeOperator(state);
+      state.log = $log;
       if (!state.ok) {
         state.ok = true;
         break;
@@ -367,8 +285,6 @@ num? _multiplicative(State<String> state) {
 String? _additiveOperator(State<String> state) {
   String? $0;
   final source = state.source;
-  state.errorPos = state.pos + 1;
-  String? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length;
   if (state.ok) {
@@ -387,7 +303,7 @@ String? _additiveOperator(State<String> state) {
     }
     state.ok = v != null;
     if (state.ok) {
-      $1 = v;
+      $0 = v;
     }
   }
   if (!state.ok) {
@@ -398,14 +314,8 @@ String? _additiveOperator(State<String> state) {
     _ws(state);
   }
   if (!state.ok) {
-    $1 = null;
+    $0 = null;
     state.pos = $pos;
-  }
-  state.restoreErrorPos();
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.error = ParseError.expected(state.pos, 'operator');
   }
   return $0;
 }
@@ -414,13 +324,16 @@ num? _additive(State<String> state) {
   num? $0;
   final $pos = state.pos;
   num? $left;
+  final $log = state.log;
   num? $1;
   $1 = _multiplicative(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      state.log = false;
       String? $2;
       $2 = _additiveOperator(state);
+      state.log = $log;
       if (!state.ok) {
         state.ok = true;
         break;
@@ -444,10 +357,11 @@ num? _additive(State<String> state) {
 
 num? _expression(State<String> state) {
   num? $0;
+  final $errorPos = state.errorPos;
   state.errorPos = state.pos + 1;
   num? $1;
   $1 = _additive(state);
-  state.restoreErrorPos();
+  state.restoreErrorPos($errorPos);
   if (state.ok) {
     $0 = $1;
   } else {
@@ -615,6 +529,8 @@ class State<T> {
 
   int lastErrorPos = -1;
 
+  bool log = true;
+
   bool ok = false;
 
   int pos = 0;
@@ -630,17 +546,19 @@ class State<T> {
   State(this.source);
 
   set error(ParseError error) {
-    final offset = error.offset;
-    if (offset >= errorPos) {
-      if (offset > errorPos) {
-        errorPos = offset;
-        _length = 0;
+    if (log) {
+      final pos = error.offset;
+      if (errorPos <= pos) {
+        if (errorPos < pos) {
+          errorPos = pos;
+          _length = 0;
+        }
+        _errors[_length++] = error;
       }
-      _errors[_length++] = error;
-    }
 
-    if (lastErrorPos < offset) {
-      lastErrorPos = offset;
+      if (lastErrorPos < pos) {
+        lastErrorPos = pos;
+      }
     }
   }
 
@@ -678,16 +596,20 @@ class State<T> {
   }
 
   @pragma('vm:prefer-inline')
-  void restoreErrorPos() {
-    errorPos = _length == 0 ? -1 : _errors[0]!.offset;
-  }
+  void restoreErrorPos(int pos) => errorPos = errorPos <= pos
+      ? pos
+      : _length == 0
+          ? -1
+          : _errors[0]!.offset;
 
+  @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {
     if (lastErrorPos < pos) {
       lastErrorPos = pos;
     }
   }
 
+  @pragma('vm:prefer-inline')
   int setLastErrorPos(int pos) {
     final result = lastErrorPos;
     lastErrorPos = pos;

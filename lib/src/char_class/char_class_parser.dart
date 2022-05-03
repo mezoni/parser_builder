@@ -90,7 +90,8 @@ int? _rangeChar(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   final $pos1 = state.pos;
-  state.errorPos = 0x7fffffff;
+  final $log = state.log;
+  state.log = false;
   state.ok = state.pos < source.length;
   if (state.ok) {
     final pos = state.pos;
@@ -112,7 +113,7 @@ int? _rangeChar(State<String> state) {
     state.error = ParseError.expected(state.pos, '[');
     state.error = ParseError.expected(state.pos, ']');
   }
-  state.restoreErrorPos();
+  state.log = $log;
   state.ok = !state.ok;
   if (!state.ok) {
     state.pos = $pos1;
@@ -254,7 +255,9 @@ List<Tuple2<int, int>>? _range(State<String> state) {
   }
   if (state.ok) {
     var $list = <Tuple2<int, int>>[];
+    final $log = state.log;
     while (true) {
+      state.log = $list.isEmpty;
       Tuple2<int, int>? $1;
       $1 = _rangeBody(state);
       if (!state.ok) {
@@ -262,6 +265,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
       }
       $list.add($1!);
     }
+    state.log = $log;
     state.ok = $list.isNotEmpty;
     if (state.ok) {
       $0 = $list;
@@ -316,6 +320,7 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   List<List<Tuple2<int, int>>>? $1;
   var $pos = state.pos;
   final $list = <List<Tuple2<int, int>>>[];
+  final $log = state.log;
   while (true) {
     List<Tuple2<int, int>>? $2;
     final $pos1 = state.pos;
@@ -333,11 +338,13 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
     }
     $list.add($2!);
     $pos = state.pos;
+    state.log = false;
     _verbar(state);
     if (!state.ok) {
       break;
     }
   }
+  state.log = $log;
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $1 = $list;
@@ -529,6 +536,8 @@ class State<T> {
 
   int lastErrorPos = -1;
 
+  bool log = true;
+
   bool ok = false;
 
   int pos = 0;
@@ -544,17 +553,19 @@ class State<T> {
   State(this.source);
 
   set error(ParseError error) {
-    final offset = error.offset;
-    if (offset >= errorPos) {
-      if (offset > errorPos) {
-        errorPos = offset;
-        _length = 0;
+    if (log) {
+      final pos = error.offset;
+      if (errorPos <= pos) {
+        if (errorPos < pos) {
+          errorPos = pos;
+          _length = 0;
+        }
+        _errors[_length++] = error;
       }
-      _errors[_length++] = error;
-    }
 
-    if (lastErrorPos < offset) {
-      lastErrorPos = offset;
+      if (lastErrorPos < pos) {
+        lastErrorPos = pos;
+      }
     }
   }
 
@@ -596,12 +607,14 @@ class State<T> {
     errorPos = _length == 0 ? -1 : _errors[0]!.offset;
   }
 
+  @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {
     if (lastErrorPos < pos) {
       lastErrorPos = pos;
     }
   }
 
+  @pragma('vm:prefer-inline')
   int setLastErrorPos(int pos) {
     final result = lastErrorPos;
     lastErrorPos = pos;

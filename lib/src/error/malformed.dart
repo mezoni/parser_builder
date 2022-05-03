@@ -12,10 +12,11 @@ part of '../../error.dart';
 class Malformed<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{last}} = state.setLastErrorPos(-1);
+final {{errorPos}} = state.errorPos;
 state.errorPos = state.pos + 1;
 {{var1}}
 {{p1}}
-state.restoreErrorPos();
+state.restoreErrorPos({{errorPos}});
 if (state.ok) {
   {{res0}} = {{res1}};
 } else {
@@ -31,9 +32,10 @@ state.restoreLastErrorPos({{last}});''';
 
   static const _templateFast = '''
 final {{last}} = state.setLastErrorPos(-1);
+final {{errorPos}} = state.errorPos;
 state.errorPos = state.pos + 1;
 {{p1}}
-state.restoreErrorPos();
+state.restoreErrorPos({{errorPos}});
 if (!state.ok) {
   final pos = state.lastErrorPos;
   if (pos > state.pos) {
@@ -57,7 +59,7 @@ state.restoreLastErrorPos({{last}});''';
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['last']);
+    final values = context.allocateLocals(['errorPos', 'last']);
     final r1 = context.getResult(parser, !fast);
     values.addAll({
       'message': helper.escapeString(message),

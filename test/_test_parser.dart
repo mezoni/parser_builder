@@ -175,12 +175,12 @@ int? char32(State<String> state) {
 
 void andC32OrC16(State<String> state) {
   final $pos = state.pos;
-  state.errorPos = 0x7fffffff;
+  state.log = false;
   char32(state);
   if (!state.ok) {
     char16(state);
   }
-  state.restoreErrorPos();
+  state.log = true;
   if (state.ok) {
     state.pos = $pos;
   } else {
@@ -236,11 +236,13 @@ int? _binaryExpressionMul(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $left;
+  final $log = state.log;
   int? $1;
   $1 = _primaryExpression(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      state.log = false;
       String? $2;
       state.ok = state.pos < source.length;
       if (state.ok) {
@@ -269,6 +271,7 @@ int? _binaryExpressionMul(State<String> state) {
         state.error = ParseError.expected(state.pos, '*');
         state.error = ParseError.expected(state.pos, '~/');
       }
+      state.log = $log;
       if (!state.ok) {
         state.ok = true;
         break;
@@ -295,11 +298,13 @@ int? binaryExpressionAdd(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $left;
+  final $log = state.log;
   int? $1;
   $1 = _binaryExpressionMul(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      state.log = false;
       String? $2;
       state.ok = state.pos < source.length;
       if (state.ok) {
@@ -325,6 +330,7 @@ int? binaryExpressionAdd(State<String> state) {
         state.error = ParseError.expected(state.pos, '+');
         state.error = ParseError.expected(state.pos, '-');
       }
+      state.log = $log;
       if (!state.ok) {
         state.ok = true;
         break;
@@ -368,6 +374,7 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   List<String>? $1;
   var $pos1 = state.pos;
   final $list = <String>[];
+  final $log = state.log;
   while (true) {
     String? $2;
     $2 = tagAbc(state);
@@ -377,11 +384,13 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
     }
     $list.add($2!);
     $pos1 = state.pos;
+    state.log = false;
     char32(state);
     if (!state.ok) {
       break;
     }
   }
+  state.log = $log;
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $1 = $list;
@@ -531,7 +540,8 @@ int? escapeSequence32(State<String> state) {
 String? expected2C16(State<String> state) {
   String? $0;
   final source = state.source;
-  state.errorPos = 0x7fffffff;
+  final $log = state.log;
+  state.log = false;
   String? $1;
   final $pos = state.pos;
   var $count = 0;
@@ -556,7 +566,7 @@ String? expected2C16(State<String> state) {
     }
     state.pos = $pos;
   }
-  state.restoreErrorPos();
+  state.log = $log;
   if (state.ok) {
     $0 = $1;
   } else {
@@ -569,6 +579,8 @@ dynamic foldMany0Digit(State<String> state) {
   dynamic $0;
   final source = state.source;
   var $acc = 0;
+  final $log = state.log;
+  state.log = false;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length;
@@ -591,6 +603,7 @@ dynamic foldMany0Digit(State<String> state) {
     final $v = $1!;
     $acc = $acc * 10 + $v - 0x30;
   }
+  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $acc;
@@ -723,6 +736,7 @@ String? malformedTake2C16(State<String> state) {
   String? $0;
   final source = state.source;
   final $last = state.setLastErrorPos(-1);
+  final $errorPos = state.errorPos;
   state.errorPos = state.pos + 1;
   String? $1;
   final $pos = state.pos;
@@ -748,7 +762,7 @@ String? malformedTake2C16(State<String> state) {
     }
     state.pos = $pos;
   }
-  state.restoreErrorPos();
+  state.restoreErrorPos($errorPos);
   if (state.ok) {
     $0 = $1;
   } else {
@@ -768,6 +782,8 @@ List<int>? many0C16(State<String> state) {
   List<int>? $0;
   final source = state.source;
   final $list = <int>[];
+  final $log = state.log;
+  state.log = false;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
@@ -782,6 +798,7 @@ List<int>? many0C16(State<String> state) {
     }
     $list.add($1!);
   }
+  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -792,6 +809,8 @@ List<int>? many0C16(State<String> state) {
 List<int>? many0C32(State<String> state) {
   List<int>? $0;
   final $list = <int>[];
+  final $log = state.log;
+  state.log = false;
   while (true) {
     int? $1;
     $1 = char32(state);
@@ -800,6 +819,7 @@ List<int>? many0C32(State<String> state) {
     }
     $list.add($1!);
   }
+  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -810,6 +830,8 @@ List<int>? many0C32(State<String> state) {
 int? many0CountC32(State<String> state) {
   int? $0;
   var $count = 0;
+  final $log = state.log;
+  state.log = false;
   while (true) {
     char32(state);
     if (!state.ok) {
@@ -817,6 +839,7 @@ int? many0CountC32(State<String> state) {
     }
     $count++;
   }
+  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $count;
@@ -827,7 +850,9 @@ int? many0CountC32(State<String> state) {
 List<int>? many1C32(State<String> state) {
   List<int>? $0;
   var $list = <int>[];
+  final $log = state.log;
   while (true) {
+    state.log = $list.isEmpty;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
@@ -835,6 +860,7 @@ List<int>? many1C32(State<String> state) {
     }
     $list.add($1!);
   }
+  state.log = $log;
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $0 = $list;
@@ -845,13 +871,16 @@ List<int>? many1C32(State<String> state) {
 int? many1CountC32(State<String> state) {
   int? $0;
   var $count = 0;
+  final $log = state.log;
   while (true) {
+    state.log = $count == 0;
     char32(state);
     if (!state.ok) {
       break;
     }
     $count++;
   }
+  state.log = $log;
   state.ok = $count != 0;
   if (state.ok) {
     $0 = $count;
@@ -906,6 +935,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   final $list = <String>[];
+  final $log = state.log;
   while (true) {
     String? $1;
     state.ok = state.pos < source.length &&
@@ -921,6 +951,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       $0 = Tuple2($list, $1!);
       break;
     }
+    state.log = false;
     String? $2;
     state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 97;
     if (state.ok) {
@@ -939,12 +970,14 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
         state.error = ParseError.expected(state.pos, 'b');
       }
     }
+    state.log = true;
     if (!state.ok) {
       state.pos = $pos;
       break;
     }
     $list.add($2!);
   }
+  state.log = $log;
   return $0;
 }
 
@@ -1098,6 +1131,7 @@ String? memoizeC16C32OrC16(State<String> state) {
 Object? nestedC16OrTake2C32(State<String> state) {
   Object? $0;
   final source = state.source;
+  final $errorPos = state.errorPos;
   state.errorPos = state.pos + 1;
   Object? $1;
   $1 = char16(state);
@@ -1127,7 +1161,7 @@ Object? nestedC16OrTake2C32(State<String> state) {
       state.pos = $pos;
     }
   }
-  state.restoreErrorPos();
+  state.restoreErrorPos($errorPos);
   if (state.ok) {
     $0 = $1;
   } else {
@@ -1256,12 +1290,13 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
 
 void notC32OrC16(State<String> state) {
   final $pos = state.pos;
-  state.errorPos = 0x7fffffff;
+  final $log = state.log;
+  state.log = false;
   char16(state);
   if (!state.ok) {
     char32(state);
   }
-  state.restoreErrorPos();
+  state.log = $log;
   state.ok = !state.ok;
   if (!state.ok) {
     state.pos = $pos;
@@ -1312,6 +1347,8 @@ int? oneOfC32(State<String> state) {
 String? optAbc(State<String> state) {
   String? $0;
   final source = state.source;
+  final $log = state.log;
+  state.log = false;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
       source.startsWith('abc', state.pos);
@@ -1321,6 +1358,7 @@ String? optAbc(State<String> state) {
   } else {
     state.error = ParseError.expected(state.pos, 'abc');
   }
+  state.log = $log;
   if (!state.ok) {
     state.ok = true;
   }
@@ -1364,6 +1402,8 @@ int? postfixExpression(State<String> state) {
   $1 = _primaryExpression(state);
   if (state.ok) {
     String? $2;
+    final $log = state.log;
+    state.log = false;
     state.ok = state.pos < source.length;
     if (state.ok) {
       final pos = state.pos;
@@ -1394,6 +1434,7 @@ int? postfixExpression(State<String> state) {
       state.error = ParseError.expected(state.pos, '--');
       state.error = ParseError.expected(state.pos, '++');
     }
+    state.log = $log;
     if (!state.ok) {
       state.ok = true;
     }
@@ -1412,6 +1453,8 @@ int? prefixExpression(State<String> state) {
   int? $0;
   final source = state.source;
   String? $1;
+  final $log = state.log;
+  state.log = false;
   state.ok = state.pos < source.length;
   if (state.ok) {
     final pos = state.pos;
@@ -1445,6 +1488,7 @@ int? prefixExpression(State<String> state) {
     state.error = ParseError.expected(state.pos, '--');
     state.error = ParseError.expected(state.pos, '++');
   }
+  state.log = $log;
   if (!state.ok) {
     state.ok = true;
   }
@@ -1552,6 +1596,8 @@ List<int>? separatedList0C32Abc(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <int>[];
+  final $log = state.log;
+  state.log = false;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
@@ -1579,6 +1625,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
       break;
     }
   }
+  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -1591,6 +1638,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <int>[];
+  final $log = state.log;
   while (true) {
     int? $1;
     state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
@@ -1606,6 +1654,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
     }
     $list.add($1!);
     $pos = state.pos;
+    state.log = false;
     state.ok = state.pos < source.length &&
         source.codeUnitAt(state.pos) == 97 &&
         source.startsWith('abc', state.pos);
@@ -1618,6 +1667,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
       break;
     }
   }
+  state.log = $log;
   state.ok = $list.isNotEmpty;
   if (state.ok) {
     $0 = $list;
@@ -2441,7 +2491,8 @@ String? verifyIs3Digit(State<String> state) {
     if (state.ok) {
       $0 = v;
     } else {
-      state.error = ParseError.message($pos, state.pos - $pos, 'Message');
+      final length = $pos - state.pos;
+      state.error = ParseError.message(state.pos, length, 'Message');
       state.pos = $pos;
     }
   }
@@ -2469,7 +2520,8 @@ void verifyIs3DigitFast(State<String> state) {
     final v = $1!;
     state.ok = v.length == 3;
     if (!state.ok) {
-      state.error = ParseError.message($pos, state.pos - $pos, 'Message');
+      final length = $pos - state.pos;
+      state.error = ParseError.message(state.pos, length, 'Message');
       state.pos = $pos;
     }
   }
@@ -2604,6 +2656,8 @@ class State<T> {
 
   int lastErrorPos = -1;
 
+  bool log = true;
+
   bool ok = false;
 
   int pos = 0;
@@ -2619,17 +2673,19 @@ class State<T> {
   State(this.source);
 
   set error(ParseError error) {
-    final offset = error.offset;
-    if (offset >= errorPos) {
-      if (offset > errorPos) {
-        errorPos = offset;
-        _length = 0;
+    if (log) {
+      final pos = error.offset;
+      if (errorPos <= pos) {
+        if (errorPos < pos) {
+          errorPos = pos;
+          _length = 0;
+        }
+        _errors[_length++] = error;
       }
-      _errors[_length++] = error;
-    }
 
-    if (lastErrorPos < offset) {
-      lastErrorPos = offset;
+      if (lastErrorPos < pos) {
+        lastErrorPos = pos;
+      }
     }
   }
 
@@ -2667,16 +2723,20 @@ class State<T> {
   }
 
   @pragma('vm:prefer-inline')
-  void restoreErrorPos() {
-    errorPos = _length == 0 ? -1 : _errors[0]!.offset;
-  }
+  void restoreErrorPos(int pos) => errorPos = errorPos <= pos
+      ? pos
+      : _length == 0
+          ? -1
+          : _errors[0]!.offset;
 
+  @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {
     if (lastErrorPos < pos) {
       lastErrorPos = pos;
     }
   }
 
+  @pragma('vm:prefer-inline')
   int setLastErrorPos(int pos) {
     final result = lastErrorPos;
     lastErrorPos = pos;

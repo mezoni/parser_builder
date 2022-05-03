@@ -3,9 +3,9 @@ part of '../../combinator.dart';
 class And<I> extends ParserBuilder<I, void> {
   static const _template = '''
 final {{pos}} = state.pos;
-state.errorPos = 0x7fffffff;
+state.log = false;
 {{p1}}
-state.restoreErrorPos();
+state.log = true;
 if (state.ok) {
   state.pos = {{pos}};
 } else {

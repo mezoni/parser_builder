@@ -3,7 +3,9 @@ part of '../../multi.dart';
 class Many1<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
 var {{list}} = <{{O}}>[];
+final {{log}} = state.log;
 while (true) {
+  state.log = {{list}}.isEmpty;
   {{var1}}
   {{p1}}
   if (!state.ok) {
@@ -11,6 +13,7 @@ while (true) {
   }
   {{list}}.add({{val1}});
 }
+state.log = {{log}};
 state.ok = {{list}}.isNotEmpty;
 if (state.ok) {
   {{res0}} = {{list}};
@@ -18,13 +21,16 @@ if (state.ok) {
 
   static const _templateFast = '''
 var {{ok}} = false;
+final {{log}} = state.log;
 while (true) {
+  state.log = !{{ok}};
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{ok}} = true;
 }
+state.log = {{log}};
 state.ok = {{ok}};''';
 
   final ParserBuilder<I, O> parser;
@@ -34,7 +40,7 @@ state.ok = {{ok}};''';
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['list', 'ok']);
+    final values = context.allocateLocals(['list', 'log', 'ok']);
     final r1 = context.getResult(parser, !fast);
     values.addAll({
       'O': '$O',

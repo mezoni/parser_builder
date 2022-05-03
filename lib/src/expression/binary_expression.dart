@@ -4,13 +4,16 @@ class BinaryExpression<I, O1, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{O}} {{left}};
+final {{log}} = state.log;
 {{var1}}
 {{p1}}
 if (state.ok) {
   {{left}} = {{res1}};
   while (true) {
+    state.log = false;
     {{var2}}
     {{p2}}
+    state.log = {{log}};
     if (!state.ok) {
       state.ok = true;
       break;
@@ -33,13 +36,16 @@ if (state.ok) {
   static const _templateFast = '''
 final {{pos}} = state.pos;
 {{O}} {{left}};
+final {{log}} = state.log;
 {{var1}}
 {{p1}}
 if (state.ok) {
   {{left}} = {{res1}};
   while (true) {
+    state.log = false;
     {{var2}}
     {{p2}}
+    state.log = {{log}};
     if (!state.ok) {
       state.ok = true;
       break;
@@ -69,7 +75,8 @@ if (state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['left', 'op', 'pos', 'right']);
+    final values =
+        context.allocateLocals(['left', 'log', 'op', 'pos', 'right']);
     final r1 = context.getResult(left, !fast);
     final r2 = context.getResult(operator, !fast);
     final r3 = context.getResult(right, !fast);

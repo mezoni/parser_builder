@@ -47,51 +47,36 @@ const _additive = Named(
     BinaryExpression(
         _multiplicative, _additiveOperator, _multiplicative, _calculate));
 
-const _additiveOperator = Named(
-    '_additiveOperator', Nested(_operator, Terminated(Tags(['+', '-']), _ws)));
+const _additiveOperator =
+    Named('_additiveOperator', Terminated(Tags(['+', '-']), _ws));
 
 const _calculate = ExpressionAction<num>(
     ['left', 'op', 'right'], '_calculate({{left}}, {{op}}, {{right}})');
 
 const _closeParen = Named('_closeParen', Terminated(Tag(')'), _ws));
 
-const _decimal = Named(
-    '_decimal',
-    Malformed(
-        'decimal',
-        'Malformed decimal',
-        Terminated(
-            Map1(
-                Recognize(
-                  Tuple3(Digit1(), Tag('.'), Digit1()),
-                ),
-                ExpressionAction<num>(['x'], 'num.parse({{x}})')),
-            _ws)));
+const _digit1 = Named('_digit1', Digit1());
 
 const _expression = Ref<String, num>('_expression');
 
 const _expression_ = Named('_expression', Nested('expression', _additive));
-
-const _integer = Named(
-    '_integer',
-    Malformed(
-        'integer',
-        'Malformed integer',
-        Terminated(
-            Map1(Digit1(), ExpressionAction<num>(['x'], 'int.parse({{x}})')),
-            _ws)));
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 
 const _multiplicative = Named('_multiplicative',
     BinaryExpression(_primary, _multiplicativeOperator, _primary, _calculate));
 
-const _multiplicativeOperator = Named('_multiplicativeOperator',
-    Nested(_operator, Terminated(Tags(['*', '/', '~/']), _ws)));
+const _multiplicativeOperator =
+    Named('_multiplicativeOperator', Terminated(Tags(['*', '/', '~/']), _ws));
+
+const _number = Named(
+    '_number',
+    Expected(
+        'number',
+        Map1(Recognize(Pair(_digit1, Opt(Pair(Tag('.'), _digit1)))),
+            ExpressionAction<num>(['x'], 'num.parse({{x}})'))));
 
 const _openParen = Named('_openParen', Terminated(Tag('('), _ws));
-
-const _operator = 'operator';
 
 const _parse = Named('_parse', Terminated(_expression, Eof<String>()));
 
@@ -99,9 +84,8 @@ const _primary = Named(
     '_primary',
     Nested(
         'expression',
-        Alt3(
-          _decimal,
-          _integer,
+        Alt2(
+          _number,
           Delimited(_openParen, _expression, _closeParen),
         )));
 

@@ -268,6 +268,8 @@ class State<T> {
 
   int lastErrorPos = -1;
 
+  bool log = true;
+
   bool ok = false;
 
   int pos = 0;
@@ -283,17 +285,19 @@ class State<T> {
   State(this.source);
 
   set error(ParseError error) {
-    final offset = error.offset;
-    if (offset >= errorPos) {
-      if (offset > errorPos) {
-        errorPos = offset;
-        _length = 0;
+    if (log) {
+      final pos = error.offset;
+      if (errorPos <= pos) {
+        if (errorPos < pos) {
+          errorPos = pos;
+          _length = 0;
+        }
+        _errors[_length++] = error;
       }
-      _errors[_length++] = error;
-    }
 
-    if (lastErrorPos < offset) {
-      lastErrorPos = offset;
+      if (lastErrorPos < pos) {
+        lastErrorPos = pos;
+      }
     }
   }
 
@@ -335,12 +339,14 @@ class State<T> {
     errorPos = _length == 0 ? -1 : _errors[0]!.offset;
   }
 
+  @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {
     if (lastErrorPos < pos) {
       lastErrorPos = pos;
     }
   }
 
+  @pragma('vm:prefer-inline')
   int setLastErrorPos(int pos) {
     final result = lastErrorPos;
     lastErrorPos = pos;
