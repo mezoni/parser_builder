@@ -15,14 +15,13 @@ while (true) {
   state.log = false;
   {{var2}}
   {{p2}}
-  state.log = true;
+  state.log = {{log}};
   if (!state.ok) {
     state.pos = {{pos}};
     break;
   }
   {{list}}.add({{val2}});
-}
-state.log = {{log}};''';
+}''';
 
   static const _templateFast = '''
 final {{pos}} = state.pos;
@@ -34,13 +33,12 @@ while (true) {
   }
   state.log = false;
   {{p2}}
-  state.log = true;
+  state.log = {{log}};
   if (!state.ok) {
     state.pos = {{pos}};
     break;
   }
-}
-state.log = {{log}};''';
+}''';
 
   final ParserBuilder<I, O2> end;
 

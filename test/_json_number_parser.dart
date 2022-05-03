@@ -555,9 +555,11 @@ class State<T> {
   }
 
   @pragma('vm:prefer-inline')
-  void restoreErrorPos() {
-    errorPos = _length == 0 ? -1 : _errors[0]!.offset;
-  }
+  void restoreErrorPos(int pos) => errorPos = errorPos <= pos
+      ? pos
+      : _length == 0
+          ? -1
+          : _errors[0]!.offset;
 
   @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {

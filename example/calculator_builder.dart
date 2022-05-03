@@ -69,8 +69,10 @@ const _multiplicative = Named('_multiplicative',
 const _multiplicativeOperator =
     Named('_multiplicativeOperator', Terminated(Tags(['*', '/', '~/']), _ws));
 
-const _number = Named(
-    '_number',
+const _number = Named('_number', Terminated(_numberImpl, _ws));
+
+const _numberImpl = Named(
+    '_numberImpl',
     Expected(
         'number',
         Map1(Recognize(Pair(_digit1, Opt(Pair(Tag('.'), _digit1)))),

@@ -51,6 +51,7 @@ Color? _hexColor(State<String> state) {
   Color? $0;
   final source = state.source;
   final $last = state.setLastErrorPos(-1);
+  final $errorPos = state.errorPos;
   state.errorPos = state.pos + 1;
   Color? $1;
   final $pos = state.pos;
@@ -86,7 +87,7 @@ Color? _hexColor(State<String> state) {
     $1 = null;
     state.pos = $pos;
   }
-  state.restoreErrorPos();
+  state.restoreErrorPos($errorPos);
   if (state.ok) {
     $0 = $1;
   } else {
@@ -335,9 +336,11 @@ class State<T> {
   }
 
   @pragma('vm:prefer-inline')
-  void restoreErrorPos() {
-    errorPos = _length == 0 ? -1 : _errors[0]!.offset;
-  }
+  void restoreErrorPos(int pos) => errorPos = errorPos <= pos
+      ? pos
+      : _length == 0
+          ? -1
+          : _errors[0]!.offset;
 
   @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {

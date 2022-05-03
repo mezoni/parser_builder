@@ -5,13 +5,13 @@ class Many1<I, O> extends ParserBuilder<I, List<O>> {
 var {{list}} = <{{O}}>[];
 final {{log}} = state.log;
 while (true) {
-  state.log = {{list}}.isEmpty;
   {{var1}}
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{list}}.add({{val1}});
+  state.log = false;
 }
 state.log = {{log}};
 state.ok = {{list}}.isNotEmpty;
@@ -23,12 +23,12 @@ if (state.ok) {
 var {{ok}} = false;
 final {{log}} = state.log;
 while (true) {
-  state.log = !{{ok}};
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{ok}} = true;
+  state.log = false;
 }
 state.log = {{log}};
 state.ok = {{ok}};''';

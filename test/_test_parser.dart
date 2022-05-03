@@ -175,12 +175,13 @@ int? char32(State<String> state) {
 
 void andC32OrC16(State<String> state) {
   final $pos = state.pos;
+  final $log = state.log;
   state.log = false;
   char32(state);
   if (!state.ok) {
     char16(state);
   }
-  state.log = true;
+  state.log = $log;
   if (state.ok) {
     state.pos = $pos;
   } else {
@@ -852,13 +853,13 @@ List<int>? many1C32(State<String> state) {
   var $list = <int>[];
   final $log = state.log;
   while (true) {
-    state.log = $list.isEmpty;
     int? $1;
     $1 = char32(state);
     if (!state.ok) {
       break;
     }
     $list.add($1!);
+    state.log = false;
   }
   state.log = $log;
   state.ok = $list.isNotEmpty;
@@ -873,12 +874,12 @@ int? many1CountC32(State<String> state) {
   var $count = 0;
   final $log = state.log;
   while (true) {
-    state.log = $count == 0;
     char32(state);
     if (!state.ok) {
       break;
     }
     $count++;
+    state.log = false;
   }
   state.log = $log;
   state.ok = $count != 0;
@@ -970,14 +971,13 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
         state.error = ParseError.expected(state.pos, 'b');
       }
     }
-    state.log = true;
+    state.log = $log;
     if (!state.ok) {
       state.pos = $pos;
       break;
     }
     $list.add($2!);
   }
-  state.log = $log;
   return $0;
 }
 

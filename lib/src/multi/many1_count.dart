@@ -5,12 +5,12 @@ class Many1Count<I> extends ParserBuilder<I, int> {
 var {{count}} = 0;
 final {{log}} = state.log;
 while (true) {
-  state.log = {{count}} == 0;
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{count}}++;
+  state.log = false;
 }
 state.log = {{log}};
 state.ok = {{count}} != 0;
@@ -22,12 +22,12 @@ if (state.ok) {
 var {{ok}} = false;
 final {{log}} = state.log;
 while (true) {
-  state.log = !{{ok}};
   {{p1}}
   if (!state.ok) {
     break;
   }
   {{ok}} = true;
+  state.log = false;
 }
 state.log = {{log}};
 state.ok = {{ok}};''';

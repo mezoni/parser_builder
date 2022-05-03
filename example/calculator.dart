@@ -75,7 +75,7 @@ void _digit1(State<String> state) {
   }
 }
 
-num? _number(State<String> state) {
+num? _numberImpl(State<String> state) {
   num? $0;
   final source = state.source;
   final $log = state.log;
@@ -136,6 +136,20 @@ void _ws(State<String> state) {
     state.pos++;
   }
   state.ok = true;
+}
+
+num? _number(State<String> state) {
+  num? $0;
+  final $pos = state.pos;
+  $0 = _numberImpl(state);
+  if (state.ok) {
+    _ws(state);
+  }
+  if (!state.ok) {
+    $0 = null;
+    state.pos = $pos;
+  }
+  return $0;
 }
 
 void _openParen(State<String> state) {

@@ -257,13 +257,13 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     var $list = <Tuple2<int, int>>[];
     final $log = state.log;
     while (true) {
-      state.log = $list.isEmpty;
       Tuple2<int, int>? $1;
       $1 = _rangeBody(state);
       if (!state.ok) {
         break;
       }
       $list.add($1!);
+      state.log = false;
     }
     state.log = $log;
     state.ok = $list.isNotEmpty;
@@ -603,9 +603,11 @@ class State<T> {
   }
 
   @pragma('vm:prefer-inline')
-  void restoreErrorPos() {
-    errorPos = _length == 0 ? -1 : _errors[0]!.offset;
-  }
+  void restoreErrorPos(int pos) => errorPos = errorPos <= pos
+      ? pos
+      : _length == 0
+          ? -1
+          : _errors[0]!.offset;
 
   @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {
