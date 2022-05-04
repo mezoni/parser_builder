@@ -4,7 +4,8 @@ dynamic parse(String source) {
   final state = State(source);
   final result = _json(state);
   if (!state.ok) {
-    final errors = ParseError.errorReport(state.errors);
+    final offset = state.errorPos;
+    final errors = ParseError.errorReport(offset, state.errors);
     final message = _errorMessage(source, errors);
     throw FormatException('\n$message');
   }
@@ -35,7 +36,7 @@ dynamic _json(State<String> state) {
     if (state.ok) {
       state.ok = state.pos >= source.length;
       if (!state.ok) {
-        state.error = ParseError.expected(state.pos, 'EOF');
+        state.fail(state.pos, const ParseError.expected('EOF'));
       }
     }
   }
@@ -57,7 +58,7 @@ int? _escapeHex(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.error = ParseError.expected(state.pos, 'u');
+    state.fail(state.pos, const ParseError.expected('u'));
   }
   if (state.ok) {
     String? $2;
@@ -79,9 +80,9 @@ int? _escapeHex(State<String> state) {
     } else {
       if (state.pos < source.length) {
         final c = source.runeAt(state.pos);
-        state.error = ParseError.unexpected(state.pos, 0, c);
+        state.fail(state.pos, ParseError.unexpected(0, c));
       } else {
-        state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+        state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
       }
       state.pos = $pos1;
     }
@@ -98,8 +99,10 @@ int? _escapeHex(State<String> state) {
   } else {
     final pos = state.lastErrorPos;
     final length = state.pos - pos;
-    state.error = ParseError.message(pos, length,
-        'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits');
+    state.fail(
+        pos,
+        ParseError.message(length,
+            'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits'));
   }
   state.restoreLastErrorPos($last);
   return $0;
@@ -140,10 +143,10 @@ int? _escaped(State<String> state) {
       $0 = v;
     } else {
       final c = source.runeAt(state.pos);
-      state.error = ParseError.unexpected(state.pos, 0, c);
+      state.fail(state.pos, ParseError.unexpected(0, c));
     }
   } else {
-    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
   }
   if (!state.ok) {
     $0 = _escapeHex(state);
@@ -159,7 +162,7 @@ void _quote(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.error = ParseError.expected(state.pos, '"');
+    state.fail(state.pos, const ParseError.expected('"'));
   }
   if (state.ok) {
     _ws(state);
@@ -172,15 +175,14 @@ void _quote(State<String> state) {
 String? _string(State<String> state) {
   String? $0;
   final source = state.source;
-  final $errorPos = state.errorPos;
-  state.errorPos = state.pos + 1;
+  state.minErrorPos = state.pos + 1;
   String? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.error = ParseError.expected(state.pos, '"');
+    state.fail(state.pos, const ParseError.expected('"'));
   }
   if (state.ok) {
     state.ok = true;
@@ -233,11 +235,11 @@ String? _string(State<String> state) {
     $1 = null;
     state.pos = $pos;
   }
-  state.restoreErrorPos($errorPos);
+  state.minErrorPos = state.errorPos;
   if (state.ok) {
     $0 = $1;
   } else {
-    state.error = ParseError.expected(state.pos, 'string');
+    state.fail(state.pos, const ParseError.expected('string'));
   }
   return $0;
 }
@@ -245,9 +247,8 @@ String? _string(State<String> state) {
 num? _number(State<String> state) {
   num? $0;
   final source = state.source;
-  final $last = state.setLastErrorPos(-1);
-  final $errorPos = state.errorPos;
-  state.errorPos = state.pos + 1;
+  final $log = state.log;
+  state.log = false;
   num? $1;
   state.ok = true;
   final $pos = state.pos;
@@ -511,25 +512,18 @@ num? _number(State<String> state) {
   } else {
     if (state.pos < source.length) {
       final c = source.runeAt(state.pos);
-      state.error = ParseError.unexpected(state.pos, 0, c);
+      state.fail(state.pos, ParseError.unexpected(0, c));
     } else {
-      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+      state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
     }
     state.pos = $pos;
   }
-  state.restoreErrorPos($errorPos);
+  state.log = $log;
   if (state.ok) {
     $0 = $1;
   } else {
-    final pos = state.lastErrorPos;
-    if (pos > state.pos) {
-      final length = state.pos - pos;
-      state.error = ParseError.message(pos, length, 'Malformed number');
-    } else {
-      state.error = ParseError.expected(state.pos, 'number');
-    }
+    state.fail(state.pos, const ParseError.expected('number'));
   }
-  state.restoreLastErrorPos($last);
   return $0;
 }
 
@@ -541,7 +535,7 @@ void _openBracket(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.error = ParseError.expected(state.pos, '[');
+    state.fail(state.pos, const ParseError.expected('['));
   }
   if (state.ok) {
     _ws(state);
@@ -556,8 +550,6 @@ List<dynamic>? _values(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <dynamic>[];
-  final $log = state.log;
-  state.log = false;
   while (true) {
     dynamic $1;
     $1 = _value(state);
@@ -572,7 +564,7 @@ List<dynamic>? _values(State<String> state) {
     if (state.ok) {
       state.pos += 1;
     } else {
-      state.error = ParseError.expected(state.pos, ',');
+      state.fail(state.pos, const ParseError.expected(','));
     }
     if (state.ok) {
       _ws(state);
@@ -584,7 +576,6 @@ List<dynamic>? _values(State<String> state) {
       break;
     }
   }
-  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -600,7 +591,7 @@ void _closeBracket(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.error = ParseError.expected(state.pos, ']');
+    state.fail(state.pos, const ParseError.expected(']'));
   }
   if (state.ok) {
     _ws(state);
@@ -635,7 +626,7 @@ void _openBrace(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.error = ParseError.expected(state.pos, '{');
+    state.fail(state.pos, const ParseError.expected('{'));
   }
   if (state.ok) {
     _ws(state);
@@ -657,7 +648,7 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
     if (state.ok) {
       state.pos += 1;
     } else {
-      state.error = ParseError.expected(state.pos, ':');
+      state.fail(state.pos, const ParseError.expected(':'));
     }
     if (state.ok) {
       _ws(state);
@@ -686,8 +677,6 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
   final source = state.source;
   var $pos = state.pos;
   final $list = <MapEntry<String, dynamic>>[];
-  final $log = state.log;
-  state.log = false;
   while (true) {
     MapEntry<String, dynamic>? $1;
     $1 = _keyValue(state);
@@ -702,7 +691,7 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
     if (state.ok) {
       state.pos += 1;
     } else {
-      state.error = ParseError.expected(state.pos, ',');
+      state.fail(state.pos, const ParseError.expected(','));
     }
     if (state.ok) {
       _ws(state);
@@ -714,7 +703,6 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
       break;
     }
   }
-  state.log = $log;
   state.ok = true;
   if (state.ok) {
     $0 = $list;
@@ -730,7 +718,7 @@ void _closeBrace(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.error = ParseError.expected(state.pos, '}');
+    state.fail(state.pos, const ParseError.expected('}'));
   }
   if (state.ok) {
     _ws(state);
@@ -770,7 +758,7 @@ bool? _false(State<String> state) {
   if (state.ok) {
     state.pos += 5;
   } else {
-    state.error = ParseError.expected(state.pos, 'false');
+    state.fail(state.pos, const ParseError.expected('false'));
   }
   if (state.ok) {
     $0 = false;
@@ -787,7 +775,7 @@ bool? _true(State<String> state) {
   if (state.ok) {
     state.pos += 4;
   } else {
-    state.error = ParseError.expected(state.pos, 'true');
+    state.fail(state.pos, const ParseError.expected('true'));
   }
   if (state.ok) {
     $0 = true;
@@ -804,7 +792,7 @@ dynamic _null(State<String> state) {
   if (state.ok) {
     state.pos += 4;
   } else {
-    state.error = ParseError.expected(state.pos, 'null');
+    state.fail(state.pos, const ParseError.expected('null'));
   }
   if (state.ok) {
     $0 = null;
@@ -844,7 +832,7 @@ dynamic _value(State<String> state) {
   return $0;
 }
 
-String _errorMessage(String source, List<ParseError> errors,
+String _errorMessage(String source, List<ParserException> errors,
     [color, int maxCount = 10, String? url]) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
@@ -853,12 +841,14 @@ String _errorMessage(String source, List<ParseError> errors,
     }
 
     final error = errors[i];
-    if (error.offset + error.length > source.length) {
-      source += ' ' * (error.offset + error.length - source.length);
+    final start = error.start;
+    final end = error.end;
+    if (end > source.length) {
+      source += ' ' * (end - source.length);
     }
 
     final file = SourceFile.fromString(source, url: url);
-    final span = file.span(error.offset, error.offset + error.length);
+    final span = file.span(start, end);
     if (sb.isNotEmpty) {
       sb.writeln();
     }
@@ -879,42 +869,30 @@ class ParseError {
 
   final int length;
 
-  final int offset;
-
   final Object? value;
 
-  ParseError.expected(this.offset, this.value)
+  const ParseError.expected(this.value)
       : kind = ParseErrorKind.expected,
         length = 0;
 
-  ParseError.message(this.offset, this.length, String message)
+  const ParseError.message(this.length, String message)
       : kind = ParseErrorKind.message,
         value = message;
 
-  ParseError.unexpected(this.offset, this.length, this.value)
+  const ParseError.unexpected(this.length, this.value)
       : kind = ParseErrorKind.unexpected;
 
-  ParseError._(this.kind, this.offset, this.length, this.value);
+  const ParseError._(this.kind, this.length, this.value);
 
   @override
-  int get hashCode =>
-      kind.hashCode ^ length.hashCode ^ offset.hashCode ^ value.hashCode;
+  int get hashCode => kind.hashCode ^ length.hashCode ^ value.hashCode;
 
   @override
   bool operator ==(other) {
     return other is ParseError &&
         other.kind == kind &&
         other.length == length &&
-        other.offset == offset &&
         other.value == value;
-  }
-
-  ParseError normalize() {
-    if (length >= 0) {
-      return this;
-    }
-
-    return ParseError._(kind, offset + length, -length, value);
   }
 
   @override
@@ -929,36 +907,37 @@ class ParseError {
     }
   }
 
-  static List<ParseError> errorReport(List<ParseError> errors) {
-    errors = errors.toSet().map((e) => e.normalize()).toList();
-    final grouped = <int, List<ParseError>>{};
+  static List<ParserException> errorReport(
+      int offset, List<ParseError> errors) {
     final expected = errors.where((e) => e.kind == ParseErrorKind.expected);
-    for (final error in expected) {
-      final offset = error.offset;
-      var list = grouped[offset];
-      if (list == null) {
-        list = [];
-        grouped[offset] = list;
-      }
-
-      list.add(error);
-    }
-
-    final result = <ParseError>[];
-    for (final key in grouped.keys) {
-      final list = grouped[key]!;
-      final values = list.map((e) => '\'${_escape(e.value)}\'').join(', ');
-      result.add(ParseError.message(key, 0, 'Expected: $values'));
+    final result = <ParserException>[];
+    if (expected.isNotEmpty) {
+      final values = expected.map((e) => '\'${_escape(e.value)}\'').join(', ');
+      result.add(ParserException(offset, 0, 'Expected: $values'));
     }
 
     for (var i = 0; i < errors.length; i++) {
-      var error = errors[i];
-      if (error.kind != ParseErrorKind.expected) {
-        if (error.kind == ParseErrorKind.unexpected) {
-          error = ParseError.unexpected(
-              error.offset, error.length, '\'${_escape(error.value)}\'');
-        }
-        result.add(error);
+      final error = errors[i];
+      switch (error.kind) {
+        case ParseErrorKind.expected:
+          break;
+        case ParseErrorKind.message:
+          var length = error.length;
+          var newOffset = offset;
+          if (length < 0) {
+            newOffset += length;
+            length = -length;
+          }
+
+          final newError =
+              ParserException(newOffset, length, error.value as String);
+          result.add(newError);
+          break;
+        case ParseErrorKind.unexpected:
+          final newError = ParserException(
+              offset, error.length, '\'${_escape(error.value)}\'');
+          result.add(newError);
+          break;
       }
     }
 
@@ -996,12 +975,24 @@ class ParseError {
 
 enum ParseErrorKind { expected, message, unexpected }
 
+class ParserException {
+  final int end;
+
+  final int start;
+
+  final String text;
+
+  ParserException(this.start, this.end, this.text);
+}
+
 class State<T> {
   dynamic context;
 
   int errorPos = -1;
 
   int lastErrorPos = -1;
+
+  int minErrorPos = -1;
 
   bool log = true;
 
@@ -1019,10 +1010,9 @@ class State<T> {
 
   State(this.source);
 
-  set error(ParseError error) {
+  void fail(int pos, ParseError error) {
     if (log) {
-      final pos = error.offset;
-      if (errorPos <= pos) {
+      if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {
           errorPos = pos;
           _length = 0;
@@ -1068,13 +1058,6 @@ class State<T> {
 
     return null;
   }
-
-  @pragma('vm:prefer-inline')
-  void restoreErrorPos(int pos) => errorPos = errorPos <= pos
-      ? pos
-      : _length == 0
-          ? -1
-          : _errors[0]!.offset;
 
   @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {

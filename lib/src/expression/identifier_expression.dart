@@ -58,7 +58,7 @@ if (state.ok) {
 }
 if (!state.ok) {
   state.pos = {{pos}};
-  state.error = ParseError.expected(state.pos, 'identifier');
+  state.fail(state.pos, const ParseError.expected('identifier'));
 }''';
 
   static const _templateFast = '''
@@ -115,7 +115,7 @@ if (state.ok) {
 }
 if (!state.ok) {
   state.pos = {{pos}};
-  state.error = ParseError.expected(state.pos, 'identifier');
+  state.fail(state.pos, const ParseError.expected('identifier'));
 }''';
 
   final SemanticAction<bool> identCont;

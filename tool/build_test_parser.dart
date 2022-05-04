@@ -37,7 +37,6 @@ Future<void> main(List<String> args) async {
     _hexDigit0,
     _hexDigit1,
     _identifier,
-    _malformedTake2C16,
     _many0C16,
     _many0C32,
     _many0CountC32,
@@ -242,9 +241,6 @@ const _isC16 = CharClass('#x50');
 const _isC32 = CharClass('#x1d200');
 
 const _isDigit = CharClass('[0-9]');
-
-const _malformedTake2C16 = Named('malformedTake2C16',
-    Malformed('tag', 'message', TakeWhileMN(2, 2, _isC16)));
 
 const _many0C16 = Named('many0C16', Many0(Char(c16)));
 

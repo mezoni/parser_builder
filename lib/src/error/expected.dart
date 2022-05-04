@@ -16,7 +16,7 @@ state.log = {{log}};
 if (state.ok) {
   {{res0}} = {{res1}};
 } else {
-  state.error = ParseError.expected(state.pos, {{tag}});
+  state.fail(state.pos, const ParseError.expected({{tag}}));
 }''';
 
   static const _templateFast = '''
@@ -25,7 +25,7 @@ state.log = false;
 {{p1}}
 state.log = {{log}};
 if (!state.ok) {
-  state.error = ParseError.expected(state.pos, {{tag}});
+  state.fail(state.pos, const ParseError.expected({{tag}}));
 }''';
 
   final ParserBuilder<I, O> parser;

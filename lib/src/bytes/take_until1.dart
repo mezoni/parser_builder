@@ -17,9 +17,10 @@ if (state.ok) {
   {{res0}} = source.substring({{pos}}, {{index}});
 } else {
   if ({{index}} == -1) {
-    state.error = ParseError.expected(source.length, {{tag}});
+    // TODO
+    state.fail(source.length, const ParseError.expected({{tag}}));
   } else {
-    state.error = ParseError.unexpected({{pos}}, 0, {{tag}});
+    state.fail({{pos}}, const ParseError.unexpected(0, {{tag}}));
   }
 }''';
 
@@ -31,9 +32,10 @@ if (state.ok) {
   state.pos = {{index}};
 } else {
   if ({{index}} == -1) {
-    state.error = ParseError.expected(source.length, {{tag}});
+    // TODO
+    state.fail(source.length, const ParseError.expected({{tag}}));
   } else {
-    state.error = ParseError.unexpected({{pos}}, 0, {{tag}});
+    state.fail({{pos}}, const ParseError.unexpected(0, {{tag}}));
   }
 }''';
 

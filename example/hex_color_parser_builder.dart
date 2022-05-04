@@ -1,10 +1,10 @@
 import 'package:parser_builder/bytes.dart';
+import 'package:parser_builder/char_class.dart';
 import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
-import 'package:parser_builder/char_class.dart';
 
 import 'hex_color_parser_helper.dart';
 
@@ -17,9 +17,8 @@ Future<void> main(List<String> args) async {
 
 const _hexColor = Named(
     '_hexColor',
-    Malformed(
+    Expected(
         'hexadecimal color',
-        'Malformed hexadecimal color',
         Preceded(
             Tag('#'),
             Map3(

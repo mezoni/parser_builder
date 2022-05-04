@@ -21,7 +21,7 @@ if (state.pos < source.length) {
       if (c == ch) {
         state.pos = pos;
         state.ok = false;
-        state.error = ParseError.unexpected(state.pos, 0, c);
+        state.fail(state.pos, ParseError.unexpected(0, c));
         break;
       }
     }
@@ -30,7 +30,7 @@ if (state.pos < source.length) {
     }
   }
 } else {
-  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
   state.ok = false;
 }''';
 
@@ -47,13 +47,13 @@ if (state.pos < source.length) {
       if (c == ch) {
         state.pos = pos;
         state.ok = false;
-        state.error = ParseError.unexpected(state.pos, 0, c);
+        state.fail(state.pos, ParseError.unexpected(0, c));
         break;
       }
     }
   }
 } else {
-  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
   state.ok = false;
 }''';
 

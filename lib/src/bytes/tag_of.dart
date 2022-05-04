@@ -11,7 +11,7 @@ if (state.ok) {
     state.pos += tag.length;
     {{res0}} = tag;
   } else {
-    state.error = ParseError.expected(state.pos, tag);
+    state.fail(state.pos, ParseError.expected(tag));
   }
 }''';
 
@@ -24,7 +24,7 @@ if (state.ok) {
   if (state.ok) {
     state.pos += tag.length;
   } else {
-    state.error = ParseError.expected(state.pos, tag);
+    state.fail(state.pos, ParseError.expected(tag));
   }
 }''';
 

@@ -12,7 +12,7 @@ state.ok = state.pos < source.length;
 if (state.ok) {
   {{res0}} = source.readRune(state);
 } else {
-  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
 }''';
 
   static const _templateFast = '''
@@ -20,7 +20,7 @@ state.ok = state.pos < source.length;
 if (state.ok) {
   source.readRune(state);
 } else {
-  state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
 }''';
 
   const AnyChar();

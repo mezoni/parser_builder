@@ -104,7 +104,6 @@ built-in:
 
 [`error`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error):
 - [`Expected`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/expected.dart)
-- [`Malformed`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/malformed.dart)
 - [`Nested`](https://github.com/mezoni/parser_builder/blob/master/lib/src/error/nested.dart)
 
 [`expression`](https://github.com/mezoni/parser_builder/blob/master/lib/src/expression):
@@ -166,12 +165,12 @@ Take look  at this very simple example of hex color parser builder:
 
 ```dart
 import 'package:parser_builder/bytes.dart';
+import 'package:parser_builder/char_class.dart';
 import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
-import 'package:parser_builder/char_class.dart';
 
 import 'hex_color_parser_helper.dart';
 
@@ -184,9 +183,8 @@ Future<void> main(List<String> args) async {
 
 const _hexColor = Named(
     '_hexColor',
-    Malformed(
+    Expected(
         'hexadecimal color',
-        'Malformed hexadecimal color',
         Preceded(
             Tag('#'),
             Map3(
@@ -273,37 +271,50 @@ const _inline = '@pragma(\'vm:prefer-inline\')';
 ## Example of generated code
 
 ```dart
-int? _hexPrimary(State<String> state) {
-  int? $0;
+Color? _hexColor(State<String> state) {
+  Color? $0;
   final source = state.source;
-  String? $1;
+  final $log = state.log;
+  state.log = false;
+  Color? $1;
   final $pos = state.pos;
-  var $count = 0;
-  while ($count < 2 && state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c <= 102 &&
-        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
-    if (!ok) {
-      break;
-    }
-    state.pos++;
-    $count++;
-  }
-  state.ok = $count >= 2;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
-    $1 = source.substring($pos, state.pos);
+    state.pos += 1;
   } else {
-    if (state.pos < source.length) {
-      final c = source.runeAt(state.pos);
-      state.error = ParseError.unexpected(state.pos, 0, c);
-    } else {
-      state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+    state.fail(state.pos, const ParseError.expected('#'));
+  }
+  if (state.ok) {
+    final $pos1 = state.pos;
+    int? $2;
+    $2 = _hexPrimary(state);
+    if (state.ok) {
+      int? $3;
+      $3 = _hexPrimary(state);
+      if (state.ok) {
+        int? $4;
+        $4 = _hexPrimary(state);
+        if (state.ok) {
+          final v1 = $2!;
+          final v2 = $3!;
+          final v3 = $4!;
+          $1 = Color(v1, v2, v3);
+        }
+      }
     }
+    if (!state.ok) {
+      state.pos = $pos1;
+    }
+  }
+  if (!state.ok) {
+    $1 = null;
     state.pos = $pos;
   }
+  state.log = $log;
   if (state.ok) {
-    final v = $1!;
-    $0 = int.parse(v, radix: 16);
+    $0 = $1;
+  } else {
+    state.fail(state.pos, const ParseError.expected('hexadecimal color'));
   }
   return $0;
 }
@@ -344,7 +355,7 @@ dynamic _json(State<String> state) {
     if (state.ok) {
       state.ok = state.pos >= source.length;
       if (!state.ok) {
-        state.error = ParseError.expected(state.pos, 'EOF');
+        state.fail(state.pos, const ParseError.expected('EOF'));
       }
     }
   }
@@ -400,24 +411,24 @@ An updated version of this section will be added later...
 
 Current performance of the generated JSON parser.  
 
-The performance is about 1.30-1.45 times lower than that of a hand-written high-quality specialized state machine based JSON parser from the Dart SDK.
+The performance is about 1.25-1.35 times lower than that of a hand-written high-quality specialized state machine based JSON parser from the Dart SDK.
 
 Better results in many cases are obtained in AOT mode. If the Dart SDK compiler had made more efficient use placement of (short lifetime) local variables in registers, the results could have been slightly better. At the moment, the generated parser code is not optimized for using machine registers, because performance tests, unfortunately, do not show a gain from this kind of optimization.
 
 AOT mode:
 
 ```
-Parse 10 times: E:\prj\test_json\bin\data\canada.json
-Dart SDK JSON    : k: 2.06, 41.70 MB/s, 514.80 ms (100.00%),
-Simple JSON NEW 2: k: 1.00, 86.01 MB/s, 249.60 ms (48.48%),
+Parse 10 times: E:\prj\test_json\bin\data\canada.json (2251.05 Kb)
+Dart SDK JSON : k: 1.94, 37.68 MB/s, 569.7320 ms (100.00%),
+Simple JSON NEW 1: k: 1.00, 72.98 MB/s, 294.1500 ms (51.63%),
 
-Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json
-Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (85.71%),
-Simple JSON NEW 2: k: 1.43, 75.41 MB/s, 218.40 ms (100.00%),
+Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json (1727.03 Kb)
+Dart SDK JSON : k: 1.00, 85.81 MB/s, 191.9380 ms (81.55%),
+Simple JSON NEW 1: k: 1.23, 69.98 MB/s, 235.3510 ms (100.00%),
 
-Parse 10 times: E:\prj\test_json\bin\data\twitter.json
-Dart SDK JSON    : k: 1.00, 57.86 MB/s, 93.60 ms (85.72%),
-Simple JSON NEW 2: k: 1.30, 49.60 MB/s, 109.20 ms (100.00%),
+Parse 10 times: E:\prj\test_json\bin\data\twitter.json (567.93 Kb)
+Dart SDK JSON : k: 1.00, 56.88 MB/s, 95.2140 ms (84.32%),
+Simple JSON NEW 1: k: 1.19, 47.96 MB/s, 112.9200 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601
@@ -427,17 +438,17 @@ Processor (4 core) Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
 JIT mode:
 
 ```
-Parse 10 times: E:\prj\test_json\bin\data\canada.json
-Dart SDK JSON    : k: 2.38, 44.39 MB/s, 483.60 ms (100.00%),
-Simple JSON NEW 2: k: 1.00, 105.86 MB/s, 202.80 ms (41.94%),
+Parse 10 times: E:\prj\test_json\bin\data\canada.json (2251.05 Kb)
+Dart SDK JSON : k: 2.37, 45.31 MB/s, 473.8040 ms (100.00%),
+Simple JSON NEW 1: k: 1.00, 107.38 MB/s, 199.9240 ms (42.20%),
 
-Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json
-Dart SDK JSON    : k: 1.00, 87.98 MB/s, 187.20 ms (75.00%),
-Simple JSON NEW 2: k: 1.43, 65.99 MB/s, 249.60 ms (100.00%),
+Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json (1727.03 Kb)
+Dart SDK JSON : k: 1.00, 92.33 MB/s, 178.3880 ms (73.91%),
+Simple JSON NEW 1: k: 1.35, 68.24 MB/s, 241.3580 ms (100.00%),
 
-Parse 10 times: E:\prj\test_json\bin\data\twitter.json
-Dart SDK JSON    : k: 1.00, 57.87 MB/s, 93.60 ms (75.00%),
-Simple JSON NEW 2: k: 1.32, 43.40 MB/s, 124.80 ms (100.00%),
+Parse 10 times: E:\prj\test_json\bin\data\twitter.json (567.93 Kb)
+Dart SDK JSON : k: 1.00, 59.94 MB/s, 90.3650 ms (79.84%),
+Simple JSON NEW 1: k: 1.25, 47.85 MB/s, 113.1820 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601

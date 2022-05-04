@@ -12,7 +12,7 @@ Future<void> main(List<String> args) async {
 
 const parser = Number();
 
-const __header = '''
+const __header = r'''
 import 'package:source_span/source_span.dart';
 
 void main() {
@@ -24,12 +24,14 @@ void main() {
     print(r);
 }
 
-num? parse(String s) {
-  final state = State(s);
+num? parse(String source) {
+  final state = State(source);
   final r = number(state);
   if (!state.ok) {
-    final errors = ParseError.errorReport(state.errors);
-    throw _errorMessage(state.source, errors);
+    final offset = state.errorPos;
+    final errors = ParseError.errorReport(offset, state.errors);
+    final message = _errorMessage(source, errors);
+    throw FormatException('\n$message');
   }
   return r!;
 }''';
@@ -51,9 +53,9 @@ if (state.ok) {
 } else {
   if (state.pos < source.length) {
     final c = source.runeAt(state.pos);
-    state.error = ParseError.unexpected(state.pos, 0, c);
+    state.fail(state.pos, ParseError.unexpected(0, c));
   } else {
-    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
   }
   state.pos = {{pos}};
 }''';
@@ -63,9 +65,9 @@ if (state.ok) {
 if (!state.ok) {
   if (state.pos < source.length) {
     final c = source.runeAt(state.pos);
-    state.error = ParseError.unexpected(state.pos, 0, c);
+    state.fail(state.pos, ParseError.unexpected(0, c));
   } else {
-    state.error = ParseError.unexpected(state.pos, 0, 'EOF');
+    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
   }
   state.pos = {{pos}};
 }''';

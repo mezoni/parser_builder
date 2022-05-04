@@ -1,6 +1,7 @@
 ## 2.0.4
 
-- Improving the stability of tracking the position of the last `local` error and restoring an error position. These features is used, in particular, in the parser builders `Malformed` and `Indicate`
+- Improved the stability of tracking the position of the last `local` error. This feature is used in the parser builder `Indicate`
+- Breaking change. Does not affect end users (parser definitions). Increased performance by reworking the `ParseError` class. Now instances of this class are mostly used as constant values. This greatly improves performance. Now the generated parsers work almost as fast as in the previous version. And, of course, now they register and report errors more accurately. There is even too much information about errors and they have to be reduced (when declaring parsers), combining them into a kind of `tokens`. Maybe it makes sense to implement a `silent` version of the `Opt` parser for special cases?
 
 ## 2.0.3
 

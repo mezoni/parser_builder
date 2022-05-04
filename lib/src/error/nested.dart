@@ -11,24 +11,22 @@ part of '../../error.dart';
 /// generated as well.
 class Nested<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
-final {{errorPos}} = state.errorPos;
-state.errorPos = state.pos + 1;
+state.minErrorPos = state.pos + 1;
 {{var1}}
 {{p1}}
-state.restoreErrorPos({{errorPos}});
+state.minErrorPos = state.errorPos;
 if (state.ok) {
   {{res0}} = {{res1}};
 } else {
-  state.error = ParseError.expected(state.pos, {{tag}});
+  state.fail(state.pos, const ParseError.expected({{tag}}));
 }''';
 
   static const _templateFast = '''
-final {{errorPos}} = state.errorPos;
-state.errorPos = state.pos + 1;
+state.minErrorPos = state.pos + 1;
 {{p1}}
-state.restoreErrorPos({{errorPos}});
+state.minErrorPos = state.errorPos;
 if (!state.ok) {
-  state.error = ParseError.expected(state.pos, {{tag}});
+  state.fail(state.pos, const ParseError.expected({{tag}}));
 }''';
 
   final ParserBuilder<I, O> parser;
@@ -40,12 +38,11 @@ if (!state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['errorPos']);
     final r1 = context.getResult(parser, !fast);
-    values.addAll({
+    final values = {
       'p1': parser.build(context, r1),
       'tag': helper.escapeString(tag),
-    });
+    };
     return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }

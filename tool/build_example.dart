@@ -104,8 +104,7 @@ const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
 
 const _null = Named('_null', Value(null as dynamic, Tag('null')));
 
-const _number = Named(
-    '_number', Malformed('number', 'Malformed number', _json_number.parser));
+const _number = Named('_number', Expected('number', _json_number.parser));
 
 const _object = Named(
     '_object',

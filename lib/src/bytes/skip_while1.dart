@@ -22,9 +22,9 @@ state.ok = state.pos != {{pos}};
 if (!state.ok) {
   if ({{pos}} < source.length) {
     final c = source.runeAt({{pos}});
-    state.error = ParseError.unexpected({{pos}}, 0, c);
+    state.fail({{pos}}, ParseError.unexpected(0, c));
   } else {
-    state.error = ParseError.unexpected({{pos}}, 0, 'EOF');
+    state.fail({{pos}}, const ParseError.unexpected(0, 'EOF'));
   }
 }''';
 
@@ -43,9 +43,9 @@ while (state.pos < source.length) {
 state.ok = state.pos != {{pos}};
 if (!state.ok) {
   if ({{pos}} < source.length) {
-    state.error = ParseError.unexpected({{pos}}, 0, {{c}}!);
+    state.fail({{pos}}, ParseError.unexpected(0, {{c}}!));
   } else {
-    state.error = ParseError.unexpected({{pos}}, 0, 'EOF');
+    state.fail({{pos}}, const ParseError.unexpected(0, 'EOF'));
   }
 }''';
 

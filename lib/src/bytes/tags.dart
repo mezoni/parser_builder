@@ -87,7 +87,7 @@ v = {{tag}};''';
 
       list.add(tag);
       final escaped = helper.escapeString(tag);
-      errors.add('state.error = ParseError.expected(state.pos, $escaped);');
+      errors.add('state.fail(state.pos, const ParseError.expected($escaped));');
     }
 
     final cases = <String>[];

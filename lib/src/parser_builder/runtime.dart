@@ -36,42 +36,30 @@ class ParseError {
 
   final int length;
 
-  final int offset;
-
   final Object? value;
 
-  ParseError.expected(this.offset, this.value)
+  const ParseError.expected(this.value)
       : kind = ParseErrorKind.expected,
         length = 0;
 
-  ParseError.message(this.offset, this.length, String message)
+  const ParseError.message(this.length, String message)
       : kind = ParseErrorKind.message,
         value = message;
 
-  ParseError.unexpected(this.offset, this.length, this.value)
+  const ParseError.unexpected(this.length, this.value)
       : kind = ParseErrorKind.unexpected;
 
-  ParseError._(this.kind, this.offset, this.length, this.value);
+  const ParseError._(this.kind, this.length, this.value);
 
   @override
-  int get hashCode =>
-      kind.hashCode ^ length.hashCode ^ offset.hashCode ^ value.hashCode;
+  int get hashCode => kind.hashCode ^ length.hashCode ^ value.hashCode;
 
   @override
   bool operator ==(other) {
     return other is ParseError &&
         other.kind == kind &&
         other.length == length &&
-        other.offset == offset &&
         other.value == value;
-  }
-
-  ParseError normalize() {
-    if (length >= 0) {
-      return this;
-    }
-
-    return ParseError._(kind, offset + length, -length, value);
   }
 
   @override
@@ -86,36 +74,37 @@ class ParseError {
     }
   }
 
-  static List<ParseError> errorReport(List<ParseError> errors) {
-    errors = errors.toSet().map((e) => e.normalize()).toList();
-    final grouped = <int, List<ParseError>>{};
+  static List<ParserException> errorReport(
+      int offset, List<ParseError> errors) {
     final expected = errors.where((e) => e.kind == ParseErrorKind.expected);
-    for (final error in expected) {
-      final offset = error.offset;
-      var list = grouped[offset];
-      if (list == null) {
-        list = [];
-        grouped[offset] = list;
-      }
-
-      list.add(error);
-    }
-
-    final result = <ParseError>[];
-    for (final key in grouped.keys) {
-      final list = grouped[key]!;
-      final values = list.map((e) => '\'${_escape(e.value)}\'').join(', ');
-      result.add(ParseError.message(key, 0, 'Expected: $values'));
+    final result = <ParserException>[];
+    if (expected.isNotEmpty) {
+      final values = expected.map((e) => '\'${_escape(e.value)}\'').join(', ');
+      result.add(ParserException(offset, 0, 'Expected: $values'));
     }
 
     for (var i = 0; i < errors.length; i++) {
-      var error = errors[i];
-      if (error.kind != ParseErrorKind.expected) {
-        if (error.kind == ParseErrorKind.unexpected) {
-          error = ParseError.unexpected(
-              error.offset, error.length, '\'${_escape(error.value)}\'');
-        }
-        result.add(error);
+      final error = errors[i];
+      switch (error.kind) {
+        case ParseErrorKind.expected:
+          break;
+        case ParseErrorKind.message:
+          var length = error.length;
+          var newOffset = offset;
+          if (length < 0) {
+            newOffset += length;
+            length = -length;
+          }
+
+          final newError =
+              ParserException(newOffset, length, error.value as String);
+          result.add(newError);
+          break;
+        case ParseErrorKind.unexpected:
+          final newError = ParserException(
+              offset, error.length, '\'${_escape(error.value)}\'');
+          result.add(newError);
+          break;
       }
     }
 
@@ -151,6 +140,17 @@ class ParseError {
   }
 }''';
 
+  static const _classParserException = '''
+class ParserException {
+  final int end;
+
+  final int start;
+
+  final String text;
+
+  ParserException(this.start, this.end, this.text);
+}''';
+
   static const _classState = r'''
 class State<T> {
   dynamic context;
@@ -158,6 +158,8 @@ class State<T> {
   int errorPos = -1;
 
   int lastErrorPos = -1;
+
+  int minErrorPos = -1;
 
   bool log = true;
 
@@ -175,10 +177,9 @@ class State<T> {
 
   State(this.source);
 
-  set error(ParseError error) {
+  void fail(int pos, ParseError error) {
     if (log) {
-      final pos = error.offset;
-      if (errorPos <= pos) {
+      if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {
           errorPos = pos;
           _length = 0;
@@ -224,13 +225,6 @@ class State<T> {
 
     return null;
   }
-
-  @pragma('vm:prefer-inline')
-  void restoreErrorPos(int pos) => errorPos = errorPos <= pos
-      ? pos
-      : _length == 0
-          ? -1
-          : _errors[0]!.offset;
 
   @pragma('vm:prefer-inline')
   void restoreLastErrorPos(int pos) {
@@ -316,7 +310,7 @@ extension on String {
 }''';
 
   static const _functionErrorMessage = r'''
-String {{name}}(String source, List<ParseError> errors,
+String {{name}}(String source, List<ParserException> errors,
     [color, int maxCount = 10, String? url]) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
@@ -325,12 +319,14 @@ String {{name}}(String source, List<ParseError> errors,
     }
 
     final error = errors[i];
-    if (error.offset + error.length > source.length) {
-      source += ' ' * (error.offset + error.length - source.length);
+    final start = error.start;
+    final end = error.end;
+    if (end > source.length) {
+      source += ' ' * (end - source.length);
     }
 
     final file = SourceFile.fromString(source, url: url);
-    final span = file.span(error.offset, error.offset + error.length);
+    final span = file.span(start, end);
     if (sb.isNotEmpty) {
       sb.writeln();
     }
@@ -344,13 +340,13 @@ String {{name}}(String source, List<ParseError> errors,
   }
 
   return sb.toString();
-}
-''';
+}''';
 
   static List<String> getClasses() {
     return const [
       _classParseError,
       _enumParseErrorKind,
+      _classParserException,
       _classState,
       _extensionString,
       _classMemo,

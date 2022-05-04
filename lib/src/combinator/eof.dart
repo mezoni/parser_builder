@@ -4,7 +4,7 @@ class Eof<I> extends ParserBuilder<I, void> {
   static const _template = '''
 state.ok = state.pos >= source.length;
 if (!state.ok) {
-  state.error = ParseError.expected(state.pos, 'EOF');
+  state.fail(state.pos, const ParseError.expected('EOF'));
 }''';
 
   const Eof();
