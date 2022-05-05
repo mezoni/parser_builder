@@ -1025,6 +1025,7 @@ String? memoizeC16C32OrC16(State<String> state) {
 Object? nestedC16OrTake2C32(State<String> state) {
   Object? $0;
   final source = state.source;
+  final $min = state.minErrorPos;
   state.minErrorPos = state.pos + 1;
   Object? $1;
   $1 = char16(state);
@@ -1049,7 +1050,7 @@ Object? nestedC16OrTake2C32(State<String> state) {
       state.pos = $pos;
     }
   }
-  state.minErrorPos = state.errorPos;
+  state.minErrorPos = $min;
   if (state.ok) {
     $0 = $1;
   } else {
@@ -1285,6 +1286,8 @@ int? postfixExpression(State<String> state) {
   int? $1;
   $1 = _primaryExpression(state);
   if (state.ok) {
+    final $log = state.log;
+    state.log = false;
     String? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
@@ -1316,14 +1319,13 @@ int? postfixExpression(State<String> state) {
       state.fail(state.pos, ParseError.expected, 0, '--');
       state.fail(state.pos, ParseError.expected, 0, '++');
     }
-    if (!state.ok) {
-      state.ok = true;
-    }
-    if ($2 != null) {
+    state.log = $log;
+    if (state.ok) {
       final v1 = $1!;
-      final v2 = $2;
+      final v2 = $2!;
       $0 = _toPostfix(v1, v2);
     } else {
+      state.ok = true;
       $0 = $1!;
     }
   }
@@ -1333,6 +1335,9 @@ int? postfixExpression(State<String> state) {
 int? prefixExpression(State<String> state) {
   int? $0;
   final source = state.source;
+  final $pos = state.pos;
+  final $log = state.log;
+  state.log = false;
   String? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
@@ -1367,19 +1372,20 @@ int? prefixExpression(State<String> state) {
     state.fail(state.pos, ParseError.expected, 0, '--');
     state.fail(state.pos, ParseError.expected, 0, '++');
   }
-  if (!state.ok) {
-    state.ok = true;
-  }
+  state.log = $log;
+  final $ok = state.ok;
   int? $2;
   $2 = _primaryExpression(state);
   if (state.ok) {
-    if ($1 != null) {
-      final v1 = $1;
+    if ($ok) {
+      final v1 = $1!;
       final v2 = $2!;
       $0 = _toPrefix(v1, v2);
     } else {
       $0 = $2!;
     }
+  } else {
+    state.pos = $pos;
   }
   return $0;
 }
@@ -2517,7 +2523,7 @@ class State<T> {
     }
 
     if (expected.isNotEmpty) {
-      final text = 'Expected: ${expected.join(', ')}';
+      final text = 'Expected: ${expected.toSet().join(', ')}';
       final error = ParseError(errorPos, errorPos, text);
       result.add(error);
     }
@@ -2533,7 +2539,7 @@ class State<T> {
         start = start - length;
       }
 
-      var end = start + (length > 0 ? length - 1 : 0);
+      final end = start + (length > 0 ? length - 1 : 0);
       switch (kind) {
         case ParseError.character:
           if (source is String) {

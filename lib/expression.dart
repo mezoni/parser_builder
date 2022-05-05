@@ -1,5 +1,3 @@
-import 'package:parser_builder/combinator.dart';
-
 import 'builder_helper.dart' as helper;
 import 'parser_builder.dart';
 

@@ -1,3 +1,9 @@
+## 2.0.6
+
+- Fixed bug in parser builder `Nested`. The value of `state.minErrorPos` was incorrectly restored to `state.errorPos`. Now this value is saved and restored from the saved value
+- Fixed bug in parser builder `PrefixExpression`. Incorrect parsing algorithm. Parser templates have been changed
+- Fixed bug in parser builder `_errorMessage()`
+
 ## 2.0.5
 
 - Improved performance of lightweight memoization. Saving the parsed state is now just creating an instance of `_Memo` and single write operation to the list. Restoring the parsed state is one read operation from the list, one conditional ternary operation and a few assignment expressions to restore the parse state. This memoization method is very fast and efficient

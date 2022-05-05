@@ -105,13 +105,13 @@ String _errorMessage(String source, List<ParseError> errors,
 
     final error = errors[i];
     final start = error.start;
-    final end = error.end;
+    final end = error.end + 1;
     if (end > source.length) {
       source += ' ' * (end - source.length);
     }
 
     final file = SourceFile.fromString(source, url: url);
-    final span = file.span(start, end + 1);
+    final span = file.span(start, end);
     if (sb.isNotEmpty) {
       sb.writeln();
     }
@@ -270,7 +270,7 @@ class State<T> {
     }
 
     if (expected.isNotEmpty) {
-      final text = 'Expected: ${expected.join(', ')}';
+      final text = 'Expected: ${expected.toSet().join(', ')}';
       final error = ParseError(errorPos, errorPos, text);
       result.add(error);
     }
@@ -286,7 +286,7 @@ class State<T> {
         start = start - length;
       }
 
-      var end = start + (length > 0 ? length - 1 : 0);
+      final end = start + (length > 0 ? length - 1 : 0);
       switch (kind) {
         case ParseError.character:
           if (source is String) {

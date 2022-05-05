@@ -2041,10 +2041,7 @@ void _testPrefixExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [
-        ParseError(0, 0, "Expected: '-', '--', '++'"),
-        ParseError(0, 0, "Unexpected 'EOF'"),
-      ]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State(' ');
@@ -2053,10 +2050,16 @@ void _testPrefixExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [
-        ParseError(0, 0, "Expected: '-', '--', '++'"),
-        ParseError(0, 0, "Unexpected ' '"),
-      ]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
+    }
+    {
+      final state = State('++');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 2);
+      expect(state.errors, [ParseError(2, 2, "Unexpected 'EOF'")]);
     }
   });
 }

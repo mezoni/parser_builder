@@ -11,10 +11,11 @@ part of '../../error.dart';
 /// generated as well.
 class Nested<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
+final {{min}} = state.minErrorPos;
 state.minErrorPos = state.pos + 1;
 {{var1}}
 {{p1}}
-state.minErrorPos = state.errorPos;
+state.minErrorPos = {{min}};
 if (state.ok) {
   {{res0}} = {{res1}};
 } else {
@@ -22,9 +23,10 @@ if (state.ok) {
 }''';
 
   static const _templateFast = '''
+final {{min}} = state.minErrorPos;
 state.minErrorPos = state.pos + 1;
 {{p1}}
-state.minErrorPos = state.errorPos;
+state.minErrorPos = {{min}};
 if (!state.ok) {
   state.fail(state.pos, ParseError.expected, 0, {{tag}});
 }''';
@@ -38,11 +40,12 @@ if (!state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
+    final values = context.allocateLocals(['min']);
     final r1 = context.getResult(parser, !fast);
-    final values = {
+    values.addAll({
       'p1': parser.build(context, r1),
       'tag': helper.escapeString(tag),
-    };
+    });
     return render2(fast, _templateFast, _template, values, [result, r1]);
   }
 }

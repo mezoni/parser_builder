@@ -2,23 +2,40 @@ part of '../../expression.dart';
 
 class PrefixExpression<I, O1, O> extends ParserBuilder<I, O> {
   static const _template = '''
+final {{pos}} = state.pos;
+final {{log}} = state.log;
+state.log = false;
 {{var1}}
 {{p1}}
+state.log = {{log}};
+final {{ok}} = state.ok;
 {{var2}}
 {{p2}}
 if (state.ok) {
-  if ({{res1}} != null) {
-    final v1 = {{res1}};
+  if ({{ok}}) {
+    final v1 = {{val1}};
     final v2 = {{val2}};
     {{res0}} = {{calculate}};
   } else {
     {{res0}} = {{val2}};
   }
+} else {
+  state.pos = {{pos}};
 }''';
 
   static const _templateFast = '''
+final {{pos}} = state.pos;
+final {{log}} = state.log;
+state.log = false;
+{{var1}}
 {{p1}}
-{{p2}}''';
+state.log = {{log}};
+final {{ok}} = state.ok;
+{{var2}}
+{{p2}}
+if (!state.ok) {
+  state.pos = {{pos}};
+}''';
 
   final SemanticAction<O> calculate;
 
@@ -31,13 +48,14 @@ if (state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
+    final values = context.allocateLocals(['log', 'ok', 'pos']);
     final r1 = context.getResult(operator, !fast);
     final r2 = context.getResult(expression, !fast);
-    final values = {
+    values.addAll({
       'calculate': calculate.build(context, 'calculate', ['v1', 'v2']),
-      'p1': Opt(operator).build(context, r1),
+      'p1': operator.build(context, r1),
       'p2': expression.build(context, r2),
-    };
+    });
     return render2(fast, _templateFast, _template, values, [result, r1, r2]);
   }
 }
