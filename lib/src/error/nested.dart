@@ -18,7 +18,7 @@ state.minErrorPos = state.errorPos;
 if (state.ok) {
   {{res0}} = {{res1}};
 } else {
-  state.fail(state.pos, const ParseError.expected({{tag}}));
+  state.fail(state.pos, ParseError.expected, 0, {{tag}});
 }''';
 
   static const _templateFast = '''
@@ -26,7 +26,7 @@ state.minErrorPos = state.pos + 1;
 {{p1}}
 state.minErrorPos = state.errorPos;
 if (!state.ok) {
-  state.fail(state.pos, const ParseError.expected({{tag}}));
+  state.fail(state.pos, ParseError.expected, 0, {{tag}});
 }''';
 
   final ParserBuilder<I, O> parser;

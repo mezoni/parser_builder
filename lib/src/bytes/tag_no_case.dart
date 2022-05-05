@@ -21,7 +21,7 @@ if (state.ok) {
   }
 }
 if (!state.ok) {
-  state.fail({{start}}, const ParseError.expected({{tag}}));
+  state.fail({{start}}, ParseError.expected, 0, {{tag}});
 }''';
 
   static const _templateFast = '''
@@ -36,7 +36,7 @@ if (state.ok) {
   }
 }
 if (!state.ok) {
-  state.fail({{start}}, const ParseError.expected({{tag}}));
+  state.fail({{start}}, ParseError.expected, 0, {{tag}});
 }''';
 
   final String tag;

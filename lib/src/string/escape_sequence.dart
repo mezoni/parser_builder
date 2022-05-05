@@ -29,11 +29,10 @@ if (state.ok) {
     state.pos++;
     {{res0}} = v;
   } else {
-    final c = source.runeAt(state.pos);
-    state.fail(state.pos, ParseError.unexpected(0, c));
+    state.fail(state.pos, ParseError.character, 0, 0);
   }
 } else {
-  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
+  state.fail(state.pos, ParseError.character, 0, 0);
 }''';
 
   static const _template16Fast = '''
@@ -49,11 +48,10 @@ if (state.ok) {
     state.pos++;
     state.ok = true;
   } else {
-    final c = source.runeAt(state.pos);
-    state.fail(state.pos, ParseError.unexpected(0, c));
+    state.fail(state.pos, ParseError.character, 0, 0);
   }
 } else {
-  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
+  state.fail(state.pos, ParseError.character, 0, 0);
 }''';
 
   static const _template32 = '''
@@ -70,10 +68,10 @@ if (state.ok) {
     {{res0}} = v;
   } else {
     state.pos = pos;
-    state.fail(state.pos, ParseError.unexpected(0, c));
+    state.fail(state.pos, ParseError.character, 0, c);
   }
 } else {
-  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
+  state.fail(state.pos, ParseError.character, 0, 0);
 }''';
 
   static const _template32Fast = '''
@@ -88,10 +86,10 @@ if (state.ok) {
   state.ok = v != null;
   if (!state.ok) {
     state.pos = pos;
-    state.fail(state.pos, ParseError.unexpected(0, c));
+    state.fail(state.pos, ParseError.character, 0, c);
   }
 } else {
-  state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
+  state.fail(state.pos, ParseError.character, 0, 0);
 }''';
 
   final Map<int, int> table;

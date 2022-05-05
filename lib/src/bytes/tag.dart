@@ -13,7 +13,7 @@ if (state.ok) {
   state.pos += {{length}};
   {{res0}} = {{tag}};
 } else {
-  state.fail(state.pos, const ParseError.expected({{tag}}));
+  state.fail(state.pos, ParseError.expected, 0, {{tag}});
 }''';
 
   static const _templateFast = '''
@@ -21,7 +21,7 @@ state.ok = {{test}};
 if (state.ok) {
   state.pos += {{length}};
 } else {
-  state.fail(state.pos, const ParseError.expected({{tag}}));
+  state.fail(state.pos, ParseError.expected, 0, {{tag}});
 }''';
 
   final String tag;

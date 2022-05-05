@@ -49,8 +49,6 @@ int _toHexValue(String s) {
 }''';
 
 const __header = r'''
-// ignore_for_file: unnecessary_cast
-
 import 'package:source_span/source_span.dart';
 import 'package:tuple/tuple.dart';
 

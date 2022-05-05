@@ -61,9 +61,7 @@ String _publish(String name, Named builder) {
   final state = State(source);
   final result = {{parse}}(state);
   if (!state.ok) {
-    final offset = state.errorPos;
-    final errors = ParseError.errorReport(offset, state.errors);
-    final message = _errorMessage(source, errors);
+    final message = _errorMessage(source, state.errors);
     throw FormatException('\n$message');
   }
 

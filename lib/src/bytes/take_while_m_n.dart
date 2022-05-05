@@ -8,7 +8,8 @@ part of '../../bytes.dart';
 /// TakeWhileMN(4, 4, CharClass('[0-9] | [a-f] | [A-F]'))
 /// ```
 class TakeWhileMN extends ParserBuilder<String, String> {
-  static const _template16 = '''
+  static const _template16 =
+      '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {
@@ -24,16 +25,12 @@ state.ok = {{count}} >= {{m}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  if (state.pos < source.length) {
-    final c = source.runeAt(state.pos);
-    state.fail(state.pos, ParseError.unexpected(0, c));
-  } else {
-    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail(state.pos, ParseError.character, 0, 0);
   state.pos = {{pos}};
 }''';
 
-  static const _template16Fast = '''
+  static const _template16Fast =
+      '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {
@@ -47,22 +44,17 @@ while ({{count}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{count}} >= {{m}};
 if (!state.ok) {
-  if (state.pos < source.length) {
-    final c = source.runeAt(state.pos);
-    state.fail(state.pos, ParseError.unexpected(0, c));
-  } else {
-    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail(state.pos, ParseError.character, 0, 0);
   state.pos = {{pos}};
 }''';
 
-  static const _template32 = '''
+  static const _template32 =
+      '''
 final {{pos}} = state.pos;
-int? {{c}};
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {
   final pos = state.pos;
-  {{c}} = source.readRune(state);
+  final c = source.readRune(state);
   final ok = {{test}};
   if (!ok) {
     state.pos = pos;
@@ -74,21 +66,17 @@ state.ok = {{count}} >= {{m}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  if (state.pos < source.length) {
-    state.fail(state.pos, ParseError.unexpected(0, {{c}}!));
-  } else {
-    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail(state.pos, ParseError.character, 0, 0);
   state.pos = {{pos}};
 }''';
 
-  static const _template32Fast = '''
+  static const _template32Fast =
+      '''
 final {{pos}} = state.pos;
-int? {{c}};
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {
   final pos = state.pos;
-  {{c}} = source.readRune(state);
+  final c = source.readRune(state);
   final ok = {{test}};
   if (!ok) {
     state.pos = pos;
@@ -98,11 +86,7 @@ while ({{count}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{count}} >= {{m}};
 if (!state.ok) {
-  if (state.pos < source.length) {
-    state.fail(state.pos, ParseError.unexpected(0, {{c}}!));
-  } else {
-    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail(state.pos, ParseError.character, 0, 0);
   state.pos = {{pos}};
 }''';
 
@@ -131,13 +115,12 @@ if (!state.ok) {
 
     context.refersToStateSource = true;
     final fast = result == null;
-    final values = context.allocateLocals(['c', 'count', 'pos']);
+    final values = context.allocateLocals(['count', 'pos']);
     final isUnicode = predicate.isUnicode;
-    final c = isUnicode ? values['c']! : 'c';
     values.addAll({
       'm': '$m',
       'n': '$n',
-      'test': predicate.build(context, 'test', [c]),
+      'test': predicate.build(context, 'test', ['c']),
     });
     final String template;
     if (isUnicode) {

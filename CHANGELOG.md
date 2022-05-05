@@ -1,3 +1,8 @@
+## 2.0.5
+
+- Improved performance of lightweight memoization. Saving the parsed state is now just creating an instance of `_Memo` and single write operation to the list. Restoring the parsed state is one read operation from the list, one conditional ternary operation and a few assignment expressions to restore the parse state. This memoization method is very fast and efficient
+- Breaking change. Does not affect end users (parser definitions). The error registration operation has been changed. Now registering an error does not require any data instances to be created. This works quite quickly and efficiently and does not consume memory
+
 ## 2.0.4
 
 - Improved the stability of tracking the position of the last `local` error. This feature is used in the parser builder `Indicate`

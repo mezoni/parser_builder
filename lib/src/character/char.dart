@@ -13,7 +13,7 @@ if (state.ok) {
   state.pos++;
   {{res0}} = {{cc}};
 } else {
-  state.fail(state.pos, const ParseError.expected({{cc}}));
+  state.fail(state.pos, ParseError.expected, 0, {{cc}});
 }''';
 
   static const _template16Fast = '''
@@ -21,7 +21,7 @@ state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos++;
 } else {
-  state.fail(state.pos, const ParseError.expected({{cc}}));
+  state.fail(state.pos, ParseError.expected, 0, {{cc}});
 }''';
 
   static const _template32 = '''
@@ -30,7 +30,7 @@ if (state.ok) {
   state.pos += 2;
   {{res0}} = {{cc}};
 } else {
-  state.fail(state.pos, const ParseError.expected({{cc}}));
+  state.fail(state.pos, ParseError.expected, 0, {{cc}});
 }''';
 
   static const _template32Fast = '''
@@ -38,7 +38,7 @@ state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
 if (state.ok) {
   state.pos += 2;
 } else {
-  state.fail(state.pos, const ParseError.expected{{cc}}));
+  state.fail(state.pos, ParseError.expected, 0, {{cc}});
 }''';
 
   final int char;

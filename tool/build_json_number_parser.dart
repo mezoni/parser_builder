@@ -28,9 +28,7 @@ num? parse(String source) {
   final state = State(source);
   final r = number(state);
   if (!state.ok) {
-    final offset = state.errorPos;
-    final errors = ParseError.errorReport(offset, state.errors);
-    final message = _errorMessage(source, errors);
+    final message = _errorMessage(source, state.errors);
     throw FormatException('\n$message');
   }
   return r!;
@@ -51,24 +49,14 @@ class Number extends ParserBuilder<String, num> {
 if (state.ok) {
   {{res0}} = {{v}};
 } else {
-  if (state.pos < source.length) {
-    final c = source.runeAt(state.pos);
-    state.fail(state.pos, ParseError.unexpected(0, c));
-  } else {
-    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail(state.pos, ParseError.character, 0, 0);
   state.pos = {{pos}};
 }''';
 
   static const _templateFast = '''
 {{parse}}
 if (!state.ok) {
-  if (state.pos < source.length) {
-    final c = source.runeAt(state.pos);
-    state.fail(state.pos, ParseError.unexpected(0, c));
-  } else {
-    state.fail(state.pos, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail(state.pos, ParseError.character, 0, 0);
   state.pos = {{pos}};
 }''';
 

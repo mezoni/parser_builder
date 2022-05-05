@@ -17,10 +17,16 @@ if (state.ok) {
   {{res0}} = source.substring({{pos}}, {{index}});
 } else {
   if ({{index}} == -1) {
-    // TODO
-    state.fail(source.length, const ParseError.expected({{tag}}));
+    if (state.pos < source.length) {
+      final pos = state.pos;
+      source.readRune(state);
+      state.fail(state.pos, ParseError.expected, {{length}}, {{tag}});
+      state.pos = pos;
+    } else {
+      state.fail(state.pos, ParseError.character, 0, 0);
+    }
   } else {
-    state.fail({{pos}}, const ParseError.unexpected(0, {{tag}}));
+    state.fail({{pos}}, ParseError.unexpected, {{length}}, {{tag}});
   }
 }''';
 
@@ -32,10 +38,16 @@ if (state.ok) {
   state.pos = {{index}};
 } else {
   if ({{index}} == -1) {
-    // TODO
-    state.fail(source.length, const ParseError.expected({{tag}}));
+    if (state.pos < source.length) {
+      final pos = state.pos;
+      source.readRune(state);
+      state.fail(state.pos, ParseError.expected, {{length}}, {{tag}});
+      state.pos = pos;
+    } else {
+      state.fail(state.pos, ParseError.character, 0, 0);
+    }
   } else {
-    state.fail({{pos}}, const ParseError.unexpected(0, {{tag}}));
+    state.fail({{pos}}, ParseError.unexpected, {{length}}, {{tag}});
   }
 }''';
 
@@ -49,6 +61,7 @@ if (state.ok) {
     final fast = result == null;
     final values = context.allocateLocals(['index', 'pos']);
     values.addAll({
+      'length': '${tag.length}',
       'tag': helper.escapeString(tag),
     });
     return render2(fast, _templateFast, _template, values, [result]);

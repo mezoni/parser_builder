@@ -8,7 +8,8 @@ part of '../../bytes.dart';
 /// SkipWhile1(CharClass('[#x30-#x39]'), unicode: false)
 /// ```
 class SkipWhile1 extends ParserBuilder<String, void> {
-  static const _template16 = '''
+  static const _template16 =
+      '''
 final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
@@ -20,20 +21,15 @@ while (state.pos < source.length) {
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok) {
-  if ({{pos}} < source.length) {
-    final c = source.runeAt({{pos}});
-    state.fail({{pos}}, ParseError.unexpected(0, c));
-  } else {
-    state.fail({{pos}}, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail({{pos}}, ParseError.character, 0, 0);
 }''';
 
-  static const _template32 = '''
+  static const _template32 =
+      '''
 final {{pos}} = state.pos;
-int? {{c}};
 while (state.pos < source.length) {
   final pos = state.pos;
-  {{c}} = source.readRune(state);
+  final c = source.readRune(state);
   final ok = {{test}};
   if (!ok) {
     state.pos = pos;
@@ -42,11 +38,7 @@ while (state.pos < source.length) {
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok) {
-  if ({{pos}} < source.length) {
-    state.fail({{pos}}, ParseError.unexpected(0, {{c}}!));
-  } else {
-    state.fail({{pos}}, const ParseError.unexpected(0, 'EOF'));
-  }
+  state.fail({{pos}}, ParseError.character, 0, 0);
 }''';
 
   final SemanticAction<bool> predicate;
@@ -56,11 +48,10 @@ if (!state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    final values = context.allocateLocals(['c', 'pos']);
+    final values = context.allocateLocals(['pos']);
     final isUnicode = predicate.isUnicode;
-    final c = isUnicode ? values['c']! : 'c';
     values.addAll({
-      'test': predicate.build(context, 'test', [c]),
+      'test': predicate.build(context, 'test', ['c']),
     });
     return render2(isUnicode, _template32, _template16, values);
   }

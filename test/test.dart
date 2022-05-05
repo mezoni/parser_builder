@@ -50,7 +50,7 @@ void _test() {
   _testManyTill();
   _testMap();
   _testMap1();
-  _testMemoized();
+  _testMemoize();
   _testNested();
   _testNoneOf();
   _testNoneOfEx();
@@ -182,7 +182,7 @@ void _testAlpha1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s32');
@@ -191,7 +191,7 @@ void _testAlpha1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
   });
 }
@@ -338,7 +338,7 @@ void _testAlphanumeric1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s32');
@@ -347,7 +347,7 @@ void _testAlphanumeric1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
   });
 }
@@ -376,10 +376,7 @@ void _testAlt() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(
-        state.errors,
-        [ParseError.expected(c16), ParseError.expected(c32)],
-      );
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16', '$s32'")]);
     }
     {
       final state = State(' $s16');
@@ -388,10 +385,7 @@ void _testAlt() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [
-        ParseError.expected(c16),
-        ParseError.expected(c32),
-      ]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16', '$s32'")]);
     }
   });
 }
@@ -417,7 +411,7 @@ void _testAnd() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.message(0, 'Unknown error')]);
+      expect(state.errors, [ParseError(0, 0, 'Unknown error')]);
     }
     {
       final state = State(' ');
@@ -425,7 +419,7 @@ void _testAnd() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.message(0, 'Unknown error')]);
+      expect(state.errors, [ParseError(0, 0, 'Unknown error')]);
     }
   });
 }
@@ -454,7 +448,7 @@ void _testAnyChar() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
   });
 }
@@ -504,7 +498,7 @@ void _testBinaryExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 4);
-      expect(state.errors, [ParseError.unexpected(0, 0x61)]);
+      expect(state.errors, [ParseError(4, 4, "Unexpected 'a'")]);
     }
     {
       final state = State('1+2-');
@@ -513,7 +507,7 @@ void _testBinaryExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 4);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(4, 4, "Unexpected 'EOF'")]);
     }
   });
 }
@@ -546,7 +540,7 @@ void _testChar() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.expected(c)]);
+        expect(state.errors, [ParseError(0, 0, "Expected: '$s'")]);
       }
       {
         final state = State('');
@@ -555,7 +549,7 @@ void _testChar() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.expected(c)]);
+        expect(state.errors, [ParseError(0, 0, "Expected: '$s'")]);
       }
     }
   });
@@ -580,7 +574,7 @@ void _testConsumed() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc'")]);
     }
   });
 }
@@ -602,7 +596,7 @@ void _testDelimited() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State('');
@@ -611,7 +605,7 @@ void _testDelimited() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State('$s16');
@@ -620,7 +614,7 @@ void _testDelimited() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 1);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(1, 1, "Expected: '$s32'")]);
     }
   });
 }
@@ -697,7 +691,7 @@ void _testDigit1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s32');
@@ -706,7 +700,7 @@ void _testDigit1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
   });
 }
@@ -726,7 +720,7 @@ void _testEof() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'EOF'")]);
     }
   });
 }
@@ -762,7 +756,7 @@ void _testEscapeSequence() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State(' ');
@@ -771,7 +765,7 @@ void _testEscapeSequence() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0x20)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
     }
     {
       final state = State('$s32');
@@ -780,7 +774,7 @@ void _testEscapeSequence() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
     final parser32 = escapeSequence32;
     {
@@ -818,7 +812,7 @@ void _testEscapeSequence() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State(' ');
@@ -827,7 +821,7 @@ void _testEscapeSequence() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0x20)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
     }
   });
 }
@@ -849,7 +843,7 @@ void _testExpected() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('c16c16')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'c16c16'")]);
     }
     {
       final state = State('');
@@ -858,7 +852,7 @@ void _testExpected() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('c16c16')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'c16c16'")]);
     }
     {
       final state = State(' ');
@@ -867,7 +861,7 @@ void _testExpected() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('c16c16')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'c16c16'")]);
     }
   });
 }
@@ -971,7 +965,7 @@ void _testHexDigit1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s32');
@@ -980,7 +974,7 @@ void _testHexDigit1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
   });
 }
@@ -1030,7 +1024,7 @@ void _testIdentifierExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('identifier')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'identifier'")]);
     }
     {
       final state = State('while ');
@@ -1039,7 +1033,7 @@ void _testIdentifierExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('identifier')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'identifier'")]);
     }
     {
       final state = State('else ');
@@ -1049,7 +1043,7 @@ void _testIdentifierExpression() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('identifier')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'identifier'")]);
     }
     {
       final state = State('');
@@ -1058,7 +1052,7 @@ void _testIdentifierExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('identifier')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'identifier'")]);
     }
   });
 }
@@ -1171,7 +1165,7 @@ void _testMany1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32');
@@ -1194,7 +1188,7 @@ void _testMany1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
@@ -1208,7 +1202,7 @@ void _testMany1Count() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32');
@@ -1231,7 +1225,7 @@ void _testMany1Count() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
@@ -1246,7 +1240,7 @@ void _testManyMN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32');
@@ -1255,7 +1249,7 @@ void _testManyMN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(2, 2, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32$s32');
@@ -1285,7 +1279,7 @@ void _testManyMN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
@@ -1300,7 +1294,7 @@ void _testManyN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32');
@@ -1309,7 +1303,7 @@ void _testManyN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(2, 2, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32$s32');
@@ -1332,7 +1326,7 @@ void _testManyN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
@@ -1374,11 +1368,7 @@ void _testManyTill() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [
-        ParseError.expected('abc'),
-        ParseError.expected('a'),
-        ParseError.expected('b'),
-      ]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc', 'a', 'b'")]);
     }
     {
       final state = State('');
@@ -1387,11 +1377,7 @@ void _testManyTill() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [
-        ParseError.expected('abc'),
-        ParseError.expected('a'),
-        ParseError.expected('b'),
-      ]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc', 'a', 'b'")]);
     }
     {
       final state = State('a');
@@ -1400,11 +1386,7 @@ void _testManyTill() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 1);
-      expect(state.errors, [
-        ParseError.expected('abc'),
-        ParseError.expected('a'),
-        ParseError.expected('b'),
-      ]);
+      expect(state.errors, [ParseError(1, 1, "Expected: 'abc', 'a', 'b'")]);
     }
   });
 }
@@ -1426,7 +1408,7 @@ void _testMap() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 3);
-      expect(state.errors, [ParseError.unexpected(0, c16)]);
+      expect(state.errors, [ParseError(3, 3, "Unexpected '$s16'")]);
     }
     {
       final state = State('123');
@@ -1435,7 +1417,7 @@ void _testMap() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 3);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(3, 3, "Unexpected 'EOF'")]);
     }
     {
       final state = State(' ');
@@ -1444,7 +1426,7 @@ void _testMap() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0x20)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
     }
   });
 }
@@ -1466,13 +1448,13 @@ void _testMap1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
 
-void _testMemoized() {
-  test('Memoized', () {
+void _testMemoize() {
+  test('Memoize', () {
     final parser = memoizeC16C32OrC16;
     {
       final state = State('$s16');
@@ -1495,7 +1477,7 @@ void _testMemoized() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State(' ');
@@ -1504,7 +1486,7 @@ void _testMemoized() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
   });
 }
@@ -1533,7 +1515,7 @@ void _testNested() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(2, 2, "Unexpected 'EOF'")]);
     }
     {
       final state = State('');
@@ -1542,7 +1524,7 @@ void _testNested() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('nested')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'nested'")]);
     }
     {
       final state = State(' ');
@@ -1551,7 +1533,7 @@ void _testNested() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected('nested')]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'nested'")]);
     }
   });
 }
@@ -1580,7 +1562,7 @@ void _testNoneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c16)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s16'")]);
     }
     {
       final state = State('');
@@ -1589,7 +1571,7 @@ void _testNoneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
 
     final parser32 = noneOfC32;
@@ -1614,7 +1596,7 @@ void _testNoneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
     {
       final state = State('');
@@ -1623,7 +1605,7 @@ void _testNoneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
   });
 }
@@ -1655,7 +1637,7 @@ void _testNoneOfEx() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s16');
@@ -1665,7 +1647,7 @@ void _testNoneOfEx() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c16)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s16'")]);
     }
     {
       final state = State('$s32');
@@ -1675,7 +1657,7 @@ void _testNoneOfEx() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
   });
 }
@@ -1689,7 +1671,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(3, 'abc')]);
+      expect(state.errors, [ParseError(0, 2, "Unexpected 'abc'")]);
     }
     {
       final state = State('abd');
@@ -1697,7 +1679,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(3, 'abd')]);
+      expect(state.errors, [ParseError(0, 2, "Unexpected 'abd'")]);
     }
     {
       final state = State('def');
@@ -1705,7 +1687,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(3, 'def')]);
+      expect(state.errors, [ParseError(0, 2, "Unexpected 'def'")]);
     }
     {
       final state = State('deg');
@@ -1713,7 +1695,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(3, 'deg')]);
+      expect(state.errors, [ParseError(0, 2, "Unexpected 'deg'")]);
     }
     {
       final state = State('x');
@@ -1721,7 +1703,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'x')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'x'")]);
     }
     {
       final state = State('xy');
@@ -1729,7 +1711,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(2, 'xy')]);
+      expect(state.errors, [ParseError(0, 1, "Unexpected 'xy'")]);
     }
     {
       final state = State('');
@@ -1767,7 +1749,7 @@ void _testNot() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.message(0, 'Unknown error')]);
+      expect(state.errors, [ParseError(0, 0, 'Unknown error')]);
     }
     {
       final state = State('$s32');
@@ -1775,7 +1757,7 @@ void _testNot() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.message(0, 'Unknown error')]);
+      expect(state.errors, [ParseError(0, 0, 'Unknown error')]);
     }
   });
 }
@@ -1797,7 +1779,7 @@ void _testOneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
     {
       final state = State('a');
@@ -1806,7 +1788,7 @@ void _testOneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0x61)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'a'")]);
     }
     {
       final state = State('');
@@ -1815,7 +1797,7 @@ void _testOneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
 
     final parser32 = oneOfC32;
@@ -1833,7 +1815,7 @@ void _testOneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c16)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s16'")]);
     }
     {
       final state = State('a');
@@ -1842,7 +1824,7 @@ void _testOneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0x61)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'a'")]);
     }
     {
       final state = State('');
@@ -1851,7 +1833,7 @@ void _testOneOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
   });
 }
@@ -1900,7 +1882,7 @@ void _testPair() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
   });
 }
@@ -1922,7 +1904,7 @@ void _testPeek() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s16');
@@ -1931,7 +1913,7 @@ void _testPeek() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
@@ -1967,7 +1949,7 @@ void _testPostfixExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State(' ');
@@ -1976,7 +1958,7 @@ void _testPostfixExpression() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 0x20)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
     }
   });
 }
@@ -1998,7 +1980,7 @@ void _testPreceded() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State('');
@@ -2007,7 +1989,7 @@ void _testPreceded() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State('$s16');
@@ -2016,7 +1998,7 @@ void _testPreceded() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 1);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(1, 1, "Expected: '$s32'")]);
     }
   });
 }
@@ -2060,10 +2042,8 @@ void _testPrefixExpression() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [
-        ParseError.expected('-'),
-        ParseError.expected('--'),
-        ParseError.expected('++'),
-        ParseError.unexpected(0, 'EOF'),
+        ParseError(0, 0, "Expected: '-', '--', '++'"),
+        ParseError(0, 0, "Unexpected 'EOF'"),
       ]);
     }
     {
@@ -2074,10 +2054,8 @@ void _testPrefixExpression() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [
-        ParseError.expected('-'),
-        ParseError.expected('--'),
-        ParseError.expected('++'),
-        ParseError.unexpected(0, 0x20),
+        ParseError(0, 0, "Expected: '-', '--', '++'"),
+        ParseError(0, 0, "Unexpected ' '"),
       ]);
     }
   });
@@ -2107,7 +2085,7 @@ void _testRecognize() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32');
@@ -2116,7 +2094,7 @@ void _testRecognize() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(2, 2, "Expected: 'abc'")]);
     }
     {
       final state = State('$s32$abc');
@@ -2125,7 +2103,7 @@ void _testRecognize() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 5);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(5, 5, "Expected: '$s16'")]);
     }
   });
 }
@@ -2147,7 +2125,7 @@ void _testRef() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
   });
 }
@@ -2176,7 +2154,7 @@ void _testSatisfy() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s32');
@@ -2185,7 +2163,7 @@ void _testSatisfy() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
 
     final parser32 = satisfyC32;
@@ -2210,7 +2188,7 @@ void _testSatisfy() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s16');
@@ -2219,7 +2197,7 @@ void _testSatisfy() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c16)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s16'")]);
     }
   });
 }
@@ -2280,7 +2258,7 @@ void _testSemanticActions() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+        expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
       }
       {
         final state = State('1');
@@ -2289,7 +2267,7 @@ void _testSemanticActions() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.unexpected(0, 0x31)]);
+        expect(state.errors, [ParseError(0, 0, "Unexpected '1'")]);
       }
     });
   }
@@ -2381,7 +2359,7 @@ void _testSeparatedList1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s16');
@@ -2390,7 +2368,7 @@ void _testSeparatedList1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
@@ -2405,7 +2383,7 @@ void _testSeparatedListN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(2, 2, "Expected: 'abc'")]);
     }
     {
       final state = State('$s32$abc');
@@ -2414,7 +2392,7 @@ void _testSeparatedListN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 5);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(5, 5, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32$abc$s32');
@@ -2444,7 +2422,7 @@ void _testSeparatedListN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s16');
@@ -2453,7 +2431,7 @@ void _testSeparatedListN() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
   });
 }
@@ -2475,7 +2453,7 @@ void _testSeparatedPair() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 4);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(4, 4, "Expected: '$s32'")]);
     }
     {
       final state = State('');
@@ -2484,7 +2462,7 @@ void _testSeparatedPair() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State('$s16');
@@ -2493,7 +2471,7 @@ void _testSeparatedPair() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 1);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(1, 1, "Expected: 'abc'")]);
     }
   });
 }
@@ -2592,7 +2570,7 @@ void _testSkipWhile1() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s32');
@@ -2600,7 +2578,7 @@ void _testSkipWhile1() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c32)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s32'")]);
     }
     final parser32 = skipWhile1C32;
     {
@@ -2627,7 +2605,7 @@ void _testSkipWhile1() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
       final state = State('$s16');
@@ -2635,7 +2613,7 @@ void _testSkipWhile1() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, c16)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected '$s16'")]);
     }
   });
 }
@@ -2740,7 +2718,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State(' ');
@@ -2749,7 +2727,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     final parserC16C32 = tagC16C32;
     {
@@ -2773,7 +2751,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s16 + s32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16$s32'")]);
     }
     {
       final state = State(' ');
@@ -2782,7 +2760,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s16 + s32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16$s32'")]);
     }
     final parser32 = tagC32;
     {
@@ -2806,7 +2784,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State(' ');
@@ -2815,7 +2793,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     final parserC32C16 = tagC32C16;
     {
@@ -2839,7 +2817,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s32 + s16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32$s16'")]);
     }
     {
       final state = State(' ');
@@ -2848,7 +2826,7 @@ void _testTag() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(s32 + s16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32$s16'")]);
     }
   });
 }
@@ -2884,7 +2862,7 @@ void _testTagNoCase() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc'")]);
     }
     {
       final state = State(' $abc');
@@ -2893,7 +2871,7 @@ void _testTagNoCase() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc'")]);
     }
   });
 }
@@ -2926,7 +2904,7 @@ void _testTagOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(foo)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'foo'")]);
     }
     {
       final state = State(' $foo');
@@ -2936,7 +2914,7 @@ void _testTagOf() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(foo)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'foo'")]);
     }
   });
 }
@@ -2994,12 +2972,7 @@ void _testTags() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [
-        ParseError.expected('abc'),
-        ParseError.expected('abd'),
-        ParseError.expected('def'),
-        ParseError.expected('deg'),
-        ParseError.expected('x'),
-        ParseError.expected('xy'),
+        ParseError(0, 0, "Expected: 'abc', 'abd', 'def', 'deg', 'x', 'xy'")
       ]);
     }
     {
@@ -3010,12 +2983,7 @@ void _testTags() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [
-        ParseError.expected('abc'),
-        ParseError.expected('abd'),
-        ParseError.expected('def'),
-        ParseError.expected('deg'),
-        ParseError.expected('x'),
-        ParseError.expected('xy'),
+        ParseError(0, 0, "Expected: 'abc', 'abd', 'def', 'deg', 'x', 'xy'")
       ]);
     }
   });
@@ -3052,7 +3020,7 @@ void _testTakeUntil() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc'")]);
     }
   });
 }
@@ -3081,7 +3049,7 @@ void _testTakeUntil1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.unexpected(0, 'abc')]);
+      expect(state.errors, [ParseError(0, 2, "Unexpected 'abc'")]);
     }
     {
       final state = State('');
@@ -3090,7 +3058,16 @@ void _testTakeUntil1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 1);
+      expect(state.errors, [ParseError(1, 1, "Expected: 'abc'")]);
     }
   });
 }
@@ -3176,7 +3153,7 @@ void _testTakeWhile1() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+        expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
       }
       {
         final state = State(' $s');
@@ -3185,7 +3162,7 @@ void _testTakeWhile1() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.unexpected(0, 0x20)]);
+        expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
       }
     }
   });
@@ -3239,7 +3216,7 @@ void _testTakeWhileMN() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+        expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
       }
       {
         final state = State('$s');
@@ -3248,29 +3225,28 @@ void _testTakeWhileMN() {
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 1 * len);
-        expect(state.errors, [ParseError.unexpected(0, 'EOF')]);
+        expect(
+            state.errors, [ParseError(1 * len, 1 * len, "Unexpected 'EOF'")]);
       }
       {
         final sBad = '0';
-        final cBad = sBad.codeUnitAt(0);
         final state = State('$s$sBad');
         final r = parser(state);
         expect(state.ok, false);
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 1 * len);
-        expect(state.errors, [ParseError.unexpected(0, cBad)]);
+        expect(state.errors, [ParseError(1 * len, 1 * len, "Unexpected '0'")]);
       }
       {
         final sBad = '0';
-        final cBad = sBad.codeUnitAt(0);
         final state = State('$sBad$s');
         final r = parser(state);
         expect(state.ok, false);
         expect(r, null);
         expect(state.pos, 0);
         expect(state.errorPos, 0);
-        expect(state.errors, [ParseError.unexpected(0, cBad)]);
+        expect(state.errors, [ParseError(0, 0, "Unexpected '0'")]);
       }
     }
   });
@@ -3293,7 +3269,7 @@ void _testTerminated() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State('');
@@ -3302,7 +3278,7 @@ void _testTerminated() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
     {
       final state = State('$s16');
@@ -3311,7 +3287,7 @@ void _testTerminated() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 1);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(1, 1, "Expected: '$s32'")]);
     }
   });
 }
@@ -3333,7 +3309,7 @@ void _testTuple() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32');
@@ -3342,7 +3318,7 @@ void _testTuple() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(2, 2, "Expected: 'abc'")]);
     }
 
     final parser2 = tuple3C32AbcC16;
@@ -3360,7 +3336,7 @@ void _testTuple() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(c32)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s32'")]);
     }
     {
       final state = State('$s32');
@@ -3369,7 +3345,7 @@ void _testTuple() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(2, 2, "Expected: 'abc'")]);
     }
     {
       final state = State('$s32$abc');
@@ -3378,7 +3354,7 @@ void _testTuple() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 5);
-      expect(state.errors, [ParseError.expected(c16)]);
+      expect(state.errors, [ParseError(5, 5, "Expected: '$s16'")]);
     }
   });
 }
@@ -3400,7 +3376,7 @@ void _testValue() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc'")]);
     }
     {
       final state = State(' ');
@@ -3409,7 +3385,7 @@ void _testValue() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.expected(abc)]);
+      expect(state.errors, [ParseError(0, 0, "Expected: 'abc'")]);
     }
 
     final parser2 = valueTrue;
@@ -3454,7 +3430,7 @@ void _testVerify() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.message(0, 'Message')]);
+      expect(state.errors, [ParseError(0, 0, 'Message')]);
     }
     {
       final state = State('12');
@@ -3463,7 +3439,7 @@ void _testVerify() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.message(-2, 'Message')]);
+      expect(state.errors, [ParseError(0, 1, 'Message')]);
     }
     final parserFast = verifyIs3DigitFast;
     {
@@ -3478,7 +3454,7 @@ void _testVerify() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError.message(0, 'Message')]);
+      expect(state.errors, [ParseError(0, 0, 'Message')]);
     }
     {
       final state = State('12');
@@ -3486,7 +3462,7 @@ void _testVerify() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError.message(-2, 'Message')]);
+      expect(state.errors, [ParseError(0, 1, 'Message')]);
     }
   });
 }

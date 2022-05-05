@@ -1,6 +1,7 @@
 import 'package:parser_builder/branch.dart';
 import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/char_class.dart';
+import 'package:parser_builder/character.dart';
 import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
@@ -64,9 +65,12 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
 const _escapeHex = Named(
     '_escapeHex',
-    Indicate(
-        r"An escape sequence starting with '\u' must be followed by 4 hexadecimal digits",
-        Map2(Fast(Tag('u')), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')), ExpressionAction<int>(['s'], '_toHexValue({{s}})'))),
+    Map2(
+        Fast(Satisfy(CharClass('[u]'))),
+        Indicate(
+            "An escape sequence starting with '\\u' must be followed by 4 hexadecimal digits",
+            TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]'))),
+        ExpressionAction<int>(['s'], '_toHexValue({{s}})')),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({
