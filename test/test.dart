@@ -77,6 +77,7 @@ void _test() {
   _testTagOf();
   _testTagNoCase();
   _testTags();
+  _testTagValues();
   _testTakeUntil();
   _testTakeUntil1();
   _testTakeWhile();
@@ -2924,7 +2925,7 @@ void _testTagOf() {
 
 void _testTags() {
   test('Tags', () {
-    final parser = tagsAbcAbdDefDegXXY;
+    final parser = tagsAbcAbdDefDegXXYZ;
     {
       final state = State('abc');
       final r = parser(state);
@@ -2968,6 +2969,13 @@ void _testTags() {
       expect(state.pos, 2);
     }
     {
+      final state = State('z');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, 'z');
+      expect(state.pos, 1);
+    }
+    {
       final state = State('');
       final r = parser(state);
       expect(state.ok, false);
@@ -2975,7 +2983,7 @@ void _testTags() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [
-        ParseError(0, 0, "Expected: 'abc', 'abd', 'def', 'deg', 'x', 'xy'")
+        ParseError(0, 0, "Expected: 'abc', 'abd', 'def', 'deg', 'x', 'xy', 'z'")
       ]);
     }
     {
@@ -2986,8 +2994,55 @@ void _testTags() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [
-        ParseError(0, 0, "Expected: 'abc', 'abd', 'def', 'deg', 'x', 'xy'")
+        ParseError(0, 0, "Expected: 'abc', 'abd', 'def', 'deg', 'x', 'xy', 'z'")
       ]);
+    }
+  });
+}
+
+void _testTagValues() {
+  test('TagValues', () {
+    final parser = tagValues;
+    {
+      final state = State('false ');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, false);
+      expect(state.pos, 5);
+    }
+    {
+      final state = State('true ');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, true);
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('null ');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, null);
+      expect(state.pos, 4);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 0);
+      expect(state.errors,
+          [ParseError(0, 0, "Expected: 'false', 'true', 'null'")]);
+    }
+    {
+      final state = State(' ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 0);
+      expect(state.errors,
+          [ParseError(0, 0, "Expected: 'false', 'true', 'null'")]);
     }
   });
 }

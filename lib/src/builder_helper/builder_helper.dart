@@ -1,5 +1,54 @@
 part of '../../builder_helper.dart';
 
+String buildConditional(Map<String, String> branches) {
+  if (branches.isEmpty) {
+    throw ArgumentError.value(branches, 'branches', 'Must not be empty');
+  }
+
+  final conditions = branches.keys.toList();
+  if (conditions.length == 1 && conditions.last.trim().isEmpty) {
+    return branches[conditions.first]!;
+  }
+
+  final list = <String>[];
+  String? elseBranch;
+  for (var i = 0; i < conditions.length; i++) {
+    final condition = conditions[i];
+    final body = branches[condition]!;
+    if (condition.trim().isEmpty) {
+      if (i != conditions.length - 1) {
+        throw ArgumentError(
+            'A branch without a condition must be the last branch');
+      }
+
+      if (conditions.length < 2) {
+        throw ArgumentError(
+            'A conditional with an empty condition must contain at least 2 branches');
+      }
+
+      elseBranch = body;
+      continue;
+    }
+
+    final sb = StringBuffer();
+    sb.writeln('($condition) {');
+    sb.writeln(body);
+    sb.write('}');
+    list.add(sb.toString());
+  }
+
+  final sb = StringBuffer();
+  sb.write('if ');
+  sb.write(list.join(' else if '));
+  if (elseBranch != null) {
+    sb.writeln(' else {');
+    sb.writeln(elseBranch);
+    sb.write('}');
+  }
+
+  return sb.toString();
+}
+
 String escapeString(String text, [bool quote = true]) {
   text = text.replaceAll('\\', r'\\');
   text = text.replaceAll('\b', r'\b');

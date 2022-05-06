@@ -1,3 +1,8 @@
+## 2.0.8
+
+- Implemented, tested and documented parser builder `TagValues`
+- The `Tags` parser builder has been changed from generating source code using a `switch` statement to using `if-else` statements
+
 ## 2.0.7
 
 - Fixed bug in parser builder `Memoize`. Added missing result type information to `state.memoized<R>()` and `state.memoize<R>()` calls

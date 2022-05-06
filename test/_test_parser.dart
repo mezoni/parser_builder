@@ -235,18 +235,14 @@ int? _binaryExpressionMul(State<String> state) {
         final pos = state.pos;
         final c = source.codeUnitAt(pos);
         String? v;
-        switch (c) {
-          case 42:
-            state.pos++;
-            v = '*';
-            break;
-          case 126:
-            if (source.startsWith('~/', pos)) {
-              state.pos += 2;
-              v = '~/';
-              break;
-            }
-            break;
+        if (c == 42) {
+          state.pos++;
+          v = '*';
+        } else if (c == 126) {
+          if (source.startsWith('~/', pos)) {
+            state.pos += 2;
+            v = '~/';
+          }
         }
         state.ok = v != null;
         if (state.ok) {
@@ -297,15 +293,12 @@ int? binaryExpressionAdd(State<String> state) {
         final pos = state.pos;
         final c = source.codeUnitAt(pos);
         String? v;
-        switch (c) {
-          case 43:
-            state.pos++;
-            v = '+';
-            break;
-          case 45:
-            state.pos++;
-            v = '-';
-            break;
+        if (c == 43) {
+          state.pos++;
+          v = '+';
+        } else if (c == 45) {
+          state.pos++;
+          v = '-';
         }
         state.ok = v != null;
         if (state.ok) {
@@ -1294,21 +1287,16 @@ int? postfixExpression(State<String> state) {
       final pos = state.pos;
       final c = source.codeUnitAt(pos);
       String? v;
-      switch (c) {
-        case 45:
-          if (source.startsWith('--', pos)) {
-            state.pos += 2;
-            v = '--';
-            break;
-          }
-          break;
-        case 43:
-          if (source.startsWith('++', pos)) {
-            state.pos += 2;
-            v = '++';
-            break;
-          }
-          break;
+      if (c == 45) {
+        if (source.startsWith('--', pos)) {
+          state.pos += 2;
+          v = '--';
+        }
+      } else if (c == 43) {
+        if (source.startsWith('++', pos)) {
+          state.pos += 2;
+          v = '++';
+        }
       }
       state.ok = v != null;
       if (state.ok) {
@@ -1344,23 +1332,19 @@ int? prefixExpression(State<String> state) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
     String? v;
-    switch (c) {
-      case 45:
-        if (source.startsWith('--', pos)) {
-          state.pos += 2;
-          v = '--';
-          break;
-        }
+    if (c == 45) {
+      if (source.startsWith('--', pos)) {
+        state.pos += 2;
+        v = '--';
+      } else {
         state.pos++;
         v = '-';
-        break;
-      case 43:
-        if (source.startsWith('++', pos)) {
-          state.pos += 2;
-          v = '++';
-          break;
-        }
-        break;
+      }
+    } else if (c == 43) {
+      if (source.startsWith('++', pos)) {
+        state.pos += 2;
+        v = '++';
+      }
     }
     state.ok = v != null;
     if (state.ok) {
@@ -1867,7 +1851,7 @@ String? tagNoCaseAbc(State<String> state) {
   return $0;
 }
 
-String? tagsAbcAbdDefDegXXY(State<String> state) {
+String? tagsAbcAbdDefDegXXYZ(State<String> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -1875,40 +1859,33 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
     String? v;
-    switch (c) {
-      case 97:
-        if (source.startsWith('abc', pos)) {
-          state.pos += 3;
-          v = 'abc';
-          break;
-        }
-        if (source.startsWith('abd', pos)) {
-          state.pos += 3;
-          v = 'abd';
-          break;
-        }
-        break;
-      case 100:
-        if (source.startsWith('def', pos)) {
-          state.pos += 3;
-          v = 'def';
-          break;
-        }
-        if (source.startsWith('deg', pos)) {
-          state.pos += 3;
-          v = 'deg';
-          break;
-        }
-        break;
-      case 120:
-        if (source.startsWith('xy', pos)) {
-          state.pos += 2;
-          v = 'xy';
-          break;
-        }
+    if (c == 97) {
+      if (source.startsWith('abc', pos)) {
+        state.pos += 3;
+        v = 'abc';
+      } else if (source.startsWith('abd', pos)) {
+        state.pos += 3;
+        v = 'abd';
+      }
+    } else if (c == 100) {
+      if (source.startsWith('def', pos)) {
+        state.pos += 3;
+        v = 'def';
+      } else if (source.startsWith('deg', pos)) {
+        state.pos += 3;
+        v = 'deg';
+      }
+    } else if (c == 120) {
+      if (source.startsWith('xy', pos)) {
+        state.pos += 2;
+        v = 'xy';
+      } else {
         state.pos++;
         v = 'x';
-        break;
+      }
+    } else if (c == 122) {
+      state.pos++;
+      v = 'z';
     }
     state.ok = v != null;
     if (state.ok) {
@@ -1922,6 +1899,47 @@ String? tagsAbcAbdDefDegXXY(State<String> state) {
     state.fail(state.pos, ParseError.expected, 0, 'deg');
     state.fail(state.pos, ParseError.expected, 0, 'x');
     state.fail(state.pos, ParseError.expected, 0, 'xy');
+    state.fail(state.pos, ParseError.expected, 0, 'z');
+  }
+  return $0;
+}
+
+bool? tagValues(State<String> state) {
+  bool? $0;
+  final source = state.source;
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    bool? v;
+    state.ok = false;
+    if (c == 102) {
+      if (source.startsWith('false', pos)) {
+        state.ok = true;
+        state.pos += 5;
+        v = false;
+      }
+    } else if (c == 116) {
+      if (source.startsWith('true', pos)) {
+        state.ok = true;
+        state.pos += 4;
+        v = true;
+      }
+    } else if (c == 110) {
+      if (source.startsWith('null', pos)) {
+        state.ok = true;
+        state.pos += 4;
+        v = null;
+      }
+    }
+    if (state.ok) {
+      $0 = v;
+    }
+  }
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.expected, 0, 'false');
+    state.fail(state.pos, ParseError.expected, 0, 'true');
+    state.fail(state.pos, ParseError.expected, 0, 'null');
   }
   return $0;
 }

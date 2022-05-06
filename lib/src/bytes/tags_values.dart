@@ -1,20 +1,17 @@
 part of '../../bytes.dart';
 
-/// Parses [tags] one by one and returns the first [arguments] found.
-///
-/// Example:
-/// ```dart
-/// Tags(['true', 'false'])
-/// ```
-class Tags extends ParserBuilder<String, String> {
+/// Parses the keys from hash table [table] as tags and returns the
+/// corresponding value from hash table [table].
+@experimental
+class TagValues<O> extends ParserBuilder<String, O> {
   static const _template = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
   final pos = state.pos;
   final c = source.codeUnitAt(pos);
-  String? v;
+  {{type}} v;
+  state.ok =false;
   {{tests}}
-  state.ok = v != null;
   if (state.ok) {
     {{res0}} = v;
   }
@@ -28,31 +25,33 @@ state.ok = state.pos < source.length;
 if (state.ok) {
   final pos = state.pos;
   final c = source.codeUnitAt(pos);
-  String? v;
+  {{type}} v;
+  state.ok =false;
   {{tests}}
-  state.ok = v != null;
 }
 if (!state.ok) {
   {{errors}}
 }''';
 
   static const _templateTestLong = '''
-state.pos += {{length}};
-v = {{tag}};''';
+  state.ok = true;
+  state.pos += {{length}};
+  v = {{value}};''';
 
   static const _templateTestShort = '''
+state.ok = true;
 state.pos++;
-v = {{tag}};''';
+v = {{value}};''';
 
-  final List<String> tags;
+  final Map<String, O> table;
 
-  const Tags(this.tags);
+  const TagValues(this.table);
 
   @override
   String build(Context context, ParserResult? result) {
-    if (tags.isEmpty) {
+    if (table.isEmpty) {
       throw ArgumentError.value(
-          tags, 'tags', 'The list of tags must not be empty: $this');
+          table, 'tags', 'The list of tags must not be empty: $this');
     }
 
     context.refersToStateSource = true;
@@ -60,10 +59,10 @@ v = {{tag}};''';
     final values = context.allocateLocals(['pos']);
     final map = <int, List<String>>{};
     final errors = <String>[];
-    for (final tag in tags) {
+    for (final tag in table.keys) {
       if (tag.isEmpty) {
-        throw ArgumentError.value(
-            tags, 'tags', 'The list of tags must not contain empty tags');
+        throw ArgumentError.value(table, 'tags',
+            'The list of tags must not contain empty tags: $table');
       }
 
       final c = tag.codeUnitAt(0);
@@ -83,12 +82,15 @@ v = {{tag}};''';
       final tags = map[c]!;
       tags.sort((x, y) => y.length.compareTo(x.length));
       final tests = <String, String>{};
+      String? elseBranch;
       for (final tag in tags) {
         final length = tag.length;
+        final value = table[tag];
         final escaped = helper.escapeString(tag);
         final values = {
           'length': '$length',
           'tag': escaped,
+          'value': helper.getAsCode(value),
         };
 
         final isLong = tag.length > 1;

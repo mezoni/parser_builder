@@ -84,8 +84,6 @@ const _escapeSeq = EscapeSequence({
   0x74: 0x09
 });
 
-const _false = Named('_false', Value(false, Tag('false')));
-
 const _inline = '@pragma(\'vm:prefer-inline\')';
 
 const _isNormalChar = ExpressionAction<bool>(
@@ -106,8 +104,6 @@ const _keyValue = Named(
 
 const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
 
-const _null = Named('_null', Value(null as dynamic, Tag('null')));
-
 const _number = Named('_number', Expected('number', _json_number.parser));
 
 const _object = Named(
@@ -121,6 +117,14 @@ const _openBrace =
 const _openBracket =
     Named('_openBracket', Fast(Terminated(Tag('['), _ws)), [_inline]);
 
+const _primitives = Named(
+    '_primitives',
+    TagValues({
+      'false': false,
+      'true': true,
+      'null': null as dynamic,
+    }));
+
 const _quote = Named('_quote', Fast(Terminated(Tag('"'), _ws)), [_inline]);
 
 const _string = Named(
@@ -128,21 +132,17 @@ const _string = Named(
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
 
-const _true = Named('_true', Value(true, Tag('true')));
-
 const _value = Ref<String, dynamic>('_value');
 
 const _value_ = Named(
     '_value',
     Terminated(
-        Alt7(
+        Alt5(
           _string,
           _number,
           _array,
           _object,
-          _false,
-          _true,
-          _null,
+          _primitives,
         ),
         _ws));
 

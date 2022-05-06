@@ -81,7 +81,8 @@ Future<void> main(List<String> args) async {
     _tagC32C16,
     _tagOfFoo,
     _tagNoCaseAbc,
-    _tagsAbcAbdDefDegXXY,
+    _tagsAbcAbdDefDegXXYZ,
+    _tagValues,
     _takeUntilAbc,
     _takeUntil1Abc,
     _takeWhile1C16,
@@ -278,10 +279,10 @@ const _mapC32ToStr = Named(
     Map1(Char(c32),
         ExpressionAction<String>(['c'], 'String.fromCharCode({{c}})')));
 
+const _memoizeC16 = Memoize(_char16);
+
 const _memoizeC16C32OrC16 = Named('memoizeC16C32OrC16',
     Alt2(Recognize(Tuple2(_memoizeC16, _char32)), Recognize(_memoizeC16)));
-
-const _memoizeC16 = Memoize(_char16);
 
 const _nestedC16OrTake2C32 = Named('nestedC16OrTake2C32',
     Nested('nested', Alt2(_char16, TakeWhileMN(2, 2, _isC32))));
@@ -379,8 +380,16 @@ const _tagOfFoo = Named(
     TagOf(Calculate(VariableAction([], '{{foo}}',
         key: 'foo', init: 'state.context.foo as String'))));
 
-const _tagsAbcAbdDefDegXXY =
-    Named('tagsAbcAbdDefDegXXY', Tags(['abc', 'abd', 'def', 'deg', 'x', 'xy']));
+const _tagsAbcAbdDefDegXXYZ = Named(
+    'tagsAbcAbdDefDegXXYZ', Tags(['abc', 'abd', 'def', 'deg', 'x', 'xy', 'z']));
+
+const _tagValues = Named(
+    'tagValues',
+    TagValues({
+      'false': false,
+      'true': true,
+      'null': null,
+    }));
 
 const _takeUntil1Abc = Named('takeUntil1Abc', TakeUntil1(abc));
 

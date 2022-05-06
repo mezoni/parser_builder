@@ -741,53 +741,42 @@ dynamic _object(State<String> state) {
   return $0;
 }
 
-bool? _false(State<String> state) {
-  bool? $0;
-  final source = state.source;
-  state.ok = state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 102 &&
-      source.startsWith('false', state.pos);
-  if (state.ok) {
-    state.pos += 5;
-  } else {
-    state.fail(state.pos, ParseError.expected, 0, 'false');
-  }
-  if (state.ok) {
-    $0 = false;
-  }
-  return $0;
-}
-
-bool? _true(State<String> state) {
-  bool? $0;
-  final source = state.source;
-  state.ok = state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 116 &&
-      source.startsWith('true', state.pos);
-  if (state.ok) {
-    state.pos += 4;
-  } else {
-    state.fail(state.pos, ParseError.expected, 0, 'true');
-  }
-  if (state.ok) {
-    $0 = true;
-  }
-  return $0;
-}
-
-dynamic _null(State<String> state) {
+dynamic _primitives(State<String> state) {
   dynamic $0;
   final source = state.source;
-  state.ok = state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 110 &&
-      source.startsWith('null', state.pos);
+  state.ok = state.pos < source.length;
   if (state.ok) {
-    state.pos += 4;
-  } else {
-    state.fail(state.pos, ParseError.expected, 0, 'null');
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    dynamic v;
+    state.ok = false;
+    if (c == 102) {
+      if (source.startsWith('false', pos)) {
+        state.ok = true;
+        state.pos += 5;
+        v = false;
+      }
+    } else if (c == 116) {
+      if (source.startsWith('true', pos)) {
+        state.ok = true;
+        state.pos += 4;
+        v = true;
+      }
+    } else if (c == 110) {
+      if (source.startsWith('null', pos)) {
+        state.ok = true;
+        state.pos += 4;
+        v = null;
+      }
+    }
+    if (state.ok) {
+      $0 = v;
+    }
   }
-  if (state.ok) {
-    $0 = null;
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.expected, 0, 'false');
+    state.fail(state.pos, ParseError.expected, 0, 'true');
+    state.fail(state.pos, ParseError.expected, 0, 'null');
   }
   return $0;
 }
@@ -803,13 +792,7 @@ dynamic _value(State<String> state) {
       if (!state.ok) {
         $0 = _object(state);
         if (!state.ok) {
-          $0 = _false(state);
-          if (!state.ok) {
-            $0 = _true(state);
-            if (!state.ok) {
-              $0 = _null(state);
-            }
-          }
+          $0 = _primitives(state);
         }
       }
     }
