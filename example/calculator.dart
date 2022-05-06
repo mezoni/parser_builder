@@ -362,16 +362,7 @@ num? _additive(State<String> state) {
 
 num? _expression(State<String> state) {
   num? $0;
-  final $min = state.minErrorPos;
-  state.minErrorPos = state.pos + 1;
-  num? $1;
-  $1 = _additive(state);
-  state.minErrorPos = $min;
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.fail(state.pos, ParseError.expected, 0, 'expression');
-  }
+  $0 = _additive(state);
   return $0;
 }
 
@@ -494,7 +485,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void memoize<R>(int id, bool fast, int start, [R? result]) =>
-      _memos[id] = _Memo(id, fast, start, pos, ok, result);
+      _memos[id] = _Memo<R>(id, fast, start, pos, ok, result);
 
   @pragma('vm:prefer-inline')
   _Memo<R>? memoized<R>(int id, bool fast, int start) {

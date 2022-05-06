@@ -985,13 +985,13 @@ String? memoizeC16C32OrC16(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   final $pos1 = state.pos;
-  final $memo = state.memoized(0, true, state.pos);
+  final $memo = state.memoized<int?>(0, false, state.pos);
   if ($memo != null) {
     $memo.restore(state);
   } else {
     final $pos2 = state.pos;
     char16(state);
-    state.memoize(0, true, $pos2);
+    state.memoize<int?>(0, true, $pos2);
   }
   if (state.ok) {
     char32(state);
@@ -1007,13 +1007,13 @@ String? memoizeC16C32OrC16(State<String> state) {
   }
   if (!state.ok) {
     final $pos3 = state.pos;
-    final $memo1 = state.memoized(0, true, state.pos);
+    final $memo1 = state.memoized<int?>(0, false, state.pos);
     if ($memo1 != null) {
       $memo1.restore(state);
     } else {
       final $pos4 = state.pos;
       char16(state);
-      state.memoize(0, true, $pos4);
+      state.memoize<int?>(0, true, $pos4);
     }
     if (state.ok) {
       $0 = source.slice($pos3, state.pos);
@@ -2467,7 +2467,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void memoize<R>(int id, bool fast, int start, [R? result]) =>
-      _memos[id] = _Memo(id, fast, start, pos, ok, result);
+      _memos[id] = _Memo<R>(id, fast, start, pos, ok, result);
 
   @pragma('vm:prefer-inline')
   _Memo<R>? memoized<R>(int id, bool fast, int start) {

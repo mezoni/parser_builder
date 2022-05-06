@@ -1,8 +1,13 @@
+## 2.0.7
+
+- Fixed bug in parser builder `Memoize`. Added missing result type information to `state.memoized<R>()` and `state.memoize<R>()` calls
+- Fixed bug in method `state.memoize<R>()`. Added missing result type information when instantiating `_Memo<R>`
+
 ## 2.0.6
 
 - Fixed bug in parser builder `Nested`. The value of `state.minErrorPos` was incorrectly restored to `state.errorPos`. Now this value is saved and restored from the saved value
 - Fixed bug in parser builder `PrefixExpression`. Incorrect parsing algorithm. Parser templates have been changed
-- Fixed bug in parser builder `_errorMessage()`
+- Fixed bug in function `_errorMessage()`
 
 ## 2.0.5
 

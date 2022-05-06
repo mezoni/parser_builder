@@ -14,23 +14,23 @@ part of '../../memoization.dart';
 @experimental
 class Memoize<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
-final {{memo}} = state.memoized({{id}}, false, state.pos);
+final {{memo}} = state.memoized<{{type}}>({{id}}, false, state.pos);
 if ({{memo}} != null) {
   {{res0}} = {{memo}}.restore(state);
 } else {
   final {{pos}} = state.pos;
   {{p1}}
-  state.memoize({{id}}, false, {{pos}}, {{res0}});
+  state.memoize<{{type}}>({{id}}, false, {{pos}}, {{res0}});
 }''';
 
   static const _templateFast = '''
-final {{memo}} = state.memoized({{id}}, true, state.pos);
+final {{memo}} = state.memoized<{{type}}>({{id}}, false, state.pos);
 if ({{memo}} != null) {
   {{memo}}.restore(state);
 } else {
   final {{pos}} = state.pos;
   {{p1}}
-  state.memoize({{id}}, true, {{pos}});
+  state.memoize<{{type}}>({{id}}, true, {{pos}});
 }''';
 
   final ParserBuilder<I, O> parser;
@@ -45,6 +45,7 @@ if ({{memo}} != null) {
     values.addAll({
       'id': '$id',
       'p1': parser.build(context, result),
+      'type': parser.getResultType(),
     });
     return render2(fast, _templateFast, _template, values, [result]);
   }

@@ -3072,6 +3072,15 @@ void _testTakeUntil1() {
       expect(state.errorPos, 1);
       expect(state.errors, [ParseError(1, 1, "Expected: 'abc'")]);
     }
+    {
+      final state = State('  ');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 1);
+      expect(state.errors, [ParseError(1, 1, "Expected: 'abc'")]);
+    }
   });
 }
 

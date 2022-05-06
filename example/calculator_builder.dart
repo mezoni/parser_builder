@@ -59,7 +59,7 @@ const _digit1 = Named('_digit1', Digit1());
 
 const _expression = Ref<String, num>('_expression');
 
-const _expression_ = Named('_expression', Nested('expression', _additive));
+const _expression_ = Named('_expression', _additive);
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 

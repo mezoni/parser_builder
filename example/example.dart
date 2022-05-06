@@ -943,7 +943,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void memoize<R>(int id, bool fast, int start, [R? result]) =>
-      _memos[id] = _Memo(id, fast, start, pos, ok, result);
+      _memos[id] = _Memo<R>(id, fast, start, pos, ok, result);
 
   @pragma('vm:prefer-inline')
   _Memo<R>? memoized<R>(int id, bool fast, int start) {
