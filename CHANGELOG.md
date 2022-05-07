@@ -1,3 +1,7 @@
+## 2.0.9
+
+- Fixed bug in parser builder `Memoize`. In fast parsing mode, memoization did not work due to passing an invalid value as an argument, indicating the parsing mode. This was due to a `copy-paste` oversight made while editing the templates
+
 ## 2.0.8
 
 - Implemented, tested and documented parser builder `TagValues`

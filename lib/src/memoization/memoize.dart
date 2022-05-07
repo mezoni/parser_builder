@@ -24,7 +24,7 @@ if ({{memo}} != null) {
 }''';
 
   static const _templateFast = '''
-final {{memo}} = state.memoized<{{type}}>({{id}}, false, state.pos);
+final {{memo}} = state.memoized<{{type}}>({{id}}, true, state.pos);
 if ({{memo}} != null) {
   {{memo}}.restore(state);
 } else {

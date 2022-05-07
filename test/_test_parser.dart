@@ -978,7 +978,7 @@ String? memoizeC16C32OrC16(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   final $pos1 = state.pos;
-  final $memo = state.memoized<int?>(0, false, state.pos);
+  final $memo = state.memoized<int?>(0, true, state.pos);
   if ($memo != null) {
     $memo.restore(state);
   } else {
@@ -1000,7 +1000,7 @@ String? memoizeC16C32OrC16(State<String> state) {
   }
   if (!state.ok) {
     final $pos3 = state.pos;
-    final $memo1 = state.memoized<int?>(0, false, state.pos);
+    final $memo1 = state.memoized<int?>(0, true, state.pos);
     if ($memo1 != null) {
       $memo1.restore(state);
     } else {
