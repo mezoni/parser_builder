@@ -21,7 +21,7 @@ if (state.ok) {
     final text = source.slice({{pos}}, state.pos);
     final length = text.length;
     final c = text.codeUnitAt(0);
-    final words = const {{words}};
+    final words = const <List<String>>{{words}};
     var index = -1;
     var min = 0;
     var max = words.length - 1;
@@ -81,7 +81,7 @@ if (state.ok) {
     final text = source.slice({{pos}}, state.pos);
     final length = text.length;
     final c = text.codeUnitAt(0);
-    final words = const {{words}};
+    final words = const <List<String>>{{words}};
     var index = -1;
     var min = 0;
     var max = words.length - 1;

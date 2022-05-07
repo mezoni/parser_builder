@@ -85,14 +85,14 @@ class State<T> {
 
   final List<_Memo?> _memos = List.filled(150, null);
 
-  final List _values = List.filled(150, null);
+  final List<Object?> _values = List.filled(150, null);
 
   State(this.source);
 
   List<ParseError> get errors => _buildErrors();
 
   @pragma('vm:prefer-inline')
-  void fail(int pos, int kind, int length, value) {
+  void fail(int pos, int kind, int length, Object? value) {
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {
@@ -164,8 +164,8 @@ class State<T> {
       final kind = _kinds[i];
       if (kind == ParseError.expected) {
         var value = _values[i];
-        value = _escape(value);
-        expected.add(value);
+        final escaped = _escape(value);
+        expected.add(escaped);
       }
     }
 
@@ -193,8 +193,9 @@ class State<T> {
             final string = source as String;
             if (start < string.length) {
               value = string.runeAt(errorPos);
-              value = _escape(value);
-              final error = ParseError(errorPos, errorPos, "Unexpected $value");
+              final escaped = _escape(value);
+              final error =
+                  ParseError(errorPos, errorPos, 'Unexpected $escaped');
               result.add(error);
             } else {
               final error = ParseError(errorPos, errorPos, "Unexpected 'EOF'");
@@ -202,7 +203,7 @@ class State<T> {
             }
           } else {
             final error =
-                ParseError(errorPos, errorPos, "Unexpected character");
+                ParseError(errorPos, errorPos, 'Unexpected character');
             result.add(error);
           }
 
@@ -214,8 +215,8 @@ class State<T> {
           result.add(error);
           break;
         case ParseError.unexpected:
-          value = _escape(value);
-          final error = ParseError(start, end, 'Unexpected $value');
+          final escaped = _escape(value);
+          final error = ParseError(start, end, 'Unexpected $escaped');
           result.add(error);
           break;
         default:
@@ -227,7 +228,7 @@ class State<T> {
     return result.toSet().toList();
   }
 
-  String _escape(value, [bool quote = true]) {
+  String _escape(Object? value, [bool quote = true]) {
     if (value is int) {
       if (value >= 0 && value <= 0xd7ff ||
           value >= 0xe000 && value <= 0x10ffff) {
@@ -310,7 +311,7 @@ extension on String {
 
   static const _functionErrorMessage = r'''
 String _errorMessage(String source, List<ParseError> errors,
-    [color, int maxCount = 10, String? url]) {
+    [Object? color, int maxCount = 10, String? url]) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
     if (i > maxCount) {

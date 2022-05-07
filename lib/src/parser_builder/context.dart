@@ -31,7 +31,7 @@ class Context {
     return result;
   }
 
-  Map<String, String> allocateLocals(Iterable names) {
+  Map<String, String> allocateLocals(Iterable<String> names) {
     final result = <String, String>{};
     for (final name in names) {
       result[name] = allocateLocal(name);

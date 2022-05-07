@@ -82,7 +82,6 @@ v = {{value}};''';
       final tags = map[c]!;
       tags.sort((x, y) => y.length.compareTo(x.length));
       final tests = <String, String>{};
-      String? elseBranch;
       for (final tag in tags) {
         final length = tag.length;
         final value = table[tag];

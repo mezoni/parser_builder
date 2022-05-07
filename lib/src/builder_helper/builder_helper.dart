@@ -66,7 +66,7 @@ String escapeString(String text, [bool quote = true]) {
   return '\'$text\'';
 }
 
-String getAsCode(value) {
+String getAsCode(dynamic value) {
   final result = tryGetAsCode(value);
   if (result != null) {
     return result;
@@ -95,7 +95,7 @@ String toHex(int value) {
   return '0x${value.toRadixString(16).toUpperCase()}';
 }
 
-String? tryGetAsCode(value) {
+String? tryGetAsCode(dynamic value) {
   if (value is String) {
     final escaped = escapeString(value);
     return escaped;
