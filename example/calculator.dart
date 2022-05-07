@@ -215,22 +215,17 @@ String? _multiplicativeOperator(State<String> state) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
     String? v;
-    switch (c) {
-      case 42:
-        state.pos++;
-        v = '*';
-        break;
-      case 47:
-        state.pos++;
-        v = '/';
-        break;
-      case 126:
-        if (source.startsWith('~/', pos)) {
-          state.pos += 2;
-          v = '~/';
-          break;
-        }
-        break;
+    if (c == 42) {
+      state.pos++;
+      v = '*';
+    } else if (c == 47) {
+      state.pos++;
+      v = '/';
+    } else if (c == 126) {
+      if (source.startsWith('~/', pos)) {
+        state.pos += 2;
+        v = '~/';
+      }
     }
     state.ok = v != null;
     if (state.ok) {
@@ -256,14 +251,14 @@ num? _multiplicative(State<String> state) {
   num? $0;
   final $pos = state.pos;
   num? $left;
-  final $log = state.log;
   num? $1;
   $1 = _primary(state);
   if (state.ok) {
     $left = $1;
     while (true) {
-      state.log = false;
       String? $2;
+      final $log = state.log;
+      state.log = false;
       $2 = _multiplicativeOperator(state);
       state.log = $log;
       if (!state.ok) {
@@ -296,15 +291,12 @@ String? _additiveOperator(State<String> state) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
     String? v;
-    switch (c) {
-      case 43:
-        state.pos++;
-        v = '+';
-        break;
-      case 45:
-        state.pos++;
-        v = '-';
-        break;
+    if (c == 43) {
+      state.pos++;
+      v = '+';
+    } else if (c == 45) {
+      state.pos++;
+      v = '-';
     }
     state.ok = v != null;
     if (state.ok) {
@@ -329,14 +321,14 @@ num? _additive(State<String> state) {
   num? $0;
   final $pos = state.pos;
   num? $left;
-  final $log = state.log;
   num? $1;
   $1 = _multiplicative(state);
   if (state.ok) {
     $left = $1;
     while (true) {
-      state.log = false;
       String? $2;
+      final $log = state.log;
+      state.log = false;
       $2 = _additiveOperator(state);
       state.log = $log;
       if (!state.ok) {
@@ -614,7 +606,7 @@ class State<T> {
       '\b': '\\b',
       '\f': '\\f',
       '\n': '\\n',
-      '\r': '\\t',
+      '\r': '\\r',
       '\t': '\\t',
       '\v': '\\v',
     };

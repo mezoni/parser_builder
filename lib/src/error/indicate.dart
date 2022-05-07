@@ -4,8 +4,8 @@ part of '../../error.dart';
 ///
 /// This parser works as follows:
 ///
-/// If a parsing errors occurs, then an `Message(message)` error is generated
-/// and all other errors are generated as well.
+/// If a parsing errors occurs, then an `ParseError.message(message)` error is
+/// generated and all other errors are generated as well.
 @experimental
 class Indicate<I, O> extends ParserBuilder<I, O> {
   static const _template = '''

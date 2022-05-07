@@ -4,8 +4,8 @@ part of '../../error.dart';
 ///
 /// This parser works as follows:
 ///
-/// If a parsing errors occurs at the start position, then an `Expected 'tag'`
-/// error is generated instead of these errors.
+/// If a parsing errors occurs at the start position, then an
+/// `ParseError.expected('tag')` error is generated instead of these errors.
 ///
 /// If a parsing errors occurs at the next positions, then all other errors are
 /// generated as well.

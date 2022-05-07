@@ -3,11 +3,8 @@ part of '../../expression.dart';
 class PrefixExpression<I, O1, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{pos}} = state.pos;
-final {{log}} = state.log;
-state.log = false;
 {{var1}}
 {{p1}}
-state.log = {{log}};
 final {{ok}} = state.ok;
 {{var2}}
 {{p2}}
@@ -25,11 +22,8 @@ if (state.ok) {
 
   static const _templateFast = '''
 final {{pos}} = state.pos;
-final {{log}} = state.log;
-state.log = false;
 {{var1}}
 {{p1}}
-state.log = {{log}};
 final {{ok}} = state.ok;
 {{var2}}
 {{p2}}
@@ -48,12 +42,12 @@ if (!state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final values = context.allocateLocals(['log', 'ok', 'pos']);
+    final values = context.allocateLocals(['ok', 'pos']);
     final r1 = context.getResult(operator, !fast);
     final r2 = context.getResult(expression, !fast);
     values.addAll({
       'calculate': calculate.build(context, 'calculate', ['v1', 'v2']),
-      'p1': operator.build(context, r1),
+      'p1': Silent(operator).build(context, r1),
       'p2': expression.build(context, r2),
     });
     return render2(fast, _templateFast, _template, values, [result, r1, r2]);

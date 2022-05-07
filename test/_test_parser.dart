@@ -222,14 +222,14 @@ int? _binaryExpressionMul(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $left;
-  final $log = state.log;
   int? $1;
   $1 = _primaryExpression(state);
   if (state.ok) {
     $left = $1;
     while (true) {
-      state.log = false;
       String? $2;
+      final $log = state.log;
+      state.log = false;
       state.ok = state.pos < source.length;
       if (state.ok) {
         final pos = state.pos;
@@ -280,14 +280,14 @@ int? binaryExpressionAdd(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $left;
-  final $log = state.log;
   int? $1;
   $1 = _binaryExpressionMul(state);
   if (state.ok) {
     $left = $1;
     while (true) {
-      state.log = false;
       String? $2;
+      final $log = state.log;
+      state.log = false;
       state.ok = state.pos < source.length;
       if (state.ok) {
         final pos = state.pos;
@@ -1279,9 +1279,9 @@ int? postfixExpression(State<String> state) {
   int? $1;
   $1 = _primaryExpression(state);
   if (state.ok) {
+    String? $2;
     final $log = state.log;
     state.log = false;
-    String? $2;
     state.ok = state.pos < source.length;
     if (state.ok) {
       final pos = state.pos;
@@ -1324,9 +1324,9 @@ int? prefixExpression(State<String> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
+  String? $1;
   final $log = state.log;
   state.log = false;
-  String? $1;
   state.ok = state.pos < source.length;
   if (state.ok) {
     final pos = state.pos;
@@ -2614,7 +2614,7 @@ class State<T> {
       '\b': '\\b',
       '\f': '\\f',
       '\n': '\\n',
-      '\r': '\\t',
+      '\r': '\\r',
       '\t': '\\t',
       '\v': '\\v',
     };

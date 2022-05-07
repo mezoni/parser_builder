@@ -13,6 +13,6 @@ part 'src/combinator/not.dart';
 part 'src/combinator/opt.dart';
 part 'src/combinator/peek.dart';
 part 'src/combinator/recognize.dart';
-part 'src/combinator/silent_opt.dart';
+part 'src/combinator/silent.dart';
 part 'src/combinator/value.dart';
 part 'src/combinator/verify.dart';

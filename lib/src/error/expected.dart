@@ -4,8 +4,8 @@ part of '../../error.dart';
 ///
 /// This parser works as follows:
 ///
-/// If a parsing errors occurs, then an `Expected(tag)` error is generated
-/// instead of these errors.
+/// If a parsing errors occurs, then an `ParseError.expected(tag)` error is
+/// generated instead of these errors.
 class Expected<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{log}} = state.log;

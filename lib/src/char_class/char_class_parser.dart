@@ -89,15 +89,12 @@ int? _rangeChar(State<String> state) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
     String? v;
-    switch (c) {
-      case 91:
-        state.pos++;
-        v = '[';
-        break;
-      case 93:
-        state.pos++;
-        v = ']';
-        break;
+    if (c == 91) {
+      state.pos++;
+      v = '[';
+    } else if (c == 93) {
+      state.pos++;
+      v = ']';
     }
     state.ok = v != null;
   }
@@ -611,7 +608,7 @@ class State<T> {
       '\b': '\\b',
       '\f': '\\f',
       '\n': '\\n',
-      '\r': '\\t',
+      '\r': '\\r',
       '\t': '\\t',
       '\v': '\\v',
     };
