@@ -54,7 +54,7 @@ abstract class SemanticAction<T> {
       List<String> parameters, List<String> arguments, String information) {
     if (arguments.length != parameters.length) {
       throw ArgumentError(
-          'The list of arguments [${arguments.join(', ')}] does not match the number of parameters [${parameters.join(', ')}]: $information');
+          'The list of arguments [${arguments.join(', ')}] does not match the number of parameters [${parameters.join(', ')}]\n$information');
     }
 
     return arguments.join(', ');

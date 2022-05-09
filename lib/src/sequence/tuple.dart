@@ -163,4 +163,9 @@ abstract class _Tuple<I, O> extends _Sequence<I, O> {
     };
     return render(_template, values);
   }
+
+  @override
+  bool _useParserResult(ParserBuilder parser, int index) {
+    return true;
+  }
 }

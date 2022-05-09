@@ -1,3 +1,9 @@
+## 2.0.10
+
+- The parser builder `Peek` has been optimized for size and speed
+- Fixed bug in parser builder `Named`. For functions with a return type of `void`, the fast parsing mode is forced to turn on
+- Implemented (inlined) binary search expression builder
+
 ## 2.0.9
 
 - Fixed bug in parser builder `Memoize`. In fast parsing mode, memoization did not work due to passing an invalid value as an argument, indicating the parsing mode. This was due to a `copy-paste` oversight made while editing the templates

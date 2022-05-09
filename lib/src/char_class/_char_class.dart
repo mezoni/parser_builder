@@ -20,6 +20,28 @@ abstract class _CharClass extends SemanticAction<bool> {
     checkArguments(['c'], arguments, getChars());
     final argument = arguments.first;
     final list = getCharList();
+    final code = _binarySearch(list, argument);
+    if (negate) {
+      if (list.length == 2) {
+        final start = list[0];
+        final end = list[1];
+        if (start == end) {
+          return '$argument != $start';
+        }
+      }
+
+      return '!($code)';
+    } else {
+      return code;
+    }
+  }
+
+  /*
+  @override
+  String build(Context context, String name, List<String> arguments) {
+    checkArguments(['c'], arguments, getChars());
+    final argument = arguments.first;
+    final list = getCharList();
     final tests = <String>[];
     var simple = true;
     for (var i = 0; i < list.length; i += 2) {
@@ -95,6 +117,7 @@ abstract class _CharClass extends SemanticAction<bool> {
       return result;
     }
   }
+  */
 
   List<int> getCharList() {
     final chars = getChars();
@@ -104,6 +127,93 @@ abstract class _CharClass extends SemanticAction<bool> {
   }
 
   String getChars();
+
+  String _binarySearch(List<int> chars, String name) {
+    final low = <int>[];
+    final high = <int>[];
+    for (var i = 0; i < chars.length; i += 2) {
+      low.add(chars[i]);
+      high.add(chars[i + 1]);
+    }
+
+    String plunge(int min, int max, Set<int> tested) {
+      if (min > max) {
+        throw ArgumentError.value(
+            min, 'min', 'Must be less than or equal to $max');
+      }
+
+      final mid = min + (max - min) ~/ 2;
+      final start = low[mid];
+      final end = high[mid];
+      var left = '';
+      final hasOnLeftSide = min != mid;
+      final hasOnRightSide = min != max;
+      if (hasOnLeftSide && hasOnRightSide) {
+        final x = high[mid - 1];
+        tested.add(x);
+      }
+
+      if (!hasOnLeftSide) {
+        if (start == end) {
+          left = '$name == $start';
+        } else {
+          if (tested.contains(end)) {
+            if (start == end) {
+              left = '$name == $start';
+            } else {
+              left = '$name >= $start';
+            }
+          } else {
+            if (start + 1 == end) {
+              left = '($name == $end || $name == $start)';
+            } else {
+              left = '$name <= $end && $name >= $start';
+            }
+          }
+        }
+      } else {
+        left = plunge(min, mid - 1, tested);
+      }
+
+      if (!hasOnRightSide) {
+        return left;
+      } else {
+        final right = plunge(mid + 1, max, tested);
+        if (start == end) {
+          if (!hasOnLeftSide) {
+            final result = '($name == $start || $right)';
+            return result;
+          } else {
+            final x = high[mid - 1];
+            final result = '($name == $start || $name <= $x ? $left : $right)';
+            return result;
+          }
+        } else {
+          if (!hasOnLeftSide) {
+            if (start + 1 == end) {
+              final result = '($name == $end || $name == $start || $right)';
+              return result;
+            } else {
+              final result = '($name <= $end && $name >= $start || $right)';
+              return result;
+            }
+          } else {
+            final x = high[mid - 1];
+            final result =
+                '($name <= $x ? $left : $name <= $end ? $name >= $start : $right)';
+            return result;
+          }
+        }
+      }
+    }
+
+    var result = plunge(0, low.length - 1, {});
+    if (result.startsWith('(')) {
+      result = result.substring(1, result.length - 1);
+    }
+
+    return result;
+  }
 
   static String listToPattern(List<int> chars) {
     if (chars.isEmpty) {

@@ -201,7 +201,8 @@ final {{name}} = {{value}};''';
   }
 
   @override
-  bool _useResultsOfFastParsers() {
-    return false;
+  bool _useParserResult(ParserBuilder parser, int index) {
+    final type = parser.getResultType();
+    return type != 'void';
   }
 }

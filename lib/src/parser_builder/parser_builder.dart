@@ -63,9 +63,11 @@ abstract class ParserBuilder<I, O> {
       Map<String, String> values,
       [List<ParserResult?>? results]) {
     if (condition) {
-      return render(template1, values, results);
+      final result = render(template1, values, results);
+      return result;
     } else {
-      return render(template2, values, results);
+      final result = render(template2, values, results);
+      return result;
     }
   }
 

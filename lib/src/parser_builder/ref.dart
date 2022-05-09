@@ -5,7 +5,7 @@ class Ref<I, O> extends ParserBuilder<I, O> {
 {{res0}} = {{name}}(state);''';
 
   static const _templateFast = '''
-{{name}}(statae);''';
+{{name}}(state);''';
 
   final String name;
 

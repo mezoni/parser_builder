@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:tuple/tuple.dart' as tuple;
 
 import 'builder_helper.dart' as helper;
@@ -8,6 +9,7 @@ part 'src/combinator/calculate.dart';
 part 'src/combinator/consumed.dart';
 part 'src/combinator/eof.dart';
 part 'src/combinator/fast.dart';
+part 'src/combinator/lookahead.dart';
 part 'src/combinator/map1.dart';
 part 'src/combinator/not.dart';
 part 'src/combinator/opt.dart';

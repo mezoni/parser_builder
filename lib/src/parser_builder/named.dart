@@ -40,6 +40,11 @@ class Named<I, O> extends ParserBuilder<I, O> {
     return render2(fast, _templateFast, _template, values, [result]);
   }
 
+  @override
+  String toString() {
+    return name;
+  }
+
   void _buildDeclaration(Context context, bool fast) {
     final localAllocator = context.localAllocator;
     final localDeclarations = context.localDeclarations;
@@ -49,6 +54,10 @@ class Named<I, O> extends ParserBuilder<I, O> {
     context.localDeclarations = {};
     context.localRegistry = {};
     context.refersToStateSource = false;
+    if (parser.getResultType() == 'void') {
+      fast = true;
+    }
+
     final result = context.getResult(parser, !fast);
     final code = parser.build(context, result);
     final buffer = StringBuffer();

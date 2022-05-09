@@ -8,8 +8,7 @@ part of '../../bytes.dart';
 /// TakeWhileMN(4, 4, CharClass('[0-9] | [a-f] | [A-F]'))
 /// ```
 class TakeWhileMN extends ParserBuilder<String, String> {
-  static const _template16 =
-      '''
+  static const _template16 = '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {
@@ -29,8 +28,7 @@ if (state.ok) {
   state.pos = {{pos}};
 }''';
 
-  static const _template16Fast =
-      '''
+  static const _template16Fast = '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {
@@ -48,8 +46,7 @@ if (!state.ok) {
   state.pos = {{pos}};
 }''';
 
-  static const _template32 =
-      '''
+  static const _template32 = '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {
@@ -70,8 +67,7 @@ if (state.ok) {
   state.pos = {{pos}};
 }''';
 
-  static const _template32Fast =
-      '''
+  static const _template32Fast = '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
 while ({{count}} < {{n}} && state.pos < source.length) {

@@ -19,8 +19,11 @@ int? _hexPrimary(State<String> state) {
   var $count = 0;
   while ($count < 2 && state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 102 &&
-        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
+    final ok = c <= 57
+        ? c >= 48
+        : c <= 70
+            ? c >= 65
+            : c <= 102 && c >= 97;
     if (!ok) {
       break;
     }

@@ -8,8 +8,7 @@ part of '../../bytes.dart';
 /// SkipWhile1(CharClass('[#x30-#x39]'), unicode: false)
 /// ```
 class SkipWhile1 extends ParserBuilder<String, void> {
-  static const _template16 =
-      '''
+  static const _template16 = '''
 final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
@@ -24,8 +23,7 @@ if (!state.ok) {
   state.fail({{pos}}, ParseError.character, 0, 0);
 }''';
 
-  static const _template32 =
-      '''
+  static const _template32 = '''
 final {{pos}} = state.pos;
 while (state.pos < source.length) {
   final pos = state.pos;

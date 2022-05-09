@@ -45,7 +45,7 @@ String? alpha0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 122 && (c >= 65 && c <= 90 || c >= 97 && c <= 122);
+    final ok = c <= 90 && c >= 65 || c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -64,7 +64,7 @@ String? alpha1(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 122 && (c >= 65 && c <= 90 || c >= 97 && c <= 122);
+    final ok = c <= 90 && c >= 65 || c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -85,8 +85,11 @@ String? alphanumeric0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 122 &&
-        (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
+    final ok = c <= 57
+        ? c >= 48
+        : c <= 90
+            ? c >= 65
+            : c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -105,8 +108,11 @@ String? alphanumeric1(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 122 &&
-        (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
+    final ok = c <= 57
+        ? c >= 48
+        : c <= 90
+            ? c >= 65
+            : c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -198,7 +204,7 @@ int? _primaryExpression(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
+    final ok = c <= 57 && c >= 48;
     if (!ok) {
       break;
     }
@@ -401,7 +407,7 @@ String? digit0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
+    final ok = c <= 57 && c >= 48;
     if (!ok) {
       break;
     }
@@ -420,7 +426,7 @@ String? digit1(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
+    final ok = c <= 57 && c >= 48;
     if (!ok) {
       break;
     }
@@ -549,7 +555,7 @@ dynamic foldMany0Digit(State<String> state) {
     state.ok = state.pos < source.length;
     if (state.ok) {
       final c = source.codeUnitAt(state.pos);
-      state.ok = c >= 48 && c <= 57;
+      state.ok = c <= 57 && c >= 48;
       if (state.ok) {
         state.pos++;
         $1 = c;
@@ -578,8 +584,11 @@ String? hexDigit0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 102 &&
-        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
+    final ok = c <= 57
+        ? c >= 48
+        : c <= 70
+            ? c >= 65
+            : c <= 102 && c >= 97;
     if (!ok) {
       break;
     }
@@ -598,8 +607,11 @@ String? hexDigit1(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 102 &&
-        (c >= 48 && c <= 57 || c >= 65 && c <= 70 || c >= 97 && c <= 102);
+    final ok = c <= 57
+        ? c >= 48
+        : c <= 70
+            ? c >= 65
+            : c <= 102 && c >= 97;
     if (!ok) {
       break;
     }
@@ -621,17 +633,20 @@ String? identifier(State<String> state) {
   state.ok = state.pos < source.length;
   if (state.ok) {
     final c = source.codeUnitAt(state.pos++);
-    state.ok = c <= 122 &&
-        (c >= 48 && c <= 57 ||
-            c >= 65 && c <= 90 ||
-            c == 95 ||
-            c >= 97 && c <= 122);
+    state.ok = c <= 57
+        ? c >= 48
+        : c <= 90
+            ? c >= 65
+            : (c == 95 || c <= 122 && c >= 97);
     if (state.ok) {
       while (state.pos < source.length) {
         final pos = state.pos;
         final c = source.codeUnitAt(state.pos++);
-        state.ok = c <= 122 &&
-            (c >= 48 && c <= 57 || c >= 65 && c <= 90 || c >= 97 && c <= 122);
+        state.ok = c <= 57
+            ? c >= 48
+            : c <= 90
+                ? c >= 65
+                : c <= 122 && c >= 97;
         if (!state.ok) {
           state.pos = pos;
           break;
@@ -880,7 +895,7 @@ dynamic map4Digits(State<String> state) {
   state.ok = state.pos < source.length;
   if (state.ok) {
     final c = source.codeUnitAt(state.pos);
-    state.ok = c >= 48 && c <= 57;
+    state.ok = c <= 57 && c >= 48;
     if (state.ok) {
       state.pos++;
       $1 = c;
@@ -895,7 +910,7 @@ dynamic map4Digits(State<String> state) {
     state.ok = state.pos < source.length;
     if (state.ok) {
       final c = source.codeUnitAt(state.pos);
-      state.ok = c >= 48 && c <= 57;
+      state.ok = c <= 57 && c >= 48;
       if (state.ok) {
         state.pos++;
         $2 = c;
@@ -910,7 +925,7 @@ dynamic map4Digits(State<String> state) {
       state.ok = state.pos < source.length;
       if (state.ok) {
         final c = source.codeUnitAt(state.pos);
-        state.ok = c >= 48 && c <= 57;
+        state.ok = c <= 57 && c >= 48;
         if (state.ok) {
           state.pos++;
           $3 = c;
@@ -925,7 +940,7 @@ dynamic map4Digits(State<String> state) {
         state.ok = state.pos < source.length;
         if (state.ok) {
           final c = source.codeUnitAt(state.pos);
-          state.ok = c >= 48 && c <= 57;
+          state.ok = c <= 57 && c >= 48;
           if (state.ok) {
             state.pos++;
             $4 = c;
@@ -1264,11 +1279,9 @@ Tuple2<int, int>? pairC16C32(State<String> state) {
 int? peekC32(State<String> state) {
   int? $0;
   final $pos = state.pos;
-  int? $1;
-  $1 = char32(state);
+  $0 = char32(state);
   if (state.ok) {
     state.pos = $pos;
-    $0 = $1!;
   }
   return $0;
 }
@@ -2216,7 +2229,7 @@ String? transformersCharClassIsDigit(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
+    final ok = c <= 57 && c >= 48;
     if (!ok) {
       break;
     }
@@ -2280,7 +2293,7 @@ String? transformersNotCharClassIsDigit(State<String> state) {
   while (state.pos < source.length) {
     final pos = state.pos;
     final c = source.readRune(state);
-    final ok = c > 1114111 || !(c >= 0 && c <= 47 || c >= 58 && c <= 1114111);
+    final ok = !(c <= 47 && c >= 0 || c <= 1114111 && c >= 58);
     if (!ok) {
       state.pos = pos;
       break;
@@ -2346,7 +2359,7 @@ String? verifyIs3Digit(State<String> state) {
   final $pos1 = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
+    final ok = c <= 57 && c >= 48;
     if (!ok) {
       break;
     }
@@ -2373,11 +2386,11 @@ String? verifyIs3Digit(State<String> state) {
 void verifyIs3DigitFast(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  String? $1;
+  String? $0;
   final $pos1 = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c >= 48 && c <= 57;
+    final ok = c <= 57 && c >= 48;
     if (!ok) {
       break;
     }
@@ -2385,10 +2398,10 @@ void verifyIs3DigitFast(State<String> state) {
   }
   state.ok = true;
   if (state.ok) {
-    $1 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
+    $0 = $pos1 == state.pos ? '' : source.substring($pos1, state.pos);
   }
   if (state.ok) {
-    final v = $1!;
+    final v = $0!;
     state.ok = v.length == 3;
     if (!state.ok) {
       final length = $pos - state.pos;
