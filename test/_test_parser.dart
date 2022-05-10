@@ -45,7 +45,7 @@ String? alpha0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 90 && c >= 65 || c <= 122 && c >= 97;
+    final ok = c <= 90 ? c >= 65 : c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -64,7 +64,7 @@ String? alpha1(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 90 && c >= 65 || c <= 122 && c >= 97;
+    final ok = c <= 90 ? c >= 65 : c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -637,7 +637,9 @@ String? identifier(State<String> state) {
         ? c >= 48
         : c <= 90
             ? c >= 65
-            : (c == 95 || c <= 122 && c >= 97);
+            : c < 97
+                ? c == 95
+                : c <= 122;
     if (state.ok) {
       while (state.pos < source.length) {
         final pos = state.pos;
@@ -2293,7 +2295,7 @@ String? transformersNotCharClassIsDigit(State<String> state) {
   while (state.pos < source.length) {
     final pos = state.pos;
     final c = source.readRune(state);
-    final ok = !(c <= 47 && c >= 0 || c <= 1114111 && c >= 58);
+    final ok = !(c <= 47 ? c >= 0 : c <= 1114111 && c >= 58);
     if (!ok) {
       state.pos = pos;
       break;

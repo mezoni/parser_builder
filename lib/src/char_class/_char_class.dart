@@ -142,6 +142,26 @@ abstract class _CharClass extends SemanticAction<bool> {
             min, 'min', 'Must be less than or equal to $max');
       }
 
+      String compareUseTested(int start, int end) {
+        if (tested.contains(end)) {
+          if (start == end) {
+            final result = '$name == $start';
+            return result;
+          } else {
+            final result = '$name >= $start';
+            return result;
+          }
+        } else {
+          if (start + 1 == end) {
+            final result = '($name == $end || $name == $start)';
+            return result;
+          } else {
+            final result = '$name <= $end && $name >= $start';
+            return result;
+          }
+        }
+      }
+
       final mid = min + (max - min) ~/ 2;
       final start = low[mid];
       final end = high[mid];
@@ -157,19 +177,7 @@ abstract class _CharClass extends SemanticAction<bool> {
         if (start == end) {
           left = '$name == $start';
         } else {
-          if (tested.contains(end)) {
-            if (start == end) {
-              left = '$name == $start';
-            } else {
-              left = '$name >= $start';
-            }
-          } else {
-            if (start + 1 == end) {
-              left = '($name == $end || $name == $start)';
-            } else {
-              left = '$name <= $end && $name >= $start';
-            }
-          }
+          left = compareUseTested(start, end);
         }
       } else {
         left = plunge(min, mid - 1, tested);
@@ -178,11 +186,20 @@ abstract class _CharClass extends SemanticAction<bool> {
       if (!hasOnRightSide) {
         return left;
       } else {
+        final isLastRight = mid + 1 == max;
         final right = plunge(mid + 1, max, tested);
         if (start == end) {
           if (!hasOnLeftSide) {
-            final result = '($name == $start || $right)';
-            return result;
+            if (isLastRight) {
+              final rightStart = low[max];
+              final rightEnd = high[max];
+              final result =
+                  '$name < $rightStart ? $name == $start : $name <= $rightEnd';
+              return result;
+            } else {
+              final result = '($name == $start || $right)';
+              return result;
+            }
           } else {
             final x = high[mid - 1];
             final result = '($name == $start || $name <= $x ? $left : $right)';
@@ -194,8 +211,16 @@ abstract class _CharClass extends SemanticAction<bool> {
               final result = '($name == $end || $name == $start || $right)';
               return result;
             } else {
-              final result = '($name <= $end && $name >= $start || $right)';
-              return result;
+              if (isLastRight) {
+                final rightStart = low[max];
+                final rightEnd = high[max];
+                final right = compareUseTested(rightStart, rightEnd);
+                final result = '$name <= $end ? $name >= $start : $right';
+                return result;
+              } else {
+                final result = '($name <= $end && $name >= $start || $right)';
+                return result;
+              }
             }
           } else {
             final x = high[mid - 1];

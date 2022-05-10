@@ -79,7 +79,6 @@ while (state.pos < source.length) {
     break;
   }
   state.pos += {{size}};
-  {{var1}}
   {{p1}}
   if (!state.ok) {
     state.pos = {{pos}};
@@ -88,7 +87,7 @@ while (state.pos < source.length) {
   if ({{list}}.isEmpty && {{str}} != '') {
     {{list}}.add({{str}});
   }
-  {{list}}.add(String.fromCharCode({{val1}}));
+  {{list}}.add('');
 }''';
 
   final int controlChar;

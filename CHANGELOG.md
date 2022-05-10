@@ -1,3 +1,8 @@
+## 2.0.11
+
+- Fixed bug in parser builders `SeparatedList0`, `SeparatedList1`. Invalid `{{var1}}` keys have been removed from fast templates
+- Fixed bug in parser builder `StringValue`. Invalid `{{val1}}` keys have been removed from fast template
+
 ## 2.0.10
 
 - The parser builder `Peek` has been optimized for size and speed

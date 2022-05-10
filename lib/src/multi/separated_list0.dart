@@ -26,7 +26,6 @@ if (state.ok) {
   static const _templateFast = '''
 var {{pos}} = state.pos;
 while (true) {
-  {{var1}}
   {{p1}}
   if (!state.ok) {
     state.pos = {{pos}};

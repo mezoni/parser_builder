@@ -27,7 +27,6 @@ if (state.ok) {
 var {{pos}} = state.pos;
 var {{ok}} = false;
 while (true) {
-  {{var1}}
   {{p1}}
   if (!state.ok) {
     state.pos = {{pos}};
