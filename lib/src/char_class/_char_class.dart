@@ -18,22 +18,11 @@ abstract class _CharClass extends SemanticAction<bool> {
   @override
   String build(Context context, String name, List<String> arguments) {
     checkArguments(['c'], arguments, getChars());
+    final builder = BinarySearchBuilder();
     final argument = arguments.first;
     final list = getCharList();
-    final code = _binarySearch(list, argument);
-    if (negate) {
-      if (list.length == 2) {
-        final start = list[0];
-        final end = list[1];
-        if (start == end) {
-          return '$argument != $start';
-        }
-      }
-
-      return '!($code)';
-    } else {
-      return code;
-    }
+    final result = builder.build(argument, list, negate);
+    return result;
   }
 
   /*

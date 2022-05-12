@@ -1,3 +1,7 @@
+## 2.0.12
+
+- The binary search code builder has been redesigned. Now it is a separate class. New implementation tested. The generated code is very efficient. It generates a single expression consisting of many comparison tests. For 3 ranges (6 values), the generated algorithm finds the result by testing 2-3 constant values. For 20 ranges (40 values) finds the result by testing 5-6 constant values. The only downside is that the Dart SDK formatter formats such code using 4 character indentation instead of 2 character indentation
+
 ## 2.0.11
 
 - Fixed bug in parser builders `SeparatedList0`, `SeparatedList1`. Invalid `{{var1}}` keys have been removed from fast templates

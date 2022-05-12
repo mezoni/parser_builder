@@ -120,7 +120,11 @@ void _ws(State<String> state) {
   final source = state.source;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c == 13 || c <= 10 ? c >= 9 : c == 32;
+    final ok = c <= 13
+        ? c <= 10
+            ? c >= 9
+            : c == 13
+        : c == 32;
     if (!ok) {
       break;
     }

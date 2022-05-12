@@ -1,4 +1,5 @@
 import 'parser_builder.dart';
+import 'src/char_class/binary_search_builder.dart';
 import 'src/char_class/char_class_parser.dart' as char_class_parser;
 
 part 'src/char_class/_char_class.dart';

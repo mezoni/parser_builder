@@ -85,11 +85,11 @@ String? alphanumeric0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 57
-        ? c >= 48
-        : c <= 90
-            ? c >= 65
-            : c <= 122 && c >= 97;
+    final ok = c <= 90
+        ? c <= 57
+            ? c >= 48
+            : c >= 65
+        : c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -108,11 +108,11 @@ String? alphanumeric1(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 57
-        ? c >= 48
-        : c <= 90
-            ? c >= 65
-            : c <= 122 && c >= 97;
+    final ok = c <= 90
+        ? c <= 57
+            ? c >= 48
+            : c >= 65
+        : c <= 122 && c >= 97;
     if (!ok) {
       break;
     }
@@ -584,11 +584,11 @@ String? hexDigit0(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 57
-        ? c >= 48
-        : c <= 70
-            ? c >= 65
-            : c <= 102 && c >= 97;
+    final ok = c <= 70
+        ? c <= 57
+            ? c >= 48
+            : c >= 65
+        : c <= 102 && c >= 97;
     if (!ok) {
       break;
     }
@@ -607,11 +607,11 @@ String? hexDigit1(State<String> state) {
   final $pos = state.pos;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
-    final ok = c <= 57
-        ? c >= 48
-        : c <= 70
-            ? c >= 65
-            : c <= 102 && c >= 97;
+    final ok = c <= 70
+        ? c <= 57
+            ? c >= 48
+            : c >= 65
+        : c <= 102 && c >= 97;
     if (!ok) {
       break;
     }
@@ -633,22 +633,22 @@ String? identifier(State<String> state) {
   state.ok = state.pos < source.length;
   if (state.ok) {
     final c = source.codeUnitAt(state.pos++);
-    state.ok = c <= 57
-        ? c >= 48
-        : c <= 90
-            ? c >= 65
-            : c < 97
-                ? c == 95
-                : c <= 122;
+    state.ok = c <= 90
+        ? c <= 57
+            ? c >= 48
+            : c >= 65
+        : c <= 95
+            ? c == 95
+            : c <= 122 && c >= 97;
     if (state.ok) {
       while (state.pos < source.length) {
         final pos = state.pos;
         final c = source.codeUnitAt(state.pos++);
-        state.ok = c <= 57
-            ? c >= 48
-            : c <= 90
-                ? c >= 65
-                : c <= 122 && c >= 97;
+        state.ok = c <= 90
+            ? c <= 57
+                ? c >= 48
+                : c >= 65
+            : c <= 122 && c >= 97;
         if (!state.ok) {
           state.pos = pos;
           break;
@@ -1076,7 +1076,7 @@ int? noneOfC16(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.readRune(state);
-    state.ok = c != 80;
+    state.ok = !(c == 80);
     if (state.ok) {
       $0 = c;
     } else {
@@ -1130,7 +1130,7 @@ int? noneOfC32(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.readRune(state);
-    state.ok = c != 119296;
+    state.ok = !(c == 119296);
     if (state.ok) {
       $0 = c;
     } else {
