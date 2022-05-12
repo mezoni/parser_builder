@@ -9,7 +9,6 @@ part 'src/combinator/calculate.dart';
 part 'src/combinator/consumed.dart';
 part 'src/combinator/eof.dart';
 part 'src/combinator/fast.dart';
-part 'src/combinator/handle.dart';
 part 'src/combinator/lookahead.dart';
 part 'src/combinator/map1.dart';
 part 'src/combinator/not.dart';
