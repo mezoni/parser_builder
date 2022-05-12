@@ -93,7 +93,7 @@ class BinarySearchBuilder {
 
     final left = _buildExpression(name, less);
     final right = _buildExpression(name, greater);
-    final result = '$right || $left';
+    final result = '($right) || ($left)';
     return result;
   }
 
