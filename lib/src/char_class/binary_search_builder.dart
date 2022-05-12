@@ -13,24 +13,16 @@ class BinarySearchBuilder {
     }
 
     if (negate) {
-      if (ranges.length < 2) {
+      if (ranges.length == 1) {
         final range1 = ranges[0];
         final start1 = range1.start;
         final end1 = range1.end;
         final isSimple1 = start1 == end1;
-        if (data.length == 1) {
+        if (ranges.length == 1) {
           if (isSimple1) {
             return '$name != $end1';
           } else {
             return '$name < $start1 || $name > $end1';
-          }
-        } else if (data.length == 1) {
-          final range2 = ranges[1];
-          final start2 = range2.start;
-          final end2 = range2.end;
-          final single2 = start2 == end2;
-          if (isSimple1 && single2) {
-            return '$name != $end1 || $name != $end2';
           }
         }
       }
@@ -65,6 +57,7 @@ class BinarySearchBuilder {
           return result;
         } else if (element2 is Range) {
           final result = _buildTriple(name, element1, element2, greater);
+          // TODO Not tested
           return result;
         }
       }
@@ -87,13 +80,15 @@ class BinarySearchBuilder {
       final isSimple = start == end;
       final op = isSimple ? '==' : '<=';
       final right = _buildExpression(name, less);
-      final result = '$name >= $end ? $name $op $start : $right';
+      final result = '$name >= $start ? $name $op $end : $right';
+      // TODO Not tested
       return result;
     }
 
     final left = _buildExpression(name, less);
     final right = _buildExpression(name, greater);
     final result = '($right) || ($left)';
+    // TODO Not tested
     return result;
   }
 
@@ -142,37 +137,35 @@ class BinarySearchBuilder {
     }
   }
 
-  String _buildTriple(String name, less, middle, greater) {
-    if (middle is Range) {
-      final start = middle.start;
-      final end = middle.end;
-      final op = start == end ? '==' : '>=';
-      final tail = '$name $op $start';
-      var temp = const [];
-      if (less is List) {
-        if (less.length == 2) {
-          temp = [
-            less[0],
-            [less[1], tail]
-          ];
-        } else if (less.length == 3) {
-          temp = [
-            less[0],
-            less[1],
-            [less[2], tail]
-          ];
-        }
-      } else if (less is Range) {
-        temp = [less, tail];
+  String _buildTriple(String name, less, Range middle, greater) {
+    final start = middle.start;
+    final end = middle.end;
+    final op = start == end ? '==' : '>=';
+    final tail = '$name $op $start';
+    var temp = const [];
+    if (less is List) {
+      if (less.length == 2) {
+        temp = [
+          less[0],
+          [less[1], tail]
+        ];
+      } else if (less.length == 3) {
+        temp = [
+          less[0],
+          less[1],
+          [less[2], tail]
+        ];
       }
+    } else if (less is Range) {
+      temp = [less, tail];
+    }
 
-      if (temp.isNotEmpty) {
-        less = temp;
-        final left = _buildExpression(name, less);
-        final right = _buildExpression(name, greater);
-        final result = '$name <= $end ? $left : $right';
-        return result;
-      }
+    if (temp.isNotEmpty) {
+      less = temp;
+      final left = _buildExpression(name, less);
+      final right = _buildExpression(name, greater);
+      final result = '$name <= $end ? $left : $right';
+      return result;
     }
 
     _error([less, middle, greater]);
