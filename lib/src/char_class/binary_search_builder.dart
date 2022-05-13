@@ -29,7 +29,7 @@ class BinarySearchBuilder {
     }
 
     final expression = _plunge(ranges, 0, ranges.length - 1);
-    final result = _buildExpression(name, expression);
+    final result = _build(name, expression);
     if (negate) {
       return '!($result)';
     }
@@ -37,94 +37,91 @@ class BinarySearchBuilder {
     return result;
   }
 
-  String _buildDouble(String name, less, greater) {
-    if (less is Range) {
-      final start = less.start;
-      final end = less.end;
+  String _build(String name, _Ranges ranges) {
+    switch (ranges.kind) {
+      case _RangesKind.double:
+        final double = ranges as _Double;
+        final result = _buildDouble(name, double);
+        return result;
+      case _RangesKind.half:
+        final half = ranges as _Half;
+        final result = _buildHalf(name, half);
+        return result;
+      case _RangesKind.single:
+        final single = ranges as _Single;
+        final result = _buildSingle(name, single);
+        return result;
+      case _RangesKind.triple:
+        final triple = ranges as _Triple;
+        final result = _buildTriple(name, triple);
+        return result;
+    }
+  }
+
+  String _buildDouble(String name, _Double double) {
+    final less = double.less;
+    final greater = double.greater;
+    if (less is _Single) {
+      final range = less.range;
+      final start = range.start;
+      final end = range.end;
       final isSimple = start == end;
       final op = isSimple ? '==' : '>=';
-      final right = _buildExpression(name, greater);
+      final right = _build(name, greater);
       final result = '$name <= $end ? $name $op $start : $right';
       return result;
     }
 
-    if (less is List) {
-      if (less.length == 2) {
-        final element1 = less[0];
-        final element2 = less[1];
-        if (element1 is Range) {
-          final result = _buildDouble(name, element1, [element2, greater]);
-          return result;
-        } else if (element2 is Range) {
-          final result = _buildTriple(name, element1, element2, greater);
-          // TODO Not tested
-          return result;
-        }
-      }
-
-      if (less.length == 3) {
-        final element1 = less[0];
-        final element2 = less[1];
-        final element3 = less[2];
-        if (element2 is Range) {
-          final result =
-              _buildTriple(name, element1, element2, [element3, greater]);
-          return result;
-        }
+    if (less is _Double) {
+      final element1 = less.less;
+      final element2 = less.greater;
+      if (element1 is _Single) {
+        final result =
+            _buildDouble(name, _Double(element1, _Double(element2, greater)));
+        return result;
+      } else if (element2 is _Single) {
+        final result = _buildTriple(name, _Triple(element1, element2, greater));
+        return result;
       }
     }
 
-    if (greater is Range) {
-      final start = greater.start;
-      final end = greater.end;
+    if (less is _Triple) {
+      final element1 = less.less;
+      final element2 = less.middle;
+      final element3 = less.greater;
+      final result = _buildTriple(
+          name, _Triple(element1, element2, _Double(element3, greater)));
+      return result;
+    }
+
+    if (greater is _Single) {
+      final range = greater.range;
+      final start = range.start;
+      final end = range.end;
       final isSimple = start == end;
       final op = isSimple ? '==' : '<=';
-      final right = _buildExpression(name, less);
+      final right = _build(name, less);
       final result = '$name >= $start ? $name $op $end : $right';
       // TODO Not tested
       return result;
     }
 
-    final left = _buildExpression(name, less);
-    final right = _buildExpression(name, greater);
+    final left = _build(name, less);
+    final right = _build(name, greater);
     final result = '($right) || ($left)';
     // TODO Not tested
     return result;
   }
 
-  String _buildExpression(String name, expression) {
-    if (expression is String) {
-      return expression;
-    }
-
-    if (expression is Range) {
-      final result = _buildSingle(name, expression);
-      return result;
-    }
-
-    if (expression is List) {
-      if (expression.length == 2) {
-        final less = expression[0];
-        final greater = expression[1];
-        final result = _buildDouble(name, less, greater);
-        return result;
-      }
-
-      if (expression.length == 3) {
-        final less = expression[0];
-        final middle = expression[1];
-        final greater = expression[2];
-        if (middle is Range) {
-          final result = _buildTriple(name, less, middle, greater);
-          return result;
-        }
-      }
-    }
-
-    _error(expression);
+  String _buildHalf(String name, _Half half) {
+    final operator = half.operator;
+    final value = half.value;
+    final result = '$name $operator $value';
+    return result;
   }
 
-  String _buildSingle(String name, Range range) {
+  String _buildSingle(String name, _Single single) {
+    final range = single.range;
     final start = range.start;
     final end = range.end;
     final isEqual = start == end;
@@ -137,64 +134,56 @@ class BinarySearchBuilder {
     }
   }
 
-  String _buildTriple(String name, less, Range middle, greater) {
-    final start = middle.start;
-    final end = middle.end;
-    final op = start == end ? '==' : '>=';
-    final tail = '$name $op $start';
-    var temp = const [];
-    if (less is List) {
-      if (less.length == 2) {
-        temp = [
-          less[0],
-          [less[1], tail]
-        ];
-      } else if (less.length == 3) {
-        temp = [
-          less[0],
-          less[1],
-          [less[2], tail]
-        ];
-      }
-    } else if (less is Range) {
-      temp = [less, tail];
+  String _buildTriple(String name, _Triple triple) {
+    var less = triple.less;
+    final middle = triple.middle;
+    var greater = triple.greater;
+    final range = middle.range;
+    final start = range.start;
+    final end = range.end;
+    final operator = start == end ? '==' : '>=';
+    final tail = _Half(start, operator);
+    if (less is _Single) {
+      less = _Double(less, tail);
+    } else if (less is _Double) {
+      less = _Double(less.less, _Double(less.greater, tail));
+    } else if (less is _Triple) {
+      less = _Triple(less.less, less.middle, _Double(less.greater, tail));
+    } else {
+      _error(triple);
     }
 
-    if (temp.isNotEmpty) {
-      less = temp;
-      final left = _buildExpression(name, less);
-      final right = _buildExpression(name, greater);
-      final result = '$name <= $end ? $left : $right';
-      return result;
-    }
-
-    _error([less, middle, greater]);
+    final left = _build(name, less);
+    final right = _build(name, greater);
+    final result = '$name <= $end ? $left : $right';
+    return result;
   }
 
-  Never _error(expression) {
+  Never _error(_Ranges expression) {
     throw StateError('Unable to build expression\nExpression: $expression');
   }
 
-  dynamic _plunge(List<Range> ranges, int min, int max) {
+  _Ranges _plunge(List<Range> ranges, int min, int max) {
     final mid = min + (max - min) ~/ 2;
     final range = ranges[mid];
     final hasLess = min != mid;
     final hasGreater = min != max;
+    final single = _Single(range);
     if (!hasLess && !hasGreater) {
-      return range;
+      return single;
     }
 
-    final less = hasLess ? _plunge(ranges, min, mid - 1) : const <List<int>>[];
-    final geeater =
-        hasGreater ? _plunge(ranges, mid + 1, max) : const <List<int>>[];
-    if (hasGreater) {
-      if (hasLess) {
-        return [less, range, geeater];
+    if (hasLess) {
+      final less = _plunge(ranges, min, mid - 1);
+      if (hasGreater) {
+        final greater = _plunge(ranges, mid + 1, max);
+        return _Triple(less, single, greater);
       } else {
-        return [range, geeater];
+        return _Double(less, single);
       }
     } else {
-      return [less, range];
+      final greater = _plunge(ranges, mid + 1, max);
+      return _Double(single, greater);
     }
   }
 }
@@ -220,4 +209,94 @@ class Range {
   String toString() {
     return '$start..$end';
   }
+}
+
+class _Double implements _Ranges {
+  @override
+  final _RangesKind kind = _RangesKind.double;
+
+  final _Ranges greater;
+
+  final _Ranges less;
+
+  _Double(this.less, this.greater) {
+    if (less.max >= greater.min) {
+      throw ArgumentError('Lest mus be less than greater');
+    }
+  }
+
+  @override
+  int get max => greater.max;
+
+  @override
+  int get min => less.min;
+}
+
+class _Half implements _Ranges {
+  @override
+  final _RangesKind kind = _RangesKind.half;
+
+  String operator;
+
+  int value;
+
+  _Half(this.value, this.operator);
+
+  @override
+  int get max => value;
+
+  @override
+  int get min => value;
+}
+
+abstract class _Ranges {
+  _RangesKind get kind;
+
+  int get max;
+
+  int get min;
+}
+
+enum _RangesKind { double, half, single, triple }
+
+class _Single implements _Ranges {
+  @override
+  final _RangesKind kind = _RangesKind.single;
+
+  final Range range;
+
+  _Single(this.range);
+
+  @override
+  int get max => range.end;
+
+  @override
+  int get min => range.start;
+}
+
+class _Triple implements _Ranges {
+  @override
+  final _RangesKind kind = _RangesKind.triple;
+
+  final _Ranges greater;
+
+  final _Ranges less;
+
+  final _Single middle;
+
+  _Triple(this.less, this.middle, this.greater) {
+    if (less.max >= middle.range.start) {
+      throw ArgumentError('Lest mus be less than middle');
+    }
+
+    if (middle.range.end >= greater.min) {
+      throw ArgumentError('Middle mus be less than greater');
+    }
+  }
+
+  @override
+  int get max => greater.max;
+
+  @override
+  int get min => less.min;
 }
