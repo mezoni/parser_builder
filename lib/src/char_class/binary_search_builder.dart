@@ -102,14 +102,12 @@ class BinarySearchBuilder {
       final op = isSimple ? '==' : '<=';
       final right = _build(name, less);
       final result = '$name >= $start ? $name $op $end : $right';
-      // TODO Not tested
       return result;
     }
 
     final left = _build(name, less);
     final right = _build(name, greater);
     final result = '($right) || ($left)';
-    // TODO Not tested
     return result;
   }
 
@@ -150,17 +148,13 @@ class BinarySearchBuilder {
     } else if (less is _Triple) {
       less = _Triple(less.less, less.middle, _Double(less.greater, tail));
     } else {
-      _error(triple);
+      throw StateError('Unable to build expression\nExpression: $triple');
     }
 
     final left = _build(name, less);
     final right = _build(name, greater);
     final result = '$name <= $end ? $left : $right';
     return result;
-  }
-
-  Never _error(_Ranges expression) {
-    throw StateError('Unable to build expression\nExpression: $expression');
   }
 
   _Ranges _plunge(List<Range> ranges, int min, int max) {

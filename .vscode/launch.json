@@ -42,6 +42,12 @@
             "type": "dart",
             "request": "launch",
             "program": "test/test_chars_parser.dart"
+        },
+        {
+            "name": "test_binary_search_builder.dart",
+            "type": "dart",
+            "request": "launch",
+            "program": "test/test_binary_search_builder.dart"
         }
     ]
 }
