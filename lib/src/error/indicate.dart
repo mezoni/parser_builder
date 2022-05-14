@@ -16,8 +16,8 @@ if (state.ok) {
   {{res0}} = {{res1}};
 } else {
   final pos = state.lastErrorPos;
-  final length = state.pos - pos;
-  state.fail(pos, ParseError.message, length, {{message}});
+  final length = pos - state.pos;
+  state.fail(pos, ParseError.message, length, {{message}}, state.pos);
 }
 state.restoreLastErrorPos({{last}});''';
 

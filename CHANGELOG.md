@@ -1,3 +1,8 @@
+## 2.0.16
+
+- Implemented the ability to register errors with a position less than the current error position. The error is registered at the current position, but with the actual location of the error (as an optional parameter). In particular, it allows errors such as `unterminated` to be elegantly registered when it is no longer possible to register the start position because the current position is at the end of the file (at a position farther away)
+- Breaking change. Errors can no longer be registered with a negative `length` value
+
 ## 2.0.15
 
 - Minor improvements in `BinarySearchBuilder`. Also `untestable` sections of the code were tested. That is, those cases are practically not achievable, but theoretically this has not been proven
