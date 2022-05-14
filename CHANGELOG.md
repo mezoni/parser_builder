@@ -1,3 +1,7 @@
+## 2.0.15
+
+- Minor improvements in `BinarySearchBuilder`. Also `untestable` sections of the code were tested. That is, those cases are practically not achievable, but theoretically this has not been proven
+
 ## 2.0.14
 
 - Fixed bug in binary search code builder
