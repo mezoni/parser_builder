@@ -305,10 +305,10 @@ num? number(State<String> state) {
     }
     if (state.ok) {
       _ws(state);
-    }
-    if (!state.ok) {
-      $0 = null;
-      state.pos = $pos1;
+      if (!state.ok) {
+        $0 = null;
+        state.pos = $pos1;
+      }
     }
     if (state.ok) {
       state.ok = state.pos >= source.length;
@@ -316,10 +316,10 @@ num? number(State<String> state) {
         state.fail(state.pos, ParseError.expected, 0, 'EOF');
       }
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }

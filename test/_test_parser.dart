@@ -393,10 +393,10 @@ int? delimited(State<String> state) {
     if (state.ok) {
       char16(state);
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -1005,9 +1005,6 @@ String? memoizeC16C32OrC16(State<String> state) {
   }
   if (state.ok) {
     char32(state);
-    if (state.ok) {
-      //
-    }
   }
   if (!state.ok) {
     state.pos = $pos1;
@@ -1270,10 +1267,9 @@ Tuple2<int, int>? pairC16C32(State<String> state) {
     $2 = char32(state);
     if (state.ok) {
       $0 = Tuple2($1!, $2!);
+    } else {
+      state.pos = $pos;
     }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
   }
   return $0;
 }
@@ -1402,10 +1398,9 @@ int? precededC16C32(State<String> state) {
     } else {
       state.fail(state.pos, ParseError.expected, 0, 119296);
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -1420,9 +1415,6 @@ String? recognize3C32AbcC16(State<String> state) {
     tagAbc(state);
     if (state.ok) {
       char16(state);
-      if (state.ok) {
-        //
-      }
     }
   }
   if (!state.ok) {
@@ -2137,10 +2129,10 @@ int? terminated(State<String> state) {
   $0 = char16(state);
   if (state.ok) {
     char32(state);
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }

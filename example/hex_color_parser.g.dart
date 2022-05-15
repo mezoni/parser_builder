@@ -78,10 +78,9 @@ Color? _hexColor(State<String> state) {
     if (!state.ok) {
       state.pos = $pos1;
     }
-  }
-  if (!state.ok) {
-    $1 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
   }
   state.log = $log;
   if (state.ok) {

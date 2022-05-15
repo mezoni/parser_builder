@@ -1,3 +1,9 @@
+## 2.0.17
+
+- The following parser builders now generate more optimized code: `Delimited`, `Pair`, `Preceded`, `Terminated`
+- The following parser builders now generate more optimized code in fast mode: `Map2-MapN`, `Tuple-TupleN`
+- The following parser builders now generate more optimized code: `Fast2-FastN`
+
 ## 2.0.16
 
 - Implemented the ability to register errors with a position less than the current error position. The error is registered at the current position, but with the actual location of the error (as an optional parameter). In particular, it allows errors such as `unterminated` to be elegantly registered when it is no longer possible to register the start position because the current position is at the end of the file (at a position farther away)

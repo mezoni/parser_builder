@@ -9,10 +9,10 @@ if (state.ok) {
   if (state.ok) {
     {{p3}}
   }
-}
-if (!state.ok) {
-  {{res0}} = null;
-  state.pos = {{pos}};
+  if (!state.ok) {
+    {{res0}} = null;
+    state.pos = {{pos}};
+  }
 }''';
 
   static const _templateFast = '''
@@ -23,9 +23,9 @@ if (state.ok) {
   if (state.ok) {
     {{p3}}
   }
-}
-if (!state.ok) {
-  state.pos = {{pos}};
+  if (!state.ok) {
+    state.pos = {{pos}};
+  }
 }''';
 
   final ParserBuilder<I, dynamic> after;

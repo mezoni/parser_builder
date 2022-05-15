@@ -21,6 +21,9 @@ if (state.ok) {
   {{next}}
 }''';
 
+  static const _templateParserLastFast = '''
+{{p1}}''';
+
   const _Sequence();
 
   @override
@@ -51,8 +54,16 @@ if (state.ok) {
         'p1': parser.build(context, r1),
         'var1': '{{var$index}}',
       };
-      final templateParser =
-          render2(!useResult, _templateParserFast, _templateParser, values);
+      final String template;
+      if (i == parsers.length - 1 && !useResult && fast) {
+        template = _templateParserLastFast;
+      } else if (useResult) {
+        template = _templateParser;
+      } else {
+        template = _templateParserFast;
+      }
+
+      final templateParser = render(template, values);
       values.clear();
       values.addAll({
         'next': templateParser,

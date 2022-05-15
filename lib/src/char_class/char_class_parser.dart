@@ -69,10 +69,9 @@ int? _hex(State<String> state) {
   }
   if (state.ok) {
     $0 = _hexVal(state);
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -123,10 +122,9 @@ int? _rangeChar(State<String> state) {
     } else {
       state.fail(state.pos, ParseError.character, 0, 0);
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -224,10 +222,10 @@ int? _char(State<String> state) {
         state.fail(state.pos, ParseError.expected, 0, '"');
       }
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -265,10 +263,10 @@ List<Tuple2<int, int>>? _range(State<String> state) {
         state.fail(state.pos, ParseError.expected, 0, ']');
       }
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   if (!state.ok) {
     int? $2;
@@ -295,9 +293,9 @@ void _verbar(State<String> state) {
   }
   if (state.ok) {
     _ws(state);
-  }
-  if (!state.ok) {
-    state.pos = $pos;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
   }
 }
 
@@ -312,10 +310,10 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
     $2 = _range(state);
     if (state.ok) {
       _ws(state);
-    }
-    if (!state.ok) {
-      $2 = null;
-      state.pos = $pos1;
+      if (!state.ok) {
+        $2 = null;
+        state.pos = $pos1;
+      }
     }
     if (!state.ok) {
       state.pos = $pos;
@@ -352,10 +350,10 @@ List<Tuple2<int, int>>? parse(State<String> state) {
         state.fail(state.pos, ParseError.expected, 0, 'EOF');
       }
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }

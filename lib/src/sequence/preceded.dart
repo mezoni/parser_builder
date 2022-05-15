@@ -6,10 +6,9 @@ final {{pos}} = state.pos;
 {{p1}}
 if (state.ok) {
   {{p2}}
-}
-if (!state.ok) {
-  {{res0}} = null;
-  state.pos = {{pos}};
+  if (!state.ok) {
+    state.pos = {{pos}};
+  }
 }''';
 
   static const _templateFast = '''
@@ -17,9 +16,9 @@ final {{pos}} = state.pos;
 {{p1}}
 if (state.ok) {
   {{p2}}
-}
-if (!state.ok) {
-  state.pos = {{pos}};
+  if (!state.ok) {
+    state.pos = {{pos}};
+  }
 }''';
 
   final ParserBuilder<I, dynamic> precede;

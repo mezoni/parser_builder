@@ -44,10 +44,10 @@ num? _parse(State<String> state) {
     if (!state.ok) {
       state.fail(state.pos, ParseError.expected, 0, 'EOF');
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -89,16 +89,16 @@ num? _numberImpl(State<String> state) {
     }
     if (state.ok) {
       _digit1(state);
-    }
-    if (!state.ok) {
-      state.pos = $pos2;
+      if (!state.ok) {
+        state.pos = $pos2;
+      }
     }
     if (!state.ok) {
       state.ok = true;
     }
-  }
-  if (!state.ok) {
-    state.pos = $pos1;
+    if (!state.ok) {
+      state.pos = $pos1;
+    }
   }
   if (state.ok) {
     $2 = source.slice($pos, state.pos);
@@ -139,10 +139,10 @@ num? _number(State<String> state) {
   $0 = _numberImpl(state);
   if (state.ok) {
     _ws(state);
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -158,9 +158,9 @@ void _openParen(State<String> state) {
   }
   if (state.ok) {
     _ws(state);
-  }
-  if (!state.ok) {
-    state.pos = $pos;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
   }
 }
 
@@ -175,9 +175,9 @@ void _closeParen(State<String> state) {
   }
   if (state.ok) {
     _ws(state);
-  }
-  if (!state.ok) {
-    state.pos = $pos;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
   }
 }
 
@@ -195,10 +195,10 @@ num? _primary(State<String> state) {
       if (state.ok) {
         _closeParen(state);
       }
-    }
-    if (!state.ok) {
-      $1 = null;
-      state.pos = $pos;
+      if (!state.ok) {
+        $1 = null;
+        state.pos = $pos;
+      }
     }
   }
   state.minErrorPos = $min;
@@ -243,10 +243,10 @@ String? _multiplicativeOperator(State<String> state) {
   }
   if (state.ok) {
     _ws(state);
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -313,10 +313,10 @@ String? _additiveOperator(State<String> state) {
   }
   if (state.ok) {
     _ws(state);
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }

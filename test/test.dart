@@ -1885,6 +1885,15 @@ void _testPair() {
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
     }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 0);
+      expect(state.errors, [ParseError(0, 0, "Expected: '$s16'")]);
+    }
   });
 }
 

@@ -87,8 +87,7 @@ const _escapeSeq = EscapeSequence({
 
 const _inline = '@pragma(\'vm:prefer-inline\')';
 
-const _isNormalChar = ExpressionAction<bool>(
-    ['x'], '{{x}} >= 0x20 && {{x}} != 0x22 && {{x}} != 0x5c');
+const _isNormalChar = CharClass('[#x20-#x21] | [#x23-#x5b] | [#x5d-#x10ffff]');
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 

@@ -2,15 +2,14 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 2.0.16
+Version: 2.0.17
 
-Early release version (not all built-in common buildres are implemented but can be used without them).  
-It is under development, but you can already play around. An example of a working JSON parser is included.  
+It is under development (not all built-in common buildres are implemented but can be used without them), but you can already play around.  
 
 At the moment, the implementation of useful built-in common parser builders is underway.
 
 The build system is already implemented and ready to use and you can try it out in action. Rewrite your existing parser and feel the difference!  
-Attention, the generated combinations of parsers are very small and very efficient.  
+The generated combinations of parsers are very small and very efficient.  
 Ask questions if something is not clear.  
 
 ## First advantage
@@ -47,6 +46,11 @@ The author of this software is also not such and is a simple person.
 It's just a simple but handy thing.  
 Use it and don't worry about it stopping working.  
 This software is already so simple that it couldn't be easier.
+
+## Projects using parser builder
+
+- [fast_csv](https://pub.dev/packages/fast_csv)
+- [fast_json](https://pub.dev/packages/fast_json)
 
 ## Included parser builders
 
@@ -155,10 +159,6 @@ built-in:
 - [`CharClass`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_class.dart)
 - [`CharClasses`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/char_classes.dart)
 - [`NotCharClass`](https://github.com/mezoni/parser_builder/blob/master/lib/src/transformers/not_char_class.dart)
-
-## Projects using parser builder
-
-- [fast_csv](https://pub.dev/packages/fast_csv)
 
 ## How to start write your parser?
 
