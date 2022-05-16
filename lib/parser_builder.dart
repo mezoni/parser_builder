@@ -8,5 +8,6 @@ part 'src/parser_builder/marked.dart';
 part 'src/parser_builder/named.dart';
 part 'src/parser_builder/parser_builder.dart';
 part 'src/parser_builder/ref.dart';
+part 'src/parser_builder/results.dart';
 part 'src/parser_builder/runtime.dart';
 part 'src/parser_builder/semantic_action.dart';

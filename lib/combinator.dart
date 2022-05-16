@@ -1,5 +1,4 @@
 import 'package:meta/meta.dart';
-import 'package:tuple/tuple.dart' as tuple;
 
 import 'builder_helper.dart' as helper;
 import 'parser_builder.dart';

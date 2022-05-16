@@ -1,7 +1,6 @@
 import 'package:source_span/source_span.dart';
-import 'package:tuple/tuple.dart';
 
-List<Tuple2<int, int>> parseString(String source) {
+List<Result2<int, int>> parseString(String source) {
   final state = State(source);
   final result = parse(state);
   if (!state.ok) {
@@ -138,8 +137,8 @@ int? _hexOrRangeChar(State<String> state) {
   return $0;
 }
 
-Tuple2<int, int>? _rangeBody(State<String> state) {
-  Tuple2<int, int>? $0;
+Result2<int, int>? _rangeBody(State<String> state) {
+  Result2<int, int>? $0;
   final source = state.source;
   final $pos = state.pos;
   int? $1;
@@ -155,7 +154,7 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
       int? $2;
       $2 = _hexOrRangeChar(state);
       if (state.ok) {
-        $0 = Tuple2($1!, $2!);
+        $0 = Result2($1!, $2!);
       }
     }
   }
@@ -167,14 +166,14 @@ Tuple2<int, int>? _rangeBody(State<String> state) {
     $3 = _hex(state);
     if (state.ok) {
       final v = $3!;
-      $0 = Tuple2(v, v);
+      $0 = Result2(v, v);
     }
     if (!state.ok) {
       int? $4;
       $4 = _rangeChar(state);
       if (state.ok) {
         final v = $4!;
-        $0 = Tuple2(v, v);
+        $0 = Result2(v, v);
       }
     }
   }
@@ -230,8 +229,8 @@ int? _char(State<String> state) {
   return $0;
 }
 
-List<Tuple2<int, int>>? _range(State<String> state) {
-  List<Tuple2<int, int>>? $0;
+List<Result2<int, int>>? _range(State<String> state) {
+  List<Result2<int, int>>? $0;
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
@@ -241,9 +240,9 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     state.fail(state.pos, ParseError.expected, 0, '[');
   }
   if (state.ok) {
-    var $list = <Tuple2<int, int>>[];
+    var $list = <Result2<int, int>>[];
     while (true) {
-      Tuple2<int, int>? $1;
+      Result2<int, int>? $1;
       $1 = _rangeBody(state);
       if (!state.ok) {
         break;
@@ -276,7 +275,7 @@ List<Tuple2<int, int>>? _range(State<String> state) {
     }
     if (state.ok) {
       final v = $2!;
-      $0 = [Tuple2(v, v)];
+      $0 = [Result2(v, v)];
     }
   }
   return $0;
@@ -299,13 +298,13 @@ void _verbar(State<String> state) {
   }
 }
 
-List<Tuple2<int, int>>? _ranges(State<String> state) {
-  List<Tuple2<int, int>>? $0;
-  List<List<Tuple2<int, int>>>? $1;
+List<Result2<int, int>>? _ranges(State<String> state) {
+  List<Result2<int, int>>? $0;
+  List<List<Result2<int, int>>>? $1;
   var $pos = state.pos;
-  final $list = <List<Tuple2<int, int>>>[];
+  final $list = <List<Result2<int, int>>>[];
   while (true) {
-    List<Tuple2<int, int>>? $2;
+    List<Result2<int, int>>? $2;
     final $pos1 = state.pos;
     $2 = _range(state);
     if (state.ok) {
@@ -332,13 +331,13 @@ List<Tuple2<int, int>>? _ranges(State<String> state) {
   }
   if (state.ok) {
     final v = $1!;
-    $0 = _flatten(v, <Tuple2<int, int>>[]);
+    $0 = _flatten(v, <Result2<int, int>>[]);
   }
   return $0;
 }
 
-List<Tuple2<int, int>>? parse(State<String> state) {
-  List<Tuple2<int, int>>? $0;
+List<Result2<int, int>>? parse(State<String> state) {
+  List<Result2<int, int>>? $0;
   final source = state.source;
   final $pos = state.pos;
   _ws(state);
@@ -388,6 +387,20 @@ String _errorMessage(String source, List<ParseError> errors,
   }
 
   return sb.toString();
+}
+
+class Result2<T0, T1> {
+  final T0 $0;
+  final T1 $1;
+
+  Result2(this.$0, this.$1);
+
+  @override
+  int get hashCode => $0.hashCode ^ $1.hashCode;
+
+  @override
+  bool operator ==(other) =>
+      other is Result2 && other.$0 == $0 && other.$1 == $1;
 }
 
 class ParseError {

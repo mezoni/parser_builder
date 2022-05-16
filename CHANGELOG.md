@@ -1,3 +1,7 @@
+## 2.0.18
+
+- Breaking change. On the way to generating parsers without dependencies, the use of the `tuple` package has been stopped. Now the `Result2`-`Result7` classes are generated on demand. These changes require minor changes to the parser definitions. The next step is to remove the dependency on the `source_span` package
+
 ## 2.0.17
 
 - The following parser builders now generate more optimized code: `Delimited`, `Pair`, `Preceded`, `Terminated`

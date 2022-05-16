@@ -6,7 +6,6 @@ import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
-import 'package:tuple/tuple.dart' as _t;
 
 Future<void> main(List<String> args) async {
   final context = Context();
@@ -50,7 +49,6 @@ int _toHexValue(String s) {
 
 const __header = r'''
 import 'package:source_span/source_span.dart';
-import 'package:tuple/tuple.dart';
 
 ''';
 
@@ -58,8 +56,8 @@ const _char = Named('_char', Delimited(Tag('"'), _charCode, Tag('"')));
 
 const _charCode = Named('_charCode', Satisfy(_isAscii));
 
-const _flatten = ExpressionAction<List<_t.Tuple2<int, int>>>(
-    ['x'], '_flatten({{x}}, <Tuple2<int, int>>[])');
+const _flatten = ExpressionAction<List<Result2<int, int>>>(
+    ['x'], '_flatten({{x}}, <Result2<int, int>>[])');
 
 const _hex = Named('_hex', Preceded(Tag('#x'), _hexVal));
 
@@ -68,7 +66,7 @@ const _hexOrRangeChar = Named('_hexOrRangeChar', Alt([_hex, _rangeChar]));
 const _hexVal = Named('_hexVal', Map1(TakeWhile1(_isHexDigit), _toHexValue));
 
 const _intToTuple2 =
-    ExpressionAction<_t.Tuple2<int, int>>(['x'], 'Tuple2({{x}}, {{x}})');
+    ExpressionAction<Result2<int, int>>(['x'], 'Result2({{x}}, {{x}})');
 
 const _isAscii = ExpressionAction<bool>(['x'], '{{x}} >= 0x20 && {{x}} < 0x7f');
 
@@ -83,10 +81,10 @@ const _parse = Named('parse', Delimited(_ws, _ranges, Eof<String>()));
 
 const _range = Named(
     '_range',
-    Alt<String, List<_t.Tuple2<int, int>>>([
+    Alt<String, List<Result2<int, int>>>([
       Delimited(Tag('['), Many1(_rangeBody), Tag(']')),
       Map1(Alt([_char, _hex]),
-          ExpressionAction(['x'], ('[Tuple2({{x}}, {{x}})]'))),
+          ExpressionAction(['x'], ('[Result2({{x}}, {{x}})]'))),
     ]));
 
 const _rangeBody = Named(

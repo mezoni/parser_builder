@@ -122,8 +122,6 @@ const s16 = 'P';
 const s32 = '𝈀';
 
 const __header = r'''
-import 'package:tuple/tuple.dart';
-
 int _toBinary(int left, String operator, int right) {
   switch (operator) {
     case '+':

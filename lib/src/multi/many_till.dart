@@ -1,6 +1,6 @@
 part of '../../multi.dart';
 
-class ManyTill<I, O1, O2> extends ParserBuilder<I, tuple.Tuple2<List<O1>, O2>> {
+class ManyTill<I, O1, O2> extends ParserBuilder<I, Result2<List<O1>, O2>> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{list}} = <{{O1}}>[];
@@ -8,7 +8,7 @@ while (true) {
   {{var1}}
   {{p1}}
   if (state.ok) {
-    {{res0}} = Tuple2({{list}}, {{val1}});
+    {{res0}} = Result2({{list}}, {{val1}});
     break;
   }
   {{var2}}
@@ -42,6 +42,7 @@ while (true) {
 
   @override
   String build(Context context, ParserResult? result) {
+    ParseRuntime.addResultClass(context, 2);
     final fast = result == null;
     final values = context.allocateLocals(['list', 'pos']);
     final r1 = context.getResult(end, !fast);

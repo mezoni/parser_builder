@@ -1,5 +1,3 @@
-import 'package:tuple/tuple.dart';
-
 int _toBinary(int left, String operator, int right) {
   switch (operator) {
     case '+':
@@ -352,8 +350,8 @@ String? tagAbc(State<String> state) {
   return $0;
 }
 
-Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
-  Tuple2<String, List<String>>? $0;
+Result2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
+  Result2<String, List<String>>? $0;
   final source = state.source;
   final $pos = state.pos;
   List<String>? $1;
@@ -379,7 +377,7 @@ Tuple2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   }
   if (state.ok) {
     final v = source.slice($pos, state.pos);
-    $0 = Tuple2(v, $1!);
+    $0 = Result2(v, $1!);
   }
   return $0;
 }
@@ -842,8 +840,8 @@ List<int>? manyNC32_2(State<String> state) {
   return $0;
 }
 
-Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
-  Tuple2<List<String>, String>? $0;
+Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
+  Result2<List<String>, String>? $0;
   final source = state.source;
   final $pos = state.pos;
   final $list = <String>[];
@@ -859,7 +857,7 @@ Tuple2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       state.fail(state.pos, ParseError.expected, 0, 'abc');
     }
     if (state.ok) {
-      $0 = Tuple2($list, $1!);
+      $0 = Result2($list, $1!);
       break;
     }
     String? $2;
@@ -1257,8 +1255,8 @@ String? optAbc(State<String> state) {
   return $0;
 }
 
-Tuple2<int, int>? pairC16C32(State<String> state) {
-  Tuple2<int, int>? $0;
+Result2<int, int>? pairC16C32(State<String> state) {
+  Result2<int, int>? $0;
   final $pos = state.pos;
   int? $1;
   $1 = char16(state);
@@ -1266,7 +1264,7 @@ Tuple2<int, int>? pairC16C32(State<String> state) {
     int? $2;
     $2 = char32(state);
     if (state.ok) {
-      $0 = Tuple2($1!, $2!);
+      $0 = Result2($1!, $2!);
     } else {
       state.pos = $pos;
     }
@@ -1588,8 +1586,8 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
   return $0;
 }
 
-Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
-  Tuple2<int, int>? $0;
+Result2<int, int>? separatedPairC16AbcC32(State<String> state) {
+  Result2<int, int>? $0;
   final source = state.source;
   final $pos = state.pos;
   int? $1;
@@ -1620,7 +1618,7 @@ Tuple2<int, int>? separatedPairC16AbcC32(State<String> state) {
         state.fail(state.pos, ParseError.expected, 0, 119296);
       }
       if (state.ok) {
-        $0 = Tuple2($1!, $2!);
+        $0 = Result2($1!, $2!);
       }
     }
   }
@@ -2143,8 +2141,8 @@ int? testRef(State<String> state) {
   return $0;
 }
 
-Tuple2<int, String>? tuple2C32Abc(State<String> state) {
-  Tuple2<int, String>? $0;
+Result2<int, String>? tuple2C32Abc(State<String> state) {
+  Result2<int, String>? $0;
   final $pos = state.pos;
   int? $1;
   $1 = char32(state);
@@ -2152,7 +2150,7 @@ Tuple2<int, String>? tuple2C32Abc(State<String> state) {
     String? $2;
     $2 = tagAbc(state);
     if (state.ok) {
-      $0 = Tuple2($1!, $2!);
+      $0 = Result2($1!, $2!);
     }
   }
   if (!state.ok) {
@@ -2161,8 +2159,8 @@ Tuple2<int, String>? tuple2C32Abc(State<String> state) {
   return $0;
 }
 
-Tuple3<int, String, int>? tuple3C32AbcC16(State<String> state) {
-  Tuple3<int, String, int>? $0;
+Result3<int, String, int>? tuple3C32AbcC16(State<String> state) {
+  Result3<int, String, int>? $0;
   final source = state.source;
   final $pos = state.pos;
   int? $1;
@@ -2181,7 +2179,7 @@ Tuple3<int, String, int>? tuple3C32AbcC16(State<String> state) {
         state.fail(state.pos, ParseError.expected, 0, 80);
       }
       if (state.ok) {
-        $0 = Tuple3($1!, $2!, $3!);
+        $0 = Result3($1!, $2!, $3!);
       }
     }
   }
@@ -2403,6 +2401,35 @@ void verifyIs3DigitFast(State<String> state) {
       state.pos = $pos;
     }
   }
+}
+
+class Result2<T0, T1> {
+  final T0 $0;
+  final T1 $1;
+
+  Result2(this.$0, this.$1);
+
+  @override
+  int get hashCode => $0.hashCode ^ $1.hashCode;
+
+  @override
+  bool operator ==(other) =>
+      other is Result2 && other.$0 == $0 && other.$1 == $1;
+}
+
+class Result3<T0, T1, T2> {
+  final T0 $0;
+  final T1 $1;
+  final T2 $2;
+
+  Result3(this.$0, this.$1, this.$2);
+
+  @override
+  int get hashCode => $0.hashCode ^ $1.hashCode ^ $2.hashCode;
+
+  @override
+  bool operator ==(other) =>
+      other is Result3 && other.$0 == $0 && other.$1 == $1 && other.$2 == $2;
 }
 
 class ParseError {

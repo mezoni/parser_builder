@@ -1,6 +1,6 @@
 part of '../../sequence.dart';
 
-class SeparatedPair<I, O1, O2> extends ParserBuilder<I, tuple.Tuple2<O1, O2>> {
+class SeparatedPair<I, O1, O2> extends ParserBuilder<I, Result2<O1, O2>> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{var1}}
@@ -11,7 +11,7 @@ if (state.ok) {
     {{var2}}
     {{p3}}
     if (state.ok) {
-      {{res0}} = Tuple2({{val1}}, {{val2}});
+      {{res0}} = Result2({{val1}}, {{val2}});
     }
   }
 }
@@ -42,6 +42,7 @@ if (!state.ok) {
 
   @override
   String build(Context context, ParserResult? result) {
+    ParseRuntime.addResultClass(context, 2);
     final fast = result == null;
     final values = context.allocateLocals(['pos']);
     final r1 = context.getResult(first, !fast);

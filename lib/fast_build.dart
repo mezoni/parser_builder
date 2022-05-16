@@ -15,6 +15,7 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
     context.globalDeclarations.clear();
     context.globalRegistry.clear();
     context.globalAllocator = context.globalAllocator.clone();
+    context.classDeclarations.clear();
     for (final parser in parsers) {
       context.localAllocator = context.localAllocator.clone();
       final result = context.getResult(parser, true);
@@ -30,6 +31,14 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
 
   if (addErrorMessageProcessor) {
     declarations.add(ParseRuntime.getErrorMessageProcessor());
+  }
+
+  final classDeclarations = context.classDeclarations;
+  final classNames = classDeclarations.keys.toList();
+  classNames.sort();
+  for (final className in classNames) {
+    final code = classDeclarations[className]!;
+    declarations.add(code);
   }
 
   declarations.addAll(ParseRuntime.getClasses());

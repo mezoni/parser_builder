@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_string_interpolations
 
 import 'package:test/test.dart';
-import 'package:tuple/tuple.dart';
 
 import '_test_parser.dart';
 
@@ -564,8 +563,8 @@ void _testConsumed() {
       final r = parser(state);
       expect(state.ok, true);
       final v = r!;
-      expect(v.item1, '$abc$s32$abc');
-      expect(v.item2, [abc, abc]);
+      expect(v.$0, '$abc$s32$abc');
+      expect(v.$1, [abc, abc]);
       expect(state.pos, 8);
     }
     {
@@ -1339,27 +1338,27 @@ void _testManyTill() {
       final state = State('$abc');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, isA<Tuple2<List<String>, String>>());
-      expect(r!.item1, <String>[]);
-      expect(r.item2, 'abc');
+      expect(r, isA<Result2<List<String>, String>>());
+      expect(r!.$0, <String>[]);
+      expect(r.$1, 'abc');
       expect(state.pos, 3);
     }
     {
       final state = State('a$abc');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, isA<Tuple2<List<String>, String>>());
-      expect(r!.item1, ['a']);
-      expect(r.item2, 'abc');
+      expect(r, isA<Result2<List<String>, String>>());
+      expect(r!.$0, ['a']);
+      expect(r.$1, 'abc');
       expect(state.pos, 4);
     }
     {
       final state = State('ab$abc');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, isA<Tuple2<List<String>, String>>());
-      expect(r!.item1, ['a', 'b']);
-      expect(r.item2, 'abc');
+      expect(r, isA<Result2<List<String>, String>>());
+      expect(r!.$0, ['a', 'b']);
+      expect(r.$1, 'abc');
       expect(state.pos, 5);
     }
     {
@@ -1873,7 +1872,7 @@ void _testPair() {
       final state = State('$s16$s32');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, Tuple2(c16, c32));
+      expect(r, Result2(c16, c32));
       expect(state.pos, 3);
     }
     {
@@ -2456,7 +2455,7 @@ void _testSeparatedPair() {
       final state = State('$s16$abc$s32');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, Tuple2(c16, c32));
+      expect(r, Result2(c16, c32));
       expect(state.pos, 6);
     }
     {
@@ -3375,7 +3374,7 @@ void _testTuple() {
       final state = State('$s32$abc');
       final r = parser1(state);
       expect(state.ok, true);
-      expect(r, Tuple2(c32, abc));
+      expect(r, Result2(c32, abc));
       expect(state.pos, 5);
     }
     {
@@ -3402,7 +3401,7 @@ void _testTuple() {
       final state = State('$s32$abc$s16');
       final r = parser2(state);
       expect(state.ok, true);
-      expect(r, Tuple3(c32, abc, c16));
+      expect(r, Result3(c32, abc, c16));
       expect(state.pos, 6);
     }
     {

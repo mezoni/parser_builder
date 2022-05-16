@@ -1,6 +1,6 @@
 part of '../../sequence.dart';
 
-class Tuple2<I, O1, O2> extends _Tuple<I, tuple.Tuple2<O1, O2>> {
+class Tuple2<I, O1, O2> extends _Tuple<I, Result2<O1, O2>> {
   final ParserBuilder<I, O1> parser1;
 
   final ParserBuilder<I, O2> parser2;
@@ -16,7 +16,7 @@ class Tuple2<I, O1, O2> extends _Tuple<I, tuple.Tuple2<O1, O2>> {
   }
 }
 
-class Tuple3<I, O1, O2, O3> extends _Tuple<I, tuple.Tuple3<O1, O2, O3>> {
+class Tuple3<I, O1, O2, O3> extends _Tuple<I, Result3<O1, O2, O3>> {
   final ParserBuilder<I, O1> parser1;
 
   final ParserBuilder<I, O2> parser2;
@@ -35,8 +35,7 @@ class Tuple3<I, O1, O2, O3> extends _Tuple<I, tuple.Tuple3<O1, O2, O3>> {
   }
 }
 
-class Tuple4<I, O1, O2, O3, O4>
-    extends _Tuple<I, tuple.Tuple4<O1, O2, O3, O4>> {
+class Tuple4<I, O1, O2, O3, O4> extends _Tuple<I, Result4<O1, O2, O3, O4>> {
   final ParserBuilder<I, O1> parser1;
 
   final ParserBuilder<I, O2> parser2;
@@ -59,7 +58,7 @@ class Tuple4<I, O1, O2, O3, O4>
 }
 
 class Tuple5<I, O1, O2, O3, O4, O5>
-    extends _Tuple<I, tuple.Tuple5<O1, O2, O3, O4, O5>> {
+    extends _Tuple<I, Result5<O1, O2, O3, O4, O5>> {
   final ParserBuilder<I, O1> parser1;
 
   final ParserBuilder<I, O2> parser2;
@@ -86,7 +85,7 @@ class Tuple5<I, O1, O2, O3, O4, O5>
 }
 
 class Tuple6<I, O1, O2, O3, O4, O5, O6>
-    extends _Tuple<I, tuple.Tuple6<O1, O2, O3, O4, O5, O6>> {
+    extends _Tuple<I, Result6<O1, O2, O3, O4, O5, O6>> {
   final ParserBuilder<I, O1> parser1;
 
   final ParserBuilder<I, O2> parser2;
@@ -116,7 +115,7 @@ class Tuple6<I, O1, O2, O3, O4, O5, O6>
 }
 
 class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
-    extends _Tuple<I, tuple.Tuple7<O1, O2, O3, O4, O5, O6, O7>> {
+    extends _Tuple<I, Result7<O1, O2, O3, O4, O5, O6, O7>> {
   final ParserBuilder<I, O1> parser1;
 
   final ParserBuilder<I, O2> parser2;
@@ -150,9 +149,17 @@ class Tuple7<I, O1, O2, O3, O4, O5, O6, O7>
 
 abstract class _Tuple<I, O> extends _Sequence<I, O> {
   static const _template = '''
-{{res0}} = Tuple{{size}}({{values}});''';
+{{res0}} = Result{{size}}({{values}});''';
 
   const _Tuple();
+
+  @override
+  String build(Context context, ParserResult? result) {
+    final parsers = _getParsers();
+    final length = parsers.length;
+    ParseRuntime.addResultClass(context, length);
+    return super.build(context, result);
+  }
 
   @override
   String _setResult(Context context, List<ParserResult> results) {

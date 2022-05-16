@@ -1,13 +1,13 @@
 part of '../../combinator.dart';
 
-class Consumed<I, O> extends ParserBuilder<I, tuple.Tuple2<I, O>> {
+class Consumed<I, O> extends ParserBuilder<I, Result2<I, O>> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{var1}}
 {{p1}}
 if (state.ok) {
   final v = source.slice({{pos}}, state.pos);
-  {{res0}} = Tuple2(v, {{val1}});
+  {{res0}} = Result2(v, {{val1}});
 }''';
 
   static const _templateFast = '''
@@ -20,6 +20,7 @@ if (state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
+    ParseRuntime.addResultClass(context, 2);
     final fast = result == null;
     final values = context.allocateLocals(['pos']);
     final r1 = context.getResult(parser, true);

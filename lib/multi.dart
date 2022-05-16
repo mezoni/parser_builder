@@ -1,5 +1,3 @@
-import 'package:tuple/tuple.dart' as tuple;
-
 import 'parser_builder.dart';
 
 part 'src/multi/fold_many0.dart';

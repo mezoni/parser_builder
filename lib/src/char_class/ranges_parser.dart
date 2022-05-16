@@ -8,22 +8,22 @@ class RangesParser {
     }
 
     for (final range in ranges) {
-      final start = range.item1;
-      final end = range.item2;
+      final start = range.$0;
+      final end = range.$1;
       if (start > end) {
         throw StateError('Invalid range ${rangeToString(start, end)}: $chars');
       }
     }
 
-    ranges.sort((x, y) => x.item1.compareTo(y.item2));
+    ranges.sort((x, y) => x.$0.compareTo(y.$1));
     final first = ranges[0];
-    final list = [first.item1, first.item2];
+    final list = [first.$0, first.$1];
     var prevStart = list[0];
     var prevEnd = list[1];
     for (var i = 1; i < ranges.length; i++) {
       final range = ranges[i];
-      final start = range.item1;
-      final end = range.item2;
+      final start = range.$0;
+      final end = range.$1;
       if (start >= prevStart && start <= prevEnd) {
         if (end > prevEnd) {
           list.last = end;
