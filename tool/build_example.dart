@@ -16,7 +16,7 @@ import 'build_json_number_parser.dart' as _json_number;
 Future<void> main(List<String> args) async {
   final context = Context();
   await fastBuild(context, [_json, _value_], 'example/example.dart',
-      footer: __footer, header: __header, publish: {'parse': _json});
+      footer: __footer, publish: {'parse': _json});
 }
 
 const __footer = r'''
@@ -42,11 +42,6 @@ int _toHexValue(String s) {
 
   return r;
 }''';
-
-const __header = r'''
-import 'package:source_span/source_span.dart';
-
-''';
 
 const _array = Named('_array', Delimited(_openBracket, _values, _closeBracket));
 
@@ -162,7 +157,7 @@ state.minErrorPos = {{min}};
 if (!state.ok) {
   state.fail(state.pos, ParseError.expected, 0, {{tag}});
   final pos = state.lastErrorPos;
-  if (pos >= source.length) {
+  if (pos != source.length) {
     state.fail(pos, ParseError.message, 0, {{message}}, state.pos);
   }
 }

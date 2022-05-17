@@ -1,3 +1,8 @@
+## 2.0.19
+
+- Minor improvements related to reducing the size of the generated code of the `built-in runtime library` for the parser. The following classes are generated only on demand: `Result2`-`Result7`, `_Memo`. Also, the size of the `State` class code is slightly reduced in the case when memoization is not used. All this does not particularly reduce the size of the code, but at the same time, it does not increase its size unnecessarily
+- Removed dependency on `source_span` package. Now the generated parsers have no dependencies
+
 ## 2.0.18
 
 - Breaking change. On the way to generating parsers without dependencies, the use of the `tuple` package has been stopped. Now the `Result2`-`Result7` classes are generated on demand. These changes require minor changes to the parser definitions. The next step is to remove the dependency on the `source_span` package

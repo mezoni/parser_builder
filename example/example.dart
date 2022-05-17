@@ -1,5 +1,3 @@
-import 'package:source_span/source_span.dart';
-
 dynamic parse(String source) {
   final state = State(source);
   final result = _json(state);
@@ -251,7 +249,7 @@ String? _string(State<String> state) {
   if (!state.ok) {
     state.fail(state.pos, ParseError.expected, 0, 'string');
     final pos = state.lastErrorPos;
-    if (pos >= source.length) {
+    if (pos != source.length) {
       state.fail(pos, ParseError.message, 0, 'Unterminated string', state.pos);
     }
   }
@@ -825,36 +823,118 @@ dynamic _value(State<String> state) {
   return $0;
 }
 
-String _errorMessage(String source, List<ParseError> errors,
-    [Object? color, int maxCount = 10, String? url]) {
-  final sb = StringBuffer();
+String _errorMessage(String source, List<ParseError> errors) {
+  final message = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
-    if (i > maxCount) {
-      break;
-    }
-
     final error = errors[i];
     final start = error.start;
-    final end = error.end + 1;
-    if (end > source.length) {
-      source += ' ' * (end - source.length);
+    final end = error.end;
+    RangeError.checkValidRange(start, end, source.length);
+    var row = 1;
+    var lineStart = 0, next = 0, pos = 0;
+    while (pos < source.length) {
+      final c = source.codeUnitAt(pos++);
+      if (c == 0xa || c == 0xd) {
+        next = c == 0xa ? 0xd : 0xa;
+        if (pos < source.length && source.codeUnitAt(pos) == next) {
+          pos++;
+        }
+
+        if (pos - 1 >= start) {
+          break;
+        }
+
+        row++;
+        lineStart = pos;
+      }
     }
 
-    final file = SourceFile.fromString(source, url: url);
-    final span = file.span(start, end);
-    if (sb.isNotEmpty) {
-      sb.writeln();
+    int max(int x, int y) => x > y ? x : y;
+    int min(int x, int y) => x < y ? x : y;
+    final sb = StringBuffer();
+    final sourceLen = source.length;
+    final totalLen = sourceLen - lineStart;
+    final lineLimit = min(80, totalLen);
+    final start2 = start;
+    final end2 = min(start2 + lineLimit, end);
+    final textLen = end2 - start2;
+    final spaceLen = lineLimit - textLen;
+    final prefixLen = min(lineLimit - textLen, start2 - lineStart);
+    final list = <int>[];
+    final iterator = RuneIterator.at(source, start2);
+    for (var i = 0; i < prefixLen; i++) {
+      if (!iterator.movePrevious()) {
+        break;
+      }
+
+      list.add(iterator.current);
     }
 
-    sb.write(span.message(error.toString(), color: color));
+    final column = start - lineStart + 1;
+    final left = String.fromCharCodes(list.reversed);
+    final end3 = max(end2, end2 + (spaceLen - prefixLen));
+    final textStart = end3 - lineLimit;
+    final indicatorOffset = start2 - textStart;
+    final indicatorLen = end2 - start2 + 1;
+    final right = source.substring(start2, end3);
+    var text = left + right;
+    text = text.replaceAll('\n', ' ');
+    text = text.replaceAll('\r', ' ');
+    text = text.replaceAll('\t', ' ');
+    sb.writeln('line $row, column $column: $error');
+    sb.writeln(text);
+    sb.writeln(' ' * indicatorOffset + '^' * indicatorLen);
+    message.writeln(sb);
   }
 
-  if (errors.length > maxCount) {
-    sb.writeln();
-    sb.write('(${errors.length - maxCount} more errors...)');
+  return message.toString();
+}
+
+extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+
+    return w1;
   }
 
-  return sb.toString();
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
+
+    return w1;
+  }
+
+  /// Returns a slice (substring) of the string from [start] to [end].
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String slice(int start, int end) {
+    return substring(start, end);
+  }
 }
 
 class ParseError {
@@ -913,8 +993,6 @@ class State<T> {
 
   final List<int> _lengths = List.filled(150, 0);
 
-  final List<_Memo?> _memos = List.filled(150, null);
-
   final List<int> _starts = List.filled(150, 0);
 
   final List<Object?> _values = List.filled(150, null);
@@ -943,20 +1021,6 @@ class State<T> {
         lastErrorPos = pos;
       }
     }
-  }
-
-  @pragma('vm:prefer-inline')
-  void memoize<R>(int id, bool fast, int start, [R? result]) =>
-      _memos[id] = _Memo<R>(id, fast, start, pos, ok, result);
-
-  @pragma('vm:prefer-inline')
-  _Memo<R>? memoized<R>(int id, bool fast, int start) {
-    final memo = _memos[id];
-    return (memo != null &&
-            memo.start == start &&
-            (memo.fast == fast || !memo.fast))
-        ? memo as _Memo<R>
-        : null;
   }
 
   @pragma('vm:prefer-inline')
@@ -1088,76 +1152,6 @@ class State<T> {
       result = "'$result'";
     }
 
-    return result;
-  }
-}
-
-extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readRune(State<String> state) {
-    final w1 = codeUnitAt(state.pos++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (state.pos < length) {
-        final w2 = codeUnitAt(state.pos++);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-
-        state.pos--;
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
-    }
-
-    return w1;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int runeAt(int index) {
-    final w1 = codeUnitAt(index++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 1);
-    }
-
-    return w1;
-  }
-
-  /// Returns a slice (substring) of the string from [start] to [end].
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  String slice(int start, int end) {
-    return substring(start, end);
-  }
-}
-
-class _Memo<T> {
-  final int end;
-
-  final bool fast;
-
-  final int id;
-
-  final bool ok;
-
-  final T? result;
-
-  final int start;
-
-  _Memo(this.id, this.fast, this.start, this.end, this.ok, this.result);
-
-  @pragma('vm:prefer-inline')
-  T? restore(State state) {
-    state.ok = ok;
-    state.pos = end;
     return result;
   }
 }

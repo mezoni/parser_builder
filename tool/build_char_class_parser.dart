@@ -11,10 +11,11 @@ Future<void> main(List<String> args) async {
   final context = Context();
   final filename = 'lib/src/char_class/char_class_parser.dart';
   await fastBuild(context, [_parse], filename,
-      footer: __footer, header: __header, publish: {'parseString': _parse});
+      footer: __footer, publish: {'parseString': _parse});
 }
 
-const __footer = '''
+const __footer =
+    '''
 List<T> _flatten<T>(List<List<T>> data, List<T> result) {
   for (final item1 in data) {
     for (final item2 in item1) {
@@ -46,11 +47,6 @@ int _toHexValue(String s) {
 
   return r;
 }''';
-
-const __header = r'''
-import 'package:source_span/source_span.dart';
-
-''';
 
 const _char = Named('_char', Delimited(Tag('"'), _charCode, Tag('"')));
 

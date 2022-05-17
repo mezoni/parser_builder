@@ -1,5 +1,3 @@
-import 'package:source_span/source_span.dart';
-
 import 'hex_color_parser_helper.dart';
 
 part 'hex_color_parser.g.dart';

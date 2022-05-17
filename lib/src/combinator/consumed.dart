@@ -20,7 +20,7 @@ if (state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    ParseRuntime.addResultClass(context, 2);
+    ParseRuntime.addClassResult(context, 2);
     final fast = result == null;
     final values = context.allocateLocals(['pos']);
     final r1 = context.getResult(parser, true);

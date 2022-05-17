@@ -16,8 +16,6 @@ Future<void> main(List<String> args) async {
 }
 
 const __header = '''
-import 'package:source_span/source_span.dart';
-
 void main() {
   final source = '1 + 2 * 3 * (1 + 2.0)';
   final result = parse(source);

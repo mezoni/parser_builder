@@ -2403,33 +2403,51 @@ void verifyIs3DigitFast(State<String> state) {
   }
 }
 
-class Result2<T0, T1> {
-  final T0 $0;
-  final T1 $1;
+extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
 
-  Result2(this.$0, this.$1);
+        state.pos--;
+      }
 
-  @override
-  int get hashCode => $0.hashCode ^ $1.hashCode;
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
 
-  @override
-  bool operator ==(other) =>
-      other is Result2 && other.$0 == $0 && other.$1 == $1;
-}
+    return w1;
+  }
 
-class Result3<T0, T1, T2> {
-  final T0 $0;
-  final T1 $1;
-  final T2 $2;
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
 
-  Result3(this.$0, this.$1, this.$2);
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
 
-  @override
-  int get hashCode => $0.hashCode ^ $1.hashCode ^ $2.hashCode;
+    return w1;
+  }
 
-  @override
-  bool operator ==(other) =>
-      other is Result3 && other.$0 == $0 && other.$1 == $1 && other.$2 == $2;
+  /// Returns a slice (substring) of the string from [start] to [end].
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String slice(int start, int end) {
+    return substring(start, end);
+  }
 }
 
 class ParseError {
@@ -2463,6 +2481,35 @@ class ParseError {
   String toString() {
     return text;
   }
+}
+
+class Result2<T0, T1> {
+  final T0 $0;
+  final T1 $1;
+
+  Result2(this.$0, this.$1);
+
+  @override
+  int get hashCode => $0.hashCode ^ $1.hashCode;
+
+  @override
+  bool operator ==(other) =>
+      other is Result2 && other.$0 == $0 && other.$1 == $1;
+}
+
+class Result3<T0, T1, T2> {
+  final T0 $0;
+  final T1 $1;
+  final T2 $2;
+
+  Result3(this.$0, this.$1, this.$2);
+
+  @override
+  int get hashCode => $0.hashCode ^ $1.hashCode ^ $2.hashCode;
+
+  @override
+  bool operator ==(other) =>
+      other is Result3 && other.$0 == $0 && other.$1 == $1 && other.$2 == $2;
 }
 
 class State<T> {
@@ -2664,53 +2711,6 @@ class State<T> {
     }
 
     return result;
-  }
-}
-
-extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readRune(State<String> state) {
-    final w1 = codeUnitAt(state.pos++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (state.pos < length) {
-        final w2 = codeUnitAt(state.pos++);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-
-        state.pos--;
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
-    }
-
-    return w1;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int runeAt(int index) {
-    final w1 = codeUnitAt(index++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 1);
-    }
-
-    return w1;
-  }
-
-  /// Returns a slice (substring) of the string from [start] to [end].
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  String slice(int start, int end) {
-    return substring(start, end);
   }
 }
 

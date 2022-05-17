@@ -403,6 +403,193 @@ class State<T> {
   }
 }''';
 
+  static const _classStateNoMemo = r'''
+class State<T> {
+  dynamic context;
+
+  int errorPos = -1;
+
+  int lastErrorPos = -1;
+
+  int minErrorPos = -1;
+
+  bool log = true;
+
+  bool ok = false;
+
+  int pos = 0;
+
+  final T source;
+
+  final List<int> _kinds = List.filled(150, 0);
+
+  int _length = 0;
+
+  final List<int> _lengths = List.filled(150, 0);
+
+  final List<int> _starts = List.filled(150, 0);
+
+  final List<Object?> _values = List.filled(150, null);
+
+  State(this.source);
+
+  List<ParseError> get errors => _buildErrors();
+
+  @pragma('vm:prefer-inline')
+  void fail(int pos, int kind, int length, Object? value, [int start = -1]) {
+    if (log) {
+      if (errorPos <= pos && minErrorPos <= pos) {
+        if (errorPos < pos) {
+          errorPos = pos;
+          _length = 0;
+        }
+
+        _kinds[_length] = kind;
+        _lengths[_length] = length;
+        _starts[_length] = start;
+        _values[_length] = value;
+        _length++;
+      }
+
+      if (lastErrorPos < pos) {
+        lastErrorPos = pos;
+      }
+    }
+  }
+
+  @pragma('vm:prefer-inline')
+  void restoreLastErrorPos(int pos) {
+    if (lastErrorPos < pos) {
+      lastErrorPos = pos;
+    }
+  }
+
+  @pragma('vm:prefer-inline')
+  int setLastErrorPos(int pos) {
+    final result = lastErrorPos;
+    lastErrorPos = pos;
+    return result;
+  }
+
+  @override
+  String toString() {
+    if (source is String) {
+      final s = source as String;
+      if (pos >= s.length) {
+        return '$pos:';
+      }
+
+      var length = s.length - pos;
+      length = length > 40 ? 40 : length;
+      final string = s.substring(pos, pos + length);
+      return '$pos:$string';
+    } else {
+      return super.toString();
+    }
+  }
+
+  List<ParseError> _buildErrors() {
+    final result = <ParseError>[];
+    final expected = <String>[];
+    for (var i = 0; i < _length; i++) {
+      final kind = _kinds[i];
+      if (kind == ParseError.expected) {
+        final value = _values[i];
+        final escaped = _escape(value);
+        expected.add(escaped);
+      }
+    }
+
+    if (expected.isNotEmpty) {
+      final text = 'Expected: ${expected.toSet().join(', ')}';
+      final error = ParseError(errorPos, errorPos, text);
+      result.add(error);
+    }
+
+    for (var i = 0; i < _length; i++) {
+      final kind = _kinds[i];
+      final length = _lengths[i];
+      var value = _values[i];
+      var start = _starts[i];
+      if (start < 0) {
+        start = errorPos;
+      }
+
+      final end = start + (length > 0 ? length - 1 : 0);
+      switch (kind) {
+        case ParseError.character:
+          if (source is String) {
+            final string = source as String;
+            if (start < string.length) {
+              value = string.runeAt(errorPos);
+              final escaped = _escape(value);
+              final error =
+                  ParseError(errorPos, errorPos, 'Unexpected $escaped');
+              result.add(error);
+            } else {
+              final error = ParseError(errorPos, errorPos, "Unexpected 'EOF'");
+              result.add(error);
+            }
+          } else {
+            final error =
+                ParseError(errorPos, errorPos, 'Unexpected character');
+            result.add(error);
+          }
+
+          break;
+        case ParseError.expected:
+          break;
+        case ParseError.message:
+          final error = ParseError(start, end, '$value');
+          result.add(error);
+          break;
+        case ParseError.unexpected:
+          final escaped = _escape(value);
+          final error = ParseError(start, end, 'Unexpected $escaped');
+          result.add(error);
+          break;
+        default:
+          final error = ParseError(start, end, '$value');
+          result.add(error);
+      }
+    }
+
+    return result.toSet().toList();
+  }
+
+  String _escape(Object? value, [bool quote = true]) {
+    if (value is int) {
+      if (value >= 0 && value <= 0xd7ff ||
+          value >= 0xe000 && value <= 0x10ffff) {
+        value = String.fromCharCode(value);
+      } else {
+        return value.toString();
+      }
+    } else if (value is! String) {
+      return value.toString();
+    }
+
+    final map = {
+      '\b': '\\b',
+      '\f': '\\f',
+      '\n': '\\n',
+      '\r': '\\r',
+      '\t': '\\t',
+      '\v': '\\v',
+    };
+    var result = value.toString();
+    for (final key in map.keys) {
+      result = result.replaceAll(key, map[key]!);
+    }
+
+    if (quote) {
+      result = "'$result'";
+    }
+
+    return result;
+  }
+}''';
+
   static const _extensionString = r'''
 extension on String {
   @pragma('vm:prefer-inline')
@@ -452,39 +639,78 @@ extension on String {
 }''';
 
   static const _functionErrorMessage = r'''
-String _errorMessage(String source, List<ParseError> errors,
-    [Object? color, int maxCount = 10, String? url]) {
-  final sb = StringBuffer();
+String _errorMessage(String source, List<ParseError> errors) {
+  final message = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
-    if (i > maxCount) {
-      break;
-    }
-
     final error = errors[i];
     final start = error.start;
-    final end = error.end + 1;
-    if (end > source.length) {
-      source += ' ' * (end - source.length);
+    final end = error.end;
+    RangeError.checkValidRange(start, end, source.length);
+    var row = 1;
+    var lineStart = 0, next = 0, pos = 0;
+    while (pos < source.length) {
+      final c = source.codeUnitAt(pos++);
+      if (c == 0xa || c == 0xd) {
+        next = c == 0xa ? 0xd : 0xa;
+        if (pos < source.length && source.codeUnitAt(pos) == next) {
+          pos++;
+        }
+
+        if (pos - 1 >= start) {
+          break;
+        }
+
+        row++;
+        lineStart = pos;
+      }
     }
 
-    final file = SourceFile.fromString(source, url: url);
-    final span = file.span(start, end);
-    if (sb.isNotEmpty) {
-      sb.writeln();
+    int max(int x, int y) => x > y ? x : y;
+    int min(int x, int y) => x < y ? x : y;
+    final sb = StringBuffer();
+    final sourceLen = source.length;
+    final totalLen = sourceLen - lineStart;
+    final lineLimit = min(80, totalLen);
+    final start2 = start;
+    final end2 = min(start2 + lineLimit, end);
+    final textLen = end2 - start2;
+    final spaceLen = lineLimit - textLen;
+    final prefixLen = min(lineLimit - textLen, start2 - lineStart);
+    final list = <int>[];
+    final iterator = RuneIterator.at(source, start2);
+    for (var i = 0; i < prefixLen; i++) {
+      if (!iterator.movePrevious()) {
+        break;
+      }
+
+      list.add(iterator.current);
     }
 
-    sb.write(span.message(error.toString(), color: color));
+    final column = start - lineStart + 1;
+    final left = String.fromCharCodes(list.reversed);
+    final end3 = max(end2, end2 + (spaceLen - prefixLen));
+    final textStart = end3 - lineLimit;
+    final indicatorOffset = start2 - textStart;
+    final indicatorLen = end2 - start2 + 1;
+    final right = source.substring(start2, end3);
+    var text = left + right;
+    text = text.replaceAll('\n', ' ');
+    text = text.replaceAll('\r', ' ');
+    text = text.replaceAll('\t', ' ');
+    sb.writeln('line $row, column $column: $error');
+    sb.writeln(text);
+    sb.writeln(' ' * indicatorOffset + '^' * indicatorLen);
+    message.writeln(sb);
   }
 
-  if (errors.length > maxCount) {
-    sb.writeln();
-    sb.write('(${errors.length - maxCount} more errors...)');
-  }
-
-  return sb.toString();
+  return message.toString();
 }''';
 
-  static addResultClass(Context context, int size) {
+  static addClassMemo(Context context) {
+    _addClass(context, '_Memo', _classMemo);
+  }
+
+  static addClassResult(Context context, int size) {
     final String code;
     switch (size) {
       case 2:
@@ -510,32 +736,34 @@ String _errorMessage(String source, List<ParseError> errors,
     }
 
     final name = 'Result$size';
+    _addClass(context, name, code);
+  }
+
+  static void addClasses(Context context) {
+    _addClass(context, 'ParseError', _classParseError);
+    if (_hasClass(context, '_Memo')) {
+      _addClass(context, 'State', _classState);
+    } else {
+      _addClass(context, 'State', _classStateNoMemo);
+    }
+
+    _addClass(context, 'State', _classState);
+    _addClass(context, 'ParseError', _classParseError);
+    context.globalDeclarations.add(_extensionString);
+  }
+
+  static String getErrorMessageProcessor() {
+    var result = _functionErrorMessage;
+    return result;
+  }
+
+  static _addClass(Context context, String name, String code) {
     if (!context.classDeclarations.containsKey(name)) {
       context.classDeclarations[name] = code;
     }
   }
 
-  static List<String> getClasses() {
-    return const [
-      _classParseError,
-      _classState,
-      _extensionString,
-      _classMemo,
-    ];
-  }
-
-  /// An unofficial way to display error messages.
-  /// Can be used as a starting point when developing parsers.
-  ///
-  /// An unofficial way because the concept of building a parser implies that
-  /// the generated parser should not have dependencies.
-  ///
-  /// Use of this function requires the import of a third party package:
-  ///
-  /// import 'package:source_span/source_span.dart';
-  static String getErrorMessageProcessor([String name = '_errorMessage']) {
-    var result = _functionErrorMessage;
-    result = result.replaceAll('{{name}}', name);
-    return result;
+  static bool _hasClass(Context context, String name) {
+    return context.classDeclarations.containsKey(name);
   }
 }

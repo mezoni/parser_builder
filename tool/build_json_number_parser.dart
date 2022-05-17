@@ -13,8 +13,6 @@ Future<void> main(List<String> args) async {
 const parser = Number();
 
 const __header = r'''
-import 'package:source_span/source_span.dart';
-
 void main() {
     final s = '100000.00123e3';
     final x = double.parse(s);

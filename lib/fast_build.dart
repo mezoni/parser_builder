@@ -33,29 +33,31 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
     declarations.add(ParseRuntime.getErrorMessageProcessor());
   }
 
+  ParseRuntime.addClasses(context);
   final classDeclarations = context.classDeclarations;
   final classNames = classDeclarations.keys.toList();
   classNames.sort();
   for (final className in classNames) {
-    final code = classDeclarations[className]!;
-    declarations.add(code);
+    final declartion = classDeclarations[className]!;
+    declarations.add(declartion);
   }
 
-  declarations.addAll(ParseRuntime.getClasses());
-  var code = declarations.join('\n\n');
+  final code = StringBuffer();
   if (partOf != null) {
-    code = 'part of \'$partOf\';\n\n' + code;
+    code.writeln('part of \'$partOf\';');
+    code.writeln();
   }
 
   if (header != null) {
-    code = header + code;
+    code.write(header);
   }
 
+  code.write(declarations.join('\n\n'));
   if (footer != null) {
-    code += footer;
+    code.write(footer);
   }
 
-  File(filename).writeAsStringSync(code);
+  File(filename).writeAsStringSync('$code');
   if (format) {
     final process =
         await Process.start(Platform.executable, ['format', filename]);
