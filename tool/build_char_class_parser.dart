@@ -14,8 +14,7 @@ Future<void> main(List<String> args) async {
       footer: __footer, publish: {'parseString': _parse});
 }
 
-const __footer =
-    '''
+const __footer = '''
 List<T> _flatten<T>(List<List<T>> data, List<T> result) {
   for (final item1 in data) {
     for (final item2 in item1) {

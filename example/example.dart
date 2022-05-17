@@ -824,8 +824,12 @@ dynamic _value(State<String> state) {
 }
 
 String _errorMessage(String source, List<ParseError> errors) {
-  final message = StringBuffer();
+  final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
+    if (sb.isNotEmpty) {
+      sb.writeln();
+    }
+
     final error = errors[i];
     final start = error.start;
     final end = error.end;
@@ -851,7 +855,6 @@ String _errorMessage(String source, List<ParseError> errors) {
 
     int max(int x, int y) => x > y ? x : y;
     int min(int x, int y) => x < y ? x : y;
-    final sb = StringBuffer();
     final sourceLen = source.length;
     final totalLen = sourceLen - lineStart;
     final lineLimit = min(80, totalLen);
@@ -883,11 +886,10 @@ String _errorMessage(String source, List<ParseError> errors) {
     text = text.replaceAll('\t', ' ');
     sb.writeln('line $row, column $column: $error');
     sb.writeln(text);
-    sb.writeln(' ' * indicatorOffset + '^' * indicatorLen);
-    message.writeln(sb);
+    sb.write(' ' * indicatorOffset + '^' * indicatorLen);
   }
 
-  return message.toString();
+  return sb.toString();
 }
 
 extension on String {
