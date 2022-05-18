@@ -11,6 +11,9 @@ import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
 import 'package:parser_builder/string.dart';
+import 'package:parser_builder/token.dart';
+
+import '../test/_token.dart';
 
 Future<void> main(List<String> args) async {
   final context = Context();
@@ -93,6 +96,8 @@ Future<void> main(List<String> args) async {
     _takeWhileMN_2_4C32,
     _terminatedC16C32,
     _testRef_,
+    _tokenizeAlphaOrDigits,
+    _tokenizeTagsIfForWhile,
     _tuple2C32Abc,
     _tuple3C32AbcC16,
     _valueAbcToTrueValue,
@@ -122,6 +127,8 @@ const s16 = 'P';
 const s32 = '𝈀';
 
 const __header = r'''
+import '_token.dart';
+
 int _toBinary(int left, String operator, int right) {
   switch (operator) {
     case '+':
@@ -410,6 +417,45 @@ const _takeWhileMN_2_4C32 =
 const _terminatedC16C32 = Named('terminated', Terminated(_char16, _char32));
 
 const _testRef_ = Named('testRef', _ref);
+
+const _tokenizeAlphaOrDigits = Named<String, Token>(
+    'tokenizeAlphaOrDigits',
+    Alt2(
+        Tokenize(
+            Alpha1(),
+            ExpressionAction([
+              'src',
+              'start',
+              'end',
+              'val'
+            ], 'Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, {{val}})')),
+        Tokenize(
+            Digit1(),
+            ExpressionAction([
+              'src',
+              'start',
+              'end',
+              'val'
+            ], 'Token<int>(TokenKind.number, {{src}}, {{start}}, {{end}}, int.parse({{val}}))'))));
+
+const _tokenizeTagsIfForWhile = Named(
+    'tokenizeTagsIfForWhile',
+    TokenizeTags(
+      {
+        'if': ExpressionAction(['src', 'start', 'end'],
+            "Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, 'if')"),
+        'for': ExpressionAction([
+          'src',
+          'start',
+          'end'
+        ], "Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, 'for')"),
+        'while': ExpressionAction([
+          'src',
+          'start',
+          'end'
+        ], "Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, 'while')"),
+      },
+    ));
 
 const _transformersCharClassIsDigit =
     Named('transformersCharClassIsDigit', TakeWhile(CharClass('[#x30-#x39]')));

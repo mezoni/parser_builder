@@ -1,3 +1,9 @@
+## 2.0.20
+
+- Despite the fact that the `source_span` package is no longer used, the error generation system, the error reporting system and the `ParseError` class have been unified in accordance with the way it is implemented in the `source_span` package, in particular in the `Span` classes. In the `ParseError` class, the `end` field no longer includes the value at that position. That is, the range (10, 10) means start position 10 with no value (empty value), (10, 11) start position 10, with value 1 element long, and so on. The values of these ranges are used to indicate the sequence of data elements using an indicator of the form `^^^^^`. Why exactly this way and not otherwise? Firstly, the ability to correctly encode empty ranges, and secondly, at runtime, during parsing, after successful parsing, the current position indicates the next element of the sequence and only such a state is available to next parsers. For example, for parsers-verifiers, this fits very well with the principle of their work. Parsers-verifiers do not analyze positions and the length of the parsed sequence at runtime, they react to the result returned by a predicate that checks the result of a successful parse and generate errors `as is` from the current parsing state data
+- Breaking change. Class `_Memo` is now public and is now called `MemoizedResult`
+- Implemented, tested, but not documented parser builders `Tokenize`, `TokenizeTags`. They are designed to implement high-performance lexers
+
 ## 2.0.19
 
 - Minor improvements related to reducing the size of the generated code of the `built-in runtime library` for the parser. The following classes are generated only on demand: `Result2`-`Result7`, `_Memo`. Also, the size of the `State` class code is slightly reduced in the case when memoization is not used. All this does not particularly reduce the size of the code, but at the same time, it does not increase its size unnecessarily

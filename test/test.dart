@@ -3,6 +3,7 @@
 import 'package:test/test.dart';
 
 import '_test_parser.dart';
+import '_token.dart';
 
 void main(List<String> args) {
   _test();
@@ -83,6 +84,8 @@ void _test() {
   _testTakeWhile1();
   _testTakeWhileMN();
   _testTerminated();
+  _testTokenize();
+  _testTokenizeTags();
   _testTuple();
   _testValue();
   _testSemanticActions();
@@ -1671,7 +1674,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 2, "Unexpected 'abc'")]);
+      expect(state.errors, [ParseError(0, 3, "Unexpected 'abc'")]);
     }
     {
       final state = State('abd');
@@ -1679,7 +1682,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 2, "Unexpected 'abd'")]);
+      expect(state.errors, [ParseError(0, 3, "Unexpected 'abd'")]);
     }
     {
       final state = State('def');
@@ -1687,7 +1690,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 2, "Unexpected 'def'")]);
+      expect(state.errors, [ParseError(0, 3, "Unexpected 'def'")]);
     }
     {
       final state = State('deg');
@@ -1695,7 +1698,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 2, "Unexpected 'deg'")]);
+      expect(state.errors, [ParseError(0, 3, "Unexpected 'deg'")]);
     }
     {
       final state = State('x');
@@ -1703,7 +1706,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 0, "Unexpected 'x'")]);
+      expect(state.errors, [ParseError(0, 1, "Unexpected 'x'")]);
     }
     {
       final state = State('xy');
@@ -1711,7 +1714,7 @@ void _testNoneOfTags() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 1, "Unexpected 'xy'")]);
+      expect(state.errors, [ParseError(0, 2, "Unexpected 'xy'")]);
     }
     {
       final state = State('');
@@ -3115,7 +3118,7 @@ void _testTakeUntil1() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 2, "Unexpected 'abc'")]);
+      expect(state.errors, [ParseError(0, 3, "Unexpected 'abc'")]);
     }
     {
       final state = State('');
@@ -3367,6 +3370,94 @@ void _testTerminated() {
   });
 }
 
+void _testTokenize() {
+  test('Tokenize', () {
+    final parser = tokenizeAlphaOrDigits;
+    {
+      final source = '123';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.number, source, 0, 3, 123));
+      expect(state.pos, 3);
+    }
+    {
+      final source = 'abc';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.text, source, 0, 3, 'abc'));
+      expect(state.pos, 3);
+    }
+    {
+      final source = '';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
+    }
+    {
+      final source = ' ';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
+    }
+  });
+}
+
+void _testTokenizeTags() {
+  test('TokenizeTags', () {
+    final parser = tokenizeTagsIfForWhile;
+    {
+      final source = 'if';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.text, source, 0, 2, 'if'));
+      expect(state.pos, 2);
+    }
+    {
+      final source = 'for';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.text, source, 0, 3, 'for'));
+      expect(state.pos, 3);
+    }
+    {
+      final source = 'while';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.text, source, 0, 5, 'while'));
+      expect(state.pos, 5);
+    }
+    {
+      final source = '';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
+    }
+    {
+      final source = ' ';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
+    }
+  });
+}
+
 void _testTuple() {
   test('Tuple', () {
     final parser1 = tuple2C32Abc;
@@ -3514,7 +3605,7 @@ void _testVerify() {
       expect(r, null);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError(0, 1, 'Message')]);
+      expect(state.errors, [ParseError(0, 2, 'Message')]);
     }
     final parserFast = verifyIs3DigitFast;
     {
@@ -3537,7 +3628,7 @@ void _testVerify() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 2);
-      expect(state.errors, [ParseError(0, 1, 'Message')]);
+      expect(state.errors, [ParseError(0, 2, 'Message')]);
     }
   });
 }

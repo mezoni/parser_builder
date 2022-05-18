@@ -11,7 +11,7 @@ import 'package:parser_builder/parser_builder.dart';
 import 'package:parser_builder/sequence.dart';
 import 'package:parser_builder/string.dart';
 
-import 'build_json_number_parser.dart' as _json_number;
+import 'build_json_number_parser.dart' as json_number;
 
 Future<void> main(List<String> args) async {
   final context = Context();
@@ -99,7 +99,7 @@ const _keyValue = Named(
 
 const _keyValues = Named('_keyValues', SeparatedList0(_keyValue, _comma));
 
-const _number = Named('_number', Expected('number', _json_number.parser));
+const _number = Named('_number', Expected('number', json_number.parser));
 
 const _object = Named(
     '_object',

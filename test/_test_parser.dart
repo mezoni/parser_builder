@@ -1,3 +1,5 @@
+import '_token.dart';
+
 int _toBinary(int left, String operator, int right) {
   switch (operator) {
     case '+':
@@ -2141,6 +2143,105 @@ int? testRef(State<String> state) {
   return $0;
 }
 
+Token<dynamic>? tokenizeAlphaOrDigits(State<String> state) {
+  Token<dynamic>? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  String? $1;
+  final $pos1 = state.pos;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c <= 90 ? c >= 65 : c <= 122 && c >= 97;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = state.pos != $pos1;
+  if (state.ok) {
+    $1 = source.substring($pos1, state.pos);
+  } else {
+    state.fail($pos1, ParseError.character, 0, 0);
+  }
+  if (state.ok) {
+    final v1 = source;
+    final v2 = $pos;
+    final v3 = state.pos;
+    final v4 = $1!;
+    $0 = Token<String>(TokenKind.text, v1, v2, v3, v4);
+  }
+  if (!state.ok) {
+    final $pos2 = state.pos;
+    String? $2;
+    final $pos3 = state.pos;
+    while (state.pos < source.length) {
+      final c = source.codeUnitAt(state.pos);
+      final ok = c <= 57 && c >= 48;
+      if (!ok) {
+        break;
+      }
+      state.pos++;
+    }
+    state.ok = state.pos != $pos3;
+    if (state.ok) {
+      $2 = source.substring($pos3, state.pos);
+    } else {
+      state.fail($pos3, ParseError.character, 0, 0);
+    }
+    if (state.ok) {
+      final v1 = source;
+      final v2 = $pos2;
+      final v3 = state.pos;
+      final v4 = $2!;
+      $0 = Token<int>(TokenKind.number, v1, v2, v3, int.parse(v4));
+    }
+  }
+  return $0;
+}
+
+dynamic tokenizeTagsIfForWhile(State<String> state) {
+  dynamic $0;
+  final source = state.source;
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    state.ok = false;
+    if (c == 105) {
+      if (source.startsWith('if', pos)) {
+        state.pos += 2;
+        state.ok = true;
+        final v1 = source;
+        final v2 = pos;
+        final v3 = state.pos;
+        $0 = Token<String>(TokenKind.text, v1, v2, v3, 'if');
+      }
+    } else if (c == 102) {
+      if (source.startsWith('for', pos)) {
+        state.pos += 3;
+        state.ok = true;
+        final v1 = source;
+        final v2 = pos;
+        final v3 = state.pos;
+        $0 = Token<String>(TokenKind.text, v1, v2, v3, 'for');
+      }
+    } else if (c == 119) {
+      if (source.startsWith('while', pos)) {
+        state.pos += 5;
+        state.ok = true;
+        final v1 = source;
+        final v2 = pos;
+        final v3 = state.pos;
+        $0 = Token<String>(TokenKind.text, v1, v2, v3, 'while');
+      }
+    }
+  }
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.character, 0, 0);
+  }
+  return $0;
+}
+
 Result2<int, String>? tuple2C32Abc(State<String> state) {
   Result2<int, String>? $0;
   final $pos = state.pos;
@@ -2450,6 +2551,30 @@ extension on String {
   }
 }
 
+class MemoizedResult<T> {
+  final int end;
+
+  final bool fast;
+
+  final int id;
+
+  final bool ok;
+
+  final T? result;
+
+  final int start;
+
+  MemoizedResult(
+      this.id, this.fast, this.start, this.end, this.ok, this.result);
+
+  @pragma('vm:prefer-inline')
+  T? restore(State state) {
+    state.ok = ok;
+    state.pos = end;
+    return result;
+  }
+}
+
 class ParseError {
   static const character = 0;
 
@@ -2535,7 +2660,7 @@ class State<T> {
 
   final List<int> _lengths = List.filled(150, 0);
 
-  final List<_Memo?> _memos = List.filled(150, null);
+  final List<MemoizedResult?> _memos = List.filled(150, null);
 
   final List<int> _starts = List.filled(150, 0);
 
@@ -2569,15 +2694,15 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void memoize<R>(int id, bool fast, int start, [R? result]) =>
-      _memos[id] = _Memo<R>(id, fast, start, pos, ok, result);
+      _memos[id] = MemoizedResult<R>(id, fast, start, pos, ok, result);
 
   @pragma('vm:prefer-inline')
-  _Memo<R>? memoized<R>(int id, bool fast, int start) {
+  MemoizedResult<R>? memoized<R>(int id, bool fast, int start) {
     final memo = _memos[id];
     return (memo != null &&
             memo.start == start &&
             (memo.fast == fast || !memo.fast))
-        ? memo as _Memo<R>
+        ? memo as MemoizedResult<R>
         : null;
   }
 
@@ -2639,7 +2764,7 @@ class State<T> {
         start = errorPos;
       }
 
-      final end = start + (length > 0 ? length - 1 : 0);
+      final end = start + length;
       switch (kind) {
         case ParseError.character:
           if (source is String) {
@@ -2710,29 +2835,6 @@ class State<T> {
       result = "'$result'";
     }
 
-    return result;
-  }
-}
-
-class _Memo<T> {
-  final int end;
-
-  final bool fast;
-
-  final int id;
-
-  final bool ok;
-
-  final T? result;
-
-  final int start;
-
-  _Memo(this.id, this.fast, this.start, this.end, this.ok, this.result);
-
-  @pragma('vm:prefer-inline')
-  T? restore(State state) {
-    state.ok = ok;
-    state.pos = end;
     return result;
   }
 }

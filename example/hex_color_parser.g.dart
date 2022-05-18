@@ -98,8 +98,12 @@ Color? _parse(State<String> state) {
 }
 
 String _errorMessage(String source, List<ParseError> errors) {
-  final message = StringBuffer();
+  final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
+    if (sb.isNotEmpty) {
+      sb.writeln();
+    }
+
     final error = errors[i];
     final start = error.start;
     final end = error.end;
@@ -114,7 +118,7 @@ String _errorMessage(String source, List<ParseError> errors) {
           pos++;
         }
 
-        if (pos >= start) {
+        if (pos - 1 >= start) {
           break;
         }
 
@@ -125,7 +129,6 @@ String _errorMessage(String source, List<ParseError> errors) {
 
     int max(int x, int y) => x > y ? x : y;
     int min(int x, int y) => x < y ? x : y;
-    final sb = StringBuffer();
     final sourceLen = source.length;
     final totalLen = sourceLen - lineStart;
     final lineLimit = min(80, totalLen);
@@ -152,14 +155,15 @@ String _errorMessage(String source, List<ParseError> errors) {
     final indicatorLen = max(1, end2 - start2);
     final right = source.substring(start2, end3);
     var text = left + right;
-    ['\n', '\r', '\t'].forEach((e) => text = text = text.replaceAll(e, ' '));
+    text = text.replaceAll('\n', ' ');
+    text = text.replaceAll('\r', ' ');
+    text = text.replaceAll('\t', ' ');
     sb.writeln('line $row, column $column: $error');
     sb.writeln(text);
-    sb.writeln(' ' * indicatorOffset + '^' * indicatorLen);
-    message.writeln(sb);
+    sb.write(' ' * indicatorOffset + '^' * indicatorLen);
   }
 
-  return message.toString();
+  return sb.toString();
 }
 
 extension on String {
@@ -353,7 +357,7 @@ class State<T> {
         start = errorPos;
       }
 
-      final end = start + (length > 0 ? length - 1 : 0);
+      final end = start + length;
       switch (kind) {
         case ParseError.character:
           if (source is String) {

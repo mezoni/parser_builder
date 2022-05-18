@@ -1,8 +1,9 @@
 part of '../../parser_builder.dart';
 
 class ParseRuntime {
-  static const _classMemo = '''
-class _Memo<T> {
+  static const _classMemoizedResult =
+      '''
+class MemoizedResult<T> {
   final int end;
 
   final bool fast;
@@ -15,7 +16,8 @@ class _Memo<T> {
 
   final int start;
 
-  _Memo(this.id, this.fast, this.start, this.end, this.ok, this.result);
+  MemoizedResult(
+      this.id, this.fast, this.start, this.end, this.ok, this.result);
 
   @pragma('vm:prefer-inline')
   T? restore(State state) {
@@ -25,7 +27,8 @@ class _Memo<T> {
   }
 }''';
 
-  static const _classParseError = '''
+  static const _classParseError =
+      '''
 class ParseError {
   static const character = 0;
 
@@ -59,7 +62,8 @@ class ParseError {
   }
 }''';
 
-  static const _classResult2 = r'''
+  static const _classResult2 =
+      r'''
 class Result2<T0, T1> {
   final T0 $0;
   final T1 $1;
@@ -74,7 +78,8 @@ class Result2<T0, T1> {
       other is Result2 && other.$0 == $0 && other.$1 == $1;
 }''';
 
-  static const _classResult3 = r'''
+  static const _classResult3 =
+      r'''
 class Result3<T0, T1, T2> {
   final T0 $0;
   final T1 $1;
@@ -90,7 +95,8 @@ class Result3<T0, T1, T2> {
       other is Result3 && other.$0 == $0 && other.$1 == $1 && other.$2 == $2;
 }''';
 
-  static const _classResult4 = r'''
+  static const _classResult4 =
+      r'''
 class Result4<T0, T1, T2, T3> {
   final T0 $0;
   final T1 $1;
@@ -111,7 +117,8 @@ class Result4<T0, T1, T2, T3> {
       other.$3 == $3;
 }''';
 
-  static const _classResult5 = r'''
+  static const _classResult5 =
+      r'''
 class Result5<T0, T1, T2, T3, T4> {
   final T0 $0;
   final T1 $1;
@@ -135,7 +142,8 @@ class Result5<T0, T1, T2, T3, T4> {
       other.$4 == $4;
 }''';
 
-  static const _classResult6 = r'''
+  static const _classResult6 =
+      r'''
 class Result6<T0, T1, T2, T3, T4, T5> {
   final T0 $0;
   final T1 $1;
@@ -166,7 +174,8 @@ class Result6<T0, T1, T2, T3, T4, T5> {
       other.$5 == $5;
 }''';
 
-  static const _classResult7 = r'''
+  static const _classResult7 =
+      r'''
 class Result7<T0, T1, T2, T3, T4, T5, T6> {
   final T0 $0;
   final T1 $1;
@@ -200,7 +209,8 @@ class Result7<T0, T1, T2, T3, T4, T5, T6> {
       other.$6 == $6;
 }''';
 
-  static const _classState = r'''
+  static const _classState =
+      r'''
 class State<T> {
   dynamic context;
 
@@ -224,7 +234,7 @@ class State<T> {
 
   final List<int> _lengths = List.filled(150, 0);
 
-  final List<_Memo?> _memos = List.filled(150, null);
+  final List<MemoizedResult?> _memos = List.filled(150, null);
 
   final List<int> _starts = List.filled(150, 0);
 
@@ -258,15 +268,15 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void memoize<R>(int id, bool fast, int start, [R? result]) =>
-      _memos[id] = _Memo<R>(id, fast, start, pos, ok, result);
+      _memos[id] = MemoizedResult<R>(id, fast, start, pos, ok, result);
 
   @pragma('vm:prefer-inline')
-  _Memo<R>? memoized<R>(int id, bool fast, int start) {
+  MemoizedResult<R>? memoized<R>(int id, bool fast, int start) {
     final memo = _memos[id];
     return (memo != null &&
             memo.start == start &&
             (memo.fast == fast || !memo.fast))
-        ? memo as _Memo<R>
+        ? memo as MemoizedResult<R>
         : null;
   }
 
@@ -328,7 +338,7 @@ class State<T> {
         start = errorPos;
       }
 
-      final end = start + (length > 0 ? length - 1 : 0);
+      final end = start + length;
       switch (kind) {
         case ParseError.character:
           if (source is String) {
@@ -403,7 +413,8 @@ class State<T> {
   }
 }''';
 
-  static const _classStateNoMemo = r'''
+  static const _classStateNoMemo =
+      r'''
 class State<T> {
   dynamic context;
 
@@ -515,7 +526,7 @@ class State<T> {
         start = errorPos;
       }
 
-      final end = start + (length > 0 ? length - 1 : 0);
+      final end = start + length;
       switch (kind) {
         case ParseError.character:
           if (source is String) {
@@ -590,7 +601,8 @@ class State<T> {
   }
 }''';
 
-  static const _extensionString = r'''
+  static const _extensionString =
+      r'''
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
@@ -638,7 +650,8 @@ extension on String {
   }
 }''';
 
-  static const _functionErrorMessage = r'''
+  static const _functionErrorMessage =
+      r'''
 String _errorMessage(String source, List<ParseError> errors) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
@@ -694,7 +707,7 @@ String _errorMessage(String source, List<ParseError> errors) {
     final end3 = max(end2, end2 + (spaceLen - prefixLen));
     final textStart = end3 - lineLimit;
     final indicatorOffset = start2 - textStart;
-    final indicatorLen = end2 - start2 + 1;
+    final indicatorLen = max(1, end2 - start2);
     final right = source.substring(start2, end3);
     var text = left + right;
     text = text.replaceAll('\n', ' ');
@@ -708,8 +721,8 @@ String _errorMessage(String source, List<ParseError> errors) {
   return sb.toString();
 }''';
 
-  static addClassMemo(Context context) {
-    _addClass(context, '_Memo', _classMemo);
+  static addClassMemoizedResult(Context context) {
+    _addClass(context, 'MemoizedResult', _classMemoizedResult);
   }
 
   static addClassResult(Context context, int size) {
@@ -742,8 +755,7 @@ String _errorMessage(String source, List<ParseError> errors) {
   }
 
   static void addClasses(Context context) {
-    _addClass(context, 'ParseError', _classParseError);
-    if (_hasClass(context, '_Memo')) {
+    if (_hasClass(context, 'MemoizedResult')) {
       _addClass(context, 'State', _classState);
     } else {
       _addClass(context, 'State', _classStateNoMemo);

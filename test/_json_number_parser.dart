@@ -323,8 +323,12 @@ num? number(State<String> state) {
 }
 
 String _errorMessage(String source, List<ParseError> errors) {
-  final message = StringBuffer();
+  final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
+    if (sb.isNotEmpty) {
+      sb.writeln();
+    }
+
     final error = errors[i];
     final start = error.start;
     final end = error.end;
@@ -350,7 +354,6 @@ String _errorMessage(String source, List<ParseError> errors) {
 
     int max(int x, int y) => x > y ? x : y;
     int min(int x, int y) => x < y ? x : y;
-    final sb = StringBuffer();
     final sourceLen = source.length;
     final totalLen = sourceLen - lineStart;
     final lineLimit = min(80, totalLen);
@@ -374,7 +377,7 @@ String _errorMessage(String source, List<ParseError> errors) {
     final end3 = max(end2, end2 + (spaceLen - prefixLen));
     final textStart = end3 - lineLimit;
     final indicatorOffset = start2 - textStart;
-    final indicatorLen = end2 - start2 + 1;
+    final indicatorLen = max(1, end2 - start2);
     final right = source.substring(start2, end3);
     var text = left + right;
     text = text.replaceAll('\n', ' ');
@@ -382,11 +385,10 @@ String _errorMessage(String source, List<ParseError> errors) {
     text = text.replaceAll('\t', ' ');
     sb.writeln('line $row, column $column: $error');
     sb.writeln(text);
-    sb.writeln(' ' * indicatorOffset + '^' * indicatorLen);
-    message.writeln(sb);
+    sb.write(' ' * indicatorOffset + '^' * indicatorLen);
   }
 
-  return message.toString();
+  return sb.toString();
 }
 
 extension on String {
@@ -580,7 +582,7 @@ class State<T> {
         start = errorPos;
       }
 
-      final end = start + (length > 0 ? length - 1 : 0);
+      final end = start + length;
       switch (kind) {
         case ParseError.character:
           if (source is String) {

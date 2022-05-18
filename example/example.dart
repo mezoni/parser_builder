@@ -878,7 +878,7 @@ String _errorMessage(String source, List<ParseError> errors) {
     final end3 = max(end2, end2 + (spaceLen - prefixLen));
     final textStart = end3 - lineLimit;
     final indicatorOffset = start2 - textStart;
-    final indicatorLen = end2 - start2 + 1;
+    final indicatorLen = max(1, end2 - start2);
     final right = source.substring(start2, end3);
     var text = left + right;
     text = text.replaceAll('\n', ' ');
@@ -1083,7 +1083,7 @@ class State<T> {
         start = errorPos;
       }
 
-      final end = start + (length > 0 ? length - 1 : 0);
+      final end = start + length;
       switch (kind) {
         case ParseError.character:
           if (source is String) {
