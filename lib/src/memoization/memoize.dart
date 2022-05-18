@@ -13,8 +13,7 @@ part of '../../memoization.dart';
 /// is restored.
 @experimental
 class Memoize<I, O> extends ParserBuilder<I, O> {
-  static const _template =
-      '''
+  static const _template = '''
 final {{memo}} = state.memoized<{{type}}>({{id}}, false, state.pos);
 if ({{memo}} != null) {
   {{res0}} = {{memo}}.restore(state);
@@ -24,8 +23,7 @@ if ({{memo}} != null) {
   state.memoize<{{type}}>({{id}}, false, {{pos}}, {{res0}});
 }''';
 
-  static const _templateFast =
-      '''
+  static const _templateFast = '''
 final {{memo}} = state.memoized<{{type}}>({{id}}, true, state.pos);
 if ({{memo}} != null) {
   {{memo}}.restore(state);

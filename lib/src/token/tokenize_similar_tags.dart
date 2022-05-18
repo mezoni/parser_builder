@@ -1,14 +1,23 @@
 part of '../../token.dart';
 
 @experimental
-class TokenizeTags<O> extends ParserBuilder<String, O> {
+class TokenizeSimilarTags<O, O1> extends ParserBuilder<String, O> {
   static const _template = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
   final pos = state.pos;
   final c = source.codeUnitAt(pos);
+  String? tag;
+  {{O1}} id;
   state.ok = false;
   {{tests}}
+  if (id != null) {
+    state.ok = true;
+    final v1 = pos;
+    final v2 = tag!;
+    final v3 = id;
+    {{res0}} = {{tokenize}};
+  }
 }
 if (!state.ok) {
   state.fail(state.pos, ParseError.character, 0, 0);
@@ -19,8 +28,10 @@ state.ok = state.pos < source.length;
 if (state.ok) {
   final pos = state.pos;
   final c = source.codeUnitAt(pos);
+  {{O1}} id;
   sttae.ok = false;
   {{tests}}
+  sttae.ok = id != null;
 }
 if (!state.ok) {
   state.fail(state.pos, ParseError.character, 0, 0);
@@ -28,21 +39,19 @@ if (!state.ok) {
 
   static const _templateTestLong = '''
 state.pos += {{length}};
-state.ok = true;
-final v1 = pos;
-final v2 = {{tag}};
-{{res0}} = {{tokenize}};''';
+id = {{id}};
+tag = {{tag}};''';
 
   static const _templateTestShort = '''
 state.pos++;
-state.ok = true;
-final v1 = pos;
-final v2 = {{tag}};
-{{res0}} = {{tokenize}};''';
+id = {{id}};
+tag = {{tag}};''';
 
-  final Map<String, SemanticAction<O>> table;
+  final Map<String, O1> table;
 
-  const TokenizeTags(this.table);
+  final SemanticAction<O> tokenize;
+
+  const TokenizeSimilarTags(this.table, this.tokenize);
 
   @override
   String build(Context context, ParserResult? result) {
@@ -59,6 +68,12 @@ final v2 = {{tag}};
       if (tag.isEmpty) {
         throw ArgumentError.value(
             table, 'table', 'The map of tags must not contain empty tags');
+      }
+
+      final value = table[tag];
+      if (value == null) {
+        throw ArgumentError.value(
+            table, 'table', 'The map of tags must not contain null values');
       }
 
       final c = tag.codeUnitAt(0);
@@ -79,12 +94,11 @@ final v2 = {{tag}};
       for (final tag in tags) {
         final length = tag.length;
         final escaped = helper.escapeString(tag);
-        final tokenize = table[tag]!;
+        final id = table[tag];
         final values = {
+          'id': helper.getAsCode(id),
           'length': '$length',
           'tag': escaped,
-          'tokenize':
-              fast ? '' : tokenize.build(context, 'tokenize', ['v1', 'v2']),
         };
 
         final isLong = tag.length > 1;
@@ -99,7 +113,10 @@ final v2 = {{tag}};
     }
 
     values.addAll({
+      'O1': helper.isNullableType<O1>() ? '$O1' : '$O1?',
       'tests': helper.buildConditional(branches),
+      'tokenize':
+          fast ? '' : tokenize.build(context, 'tokenize', ['v1', 'v2', 'v3']),
       'type': getResultType(),
     });
     return render2(fast, _templateFast, _template, values, [result]);

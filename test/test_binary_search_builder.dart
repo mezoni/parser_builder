@@ -25,7 +25,7 @@ void main() async {
           contents = contents.replaceAll('{{code}}', code);
           final directory = Directory.current;
           final relative = 'test/_test_test_binary_search_builder.dart';
-          final path = directory.path + '/' + relative;
+          final path = '${directory.path}/$relative';
           final uri = Uri.file(path);
           File(relative).writeAsStringSync(contents);
           final response = ReceivePort();

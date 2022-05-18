@@ -1,8 +1,7 @@
 part of '../../parser_builder.dart';
 
 class ParseRuntime {
-  static const _classMemoizedResult =
-      '''
+  static const _classMemoizedResult = '''
 class MemoizedResult<T> {
   final int end;
 
@@ -27,8 +26,7 @@ class MemoizedResult<T> {
   }
 }''';
 
-  static const _classParseError =
-      '''
+  static const _classParseError = '''
 class ParseError {
   static const character = 0;
 
@@ -62,8 +60,7 @@ class ParseError {
   }
 }''';
 
-  static const _classResult2 =
-      r'''
+  static const _classResult2 = r'''
 class Result2<T0, T1> {
   final T0 $0;
   final T1 $1;
@@ -78,8 +75,7 @@ class Result2<T0, T1> {
       other is Result2 && other.$0 == $0 && other.$1 == $1;
 }''';
 
-  static const _classResult3 =
-      r'''
+  static const _classResult3 = r'''
 class Result3<T0, T1, T2> {
   final T0 $0;
   final T1 $1;
@@ -95,8 +91,7 @@ class Result3<T0, T1, T2> {
       other is Result3 && other.$0 == $0 && other.$1 == $1 && other.$2 == $2;
 }''';
 
-  static const _classResult4 =
-      r'''
+  static const _classResult4 = r'''
 class Result4<T0, T1, T2, T3> {
   final T0 $0;
   final T1 $1;
@@ -117,8 +112,7 @@ class Result4<T0, T1, T2, T3> {
       other.$3 == $3;
 }''';
 
-  static const _classResult5 =
-      r'''
+  static const _classResult5 = r'''
 class Result5<T0, T1, T2, T3, T4> {
   final T0 $0;
   final T1 $1;
@@ -142,8 +136,7 @@ class Result5<T0, T1, T2, T3, T4> {
       other.$4 == $4;
 }''';
 
-  static const _classResult6 =
-      r'''
+  static const _classResult6 = r'''
 class Result6<T0, T1, T2, T3, T4, T5> {
   final T0 $0;
   final T1 $1;
@@ -174,8 +167,7 @@ class Result6<T0, T1, T2, T3, T4, T5> {
       other.$5 == $5;
 }''';
 
-  static const _classResult7 =
-      r'''
+  static const _classResult7 = r'''
 class Result7<T0, T1, T2, T3, T4, T5, T6> {
   final T0 $0;
   final T1 $1;
@@ -209,8 +201,7 @@ class Result7<T0, T1, T2, T3, T4, T5, T6> {
       other.$6 == $6;
 }''';
 
-  static const _classState =
-      r'''
+  static const _classState = r'''
 class State<T> {
   dynamic context;
 
@@ -413,8 +404,7 @@ class State<T> {
   }
 }''';
 
-  static const _classStateNoMemo =
-      r'''
+  static const _classStateNoMemo = r'''
 class State<T> {
   dynamic context;
 
@@ -601,8 +591,7 @@ class State<T> {
   }
 }''';
 
-  static const _extensionString =
-      r'''
+  static const _extensionString = r'''
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
@@ -650,8 +639,7 @@ extension on String {
   }
 }''';
 
-  static const _functionErrorMessage =
-      r'''
+  static const _functionErrorMessage = r'''
 String _errorMessage(String source, List<ParseError> errors) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {

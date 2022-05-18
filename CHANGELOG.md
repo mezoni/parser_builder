@@ -1,3 +1,8 @@
+## 2.0.21
+
+- Breaking change. Semantic actions for `Tokenize`, `TokenizeTags` parser builders have been simplified
+- Implemented, tested, but not documented parser builder `TokenizeSimilarTags`. It allows very fast parsing of tokens that can be created in a single semantic action
+
 ## 2.0.20
 
 - Despite the fact that the `source_span` package is no longer used, the error generation system, the error reporting system and the `ParseError` class have been unified in accordance with the way it is implemented in the `source_span` package, in particular in the `Span` classes. In the `ParseError` class, the `end` field no longer includes the value at that position. That is, the range (10, 10) means start position 10 with no value (empty value), (10, 11) start position 10, with value 1 element long, and so on. The values of these ranges are used to indicate the sequence of data elements using an indicator of the form `^^^^^`. Why exactly this way and not otherwise? Firstly, the ability to correctly encode empty ranges, and secondly, at runtime, during parsing, after successful parsing, the current position indicates the next element of the sequence and only such a state is available to next parsers. For example, for parsers-verifiers, this fits very well with the principle of their work. Parsers-verifiers do not analyze positions and the length of the parsed sequence at runtime, they react to the result returned by a predicate that checks the result of a successful parse and generate errors `as is` from the current parsing state data

@@ -39,6 +39,11 @@ int _toPrefix(String operator, int expression) {
   }
 }
 
+Token<T> _toToken<T>(
+    String source, int start, int end, T value, TokenKind kind) {
+  return Token(kind, source.substring(start, end), start, end, value);
+}
+
 String? alpha0(State<String> state) {
   String? $0;
   final source = state.source;
@@ -2164,11 +2169,9 @@ Token<dynamic>? tokenizeAlphaOrDigits(State<String> state) {
     state.fail($pos1, ParseError.character, 0, 0);
   }
   if (state.ok) {
-    final v1 = source;
-    final v2 = $pos;
-    final v3 = state.pos;
-    final v4 = $1!;
-    $0 = Token<String>(TokenKind.text, v1, v2, v3, v4);
+    final v1 = $pos;
+    final v2 = $1!;
+    $0 = Token<String>(TokenKind.text, v2, v1, state.pos, v2);
   }
   if (!state.ok) {
     final $pos2 = state.pos;
@@ -2189,12 +2192,53 @@ Token<dynamic>? tokenizeAlphaOrDigits(State<String> state) {
       state.fail($pos3, ParseError.character, 0, 0);
     }
     if (state.ok) {
-      final v1 = source;
-      final v2 = $pos2;
-      final v3 = state.pos;
-      final v4 = $2!;
-      $0 = Token<int>(TokenKind.number, v1, v2, v3, int.parse(v4));
+      final v1 = $pos2;
+      final v2 = $2!;
+      $0 = Token<int>(TokenKind.number, v2, v1, state.pos, int.parse(v2));
     }
+  }
+  return $0;
+}
+
+Token<dynamic>? tokenizeSimilarTagsIfForWhile(State<String> state) {
+  Token<dynamic>? $0;
+  final source = state.source;
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    String? tag;
+    TokenKind? id;
+    state.ok = false;
+    if (c == 105) {
+      if (source.startsWith('if', pos)) {
+        state.pos += 2;
+        id = TokenKind.text;
+        tag = 'if';
+      }
+    } else if (c == 102) {
+      if (source.startsWith('for', pos)) {
+        state.pos += 3;
+        id = TokenKind.text;
+        tag = 'for';
+      }
+    } else if (c == 119) {
+      if (source.startsWith('while', pos)) {
+        state.pos += 5;
+        id = TokenKind.text;
+        tag = 'while';
+      }
+    }
+    if (id != null) {
+      state.ok = true;
+      final v1 = pos;
+      final v2 = tag!;
+      final v3 = id;
+      $0 = Token<String>(v3, v2, v1, state.pos, v2);
+    }
+  }
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.character, 0, 0);
   }
   return $0;
 }
@@ -2211,28 +2255,25 @@ dynamic tokenizeTagsIfForWhile(State<String> state) {
       if (source.startsWith('if', pos)) {
         state.pos += 2;
         state.ok = true;
-        final v1 = source;
-        final v2 = pos;
-        final v3 = state.pos;
-        $0 = Token<String>(TokenKind.text, v1, v2, v3, 'if');
+        final v1 = pos;
+        final v2 = 'if';
+        $0 = Token<String>(TokenKind.text, v2, v1, state.pos, v2);
       }
     } else if (c == 102) {
       if (source.startsWith('for', pos)) {
         state.pos += 3;
         state.ok = true;
-        final v1 = source;
-        final v2 = pos;
-        final v3 = state.pos;
-        $0 = Token<String>(TokenKind.text, v1, v2, v3, 'for');
+        final v1 = pos;
+        final v2 = 'for';
+        $0 = Token<String>(TokenKind.text, v2, v1, state.pos, v2);
       }
     } else if (c == 119) {
       if (source.startsWith('while', pos)) {
         state.pos += 5;
         state.ok = true;
-        final v1 = source;
-        final v2 = pos;
-        final v3 = state.pos;
-        $0 = Token<String>(TokenKind.text, v1, v2, v3, 'while');
+        final v1 = pos;
+        final v2 = 'while';
+        $0 = Token<String>(TokenKind.text, v2, v1, state.pos, v2);
       }
     }
   }

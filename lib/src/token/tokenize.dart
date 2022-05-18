@@ -7,10 +7,8 @@ final {{pos}} = state.pos;
 {{var1}}
 {{p1}}
 if (state.ok) {
-  final v1 = source;
-  final v2 = {{pos}};
-  final v3 = state.pos;
-  final v4 = {{val1}};
+  final v1 = {{pos}};
+  final v2 = {{val1}};
   {{res0}} = {{tokenize}};
 }''';
 
@@ -31,9 +29,7 @@ if (state.ok) {
     final r1 = context.getResult(parser, !fast);
     values.addAll({
       'p1': parser.build(context, r1),
-      'tokenize': fast
-          ? ''
-          : tokenize.build(context, 'tokenize', ['v1', 'v2', 'v3', 'v4']),
+      'tokenize': fast ? '' : tokenize.build(context, 'tokenize', ['v1', 'v2']),
     });
     return render2(fast, _templateFast, _template, values, [result, r1]);
   }

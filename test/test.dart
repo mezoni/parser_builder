@@ -85,6 +85,7 @@ void _test() {
   _testTakeWhileMN();
   _testTerminated();
   _testTokenize();
+  _testTokenizeSimilarTags();
   _testTokenizeTags();
   _testTuple();
   _testValue();
@@ -3374,20 +3375,63 @@ void _testTokenize() {
   test('Tokenize', () {
     final parser = tokenizeAlphaOrDigits;
     {
-      final source = '123';
-      final state = State(source);
+      final state = State('123');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, Token(TokenKind.number, source, 0, 3, 123));
+      expect(r, Token(TokenKind.number, '123', 0, 3, 123));
       expect(state.pos, 3);
     }
     {
-      final source = 'abc';
-      final state = State(source);
+      final state = State('abc');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, Token(TokenKind.text, source, 0, 3, 'abc'));
+      expect(r, Token(TokenKind.text, 'abc', 0, 3, 'abc'));
       expect(state.pos, 3);
+    }
+    {
+      final source = '';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
+    }
+    {
+      final source = ' ';
+      final state = State(source);
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errors, [ParseError(0, 0, "Unexpected ' '")]);
+    }
+  });
+}
+
+void _testTokenizeSimilarTags() {
+  test('TokenizeSimilarTags', () {
+    final parser = tokenizeSimilarTagsIfForWhile;
+    {
+      final state = State('if');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.text, 'if', 0, 2, 'if'));
+      expect(state.pos, 2);
+    }
+    {
+      final state = State('for');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.text, 'for', 0, 3, 'for'));
+      expect(state.pos, 3);
+    }
+    {
+      final state = State('while');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, Token(TokenKind.text, 'while', 0, 5, 'while'));
+      expect(state.pos, 5);
     }
     {
       final source = '';
@@ -3414,27 +3458,24 @@ void _testTokenizeTags() {
   test('TokenizeTags', () {
     final parser = tokenizeTagsIfForWhile;
     {
-      final source = 'if';
-      final state = State(source);
+      final state = State('if');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, Token(TokenKind.text, source, 0, 2, 'if'));
+      expect(r, Token(TokenKind.text, 'if', 0, 2, 'if'));
       expect(state.pos, 2);
     }
     {
-      final source = 'for';
-      final state = State(source);
+      final state = State('for');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, Token(TokenKind.text, source, 0, 3, 'for'));
+      expect(r, Token(TokenKind.text, 'for', 0, 3, 'for'));
       expect(state.pos, 3);
     }
     {
-      final source = 'while';
-      final state = State(source);
+      final state = State('while');
       final r = parser(state);
       expect(state.ok, true);
-      expect(r, Token(TokenKind.text, source, 0, 5, 'while'));
+      expect(r, Token(TokenKind.text, 'while', 0, 5, 'while'));
       expect(state.pos, 5);
     }
     {

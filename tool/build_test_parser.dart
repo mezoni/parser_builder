@@ -97,6 +97,7 @@ Future<void> main(List<String> args) async {
     _terminatedC16C32,
     _testRef_,
     _tokenizeAlphaOrDigits,
+    _tokenizeSimilarTagsIfForWhile,
     _tokenizeTagsIfForWhile,
     _tuple2C32Abc,
     _tuple3C32AbcC16,
@@ -166,6 +167,11 @@ int _toPrefix(String operator, int expression) {
     default:
       throw StateError('Unknown operator: $operator');
   }
+}
+
+Token<T> _toToken<T>(
+    String source, int start, int end, T value, TokenKind kind) {
+  return Token(kind, source.substring(start, end), start, end, value);
 }
 ''';
 
@@ -424,36 +430,43 @@ const _tokenizeAlphaOrDigits = Named<String, Token>(
         Tokenize(
             Alpha1(),
             ExpressionAction([
-              'src',
               'start',
-              'end',
               'val'
-            ], 'Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, {{val}})')),
+            ], 'Token<String>(TokenKind.text, {{val}}, {{start}}, state.pos, {{val}})')),
         Tokenize(
             Digit1(),
             ExpressionAction([
-              'src',
               'start',
-              'end',
               'val'
-            ], 'Token<int>(TokenKind.number, {{src}}, {{start}}, {{end}}, int.parse({{val}}))'))));
+            ], 'Token<int>(TokenKind.number, {{val}}, {{start}}, state.pos,  int.parse({{val}}))'))));
+
+const _tokenizeSimilarTagsIfForWhile = Named(
+    'tokenizeSimilarTagsIfForWhile',
+    TokenizeSimilarTags(
+        {
+          'if': TokenKind.text,
+          'for': TokenKind.text,
+          'while': TokenKind.text,
+        },
+        ExpressionAction<Token>(['start', 'val', 'id'],
+            'Token<String>({{id}}, {{val}}, {{start}}, state.pos, {{val}})')));
 
 const _tokenizeTagsIfForWhile = Named(
     'tokenizeTagsIfForWhile',
     TokenizeTags(
       {
-        'if': ExpressionAction(['src', 'start', 'end'],
-            "Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, 'if')"),
+        'if': ExpressionAction([
+          'start',
+          'tag'
+        ], "Token<String>(TokenKind.text, {{tag}}, {{start}}, state.pos, {{tag}})"),
         'for': ExpressionAction([
-          'src',
           'start',
-          'end'
-        ], "Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, 'for')"),
+          'tag'
+        ], "Token<String>(TokenKind.text, {{tag}}, {{start}}, state.pos, {{tag}})"),
         'while': ExpressionAction([
-          'src',
           'start',
-          'end'
-        ], "Token<String>(TokenKind.text, {{src}}, {{start}}, {{end}}, 'while')"),
+          'tag'
+        ], "Token<String>(TokenKind.text, {{tag}}, {{start}}, state.pos, {{tag}})"),
       },
     ));
 

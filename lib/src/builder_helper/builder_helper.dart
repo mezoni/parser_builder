@@ -105,6 +105,8 @@ String? tryGetAsCode(dynamic value) {
     return '$value';
   } else if (value == null) {
     return '$value';
+  } else if (value is Enum) {
+    return '${value.runtimeType}.${value.name}';
   } else if (value is List) {
     final values = [];
     for (var item in value) {
