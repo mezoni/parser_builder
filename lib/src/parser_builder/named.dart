@@ -20,7 +20,10 @@ class Named<I, O> extends ParserBuilder<I, O> {
     final fast = result == null;
     if (context.pass == 0) {
       _registerParserMode(context, fast);
-      _buildDeclaration(context, fast);
+      final processed = _getProcessed(context);
+      if (processed.add(this)) {
+        _buildDeclaration(context, fast);
+      }
     } else {
       final processed = _getProcessed(context);
       if (processed.add(this)) {
@@ -109,7 +112,7 @@ class Named<I, O> extends ParserBuilder<I, O> {
 
   Set<Named> _getProcessed(Context context) {
     final result = context.readRegistryValue(
-        context.registry, this, 'processed', () => <Named>{});
+        context.globalRegistry, this, 'processed', () => <Named>{});
     return result;
   }
 
