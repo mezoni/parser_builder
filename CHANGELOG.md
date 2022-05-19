@@ -1,3 +1,7 @@
+## 2.0.22
+
+- Minor improvements in the experimental implementation of the `_errorMessage` function. Current operating principle. When displaying text, it is `formatted` (all `whitespace` characters are displayed as spaces) into one line (with a length of no more than 80 characters) and the position of the error is displayed as close to the center of the output line as possible. Thus (regardless of line breaks) the text before and after the error position is displayed (if it fits in a line of 80 characters). This looks more informative and clearer, and at the same time solves the problem with the case when all the parsed text is one very long line and the error message looks just awful
+
 ## 2.0.21
 
 - Breaking change. Semantic actions for `Tokenize`, `TokenizeTags` parser builders have been simplified

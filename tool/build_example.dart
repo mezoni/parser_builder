@@ -157,7 +157,7 @@ state.minErrorPos = {{min}};
 if (!state.ok) {
   state.fail(state.pos, ParseError.expected, 0, {{tag}});
   final pos = state.lastErrorPos;
-  if (pos != source.length) {
+  if (pos != state.pos) {
     state.fail(pos, ParseError.message, 0, {{message}}, state.pos);
   }
 }

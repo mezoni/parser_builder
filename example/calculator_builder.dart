@@ -78,7 +78,7 @@ const _numberImpl = Named(
 
 const _openParen = Named('_openParen', Terminated(Tag('('), _ws));
 
-const _parse = Named('_parse', Terminated(_expression, Eof<String>()));
+const _parse = Named('_parse', Delimited(_ws, _expression, Eof<String>()));
 
 const _primary = Named(
     '_primary',

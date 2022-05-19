@@ -639,11 +639,15 @@ extension on String {
   }
 }''';
 
+  /// Simplified (to reduce code size), experimental implementation.
+  /// As a result, there is a possibility that the error position indicator may
+  /// be displayed in a different position.
   static const _functionErrorMessage = r'''
 String _errorMessage(String source, List<ParseError> errors) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
     if (sb.isNotEmpty) {
+      sb.writeln();
       sb.writeln();
     }
 
@@ -673,16 +677,16 @@ String _errorMessage(String source, List<ParseError> errors) {
     int max(int x, int y) => x > y ? x : y;
     int min(int x, int y) => x < y ? x : y;
     final sourceLen = source.length;
-    final totalLen = sourceLen - lineStart;
-    final lineLimit = min(80, totalLen);
+    final lineLimit = min(80, sourceLen);
     final start2 = start;
     final end2 = min(start2 + lineLimit, end);
-    final textLen = end2 - start2;
-    final spaceLen = lineLimit - textLen;
-    final prefixLen = min(lineLimit - textLen, start2 - lineStart);
+    final errorLen = end2 - start;
+    final extraLen = lineLimit - errorLen;
+    final rightLen = min(sourceLen - end2, extraLen - (extraLen >> 1));
+    final leftLen = min(start, max(0, lineLimit - errorLen - rightLen));
     final list = <int>[];
     final iterator = RuneIterator.at(source, start2);
-    for (var i = 0; i < prefixLen; i++) {
+    for (var i = 0; i < leftLen; i++) {
       if (!iterator.movePrevious()) {
         break;
       }
@@ -692,10 +696,8 @@ String _errorMessage(String source, List<ParseError> errors) {
 
     final column = start - lineStart + 1;
     final left = String.fromCharCodes(list.reversed);
-    final end3 = max(end2, end2 + (spaceLen - prefixLen));
-    final textStart = end3 - lineLimit;
-    final indicatorOffset = start2 - textStart;
-    final indicatorLen = max(1, end2 - start2);
+    final end3 = min(sourceLen, start2 + (lineLimit - leftLen));
+    final indicatorLen = max(1, errorLen);
     final right = source.substring(start2, end3);
     var text = left + right;
     text = text.replaceAll('\n', ' ');
@@ -703,7 +705,7 @@ String _errorMessage(String source, List<ParseError> errors) {
     text = text.replaceAll('\t', ' ');
     sb.writeln('line $row, column $column: $error');
     sb.writeln(text);
-    sb.write(' ' * indicatorOffset + '^' * indicatorLen);
+    sb.write(' ' * leftLen + '^' * indicatorLen);
   }
 
   return sb.toString();
