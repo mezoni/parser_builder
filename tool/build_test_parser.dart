@@ -6,6 +6,7 @@ import 'package:parser_builder/combinator.dart';
 import 'package:parser_builder/error.dart';
 import 'package:parser_builder/expression.dart';
 import 'package:parser_builder/fast_build.dart';
+import 'package:parser_builder/markup.dart';
 import 'package:parser_builder/memoization.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
@@ -82,8 +83,9 @@ Future<void> main(List<String> args) async {
     _tagC16C32,
     _tagC32,
     _tagC32C16,
-    _tagOfFoo,
     _tagNoCaseAbc,
+    _tagOfFoo,
+    _tagPairAbc,
     _tagsAbcAbdDefDegXXYZ,
     _tagValues,
     _takeUntilAbc,
@@ -390,6 +392,17 @@ const _tagOfFoo = Named(
     'tagOfFoo',
     TagOf(Calculate(VariableAction([], '{{foo}}',
         key: 'foo', init: 'state.context.foo as String'))));
+
+const _tagPairAbc = Named(
+  'tagPairAbc',
+  TagPair(
+    Delimited(Tag('<'), Alphanumeric1(), Tag('>')),
+    Alphanumeric0(),
+    Delimited(Tag(r'<\'), Alphanumeric1(), Tag('>')),
+    ExpressionAction<bool>(['s', 'e'], '{{s}} == {{e}}'),
+    ExpressionAction<String>(['x'], r'{{x}}.$1'),
+  ),
+);
 
 const _tagsAbcAbdDefDegXXYZ = Named(
     'tagsAbcAbdDefDegXXYZ', Tags(['abc', 'abd', 'def', 'deg', 'x', 'xy', 'z']));

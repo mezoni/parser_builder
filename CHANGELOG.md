@@ -1,3 +1,7 @@
+## 2.0.24
+
+- Implemented, tested, but not documented parser builder `TagPair`. It is intended to parse markup languages elements
+
 ## 2.0.23
 
 - Fixed bug in parser builder `Named`

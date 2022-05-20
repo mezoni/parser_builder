@@ -1821,6 +1821,26 @@ String? tagC32C16(State<String> state) {
   return $0;
 }
 
+String? tagNoCaseAbc(State<String> state) {
+  String? $0;
+  final source = state.source;
+  final $start = state.pos;
+  final $end = $start + 3;
+  state.ok = $end <= source.length;
+  if (state.ok) {
+    final v = source.substring($start, $end);
+    state.ok = v.toLowerCase() == 'abc';
+    if (state.ok) {
+      state.pos = $end;
+      $0 = v;
+    }
+  }
+  if (!state.ok) {
+    state.fail($start, ParseError.expected, 0, 'abc');
+  }
+  return $0;
+}
+
 String? tagOfFoo(State<String> state) {
   String? $0;
   final source = state.source;
@@ -1843,22 +1863,139 @@ String? tagOfFoo(State<String> state) {
   return $0;
 }
 
-String? tagNoCaseAbc(State<String> state) {
+String? tagPairAbc(State<String> state) {
   String? $0;
   final source = state.source;
-  final $start = state.pos;
-  final $end = $start + 3;
-  state.ok = $end <= source.length;
+  final $pos = state.pos;
+  String? $1;
+  final $pos1 = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 60;
   if (state.ok) {
-    final v = source.substring($start, $end);
-    state.ok = v.toLowerCase() == 'abc';
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, 0, '<');
+  }
+  if (state.ok) {
+    final $pos2 = state.pos;
+    while (state.pos < source.length) {
+      final c = source.codeUnitAt(state.pos);
+      final ok = c <= 90
+          ? c <= 57
+              ? c >= 48
+              : c >= 65
+          : c <= 122 && c >= 97;
+      if (!ok) {
+        break;
+      }
+      state.pos++;
+    }
+    state.ok = state.pos != $pos2;
     if (state.ok) {
-      state.pos = $end;
-      $0 = v;
+      $1 = source.substring($pos2, state.pos);
+    } else {
+      state.fail($pos2, ParseError.character, 0, 0);
+    }
+    if (state.ok) {
+      state.ok =
+          state.pos < source.length && source.codeUnitAt(state.pos) == 62;
+      if (state.ok) {
+        state.pos += 1;
+      } else {
+        state.fail(state.pos, ParseError.expected, 0, '>');
+      }
+    }
+    if (!state.ok) {
+      $1 = null;
+      state.pos = $pos1;
+    }
+  }
+  if (state.ok) {
+    final $end = state.pos;
+    String? $2;
+    final $pos3 = state.pos;
+    while (state.pos < source.length) {
+      final c = source.codeUnitAt(state.pos);
+      final ok = c <= 90
+          ? c <= 57
+              ? c >= 48
+              : c >= 65
+          : c <= 122 && c >= 97;
+      if (!ok) {
+        break;
+      }
+      state.pos++;
+    }
+    state.ok = true;
+    if (state.ok) {
+      $2 = $pos3 == state.pos ? '' : source.substring($pos3, state.pos);
+    }
+    if (state.ok) {
+      final $start = state.pos;
+      String? $3;
+      final $pos4 = state.pos;
+      state.ok = state.pos + 1 < source.length &&
+          source.codeUnitAt(state.pos) == 60 &&
+          source.codeUnitAt(state.pos + 1) == 92;
+      if (state.ok) {
+        state.pos += 2;
+      } else {
+        state.fail(state.pos, ParseError.expected, 0, '<\\');
+      }
+      if (state.ok) {
+        final $pos5 = state.pos;
+        while (state.pos < source.length) {
+          final c = source.codeUnitAt(state.pos);
+          final ok = c <= 90
+              ? c <= 57
+                  ? c >= 48
+                  : c >= 65
+              : c <= 122 && c >= 97;
+          if (!ok) {
+            break;
+          }
+          state.pos++;
+        }
+        state.ok = state.pos != $pos5;
+        if (state.ok) {
+          $3 = source.substring($pos5, state.pos);
+        } else {
+          state.fail($pos5, ParseError.character, 0, 0);
+        }
+        if (state.ok) {
+          state.ok =
+              state.pos < source.length && source.codeUnitAt(state.pos) == 62;
+          if (state.ok) {
+            state.pos += 1;
+          } else {
+            state.fail(state.pos, ParseError.expected, 0, '>');
+          }
+        }
+        if (!state.ok) {
+          $3 = null;
+          state.pos = $pos4;
+        }
+      }
+      if (state.ok) {
+        final v1 = $1;
+        final v2 = $3;
+        state.ok = v1 == v2;
+        if (state.ok) {
+          final v3 = $2;
+          final v4 = Result3(v1, v3, v2);
+          $0 = v4.$1;
+        } else {
+          final length1 = $end - $pos;
+          final length2 = state.pos - $start;
+          final message1 = "Start tag '$v1' doesn't have a matching end tag";
+          final message2 = "End tag '$v2' does not match start tag '$v1'";
+          state.fail($start, ParseError.message, length1, message1, $pos);
+          state.fail($start, ParseError.message, length2, message2);
+        }
+      }
     }
   }
   if (!state.ok) {
-    state.fail($start, ParseError.expected, 0, 'abc');
+    state.pos = $pos;
   }
   return $0;
 }

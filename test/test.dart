@@ -74,8 +74,9 @@ void _test() {
   _testSkipWhile1();
   _testStringValue();
   _testTag();
-  _testTagOf();
   _testTagNoCase();
+  _testTagOf();
+  _testTagPair();
   _testTags();
   _testTagValues();
   _testTakeUntil();
@@ -2931,6 +2932,58 @@ void _testTagOf() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 0, "Expected: 'foo'")]);
+    }
+  });
+}
+
+void _testTagPair() {
+  test('TagPair', () {
+    final parser = tagPairAbc;
+    {
+      final state = State(r'<abc>123<\abc>');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, '123');
+      expect(state.pos, 14);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 0);
+      expect(state.errors, [ParseError(0, 0, "Expected: '<'")]);
+    }
+    {
+      final state = State(r'<abc>123');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 8);
+      expect(state.errors, [ParseError(8, 8, r"Expected: '<\'")]);
+    }
+    {
+      final state = State(r'<abc>123<\def');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 13);
+      expect(state.errors, [ParseError(13, 13, r"Expected: '>'")]);
+    }
+    {
+      final state = State(r'<abc>123<\def>');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 8);
+      expect(state.errors, [
+        ParseError(0, 5, "Start tag 'abc' doesn't have a matching end tag"),
+        ParseError(8, 14, "End tag 'def' does not match start tag 'abc'"),
+      ]);
     }
   });
 }
