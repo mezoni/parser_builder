@@ -711,11 +711,20 @@ String _errorMessage(String source, List<ParseError> errors) {
   return sb.toString();
 }''';
 
-  static addClassMemoizedResult(Context context) {
-    _addClass(context, 'MemoizedResult', _classMemoizedResult);
+  static void addClasses(Context context) {
+    final hasClassMemoizedResult = _hasClass(context, 'MemoizedResult');
+    _addClass(context, 'State', _classState, hasClassMemoizedResult);
+    _addClass(context, 'State', _classStateNoMemo, !hasClassMemoizedResult);
+    _addClass(context, 'State', _classState, true);
+    _addClass(context, 'ParseError', _classParseError, true);
+    context.globalDeclarations.add(_extensionString);
   }
 
-  static addClassResult(Context context, int size) {
+  static addClassMemoizedResult(Context context, bool condition) {
+    _addClass(context, 'MemoizedResult', _classMemoizedResult, condition);
+  }
+
+  static addClassResult(Context context, int size, bool condition) {
     final String code;
     switch (size) {
       case 2:
@@ -741,19 +750,7 @@ String _errorMessage(String source, List<ParseError> errors) {
     }
 
     final name = 'Result$size';
-    _addClass(context, name, code);
-  }
-
-  static void addClasses(Context context) {
-    if (_hasClass(context, 'MemoizedResult')) {
-      _addClass(context, 'State', _classState);
-    } else {
-      _addClass(context, 'State', _classStateNoMemo);
-    }
-
-    _addClass(context, 'State', _classState);
-    _addClass(context, 'ParseError', _classParseError);
-    context.globalDeclarations.add(_extensionString);
+    _addClass(context, name, code, condition);
   }
 
   static String getErrorMessageProcessor() {
@@ -761,9 +758,11 @@ String _errorMessage(String source, List<ParseError> errors) {
     return result;
   }
 
-  static _addClass(Context context, String name, String code) {
-    if (!context.classDeclarations.containsKey(name)) {
-      context.classDeclarations[name] = code;
+  static _addClass(Context context, String name, String code, bool condition) {
+    if (condition) {
+      if (!context.classDeclarations.containsKey(name)) {
+        context.classDeclarations[name] = code;
+      }
     }
   }
 

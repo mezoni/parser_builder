@@ -42,8 +42,8 @@ while (true) {
 
   @override
   String build(Context context, ParserResult? result) {
-    ParseRuntime.addClassResult(context, 2);
     final fast = result == null;
+    ParseRuntime.addClassResult(context, 2, !fast);
     final values = context.allocateLocals(['list', 'pos']);
     final r1 = context.getResult(end, !fast);
     final r2 = context.getResult(parser, !fast);

@@ -511,20 +511,6 @@ class ParseError {
   }
 }
 
-class Result2<T0, T1> {
-  final T0 $0;
-  final T1 $1;
-
-  Result2(this.$0, this.$1);
-
-  @override
-  int get hashCode => $0.hashCode ^ $1.hashCode;
-
-  @override
-  bool operator ==(other) =>
-      other is Result2 && other.$0 == $0 && other.$1 == $1;
-}
-
 class State<T> {
   dynamic context;
 
