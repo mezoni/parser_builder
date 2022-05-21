@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 2.0.24
+Version: 2.0.25
 
 It is under development (not all built-in common buildres are implemented but can be used without them), but you can already play around.  
 
@@ -184,16 +184,18 @@ Future<void> main(List<String> args) async {
 
 const _hexColor = Named(
     '_hexColor',
-    Expected(
+    Nested(
         'hexadecimal color',
         Preceded(
             Tag('#'),
-            Map3(
-                _hexPrimary,
-                _hexPrimary,
-                _hexPrimary,
-                ExpressionAction<Color>(
-                    ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})')))));
+            Indicate(
+                'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
+                Map3(
+                    _hexPrimary,
+                    _hexPrimary,
+                    _hexPrimary,
+                    ExpressionAction<Color>(
+                        ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))))));
 
 const _hexPrimary = Named(
     '_hexPrimary',
@@ -275,47 +277,57 @@ const _inline = '@pragma(\'vm:prefer-inline\')';
 Color? _hexColor(State<String> state) {
   Color? $0;
   final source = state.source;
-  final $log = state.log;
-  state.log = false;
-  Color? $1;
-  final $pos = state.pos;
+  final $pos = state.minErrorPos;
+  state.minErrorPos = state.pos + 1;
+  final $pos1 = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.fail(state.pos, const ParseError.expected('#'));
+    state.fail(state.pos, ParseError.expected, '#');
   }
   if (state.ok) {
-    final $pos1 = state.pos;
-    int? $2;
-    $2 = _hexPrimary(state);
+    final $pos2 = state.start;
+    state.start = state.pos;
+    final $pos3 = state.setLastErrorPos(-1);
+    final $pos4 = state.pos;
+    int? $1;
+    $1 = _hexPrimary(state);
     if (state.ok) {
-      int? $3;
-      $3 = _hexPrimary(state);
+      int? $2;
+      $2 = _hexPrimary(state);
       if (state.ok) {
-        int? $4;
-        $4 = _hexPrimary(state);
+        int? $3;
+        $3 = _hexPrimary(state);
         if (state.ok) {
-          final v1 = $2!;
-          final v2 = $3!;
-          final v3 = $4!;
-          $1 = Color(v1, v2, v3);
+          final v1 = $1!;
+          final v2 = $2!;
+          final v3 = $3!;
+          $0 = Color(v1, v2, v3);
         }
       }
     }
     if (!state.ok) {
+      state.pos = $pos4;
+    }
+    if (!state.ok) {
+      state.ok = false;
+      state.fail(
+          state.lastErrorPos,
+          ParseError.message,
+          'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
+          state.start);
+    }
+    state.restoreLastErrorPos($pos3);
+    state.start = $pos2;
+    if (!state.ok) {
       state.pos = $pos1;
     }
   }
+  state.minErrorPos = $pos;
   if (!state.ok) {
-    $1 = null;
-    state.pos = $pos;
-  }
-  state.log = $log;
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.fail(state.pos, const ParseError.expected('hexadecimal color'));
+    state.ok = false;
+    state.fail(state.pos, ParseError.expected, 'hexadecimal color');
   }
   return $0;
 }
@@ -325,10 +337,21 @@ Color? _hexColor(State<String> state) {
 This code was generated from this declaration:
 
 ```dart
-const _hexPrimary = Named(
-    '_hexPrimary',
-    Map1(TakeWhileMN(2, 2, CharClass('[0-9A-Fa-f]')),
-        ExpressionAction<int>(['x'], 'int.parse({{x}}, radix: 16)')));
+const _hexColor = Named(
+    '_hexColor',
+    Nested(
+        'hexadecimal color',
+        Preceded(
+            Tag('#'),
+            Indicate(
+                'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
+                Map3(
+                    _hexPrimary,
+                    _hexPrimary,
+                    _hexPrimary,
+                    ExpressionAction<Color>(
+                        ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))))));
+
 ```
 
 ## Inlining code example
@@ -356,13 +379,13 @@ dynamic _json(State<String> state) {
     if (state.ok) {
       state.ok = state.pos >= source.length;
       if (!state.ok) {
-        state.fail(state.pos, const ParseError.expected('EOF'));
+        state.fail(state.pos, ParseError.expected, 'EOF');
       }
     }
-  }
-  if (!state.ok) {
-    $0 = null;
-    state.pos = $pos;
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
   }
   return $0;
 }
@@ -412,24 +435,24 @@ An updated version of this section will be added later...
 
 Current performance of the generated JSON parser.  
 
-The performance is about 1.25-1.35 times lower than that of a hand-written high-quality specialized state machine based JSON parser from the Dart SDK.
+The performance is about 1.15-1.27 times lower than that of a hand-written high-quality specialized state machine based JSON parser from the Dart SDK.
 
 Better results in many cases are obtained in AOT mode. If the Dart SDK compiler had made more efficient use placement of (short lifetime) local variables in registers, the results could have been slightly better. At the moment, the generated parser code is not optimized for using machine registers, because performance tests, unfortunately, do not show a gain from this kind of optimization.
 
 AOT mode:
 
 ```
-Parse 10 times: E:\prj\test_json\bin\data\canada.json (2251.05 Kb)
-Dart SDK JSON : k: 1.94, 37.68 MB/s, 569.7320 ms (100.00%),
-Simple JSON NEW 1: k: 1.00, 72.98 MB/s, 294.1500 ms (51.63%),
+Parse 50 times: E:\prj\test_json\bin\data\canada.json (2251.05 Kb)
+Dart SDK JSON : k: 2.09, 40.00 MB/s, 2683.4750 ms (100.00%),
+Simple JSON NEW 1: k: 1.00, 83.54 MB/s, 1284.9110 ms (47.88%),
 
-Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json (1727.03 Kb)
-Dart SDK JSON : k: 1.00, 85.81 MB/s, 191.9380 ms (81.55%),
-Simple JSON NEW 1: k: 1.23, 69.98 MB/s, 235.3510 ms (100.00%),
+Parse 50 times: E:\prj\test_json\bin\data\citm_catalog.json (1727.03 Kb)
+Dart SDK JSON : k: 1.00, 88.53 MB/s, 930.2310 ms (78.65%),
+Simple JSON NEW 1: k: 1.27, 69.63 MB/s, 1182.7210 ms (100.00%),
 
-Parse 10 times: E:\prj\test_json\bin\data\twitter.json (567.93 Kb)
-Dart SDK JSON : k: 1.00, 56.88 MB/s, 95.2140 ms (84.32%),
-Simple JSON NEW 1: k: 1.19, 47.96 MB/s, 112.9200 ms (100.00%),
+Parse 50 times: E:\prj\test_json\bin\data\twitter.json (567.93 Kb)
+Dart SDK JSON : k: 1.00, 57.19 MB/s, 473.5590 ms (81.47%),
+Simple JSON NEW 1: k: 1.23, 46.59 MB/s, 581.2700 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601
@@ -439,17 +462,17 @@ Processor (4 core) Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
 JIT mode:
 
 ```
-Parse 10 times: E:\prj\test_json\bin\data\canada.json (2251.05 Kb)
-Dart SDK JSON : k: 2.37, 45.31 MB/s, 473.8040 ms (100.00%),
-Simple JSON NEW 1: k: 1.00, 107.38 MB/s, 199.9240 ms (42.20%),
+Parse 50 times: E:\prj\test_json\bin\data\canada.json (2251.05 Kb)
+Dart SDK JSON : k: 2.72, 49.65 MB/s, 2161.8200 ms (100.00%),
+Simple JSON NEW 1: k: 1.00, 135.20 MB/s, 793.9510 ms (36.73%),
 
-Parse 10 times: E:\prj\test_json\bin\data\citm_catalog.json (1727.03 Kb)
-Dart SDK JSON : k: 1.00, 92.33 MB/s, 178.3880 ms (73.91%),
-Simple JSON NEW 1: k: 1.35, 68.24 MB/s, 241.3580 ms (100.00%),
+Parse 50 times: E:\prj\test_json\bin\data\citm_catalog.json (1727.03 Kb)
+Dart SDK JSON : k: 1.00, 107.60 MB/s, 765.3480 ms (79.95%),
+Simple JSON NEW 1: k: 1.25, 86.02 MB/s, 957.3380 ms (100.00%),
 
-Parse 10 times: E:\prj\test_json\bin\data\twitter.json (567.93 Kb)
-Dart SDK JSON : k: 1.00, 59.94 MB/s, 90.3650 ms (79.84%),
-Simple JSON NEW 1: k: 1.25, 47.85 MB/s, 113.1820 ms (100.00%),
+Parse 50 times: E:\prj\test_json\bin\data\twitter.json (567.93 Kb)
+Dart SDK JSON : k: 1.00, 65.41 MB/s, 414.0220 ms (87.29%),
+Simple JSON NEW 1: k: 1.15, 57.09 MB/s, 474.3290 ms (100.00%),
 
 OS: Microsoft Windows 7 Ultimate 6.1.7601
 Kernel: Windows_NT 6.1.7601

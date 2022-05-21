@@ -17,16 +17,18 @@ Future<void> main(List<String> args) async {
 
 const _hexColor = Named(
     '_hexColor',
-    Expected(
+    Nested(
         'hexadecimal color',
         Preceded(
             Tag('#'),
-            Map3(
-                _hexPrimary,
-                _hexPrimary,
-                _hexPrimary,
-                ExpressionAction<Color>(
-                    ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})')))));
+            Indicate(
+                'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
+                Map3(
+                    _hexPrimary,
+                    _hexPrimary,
+                    _hexPrimary,
+                    ExpressionAction<Color>(
+                        ['r', 'g', 'b'], 'Color({{r}}, {{g}}, {{b}})'))))));
 
 const _hexPrimary = Named(
     '_hexPrimary',

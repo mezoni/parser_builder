@@ -11,7 +11,7 @@ if (state.ok) {
   {{tests}}
 }
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   static const _templateFast = '''
@@ -23,7 +23,7 @@ if (state.ok) {
   {{tests}}
 }
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   static const _templateTestLong = '''

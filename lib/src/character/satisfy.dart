@@ -17,10 +17,10 @@ if (state.ok) {
     state.pos++;
     {{res0}} = c;
   } else {
-    state.fail(state.pos, ParseError.character, 0, 0);
+    state.fail(state.pos, ParseError.character);
   }
 } else {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   static const _template16Fast = '''
@@ -31,10 +31,10 @@ if (state.ok) {
   if (state.ok) {
     state.pos++;
   } else {
-    state.fail(state.pos, ParseError.character, 0, 0);
+    state.fail(state.pos, ParseError.character);
   }
 } else {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   static const _template32 = '''
@@ -47,10 +47,10 @@ if (state.ok) {
     {{res0}} = c;
   } else {
     state.pos = pos;
-    state.fail(state.pos, ParseError.character, 0, c);
+    state.fail(state.pos, ParseError.character);
   }
 } else {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   static const _template32Fast = '''
@@ -61,10 +61,10 @@ if (state.ok) {
   state.ok = {{test}};
   if (!state.ok) {
     state.pos = pos;
-    state.fail(state.pos, ParseError.character, 0, c);
+    state.fail(state.pos, ParseError.character);
   }
 } else {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   final SemanticAction<bool> predicate;

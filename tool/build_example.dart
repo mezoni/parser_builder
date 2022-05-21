@@ -1,5 +1,4 @@
 import 'package:parser_builder/branch.dart';
-import 'package:parser_builder/builder_helper.dart' as helper;
 import 'package:parser_builder/bytes.dart';
 import 'package:parser_builder/char_class.dart';
 import 'package:parser_builder/character.dart';
@@ -122,10 +121,18 @@ const _primitives = Named(
 
 const _quote = Named('_quote', Fast(Terminated(Tag('"'), _ws)), [_inline]);
 
-const _string = Named(
+const _string = Named<String, String>(
     '_string',
-    _Unterminated('string', 'Unterminated string',
-        Delimited(Tag('"'), _stringValue, _quote)));
+    Nested(
+        'string',
+        WithStartAndLastErrorPos(Delimited(
+            Tag('"'),
+            _stringValue,
+            Alt2(
+              _quote,
+              FailMessage(
+                  FailPos.lastErrorPos, 'Unterminated string', FailPos.start),
+            )))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
 
@@ -146,40 +153,3 @@ const _value_ = Named(
 const _values = Named('_values', SeparatedList0(_value, _comma));
 
 const _ws = Named('_ws', SkipWhile(_isWhitespace));
-
-class _Unterminated<I, O> extends ParserBuilder<I, O> {
-  static const _template = '''
-final {{last}} = state.setLastErrorPos(-1);
-final {{min}} = state.minErrorPos;
-state.minErrorPos = state.pos + 1;
-{{p1}}
-state.minErrorPos = {{min}};
-if (!state.ok) {
-  state.fail(state.pos, ParseError.expected, 0, {{tag}});
-  final pos = state.lastErrorPos;
-  if (pos != state.pos) {
-    state.fail(pos, ParseError.message, 0, {{message}}, state.pos);
-  }
-}
-state.restoreLastErrorPos({{last}});''';
-
-  final String message;
-
-  final ParserBuilder<I, O> parser;
-
-  final String tag;
-
-  const _Unterminated(this.tag, this.message, this.parser);
-
-  @override
-  String build(Context context, ParserResult? result) {
-    context.refersToStateSource = true;
-    final values = context.allocateLocals(['last', 'min']);
-    values.addAll({
-      'message': helper.escapeString(message),
-      'p1': parser.build(context, result),
-      'tag': helper.escapeString(tag),
-    });
-    return render(_template, values, [result]);
-  }
-}

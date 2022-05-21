@@ -59,7 +59,7 @@ num? _parse(State<String> state) {
     if (state.ok) {
       state.ok = state.pos >= source.length;
       if (!state.ok) {
-        state.fail(state.pos, ParseError.expected, 0, 'EOF');
+        state.fail(state.pos, ParseError.expected, 'EOF');
       }
     }
     if (!state.ok) {
@@ -83,7 +83,7 @@ void _digit1(State<String> state) {
   }
   state.ok = state.pos != $pos;
   if (!state.ok) {
-    state.fail($pos, ParseError.character, 0, 0);
+    state.fail($pos, ParseError.character);
   }
 }
 
@@ -92,8 +92,7 @@ num? _numberImpl(State<String> state) {
   final source = state.source;
   final $log = state.log;
   state.log = false;
-  num? $1;
-  String? $2;
+  String? $1;
   final $pos = state.pos;
   final $pos1 = state.pos;
   _digit1(state);
@@ -103,7 +102,7 @@ num? _numberImpl(State<String> state) {
     if (state.ok) {
       state.pos += 1;
     } else {
-      state.fail(state.pos, ParseError.expected, 0, '.');
+      state.fail(state.pos, ParseError.expected, '.');
     }
     if (state.ok) {
       _digit1(state);
@@ -119,17 +118,16 @@ num? _numberImpl(State<String> state) {
     }
   }
   if (state.ok) {
-    $2 = source.slice($pos, state.pos);
+    $1 = source.slice($pos, state.pos);
   }
   if (state.ok) {
-    final v = $2!;
-    $1 = num.parse(v);
+    final v = $1!;
+    $0 = num.parse(v);
   }
   state.log = $log;
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.fail(state.pos, ParseError.expected, 0, 'number');
+  if (!state.ok) {
+    state.ok = false;
+    state.fail(state.pos, ParseError.expected, 'number');
   }
   return $0;
 }
@@ -155,7 +153,7 @@ void _openParen(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.fail(state.pos, ParseError.expected, 0, '(');
+    state.fail(state.pos, ParseError.expected, '(');
   }
   if (state.ok) {
     _ws(state);
@@ -172,7 +170,7 @@ void _closeParen(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.fail(state.pos, ParseError.expected, 0, ')');
+    state.fail(state.pos, ParseError.expected, ')');
   }
   if (state.ok) {
     _ws(state);
@@ -184,29 +182,27 @@ void _closeParen(State<String> state) {
 
 num? _primary(State<String> state) {
   num? $0;
-  final $min = state.minErrorPos;
+  final $pos = state.minErrorPos;
   state.minErrorPos = state.pos + 1;
-  num? $1;
-  $1 = _number(state);
+  $0 = _number(state);
   if (!state.ok) {
-    final $pos = state.pos;
+    final $pos1 = state.pos;
     _openParen(state);
     if (state.ok) {
-      $1 = _expression(state);
+      $0 = _expression(state);
       if (state.ok) {
         _closeParen(state);
       }
       if (!state.ok) {
-        $1 = null;
-        state.pos = $pos;
+        $0 = null;
+        state.pos = $pos1;
       }
     }
   }
-  state.minErrorPos = $min;
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.fail(state.pos, ParseError.expected, 0, 'expression');
+  state.minErrorPos = $pos;
+  if (!state.ok) {
+    state.ok = false;
+    state.fail(state.pos, ParseError.expected, 'expression');
   }
   return $0;
 }
@@ -238,9 +234,9 @@ String? _multiplicativeOperator(State<String> state) {
     }
   }
   if (!state.ok) {
-    state.fail(state.pos, ParseError.expected, 0, '*');
-    state.fail(state.pos, ParseError.expected, 0, '/');
-    state.fail(state.pos, ParseError.expected, 0, '~/');
+    state.fail(state.pos, ParseError.expected, '*');
+    state.fail(state.pos, ParseError.expected, '/');
+    state.fail(state.pos, ParseError.expected, '~/');
   }
   if (state.ok) {
     _ws(state);
@@ -309,8 +305,8 @@ String? _additiveOperator(State<String> state) {
     }
   }
   if (!state.ok) {
-    state.fail(state.pos, ParseError.expected, 0, '+');
-    state.fail(state.pos, ParseError.expected, 0, '-');
+    state.fail(state.pos, ParseError.expected, '+');
+    state.fail(state.pos, ParseError.expected, '-');
   }
   if (state.ok) {
     _ws(state);
@@ -526,13 +522,13 @@ class State<T> {
 
   int pos = 0;
 
+  int start = 0;
+
   final T source;
 
   final List<int> _kinds = List.filled(150, 0);
 
   int _length = 0;
-
-  final List<int> _lengths = List.filled(150, 0);
 
   final List<int> _starts = List.filled(150, 0);
 
@@ -543,7 +539,7 @@ class State<T> {
   List<ParseError> get errors => _buildErrors();
 
   @pragma('vm:prefer-inline')
-  void fail(int pos, int kind, int length, Object? value, [int start = -1]) {
+  void fail(int pos, int kind, [Object? value, int start = -1]) {
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {
@@ -552,7 +548,6 @@ class State<T> {
         }
 
         _kinds[_length] = kind;
-        _lengths[_length] = length;
         _starts[_length] = start;
         _values[_length] = value;
         _length++;
@@ -613,25 +608,28 @@ class State<T> {
       result.add(error);
     }
 
+    int max(int x, int y) => x > y ? x : y;
+    int min(int x, int y) => x < y ? x : y;
     for (var i = 0; i < _length; i++) {
       final kind = _kinds[i];
-      final length = _lengths[i];
       var value = _values[i];
       var start = _starts[i];
       if (start < 0) {
         start = errorPos;
       }
 
-      final end = start + length;
+      final end = max(start, errorPos);
+      start = min(start, errorPos);
       switch (kind) {
         case ParseError.character:
           if (source is String) {
             final string = source as String;
             if (start < string.length) {
-              value = string.runeAt(errorPos);
+              final value = string.runeAt(errorPos);
+              final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
-              final error =
-                  ParseError(errorPos, errorPos, 'Unexpected $escaped');
+              final error = ParseError(
+                  errorPos, errorPos + length, 'Unexpected $escaped');
               result.add(error);
             } else {
               final error = ParseError(errorPos, errorPos, "Unexpected 'EOF'");

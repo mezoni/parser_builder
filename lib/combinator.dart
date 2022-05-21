@@ -18,3 +18,4 @@ part 'src/combinator/silent.dart';
 part 'src/combinator/slow.dart';
 part 'src/combinator/value.dart';
 part 'src/combinator/verify.dart';
+part 'src/combinator/with_start.dart';

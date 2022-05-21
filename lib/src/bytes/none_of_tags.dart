@@ -25,13 +25,13 @@ case {{cc}}:
   static const _templateTestLong = '''
 if (source.startsWith({{tag}}, pos)) {
   state.ok = false;
-  state.fail(pos,  ParseError.unexpected, {{length}}, {{tag}});
+  state.fail(pos, ParseError.unexpected, {{tag}}, pos + {{length}});
   break;
 }''';
 
   static const _templateTestShort = '''
 state.ok = false;
-state.fail(pos, ParseError.unexpected, {{length}}, {{tag}});''';
+state.fail(pos, ParseError.unexpected, {{tag}}, pos + {{length}});''';
 
   final List<String> tags;
 

@@ -12,7 +12,7 @@ state.ok = state.pos < source.length;
 if (state.ok) {
   {{res0}} = source.readRune(state);
 } else {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   static const _templateFast = '''
@@ -20,7 +20,7 @@ state.ok = state.pos < source.length;
 if (state.ok) {
   source.readRune(state);
 } else {
-  state.fail(state.pos, ParseError.character, 0, 0);
+  state.fail(state.pos, ParseError.character);
 }''';
 
   const AnyChar();

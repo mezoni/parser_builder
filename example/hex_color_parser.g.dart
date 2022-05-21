@@ -34,7 +34,7 @@ int? _hexPrimary(State<String> state) {
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
   } else {
-    state.fail(state.pos, ParseError.character, 0, 0);
+    state.fail(state.pos, ParseError.character);
     state.pos = $pos;
   }
   if (state.ok) {
@@ -47,46 +47,57 @@ int? _hexPrimary(State<String> state) {
 Color? _hexColor(State<String> state) {
   Color? $0;
   final source = state.source;
-  final $log = state.log;
-  state.log = false;
-  Color? $1;
-  final $pos = state.pos;
+  final $pos = state.minErrorPos;
+  state.minErrorPos = state.pos + 1;
+  final $pos1 = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.fail(state.pos, ParseError.expected, 0, '#');
+    state.fail(state.pos, ParseError.expected, '#');
   }
   if (state.ok) {
-    final $pos1 = state.pos;
-    int? $2;
-    $2 = _hexPrimary(state);
+    final $pos2 = state.start;
+    state.start = state.pos;
+    final $pos3 = state.setLastErrorPos(-1);
+    final $pos4 = state.pos;
+    int? $1;
+    $1 = _hexPrimary(state);
     if (state.ok) {
-      int? $3;
-      $3 = _hexPrimary(state);
+      int? $2;
+      $2 = _hexPrimary(state);
       if (state.ok) {
-        int? $4;
-        $4 = _hexPrimary(state);
+        int? $3;
+        $3 = _hexPrimary(state);
         if (state.ok) {
-          final v1 = $2!;
-          final v2 = $3!;
-          final v3 = $4!;
-          $1 = Color(v1, v2, v3);
+          final v1 = $1!;
+          final v2 = $2!;
+          final v3 = $3!;
+          $0 = Color(v1, v2, v3);
         }
       }
     }
     if (!state.ok) {
-      state.pos = $pos1;
+      state.pos = $pos4;
     }
     if (!state.ok) {
-      state.pos = $pos;
+      state.ok = false;
+      state.fail(
+          state.lastErrorPos,
+          ParseError.message,
+          'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
+          state.start);
+    }
+    state.restoreLastErrorPos($pos3);
+    state.start = $pos2;
+    if (!state.ok) {
+      state.pos = $pos1;
     }
   }
-  state.log = $log;
-  if (state.ok) {
-    $0 = $1;
-  } else {
-    state.fail(state.pos, ParseError.expected, 0, 'hexadecimal color');
+  state.minErrorPos = $pos;
+  if (!state.ok) {
+    state.ok = false;
+    state.fail(state.pos, ParseError.expected, 'hexadecimal color');
   }
   return $0;
 }
@@ -260,13 +271,13 @@ class State<T> {
 
   int pos = 0;
 
+  int start = 0;
+
   final T source;
 
   final List<int> _kinds = List.filled(150, 0);
 
   int _length = 0;
-
-  final List<int> _lengths = List.filled(150, 0);
 
   final List<int> _starts = List.filled(150, 0);
 
@@ -277,7 +288,7 @@ class State<T> {
   List<ParseError> get errors => _buildErrors();
 
   @pragma('vm:prefer-inline')
-  void fail(int pos, int kind, int length, Object? value, [int start = -1]) {
+  void fail(int pos, int kind, [Object? value, int start = -1]) {
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {
@@ -286,7 +297,6 @@ class State<T> {
         }
 
         _kinds[_length] = kind;
-        _lengths[_length] = length;
         _starts[_length] = start;
         _values[_length] = value;
         _length++;
@@ -347,25 +357,28 @@ class State<T> {
       result.add(error);
     }
 
+    int max(int x, int y) => x > y ? x : y;
+    int min(int x, int y) => x < y ? x : y;
     for (var i = 0; i < _length; i++) {
       final kind = _kinds[i];
-      final length = _lengths[i];
       var value = _values[i];
       var start = _starts[i];
       if (start < 0) {
         start = errorPos;
       }
 
-      final end = start + length;
+      final end = max(start, errorPos);
+      start = min(start, errorPos);
       switch (kind) {
         case ParseError.character:
           if (source is String) {
             final string = source as String;
             if (start < string.length) {
-              value = string.runeAt(errorPos);
+              final value = string.runeAt(errorPos);
+              final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
-              final error =
-                  ParseError(errorPos, errorPos, 'Unexpected $escaped');
+              final error = ParseError(
+                  errorPos, errorPos + length, 'Unexpected $escaped');
               result.add(error);
             } else {
               final error = ParseError(errorPos, errorPos, "Unexpected 'EOF'");

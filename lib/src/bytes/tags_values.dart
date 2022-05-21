@@ -74,7 +74,7 @@ v = {{value}};''';
 
       list.add(tag);
       final escaped = helper.escapeString(tag);
-      errors.add('state.fail(state.pos, ParseError.expected, 0, $escaped);');
+      errors.add('state.fail(state.pos, ParseError.expected, $escaped);');
     }
 
     final branches = <String, String>{};

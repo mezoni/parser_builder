@@ -1,6 +1,6 @@
 part of '../../combinator.dart';
 
-class Silent<I, O> extends ParserBuilder<I, O?> {
+class Silent<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{log}} = state.log;
 state.log = false;

@@ -43,7 +43,7 @@ int? _hexVal(State<String> state) {
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, 0, 0);
+    state.fail($pos, ParseError.character);
   }
   if (state.ok) {
     final v = $1!;
@@ -62,7 +62,7 @@ int? _hex(State<String> state) {
   if (state.ok) {
     state.pos += 2;
   } else {
-    state.fail(state.pos, ParseError.expected, 0, '#x');
+    state.fail(state.pos, ParseError.expected, '#x');
   }
   if (state.ok) {
     $0 = _hexVal(state);
@@ -95,14 +95,14 @@ int? _rangeChar(State<String> state) {
     state.ok = v != null;
   }
   if (!state.ok) {
-    state.fail(state.pos, ParseError.expected, 0, '[');
-    state.fail(state.pos, ParseError.expected, 0, ']');
+    state.fail(state.pos, ParseError.expected, '[');
+    state.fail(state.pos, ParseError.expected, ']');
   }
   state.log = $log;
   state.ok = !state.ok;
   if (!state.ok) {
     state.pos = $pos1;
-    state.fail(state.pos, ParseError.message, 0, 'Unknown error');
+    state.fail(state.pos, ParseError.message, 'Unknown error');
   }
   if (state.ok) {
     state.ok = state.pos < source.length;
@@ -114,10 +114,10 @@ int? _rangeChar(State<String> state) {
         $0 = c;
       } else {
         state.pos = pos;
-        state.fail(state.pos, ParseError.character, 0, c);
+        state.fail(state.pos, ParseError.character);
       }
     } else {
-      state.fail(state.pos, ParseError.character, 0, 0);
+      state.fail(state.pos, ParseError.character);
     }
     if (!state.ok) {
       state.pos = $pos;
@@ -146,7 +146,7 @@ Result2<int, int>? _rangeBody(State<String> state) {
     if (state.ok) {
       state.pos += 1;
     } else {
-      state.fail(state.pos, ParseError.expected, 0, '-');
+      state.fail(state.pos, ParseError.expected, '-');
     }
     if (state.ok) {
       int? $2;
@@ -190,10 +190,10 @@ int? _charCode(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      state.fail(state.pos, ParseError.character, 0, c);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, 0, 0);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -206,7 +206,7 @@ int? _char(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.fail(state.pos, ParseError.expected, 0, '"');
+    state.fail(state.pos, ParseError.expected, '"');
   }
   if (state.ok) {
     $0 = _charCode(state);
@@ -216,7 +216,7 @@ int? _char(State<String> state) {
       if (state.ok) {
         state.pos += 1;
       } else {
-        state.fail(state.pos, ParseError.expected, 0, '"');
+        state.fail(state.pos, ParseError.expected, '"');
       }
     }
     if (!state.ok) {
@@ -235,7 +235,7 @@ List<Result2<int, int>>? _range(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.fail(state.pos, ParseError.expected, 0, '[');
+    state.fail(state.pos, ParseError.expected, '[');
   }
   if (state.ok) {
     var $list = <Result2<int, int>>[];
@@ -257,7 +257,7 @@ List<Result2<int, int>>? _range(State<String> state) {
       if (state.ok) {
         state.pos += 1;
       } else {
-        state.fail(state.pos, ParseError.expected, 0, ']');
+        state.fail(state.pos, ParseError.expected, ']');
       }
     }
     if (!state.ok) {
@@ -286,7 +286,7 @@ void _verbar(State<String> state) {
   if (state.ok) {
     state.pos += 1;
   } else {
-    state.fail(state.pos, ParseError.expected, 0, '|');
+    state.fail(state.pos, ParseError.expected, '|');
   }
   if (state.ok) {
     _ws(state);
@@ -344,7 +344,7 @@ List<Result2<int, int>>? parse(State<String> state) {
     if (state.ok) {
       state.ok = state.pos >= source.length;
       if (!state.ok) {
-        state.fail(state.pos, ParseError.expected, 0, 'EOF');
+        state.fail(state.pos, ParseError.expected, 'EOF');
       }
     }
     if (!state.ok) {
@@ -532,13 +532,13 @@ class State<T> {
 
   int pos = 0;
 
+  int start = 0;
+
   final T source;
 
   final List<int> _kinds = List.filled(150, 0);
 
   int _length = 0;
-
-  final List<int> _lengths = List.filled(150, 0);
 
   final List<int> _starts = List.filled(150, 0);
 
@@ -549,7 +549,7 @@ class State<T> {
   List<ParseError> get errors => _buildErrors();
 
   @pragma('vm:prefer-inline')
-  void fail(int pos, int kind, int length, Object? value, [int start = -1]) {
+  void fail(int pos, int kind, [Object? value, int start = -1]) {
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {
@@ -558,7 +558,6 @@ class State<T> {
         }
 
         _kinds[_length] = kind;
-        _lengths[_length] = length;
         _starts[_length] = start;
         _values[_length] = value;
         _length++;
@@ -619,25 +618,28 @@ class State<T> {
       result.add(error);
     }
 
+    int max(int x, int y) => x > y ? x : y;
+    int min(int x, int y) => x < y ? x : y;
     for (var i = 0; i < _length; i++) {
       final kind = _kinds[i];
-      final length = _lengths[i];
       var value = _values[i];
       var start = _starts[i];
       if (start < 0) {
         start = errorPos;
       }
 
-      final end = start + length;
+      final end = max(start, errorPos);
+      start = min(start, errorPos);
       switch (kind) {
         case ParseError.character:
           if (source is String) {
             final string = source as String;
             if (start < string.length) {
-              value = string.runeAt(errorPos);
+              final value = string.runeAt(errorPos);
+              final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
-              final error =
-                  ParseError(errorPos, errorPos, 'Unexpected $escaped');
+              final error = ParseError(
+                  errorPos, errorPos + length, 'Unexpected $escaped');
               result.add(error);
             } else {
               final error = ParseError(errorPos, errorPos, "Unexpected 'EOF'");

@@ -1,3 +1,11 @@
+## 2.0.25
+
+- Breaking change. Does not affect user parser definitions. The signature of the `State.fail` method has been changed. Due to improvements in the error generation system, the `length` parameter has been removed and parameter `value` is made optional. The new signature is now `void fail(int pos, int kind, [Object? value, int start = -1])`
+- Another round to improve the error reporting system. Parser builders have been added to implement the ability to generate complex error messages at any level of the parser rule. Now it is possible to generate errors using special parsers. These parser builders include facilities for generating errors directly, for capturing information about the initial parse position, tracking on demand the last error position, and turning off error generation for the current parse position. By combining the above parser builders and placing them in different places in the parsing rules, it is possible to generate complex error messages that were previously only available when implementing (hand-writing) individual parser builder classes
+- Implemnented, a little tested and not documented parser builders `FailExpected`, `FailMessage`,  `SilentAtThisPos`,  `WithLastErrorPos`, `WithStart`, `WithStartAndLastErrorPos`
+- Reimplemented error generation parser builders `Indicate`, `Expected` and `Nested` using only a combination of other error generation parser builders. That is, correctly, safely and without the need to write new code templates
+- An example of an elegant and correct way to generate an `Unterminated string` error in the JSON parser code was given. The method of generating this error demonstrates a new possibility for generating errors by combining special parser builders designed for these purposes
+
 ## 2.0.24
 
 - Implemented, tested, but not documented parser builder `TagPair`. It is intended to parse markup languages elements

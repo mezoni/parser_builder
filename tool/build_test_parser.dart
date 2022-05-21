@@ -171,10 +171,6 @@ int _toPrefix(String operator, int expression) {
   }
 }
 
-Token<T> _toToken<T>(
-    String source, int start, int end, T value, TokenKind kind) {
-  return Token(kind, source.substring(start, end), start, end, value);
-}
 ''';
 
 const _alpha0 = Named('alpha0', Alpha0());

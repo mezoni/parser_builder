@@ -10,7 +10,7 @@ state.log = {{log}};
 if (state.ok) {
   state.pos = {{pos}};
 } else {
-  state.fail(state.pos, ParseError.message, 0, 'Unknown error');
+  state.fail(state.pos, ParseError.message, 'Unknown error');
 }''';
 
   final ParserBuilder<I, dynamic> parser;

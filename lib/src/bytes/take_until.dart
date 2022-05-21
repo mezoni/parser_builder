@@ -16,7 +16,7 @@ if (state.ok) {
   state.pos = {{index}};
   {{res0}} = source.substring({{pos}}, {{index}});
 } else {
-  state.fail({{pos}}, ParseError.expected, 0, {{tag}});
+  state.fail({{pos}}, ParseError.expected, {{tag}});
 }''';
 
   static const _templateFast = '''
@@ -26,7 +26,7 @@ state.ok = {{index}} >= 0;
 if (state.ok) {
   state.pos = {{index}};
 } else {
-  state.fail({{pos}}, ParseError.expected, 0, {{tag}});
+  state.fail({{pos}}, ParseError.expected, {{tag}});
 }''';
 
   final String tag;
