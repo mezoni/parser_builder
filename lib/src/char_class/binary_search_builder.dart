@@ -4,11 +4,11 @@ class BinarySearchBuilder {
       throw ArgumentError.value(data, 'data', 'Must not be empty');
     }
 
-    final ranges = <Range>[];
+    final ranges = <_Range>[];
     for (var i = 0; i < data.length; i += 2) {
       final start = data[i];
       final end = data[i + 1];
-      final range = Range(start, end);
+      final range = _Range(start, end);
       ranges.add(range);
     }
 
@@ -157,7 +157,7 @@ class BinarySearchBuilder {
     return result;
   }
 
-  _Ranges _plunge(List<Range> ranges, int min, int max) {
+  _Ranges _plunge(List<_Range> ranges, int min, int max) {
     final mid = min + (max - min) ~/ 2;
     final range = ranges[mid];
     final hasLess = min != mid;
@@ -179,29 +179,6 @@ class BinarySearchBuilder {
       final greater = _plunge(ranges, mid + 1, max);
       return _Double(single, greater);
     }
-  }
-}
-
-class Range {
-  final int end;
-
-  final int start;
-
-  Range(this.start, this.end) {
-    if (start < 0) {
-      throw ArgumentError.value(
-          start, 'start', 'Must be greater then ot equal to 0');
-    }
-
-    if (end < start) {
-      throw ArgumentError.value(
-          end, 'end', 'Must be greater then ot equal to $start');
-    }
-  }
-
-  @override
-  String toString() {
-    return '$start..$end';
   }
 }
 
@@ -243,6 +220,29 @@ class _Half implements _Ranges {
   int get min => value;
 }
 
+class _Range {
+  final int end;
+
+  final int start;
+
+  _Range(this.start, this.end) {
+    if (start < 0) {
+      throw ArgumentError.value(
+          start, 'start', 'Must be greater then ot equal to 0');
+    }
+
+    if (end < start) {
+      throw ArgumentError.value(
+          end, 'end', 'Must be greater then ot equal to $start');
+    }
+  }
+
+  @override
+  String toString() {
+    return '$start..$end';
+  }
+}
+
 abstract class _Ranges {
   _RangesKind get kind;
 
@@ -257,7 +257,7 @@ class _Single implements _Ranges {
   @override
   final _RangesKind kind = _RangesKind.single;
 
-  final Range range;
+  final _Range range;
 
   _Single(this.range);
 

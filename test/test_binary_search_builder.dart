@@ -37,11 +37,11 @@ void main() async {
               port = message as SendPort;
               port!.send(testData);
             } else {
-              final ranges = <Range>[];
+              final ranges = <_Range>[];
               for (var i = 0; i < pattern.length; i += 2) {
                 final start = pattern[i];
                 final end = pattern[i + 1];
-                final range = Range(start, end);
+                final range = _Range(start, end);
                 ranges.add(range);
               }
 
@@ -132,4 +132,27 @@ List<int> _generateSimpleStartingWithZero(int n) {
   }
 
   return result;
+}
+
+class _Range {
+  final int end;
+
+  final int start;
+
+  _Range(this.start, this.end) {
+    if (start < 0) {
+      throw ArgumentError.value(
+          start, 'start', 'Must be greater then ot equal to 0');
+    }
+
+    if (end < start) {
+      throw ArgumentError.value(
+          end, 'end', 'Must be greater then ot equal to $start');
+    }
+  }
+
+  @override
+  String toString() {
+    return '$start..$end';
+  }
 }
