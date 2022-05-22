@@ -2981,6 +2981,7 @@ void _testTagPair() {
       expect(state.pos, 0);
       expect(state.errorPos, 8);
       expect(state.errors, [
+        ParseError(0, 5, "Start tag 'abc' does not match end tag 'def'"),
         ParseError(8, 14, "End tag 'def' does not match start tag 'abc'"),
       ]);
     }

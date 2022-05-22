@@ -7,6 +7,7 @@ final {{pos}} = state.pos;
 {{var1}}
 {{p1}}
 if (state.ok) {
+  final {{end}} = state.pos;
   {{var2}}
   {{p2}}
   if (state.ok) {
@@ -22,8 +23,11 @@ if (state.ok) {
         final v4 = Result3(v1, v3, v2);
         {{res0}} = {{map}};
       } else {
-        final message = "End tag '$v2' does not match start tag '$v1'";
-        state.fail({{start}}, ParseError.message, message, state.pos);
+        final length = {{end}} - {{pos}};
+        final message1 = "Start tag '$v1' does not match end tag '$v2'";
+        final message2 = "End tag '$v2' does not match start tag '$v1'";
+        state.fail({{start}}, ParseError.message, message1, length: length, start: {{pos}});
+        state.fail({{start}}, ParseError.message, message2, start: state.pos);
       }
     }
   }
@@ -37,6 +41,7 @@ final {{pos}} = state.pos;
 {{var1}}
 {{p1}}
 if (state.ok) {
+  final {{end}} = state.pos;
   {{p2}}
   if (state.ok) {
     final {{start}} = state.pos;
@@ -47,8 +52,11 @@ if (state.ok) {
       final v2 = {{res3}};
       state.ok = {{compare}};
       if (!state.ok) {
-        final message = "End tag '$v2' does not match start tag '$v1'";
-        state.fail({{start}}, ParseError.message, message, state.pos);
+        final length = {{end}} - {{pos}};
+        final message1 = "Start tag '$v1' does not match end tag '$v2'";
+        final message2 = "End tag '$v2' does not match start tag '$v1'";
+        state.fail({{start}}, ParseError.message, message1, length: length, start: {{pos}});
+        state.fail({{start}}, ParseError.message, message2, start: state.pos);
       }
     }
   }
@@ -73,7 +81,7 @@ if (!state.ok) {
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
     final fast = result == null;
-    final values = context.allocateLocals(['pos', 'start']);
+    final values = context.allocateLocals(['end', 'pos', 'start']);
     final r1 = context.getResult(start, true);
     final r2 = context.getResult(content, !fast);
     final r3 = context.getResult(end, true);

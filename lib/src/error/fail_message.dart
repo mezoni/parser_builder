@@ -6,7 +6,7 @@ class FailMessage<I, O> extends _Fail<I, O> {
 state.fail({{pos}}, ParseError.message, {{message}});''';
 
   static const _templateWithStart = '''
-state.fail({{pos}}, ParseError.message, {{message}}, {{start}});''';
+state.fail({{pos}}, ParseError.message, {{message}}, start: {{start}});''';
 
   final String message;
 

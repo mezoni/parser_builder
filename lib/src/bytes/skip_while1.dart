@@ -20,7 +20,7 @@ while (state.pos < source.length) {
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok) {
-  state.fail({{pos}}, ParseError.character);
+  state.fail({{pos}}, ParseError.character, null);
 }''';
 
   static const _template32 = '''
@@ -36,7 +36,7 @@ while (state.pos < source.length) {
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok) {
-  state.fail({{pos}}, ParseError.character);
+  state.fail({{pos}}, ParseError.character, null);
 }''';
 
   final SemanticAction<bool> predicate;

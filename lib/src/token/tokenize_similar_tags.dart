@@ -20,7 +20,7 @@ if (state.ok) {
   }
 }
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character);
+  state.fail(state.pos, ParseError.character, null);
 }''';
 
   static const _templateFast = '''
@@ -34,7 +34,7 @@ if (state.ok) {
   sttae.ok = id != null;
 }
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character);
+  state.fail(state.pos, ParseError.character, null);
 }''';
 
   static const _templateTestLong = '''

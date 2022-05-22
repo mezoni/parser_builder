@@ -20,13 +20,13 @@ if (state.ok) {
     if (state.pos < source.length) {
       final pos = state.pos;
       source.readRune(state);
-      state.fail(state.pos, ParseError.expected, {{tag}}, state.pos + {{length}});
+      state.fail(state.pos, ParseError.expected, {{tag}}, length: {{length}});
       state.pos = pos;
     } else {
-      state.fail(state.pos, ParseError.character);
+      state.fail(state.pos, ParseError.character, null);
     }
   } else {
-    state.fail({{pos}}, ParseError.unexpected, {{tag}}, {{pos}} + {{length}});
+    state.fail({{pos}}, ParseError.unexpected, {{tag}}, length: {{length}});
   }
 }''';
 
@@ -41,13 +41,13 @@ if (state.ok) {
     if (state.pos < source.length) {
       final pos = state.pos;
       source.readRune(state);
-      state.fail(state.pos, ParseError.expected, {{tag}}, state.pos + {{length}});
+      state.fail(state.pos, ParseError.expected, {{tag}}, length: {{length}});
       state.pos = pos;
     } else {
-      state.fail(state.pos, ParseError.character);
+      state.fail(state.pos, ParseError.character, null);
     }
   } else {
-    state.fail({{pos}}, ParseError.unexpected, {{tag}}, {{pos}} + {{length}});
+    state.fail({{pos}}, ParseError.unexpected, {{tag}}, length: {{length}});
   }
 }''';
 

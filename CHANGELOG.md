@@ -1,3 +1,8 @@
+## 2.0.27
+
+- Breaking change. Another round to improve the error reporting system. Now errors can be registered not only in any position, but also with any length. This allows an unlimited number of errors to be registered at one failure. All this together 100% justify the choice of this error system. Because this system works very fast, does not consume memory at all, does not require the creation of any data instances for registering errors, allows to register any number of errors at one failure, at any position and with any length
+- Breaking change. The signature of the `State.fail()` method has been changed. Due to improvements in the error system, the `length` parameter has been returned back. The new signature is now `void fail(int pos, int kind, Object? value, {int length = -1, int start = -1})`. This is because the `length` value is now processed differently due to a change in the error post-processing algorithm. Now it is a more versatile, more powerful and more accurate algorithm
+
 ## 2.0.26
 
 - Breaking change. The enum `FailPos` has been renamed to `StatePos` and moved from `error.dart` to `parser_builder.dart`. It is now public, but certain `state.*` fields will only have their respective values set by specially generated code to set them only on demand using special parser builders to reduce runtime overhead. Example: `WithLastErrorPos(Alt2(parser, FailMessage(StatePos.lastErrorPos, 'some message')))`

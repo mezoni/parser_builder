@@ -225,6 +225,8 @@ class State<T> {
 
   int _length = 0;
 
+  final List<int> _lengths = List.filled(150, 0);
+
   final List<MemoizedResult?> _memos = List.filled(150, null);
 
   final List<int> _starts = List.filled(150, 0);
@@ -236,7 +238,7 @@ class State<T> {
   List<ParseError> get errors => _buildErrors();
 
   @pragma('vm:prefer-inline')
-  void fail(int pos, int kind, [Object? value, int start = -1]) {
+  void fail(int pos, int kind, Object? value, {int length = -1, int start = -1}) {
     ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
@@ -246,6 +248,7 @@ class State<T> {
         }
 
         _kinds[_length] = kind;
+        _lengths[_length] = length;
         _starts[_length] = start;
         _values[_length] = value;
         _length++;
@@ -303,35 +306,67 @@ class State<T> {
   }
 
   List<ParseError> _buildErrors() {
-    final result = <ParseError>[];
-    final expected = <String>[];
-    for (var i = 0; i < _length; i++) {
-      final kind = _kinds[i];
-      if (kind == ParseError.expected) {
-        final value = _values[i];
-        final escaped = _escape(value);
-        expected.add(escaped);
-      }
-    }
-
-    if (expected.isNotEmpty) {
-      final text = 'Expected: ${expected.toSet().join(', ')}';
-      final error = ParseError(errorPos, errorPos, text);
-      result.add(error);
-    }
-
     int max(int x, int y) => x > y ? x : y;
+
     int min(int x, int y) => x < y ? x : y;
-    for (var i = 0; i < _length; i++) {
-      final kind = _kinds[i];
-      var value = _values[i];
-      var start = _starts[i];
+
+    int getStart(int index) {
+      var start = _starts[index];
       if (start < 0) {
         start = errorPos;
       }
 
-      final end = max(start, errorPos);
       start = min(start, errorPos);
+      return start;
+    }
+
+    int getEnd(int index) {
+      start = getStart(index);
+      var end = _starts[index];
+      if (end < 0) {
+        end = errorPos;
+      }
+
+      end = max(end, errorPos);
+      end = max(end, start);
+      start = min(start, end);
+      final length = _lengths[index];
+      if (length >= 0) {
+        end = start + length;
+      }
+
+      return end;
+    }
+
+    final result = <ParseError>[];
+    final expected = <int, List>{};
+    for (var i = 0; i < _length; i++) {
+      final kind = _kinds[i];
+      if (kind == ParseError.expected) {
+        final value = _values[i];
+        final start = getStart(i);
+        var list = expected[start];
+        if (list == null) {
+          list = [];
+          expected[start] = list;
+        }
+
+        list.add(value);
+      }
+    }
+
+    for (final start in expected.keys) {
+      final values = expected[start]!.toSet().map((e) => _escape(e));
+      final text = 'Expected: ${values.join(', ')}';
+      final error = ParseError(start, start, text);
+      result.add(error);
+    }
+
+    for (var i = 0; i < _length; i++) {
+      final start = getStart(i);
+      final end = getEnd(i);
+      final value = _values[i];
+      final kind = _kinds[i];
       switch (kind) {
         case ParseError.character:
           if (source is String) {
@@ -340,16 +375,15 @@ class State<T> {
               final value = string.runeAt(errorPos);
               final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
-              final error = ParseError(
-                  errorPos, errorPos + length, 'Unexpected $escaped');
+              final error =
+                  ParseError(start, start + length, 'Unexpected $escaped');
               result.add(error);
             } else {
-              final error = ParseError(errorPos, errorPos, "Unexpected 'EOF'");
+              final error = ParseError(start, start, "Unexpected 'EOF'");
               result.add(error);
             }
           } else {
-            final error =
-                ParseError(errorPos, errorPos, 'Unexpected character');
+            final error = ParseError(start, start, 'Unexpected character');
             result.add(error);
           }
 
@@ -431,6 +465,8 @@ class State<T> {
 
   int _length = 0;
 
+  final List<int> _lengths = List.filled(150, 0);
+
   final List<int> _starts = List.filled(150, 0);
 
   final List<Object?> _values = List.filled(150, null);
@@ -440,7 +476,7 @@ class State<T> {
   List<ParseError> get errors => _buildErrors();
 
   @pragma('vm:prefer-inline')
-  void fail(int pos, int kind, [Object? value, int start = -1]) {
+  void fail(int pos, int kind, Object? value, {int length = -1, int start = -1}) {
     ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
@@ -450,6 +486,7 @@ class State<T> {
         }
 
         _kinds[_length] = kind;
+        _lengths[_length] = length;
         _starts[_length] = start;
         _values[_length] = value;
         _length++;
@@ -493,35 +530,67 @@ class State<T> {
   }
 
   List<ParseError> _buildErrors() {
-    final result = <ParseError>[];
-    final expected = <String>[];
-    for (var i = 0; i < _length; i++) {
-      final kind = _kinds[i];
-      if (kind == ParseError.expected) {
-        final value = _values[i];
-        final escaped = _escape(value);
-        expected.add(escaped);
-      }
-    }
-
-    if (expected.isNotEmpty) {
-      final text = 'Expected: ${expected.toSet().join(', ')}';
-      final error = ParseError(errorPos, errorPos, text);
-      result.add(error);
-    }
-
     int max(int x, int y) => x > y ? x : y;
+
     int min(int x, int y) => x < y ? x : y;
-    for (var i = 0; i < _length; i++) {
-      final kind = _kinds[i];
-      var value = _values[i];
-      var start = _starts[i];
+
+    int getStart(int index) {
+      var start = _starts[index];
       if (start < 0) {
         start = errorPos;
       }
 
-      final end = max(start, errorPos);
       start = min(start, errorPos);
+      return start;
+    }
+
+    int getEnd(int index) {
+      start = getStart(index);
+      var end = _starts[index];
+      if (end < 0) {
+        end = errorPos;
+      }
+
+      end = max(end, errorPos);
+      end = max(end, start);
+      start = min(start, end);
+      final length = _lengths[index];
+      if (length >= 0) {
+        end = start + length;
+      }
+
+      return end;
+    }
+
+    final result = <ParseError>[];
+    final expected = <int, List>{};
+    for (var i = 0; i < _length; i++) {
+      final kind = _kinds[i];
+      if (kind == ParseError.expected) {
+        final value = _values[i];
+        final start = getStart(i);
+        var list = expected[start];
+        if (list == null) {
+          list = [];
+          expected[start] = list;
+        }
+
+        list.add(value);
+      }
+    }
+
+    for (final start in expected.keys) {
+      final values = expected[start]!.toSet().map((e) => _escape(e));
+      final text = 'Expected: ${values.join(', ')}';
+      final error = ParseError(start, start, text);
+      result.add(error);
+    }
+
+    for (var i = 0; i < _length; i++) {
+      final start = getStart(i);
+      final end = getEnd(i);
+      final value = _values[i];
+      final kind = _kinds[i];
       switch (kind) {
         case ParseError.character:
           if (source is String) {
@@ -530,16 +599,15 @@ class State<T> {
               final value = string.runeAt(errorPos);
               final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
-              final error = ParseError(
-                  errorPos, errorPos + length, 'Unexpected $escaped');
+              final error =
+                  ParseError(start, start + length, 'Unexpected $escaped');
               result.add(error);
             } else {
-              final error = ParseError(errorPos, errorPos, "Unexpected 'EOF'");
+              final error = ParseError(start, start, "Unexpected 'EOF'");
               result.add(error);
             }
           } else {
-            final error =
-                ParseError(errorPos, errorPos, 'Unexpected character');
+            final error = ParseError(start, start, 'Unexpected character');
             result.add(error);
           }
 

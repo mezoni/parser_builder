@@ -24,7 +24,7 @@ state.ok = {{count}} >= {{m}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  state.fail(state.pos, ParseError.character);
+  state.fail(state.pos, ParseError.character, null);
   state.pos = {{pos}};
 }''';
 
@@ -42,7 +42,7 @@ while ({{count}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{count}} >= {{m}};
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character);
+  state.fail(state.pos, ParseError.character, null);
   state.pos = {{pos}};
 }''';
 
@@ -63,7 +63,7 @@ state.ok = {{count}} >= {{m}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  state.fail(state.pos, ParseError.character);
+  state.fail(state.pos, ParseError.character, null);
   state.pos = {{pos}};
 }''';
 
@@ -82,7 +82,7 @@ while ({{count}} < {{n}} && state.pos < source.length) {
 }
 state.ok = {{count}} >= {{m}};
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character);
+  state.fail(state.pos, ParseError.character, null);
   state.pos = {{pos}};
 }''';
 

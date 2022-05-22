@@ -11,7 +11,7 @@ if (state.ok) {
   if (state.ok) {
     {{res0}} = v;
   } else {
-    state.fail(state.pos, ParseError.message, {{message}}, {{pos}});
+    state.fail(state.pos, ParseError.message, {{message}}, start: {{pos}});
     state.pos = {{pos}};
   }
 }''';
@@ -24,7 +24,7 @@ if (state.ok) {
   final v = {{val1}};
   state.ok = {{verify}};
   if (!state.ok) {
-    state.fail(state.pos, ParseError.message, {{message}}, {{pos}});
+    state.fail(state.pos, ParseError.message, {{message}}, start: {{pos}});
     state.pos = {{pos}};
   }
 }''';
