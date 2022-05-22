@@ -328,8 +328,6 @@ class State<T> {
       }
 
       end = max(end, errorPos);
-      end = max(end, start);
-      start = min(start, end);
       final length = _lengths[index];
       if (length >= 0) {
         end = start + length;
@@ -552,8 +550,6 @@ class State<T> {
       }
 
       end = max(end, errorPos);
-      end = max(end, start);
-      start = min(start, end);
       final length = _lengths[index];
       if (length >= 0) {
         end = start + length;
