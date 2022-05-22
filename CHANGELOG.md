@@ -1,3 +1,9 @@
+## 2.0.26
+
+- Breaking change. The enum `FailPos` has been renamed to `StatePos` and moved from `error.dart` to `parser_builder.dart`. It is now public, but certain `state.*` fields will only have their respective values set by specially generated code to set them only on demand using special parser builders to reduce runtime overhead. Example: `WithLastErrorPos(Alt2(parser, FailMessage(StatePos.lastErrorPos, 'some message')))`
+- Implemented, tested (as a basis of other builders), but not documented parser builder `SwicthTag`
+- Refactored parser builders `Tags`, `TagValues` using the new `SwicthTag` parser builder
+
 ## 2.0.25
 
 - Breaking change. Does not affect user parser definitions. The signature of the `State.fail` method has been changed. Due to improvements in the error generation system, the `length` parameter has been removed and parameter `value` is made optional. The new signature is now `void fail(int pos, int kind, [Object? value, int start = -1])`

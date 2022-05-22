@@ -240,19 +240,21 @@ int? _binaryExpressionMul(State<String> state) {
       if (state.ok) {
         final pos = state.pos;
         final c = source.codeUnitAt(pos);
-        String? v;
+        state.ok = false;
         if (c == 42) {
-          state.pos++;
-          v = '*';
+          state.ok = true;
+          state.pos += 1;
+          if (state.ok) {
+            $2 = '*';
+          }
         } else if (c == 126) {
           if (source.startsWith('~/', pos)) {
+            state.ok = true;
             state.pos += 2;
-            v = '~/';
+            if (state.ok) {
+              $2 = '~/';
+            }
           }
-        }
-        state.ok = v != null;
-        if (state.ok) {
-          $2 = v;
         }
       }
       if (!state.ok) {
@@ -298,17 +300,19 @@ int? binaryExpressionAdd(State<String> state) {
       if (state.ok) {
         final pos = state.pos;
         final c = source.codeUnitAt(pos);
-        String? v;
+        state.ok = false;
         if (c == 43) {
-          state.pos++;
-          v = '+';
+          state.ok = true;
+          state.pos += 1;
+          if (state.ok) {
+            $2 = '+';
+          }
         } else if (c == 45) {
-          state.pos++;
-          v = '-';
-        }
-        state.ok = v != null;
-        if (state.ok) {
-          $2 = v;
+          state.ok = true;
+          state.pos += 1;
+          if (state.ok) {
+            $2 = '-';
+          }
         }
       }
       if (!state.ok) {
@@ -538,7 +542,6 @@ String? expected2C16(State<String> state) {
   }
   state.log = $log;
   if (!state.ok) {
-    state.ok = false;
     state.fail(state.pos, ParseError.expected, 'c16c16');
   }
   return $0;
@@ -1056,7 +1059,6 @@ Object? nestedC16OrTake2C32(State<String> state) {
   }
   state.minErrorPos = $pos;
   if (!state.ok) {
-    state.ok = false;
     state.fail(state.pos, ParseError.expected, 'nested');
   }
   return $0;
@@ -1293,21 +1295,23 @@ int? postfixExpression(State<String> state) {
     if (state.ok) {
       final pos = state.pos;
       final c = source.codeUnitAt(pos);
-      String? v;
+      state.ok = false;
       if (c == 45) {
         if (source.startsWith('--', pos)) {
+          state.ok = true;
           state.pos += 2;
-          v = '--';
+          if (state.ok) {
+            $2 = '--';
+          }
         }
       } else if (c == 43) {
         if (source.startsWith('++', pos)) {
+          state.ok = true;
           state.pos += 2;
-          v = '++';
+          if (state.ok) {
+            $2 = '++';
+          }
         }
-      }
-      state.ok = v != null;
-      if (state.ok) {
-        $2 = v;
       }
     }
     if (!state.ok) {
@@ -1338,24 +1342,29 @@ int? prefixExpression(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
-    String? v;
+    state.ok = false;
     if (c == 45) {
       if (source.startsWith('--', pos)) {
+        state.ok = true;
         state.pos += 2;
-        v = '--';
+        if (state.ok) {
+          $1 = '--';
+        }
       } else {
-        state.pos++;
-        v = '-';
+        state.ok = true;
+        state.pos += 1;
+        if (state.ok) {
+          $1 = '-';
+        }
       }
     } else if (c == 43) {
       if (source.startsWith('++', pos)) {
+        state.ok = true;
         state.pos += 2;
-        v = '++';
+        if (state.ok) {
+          $1 = '++';
+        }
       }
-    }
-    state.ok = v != null;
-    if (state.ok) {
-      $1 = v;
     }
   }
   if (!state.ok) {
@@ -1993,38 +2002,55 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
-    String? v;
+    state.ok = false;
     if (c == 97) {
       if (source.startsWith('abc', pos)) {
+        state.ok = true;
         state.pos += 3;
-        v = 'abc';
+        if (state.ok) {
+          $0 = 'abc';
+        }
       } else if (source.startsWith('abd', pos)) {
+        state.ok = true;
         state.pos += 3;
-        v = 'abd';
+        if (state.ok) {
+          $0 = 'abd';
+        }
       }
     } else if (c == 100) {
       if (source.startsWith('def', pos)) {
+        state.ok = true;
         state.pos += 3;
-        v = 'def';
+        if (state.ok) {
+          $0 = 'def';
+        }
       } else if (source.startsWith('deg', pos)) {
+        state.ok = true;
         state.pos += 3;
-        v = 'deg';
+        if (state.ok) {
+          $0 = 'deg';
+        }
       }
     } else if (c == 120) {
       if (source.startsWith('xy', pos)) {
+        state.ok = true;
         state.pos += 2;
-        v = 'xy';
+        if (state.ok) {
+          $0 = 'xy';
+        }
       } else {
-        state.pos++;
-        v = 'x';
+        state.ok = true;
+        state.pos += 1;
+        if (state.ok) {
+          $0 = 'x';
+        }
       }
     } else if (c == 122) {
-      state.pos++;
-      v = 'z';
-    }
-    state.ok = v != null;
-    if (state.ok) {
-      $0 = v;
+      state.ok = true;
+      state.pos += 1;
+      if (state.ok) {
+        $0 = 'z';
+      }
     }
   }
   if (!state.ok) {
@@ -2046,29 +2072,31 @@ bool? tagValues(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
-    bool? v;
     state.ok = false;
     if (c == 102) {
       if (source.startsWith('false', pos)) {
         state.ok = true;
         state.pos += 5;
-        v = false;
+        if (state.ok) {
+          $0 = false;
+        }
       }
     } else if (c == 116) {
       if (source.startsWith('true', pos)) {
         state.ok = true;
         state.pos += 4;
-        v = true;
+        if (state.ok) {
+          $0 = true;
+        }
       }
     } else if (c == 110) {
       if (source.startsWith('null', pos)) {
         state.ok = true;
         state.pos += 4;
-        v = null;
+        if (state.ok) {
+          $0 = null;
+        }
       }
-    }
-    if (state.ok) {
-      $0 = v;
     }
   }
   if (!state.ok) {
@@ -2834,6 +2862,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void fail(int pos, int kind, [Object? value, int start = -1]) {
+    ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {

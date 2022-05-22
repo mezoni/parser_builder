@@ -98,6 +98,11 @@ if (state.ok) {
 
   @override
   String build(Context context, ParserResult? result) {
+    if (table.isEmpty) {
+      throw ArgumentError.value(
+          table, 'table', 'The map of characters must not be empty: $this');
+    }
+
     context.refersToStateSource = true;
     final fast = result == null;
     final isUnicode = table.keys.any((e) => e > 0xffff);

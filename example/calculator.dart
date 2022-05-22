@@ -126,7 +126,6 @@ num? _numberImpl(State<String> state) {
   }
   state.log = $log;
   if (!state.ok) {
-    state.ok = false;
     state.fail(state.pos, ParseError.expected, 'number');
   }
   return $0;
@@ -201,7 +200,6 @@ num? _primary(State<String> state) {
   }
   state.minErrorPos = $pos;
   if (!state.ok) {
-    state.ok = false;
     state.fail(state.pos, ParseError.expected, 'expression');
   }
   return $0;
@@ -215,22 +213,27 @@ String? _multiplicativeOperator(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
-    String? v;
+    state.ok = false;
     if (c == 42) {
-      state.pos++;
-      v = '*';
+      state.ok = true;
+      state.pos += 1;
+      if (state.ok) {
+        $0 = '*';
+      }
     } else if (c == 47) {
-      state.pos++;
-      v = '/';
+      state.ok = true;
+      state.pos += 1;
+      if (state.ok) {
+        $0 = '/';
+      }
     } else if (c == 126) {
       if (source.startsWith('~/', pos)) {
+        state.ok = true;
         state.pos += 2;
-        v = '~/';
+        if (state.ok) {
+          $0 = '~/';
+        }
       }
-    }
-    state.ok = v != null;
-    if (state.ok) {
-      $0 = v;
     }
   }
   if (!state.ok) {
@@ -291,17 +294,19 @@ String? _additiveOperator(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
-    String? v;
+    state.ok = false;
     if (c == 43) {
-      state.pos++;
-      v = '+';
+      state.ok = true;
+      state.pos += 1;
+      if (state.ok) {
+        $0 = '+';
+      }
     } else if (c == 45) {
-      state.pos++;
-      v = '-';
-    }
-    state.ok = v != null;
-    if (state.ok) {
-      $0 = v;
+      state.ok = true;
+      state.pos += 1;
+      if (state.ok) {
+        $0 = '-';
+      }
     }
   }
   if (!state.ok) {
@@ -540,6 +545,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void fail(int pos, int kind, [Object? value, int start = -1]) {
+    ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {

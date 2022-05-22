@@ -1,7 +1,6 @@
-part of '../../token.dart';
+part of '../../branch.dart';
 
-@experimental
-class TokenizeTags<O> extends ParserBuilder<String, O> {
+class SwitchTag<O> extends ParserBuilder<String, O> {
   static const _template = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
@@ -11,38 +10,14 @@ if (state.ok) {
   {{tests}}
 }
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character);
+  {{errors}}
 }''';
 
-  static const _templateFast = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
-  final pos = state.pos;
-  final c = source.codeUnitAt(pos);
-  sttae.ok = false;
-  {{tests}}
-}
-if (!state.ok) {
-  state.fail(state.pos, ParseError.character);
-}''';
+  final List<ParserBuilder<String, O>> errors;
 
-  static const _templateTestLong = '''
-state.pos += {{length}};
-state.ok = true;
-final v1 = pos;
-final v2 = {{tag}};
-{{res0}} = {{tokenize}};''';
+  final Map<String?, ParserBuilder<String, O>> table;
 
-  static const _templateTestShort = '''
-state.pos++;
-state.ok = true;
-final v1 = pos;
-final v2 = {{tag}};
-{{res0}} = {{tokenize}};''';
-
-  final Map<String, SemanticAction<O>> table;
-
-  const TokenizeTags(this.table);
+  const SwitchTag(this.table, this.errors);
 
   @override
   String build(Context context, ParserResult? result) {
@@ -51,11 +26,19 @@ final v2 = {{tag}};
           table, 'table', 'The map of tags must not be empty: $this');
     }
 
+    if (errors.length != table.length) {
+      throw ArgumentError.value(table, 'tags',
+          'The length of the error list (${errors.length}) does not match the tag table.: ${table.keys.join(', ')}');
+    }
+
     context.refersToStateSource = true;
-    final fast = result == null;
-    final values = <String, String>{};
+    final values = context.allocateLocals(['pos']);
     final map = <int, List<String>>{};
     for (final tag in table.keys) {
+      if (tag == null) {
+        continue;
+      }
+
       if (tag.isEmpty) {
         throw ArgumentError.value(table, 'table',
             'The map of tags must not contain empty tags: ${table.keys.join(', ')}');
@@ -77,19 +60,10 @@ final v2 = {{tag}};
       tags.sort((x, y) => y.length.compareTo(x.length));
       final tests = <String, String>{};
       for (final tag in tags) {
-        final length = tag.length;
         final escaped = helper.escapeString(tag);
-        final tokenize = table[tag]!;
-        final values = {
-          'length': '$length',
-          'tag': escaped,
-          'tokenize':
-              fast ? '' : tokenize.build(context, 'tokenize', ['v1', 'v2']),
-        };
-
+        final parser = table[tag]!;
         final isLong = tag.length > 1;
-        final template = isLong ? _templateTestLong : _templateTestShort;
-        final branch = render(template, values);
+        final branch = parser.build(context, result);
         final condition = isLong ? 'source.startsWith($escaped, pos)' : '';
         tests[condition] = branch;
       }
@@ -98,10 +72,19 @@ final v2 = {{tag}};
       branches['c == $c'] = branch;
     }
 
+    if (table.containsKey(null)) {
+      final parser = table[null]!;
+      final branch = parser.build(context, result);
+      branches[''] = branch;
+    }
+
     values.addAll({
+      'errors':
+          List.generate(errors.length, (i) => errors[i].build(context, null))
+              .join('\n'),
       'tests': helper.buildConditional(branches),
       'type': getResultType(),
     });
-    return render2(fast, _templateFast, _template, values, [result]);
+    return render(_template, values, [result]);
   }
 }

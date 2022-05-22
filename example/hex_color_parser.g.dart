@@ -81,7 +81,6 @@ Color? _hexColor(State<String> state) {
       state.pos = $pos4;
     }
     if (!state.ok) {
-      state.ok = false;
       state.fail(
           state.lastErrorPos,
           ParseError.message,
@@ -96,7 +95,6 @@ Color? _hexColor(State<String> state) {
   }
   state.minErrorPos = $pos;
   if (!state.ok) {
-    state.ok = false;
     state.fail(state.pos, ParseError.expected, 'hexadecimal color');
   }
   return $0;
@@ -289,6 +287,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void fail(int pos, int kind, [Object? value, int start = -1]) {
+    ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {

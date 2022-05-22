@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import 'builder_helper.dart' as helper;
 import 'parser_builder.dart';
 
+part 'src/combinator/add_to_pos.dart';
 part 'src/combinator/and.dart';
 part 'src/combinator/calculate.dart';
 part 'src/combinator/consumed.dart';

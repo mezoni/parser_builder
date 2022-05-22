@@ -84,15 +84,14 @@ int? _rangeChar(State<String> state) {
   if (state.ok) {
     final pos = state.pos;
     final c = source.codeUnitAt(pos);
-    String? v;
+    state.ok = false;
     if (c == 91) {
-      state.pos++;
-      v = '[';
+      state.ok = true;
+      state.pos += 1;
     } else if (c == 93) {
-      state.pos++;
-      v = ']';
+      state.ok = true;
+      state.pos += 1;
     }
-    state.ok = v != null;
   }
   if (!state.ok) {
     state.fail(state.pos, ParseError.expected, '[');
@@ -550,6 +549,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void fail(int pos, int kind, [Object? value, int start = -1]) {
+    ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {

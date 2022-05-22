@@ -1,6 +1,9 @@
 import 'package:meta/meta.dart';
 
+import 'branch.dart';
 import 'builder_helper.dart' as helper;
+import 'combinator.dart';
+import 'error.dart';
 import 'parser_builder.dart';
 
 part 'src/bytes/none_of_tags.dart';

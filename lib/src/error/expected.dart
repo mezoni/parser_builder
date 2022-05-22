@@ -15,7 +15,7 @@ class Expected<I, O> extends ParserBuilder<I, O> {
 
   @override
   String build(Context context, ParserResult? result) {
-    return Alt2<I, O>(Silent(parser), FailExpected(FailPos.pos, tag))
+    return Alt2<I, O>(Silent(parser), FailExpected(StatePos.pos, tag))
         .build(context, result);
   }
 }

@@ -86,3 +86,5 @@ class ParserResult {
 
   ParserResult(this.name, this.type, this.value);
 }
+
+enum StatePos { lastErrorPos, pos, start }

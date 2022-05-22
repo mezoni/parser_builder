@@ -18,7 +18,7 @@ class Indicate<I, O> extends ParserBuilder<I, O> {
   String build(Context context, ParserResult? result) {
     return WithStartAndLastErrorPos(Alt2(
       parser,
-      FailMessage(FailPos.lastErrorPos, message, FailPos.start),
+      FailMessage(StatePos.lastErrorPos, message, StatePos.start),
     )).build(context, result);
   }
 }

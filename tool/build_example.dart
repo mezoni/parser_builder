@@ -111,14 +111,6 @@ const _openBrace =
 const _openBracket =
     Named('_openBracket', Fast(Terminated(Tag('['), _ws)), [_inline]);
 
-const _primitives = Named(
-    '_primitives',
-    TagValues({
-      'false': false,
-      'true': true,
-      'null': null as dynamic,
-    }));
-
 const _quote = Named('_quote', Fast(Terminated(Tag('"'), _ws)), [_inline]);
 
 const _string = Named<String, String>(
@@ -131,7 +123,7 @@ const _string = Named<String, String>(
             Alt2(
               _quote,
               FailMessage(
-                  FailPos.lastErrorPos, 'Unterminated string', FailPos.start),
+                  StatePos.lastErrorPos, 'Unterminated string', StatePos.start),
             )))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
@@ -141,12 +133,25 @@ const _value = Ref<String, dynamic>('_value');
 const _value_ = Named(
     '_value',
     Terminated(
-        Alt5(
-          _string,
-          _number,
-          _array,
-          _object,
-          _primitives,
+        SwitchTag(
+          {
+            '"': _string,
+            '[': _array,
+            '{': _object,
+            'false': Value(false, AddToPos(5)),
+            'true': Value(true, AddToPos(4)),
+            'null': Value(null as dynamic, AddToPos(4)),
+            null: _number,
+          },
+          [
+            FailExpected(StatePos.pos, 'string'),
+            FailExpected(StatePos.pos, '['),
+            FailExpected(StatePos.pos, '}'),
+            FailExpected(StatePos.pos, 'false'),
+            FailExpected(StatePos.pos, 'true'),
+            FailExpected(StatePos.pos, 'null'),
+            FailExpected(StatePos.pos, 'number'),
+          ],
         ),
         _ws));
 

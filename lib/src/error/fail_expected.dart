@@ -3,16 +3,14 @@ part of '../../error.dart';
 @experimental
 class FailExpected<I, O> extends _Fail<I, O> {
   static const _template = '''
-state.ok = false;
 state.fail({{pos}}, ParseError.expected, {{value}});''';
 
   static const _templateWithStart = '''
-state.ok = false;
 state.fail({{pos}}, ParseError.expected, {{value}}, {{start}});''';
 
-  final FailPos pos;
+  final StatePos pos;
 
-  final FailPos? start;
+  final StatePos? start;
 
   final dynamic value;
 

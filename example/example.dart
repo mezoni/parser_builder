@@ -92,7 +92,6 @@ int? _escapeHex(State<String> state) {
       state.pos = $pos4;
     }
     if (!state.ok) {
-      state.ok = false;
       state.fail(
           state.lastErrorPos,
           ParseError.message,
@@ -240,7 +239,6 @@ String? _string(State<String> state) {
     if (state.ok) {
       _quote(state);
       if (!state.ok) {
-        state.ok = false;
         state.fail(state.lastErrorPos, ParseError.message,
             'Unterminated string', state.start);
       }
@@ -254,8 +252,229 @@ String? _string(State<String> state) {
   state.start = $pos1;
   state.minErrorPos = $pos;
   if (!state.ok) {
-    state.ok = false;
     state.fail(state.pos, ParseError.expected, 'string');
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+void _openBracket(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
+  if (state.ok) {
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, '[');
+  }
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  }
+}
+
+List<dynamic>? _values(State<String> state) {
+  List<dynamic>? $0;
+  final source = state.source;
+  var $pos = state.pos;
+  final $list = <dynamic>[];
+  while (true) {
+    dynamic $1;
+    $1 = _value(state);
+    if (!state.ok) {
+      state.pos = $pos;
+      break;
+    }
+    $list.add($1);
+    $pos = state.pos;
+    final $pos1 = state.pos;
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
+    if (state.ok) {
+      state.pos += 1;
+    } else {
+      state.fail(state.pos, ParseError.expected, ',');
+    }
+    if (state.ok) {
+      _ws(state);
+      if (!state.ok) {
+        state.pos = $pos1;
+      }
+    }
+    if (!state.ok) {
+      break;
+    }
+  }
+  state.ok = true;
+  if (state.ok) {
+    $0 = $list;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+void _closeBracket(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
+  if (state.ok) {
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, ']');
+  }
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  }
+}
+
+List<dynamic>? _array(State<String> state) {
+  List<dynamic>? $0;
+  final $pos = state.pos;
+  _openBracket(state);
+  if (state.ok) {
+    $0 = _values(state);
+    if (state.ok) {
+      _closeBracket(state);
+    }
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+void _openBrace(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
+  if (state.ok) {
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, '{');
+  }
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  }
+}
+
+MapEntry<String, dynamic>? _keyValue(State<String> state) {
+  MapEntry<String, dynamic>? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  String? $1;
+  $1 = _string(state);
+  if (state.ok) {
+    final $pos1 = state.pos;
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
+    if (state.ok) {
+      state.pos += 1;
+    } else {
+      state.fail(state.pos, ParseError.expected, ':');
+    }
+    if (state.ok) {
+      _ws(state);
+      if (!state.ok) {
+        state.pos = $pos1;
+      }
+    }
+    if (state.ok) {
+      dynamic $2;
+      $2 = _value(state);
+      if (state.ok) {
+        final v1 = $1!;
+        final v2 = $2;
+        $0 = MapEntry(v1, v2);
+      }
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
+  }
+  return $0;
+}
+
+List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
+  List<MapEntry<String, dynamic>>? $0;
+  final source = state.source;
+  var $pos = state.pos;
+  final $list = <MapEntry<String, dynamic>>[];
+  while (true) {
+    MapEntry<String, dynamic>? $1;
+    $1 = _keyValue(state);
+    if (!state.ok) {
+      state.pos = $pos;
+      break;
+    }
+    $list.add($1!);
+    $pos = state.pos;
+    final $pos1 = state.pos;
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
+    if (state.ok) {
+      state.pos += 1;
+    } else {
+      state.fail(state.pos, ParseError.expected, ',');
+    }
+    if (state.ok) {
+      _ws(state);
+      if (!state.ok) {
+        state.pos = $pos1;
+      }
+    }
+    if (!state.ok) {
+      break;
+    }
+  }
+  state.ok = true;
+  if (state.ok) {
+    $0 = $list;
+  }
+  return $0;
+}
+
+@pragma('vm:prefer-inline')
+void _closeBrace(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
+  if (state.ok) {
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, '}');
+  }
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  }
+}
+
+dynamic _object(State<String> state) {
+  dynamic $0;
+  final $pos = state.pos;
+  _openBrace(state);
+  if (state.ok) {
+    List<MapEntry<String, dynamic>>? $1;
+    $1 = _keyValues(state);
+    if (state.ok) {
+      _closeBrace(state);
+      if (state.ok) {
+        final v1 = $1!;
+        $0 = Map.fromEntries(v1);
+      }
+    }
+  }
+  if (!state.ok) {
+    state.pos = $pos;
   }
   return $0;
 }
@@ -530,289 +749,62 @@ num? _number(State<String> state) {
   }
   state.log = $log;
   if (!state.ok) {
-    state.ok = false;
     state.fail(state.pos, ParseError.expected, 'number');
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-void _openBracket(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
-  if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.fail(state.pos, ParseError.expected, '[');
-  }
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
-  }
-}
-
-List<dynamic>? _values(State<String> state) {
-  List<dynamic>? $0;
-  final source = state.source;
-  var $pos = state.pos;
-  final $list = <dynamic>[];
-  while (true) {
-    dynamic $1;
-    $1 = _value(state);
-    if (!state.ok) {
-      state.pos = $pos;
-      break;
-    }
-    $list.add($1);
-    $pos = state.pos;
-    final $pos1 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
-    if (state.ok) {
-      state.pos += 1;
-    } else {
-      state.fail(state.pos, ParseError.expected, ',');
-    }
-    if (state.ok) {
-      _ws(state);
-      if (!state.ok) {
-        state.pos = $pos1;
-      }
-    }
-    if (!state.ok) {
-      break;
-    }
-  }
-  state.ok = true;
-  if (state.ok) {
-    $0 = $list;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-void _closeBracket(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
-  if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.fail(state.pos, ParseError.expected, ']');
-  }
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
-  }
-}
-
-List<dynamic>? _array(State<String> state) {
-  List<dynamic>? $0;
-  final $pos = state.pos;
-  _openBracket(state);
-  if (state.ok) {
-    $0 = _values(state);
-    if (state.ok) {
-      _closeBracket(state);
-    }
-    if (!state.ok) {
-      $0 = null;
-      state.pos = $pos;
-    }
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-void _openBrace(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
-  if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.fail(state.pos, ParseError.expected, '{');
-  }
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
-  }
-}
-
-MapEntry<String, dynamic>? _keyValue(State<String> state) {
-  MapEntry<String, dynamic>? $0;
-  final source = state.source;
-  final $pos = state.pos;
-  String? $1;
-  $1 = _string(state);
-  if (state.ok) {
-    final $pos1 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
-    if (state.ok) {
-      state.pos += 1;
-    } else {
-      state.fail(state.pos, ParseError.expected, ':');
-    }
-    if (state.ok) {
-      _ws(state);
-      if (!state.ok) {
-        state.pos = $pos1;
-      }
-    }
-    if (state.ok) {
-      dynamic $2;
-      $2 = _value(state);
-      if (state.ok) {
-        final v1 = $1!;
-        final v2 = $2;
-        $0 = MapEntry(v1, v2);
-      }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
-  List<MapEntry<String, dynamic>>? $0;
-  final source = state.source;
-  var $pos = state.pos;
-  final $list = <MapEntry<String, dynamic>>[];
-  while (true) {
-    MapEntry<String, dynamic>? $1;
-    $1 = _keyValue(state);
-    if (!state.ok) {
-      state.pos = $pos;
-      break;
-    }
-    $list.add($1!);
-    $pos = state.pos;
-    final $pos1 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
-    if (state.ok) {
-      state.pos += 1;
-    } else {
-      state.fail(state.pos, ParseError.expected, ',');
-    }
-    if (state.ok) {
-      _ws(state);
-      if (!state.ok) {
-        state.pos = $pos1;
-      }
-    }
-    if (!state.ok) {
-      break;
-    }
-  }
-  state.ok = true;
-  if (state.ok) {
-    $0 = $list;
-  }
-  return $0;
-}
-
-@pragma('vm:prefer-inline')
-void _closeBrace(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
-  if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.fail(state.pos, ParseError.expected, '}');
-  }
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
-  }
-}
-
-dynamic _object(State<String> state) {
-  dynamic $0;
-  final $pos = state.pos;
-  _openBrace(state);
-  if (state.ok) {
-    List<MapEntry<String, dynamic>>? $1;
-    $1 = _keyValues(state);
-    if (state.ok) {
-      _closeBrace(state);
-      if (state.ok) {
-        final v1 = $1!;
-        $0 = Map.fromEntries(v1);
-      }
-    }
-  }
-  if (!state.ok) {
-    state.pos = $pos;
-  }
-  return $0;
-}
-
-dynamic _primitives(State<String> state) {
-  dynamic $0;
-  final source = state.source;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    dynamic v;
-    state.ok = false;
-    if (c == 102) {
-      if (source.startsWith('false', pos)) {
-        state.ok = true;
-        state.pos += 5;
-        v = false;
-      }
-    } else if (c == 116) {
-      if (source.startsWith('true', pos)) {
-        state.ok = true;
-        state.pos += 4;
-        v = true;
-      }
-    } else if (c == 110) {
-      if (source.startsWith('null', pos)) {
-        state.ok = true;
-        state.pos += 4;
-        v = null;
-      }
-    }
-    if (state.ok) {
-      $0 = v;
-    }
-  }
-  if (!state.ok) {
-    state.fail(state.pos, ParseError.expected, 'false');
-    state.fail(state.pos, ParseError.expected, 'true');
-    state.fail(state.pos, ParseError.expected, 'null');
   }
   return $0;
 }
 
 dynamic _value(State<String> state) {
   dynamic $0;
+  final source = state.source;
   final $pos = state.pos;
-  $0 = _string(state);
-  if (!state.ok) {
-    $0 = _number(state);
-    if (!state.ok) {
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    state.ok = false;
+    if (c == 34) {
+      $0 = _string(state);
+    } else if (c == 91) {
       $0 = _array(state);
-      if (!state.ok) {
-        $0 = _object(state);
-        if (!state.ok) {
-          $0 = _primitives(state);
+    } else if (c == 123) {
+      $0 = _object(state);
+    } else if (c == 102) {
+      if (source.startsWith('false', pos)) {
+        state.ok = true;
+        state.pos += 5;
+        if (state.ok) {
+          $0 = false;
         }
       }
+    } else if (c == 116) {
+      if (source.startsWith('true', pos)) {
+        state.ok = true;
+        state.pos += 4;
+        if (state.ok) {
+          $0 = true;
+        }
+      }
+    } else if (c == 110) {
+      if (source.startsWith('null', pos)) {
+        state.ok = true;
+        state.pos += 4;
+        if (state.ok) {
+          $0 = null;
+        }
+      }
+    } else {
+      $0 = _number(state);
     }
+  }
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.expected, 'string');
+    state.fail(state.pos, ParseError.expected, '[');
+    state.fail(state.pos, ParseError.expected, '}');
+    state.fail(state.pos, ParseError.expected, 'false');
+    state.fail(state.pos, ParseError.expected, 'true');
+    state.fail(state.pos, ParseError.expected, 'null');
+    state.fail(state.pos, ParseError.expected, 'number');
   }
   if (state.ok) {
     _ws(state);
@@ -1005,6 +997,7 @@ class State<T> {
 
   @pragma('vm:prefer-inline')
   void fail(int pos, int kind, [Object? value, int start = -1]) {
+    ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
         if (errorPos < pos) {

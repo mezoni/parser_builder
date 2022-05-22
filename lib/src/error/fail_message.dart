@@ -3,18 +3,16 @@ part of '../../error.dart';
 @experimental
 class FailMessage<I, O> extends _Fail<I, O> {
   static const _template = '''
-state.ok = false;
 state.fail({{pos}}, ParseError.message, {{message}});''';
 
   static const _templateWithStart = '''
-state.ok = false;
 state.fail({{pos}}, ParseError.message, {{message}}, {{start}});''';
 
   final String message;
 
-  final FailPos pos;
+  final StatePos pos;
 
-  final FailPos? start;
+  final StatePos? start;
 
   const FailMessage(this.pos, this.message, [this.start]);
 
