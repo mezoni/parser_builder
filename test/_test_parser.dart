@@ -706,6 +706,53 @@ String? identifier(State<String> state) {
   return $0;
 }
 
+String? indicateAbc4Digits(State<String> state) {
+  String? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length &&
+      source.codeUnitAt(state.pos) == 97 &&
+      source.startsWith('abc', state.pos);
+  if (state.ok) {
+    state.pos += 3;
+  } else {
+    state.fail(state.pos, ParseError.expected, 'abc');
+  }
+  if (state.ok) {
+    final $pos1 = state.start;
+    state.start = state.pos;
+    final $pos2 = state.setLastErrorPos(-1);
+    final $pos3 = state.pos;
+    var $count = 0;
+    while ($count < 4 && state.pos < source.length) {
+      final c = source.codeUnitAt(state.pos);
+      final ok = c <= 57 && c >= 48;
+      if (!ok) {
+        break;
+      }
+      state.pos++;
+      $count++;
+    }
+    state.ok = $count >= 4;
+    if (state.ok) {
+      $0 = source.substring($pos3, state.pos);
+    } else {
+      state.fail(state.pos, ParseError.character);
+      state.pos = $pos3;
+    }
+    if (!state.ok) {
+      state.fail(state.lastErrorPos, ParseError.message, 'indicate',
+          state.start, state.lastErrorPos);
+    }
+    state.restoreLastErrorPos($pos2);
+    state.start = $pos1;
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  }
+  return $0;
+}
+
 List<int>? many0C16(State<String> state) {
   List<int>? $0;
   final source = state.source;

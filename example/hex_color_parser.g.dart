@@ -85,7 +85,8 @@ Color? _hexColor(State<String> state) {
           state.lastErrorPos,
           ParseError.message,
           'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
-          state.start);
+          state.start,
+          state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos3);
     state.start = $pos2;

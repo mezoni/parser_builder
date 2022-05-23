@@ -41,6 +41,7 @@ void _test() {
   _testHexDigit0();
   _testHexDigit1();
   _testIdentifierExpression();
+  _testIndicate();
   _testMany0();
   _testMany0Count();
   _testMany1();
@@ -2143,6 +2144,52 @@ void _testRef() {
       expect(state.pos, 0);
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 0, "Expecting: '$s16'")]);
+    }
+  });
+}
+
+void _testIndicate() {
+  test('Indicate', () {
+    final parser = indicateAbc4Digits;
+    {
+      final state = State('abc1234');
+      final r = parser(state);
+      expect(state.ok, true);
+      expect(r, '1234');
+      expect(state.pos, 7);
+    }
+    {
+      final state = State('');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 0);
+      expect(state.errors, [ParseError(0, 0, "Expecting: '$abc'")]);
+    }
+    {
+      final state = State('abc');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 3);
+      expect(state.errors, [
+        ParseError(3, 3, "Unexpected 'EOF'"),
+        ParseError(3, 3, 'indicate'),
+      ]);
+    }
+    {
+      final state = State('abc123');
+      final r = parser(state);
+      expect(state.ok, false);
+      expect(r, null);
+      expect(state.pos, 0);
+      expect(state.errorPos, 6);
+      expect(state.errors, [
+        ParseError(6, 6, "Unexpected 'EOF'"),
+        ParseError(3, 6, 'indicate'),
+      ]);
     }
   });
 }

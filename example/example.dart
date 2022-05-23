@@ -96,7 +96,8 @@ int? _escapeHex(State<String> state) {
           state.lastErrorPos,
           ParseError.message,
           'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
-          state.start);
+          state.start,
+          state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos3);
     state.start = $pos2;

@@ -41,6 +41,7 @@ Future<void> main(List<String> args) async {
     _hexDigit0,
     _hexDigit1,
     _identifier,
+    _indicateAbc4Digits,
     _many0C16,
     _many0C32,
     _many0CountC32,
@@ -245,6 +246,11 @@ const _identifier = Named(
     'identifier',
     IdentifierExpression(['if', 'int', 'for', 'foreach', 'else', 'in', 'while'],
         CharClass('[a-zA-Z0-9_]'), CharClass('[a-zA-Z0-9]')));
+
+const _indicateAbc4Digits = Named(
+    'indicateAbc4Digits',
+    Preceded(Tag('abc'),
+        Indicate('indicate', TakeWhileMN(4, 4, CharClass('[0-9]')))));
 
 const _isC16 = CharClass('#x50');
 

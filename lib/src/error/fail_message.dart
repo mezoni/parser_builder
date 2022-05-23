@@ -28,7 +28,7 @@ state.fail({{pos}}, ParseError.message, {{message}}, {{start}}, {{end}});''';
     }
 
     final values = {
-      'end': _getFailPos(start),
+      'end': _getFailPos(end),
       'message': helper.escapeString(message),
       'pos': _getFailPos(pos),
       'start': _getFailPos(start),
