@@ -23,11 +23,10 @@ if (state.ok) {
         final v4 = Result3(v1, v3, v2);
         {{res0}} = {{map}};
       } else {
-        final length = {{end}} - {{pos}};
         final message1 = "Start tag '$v1' does not match end tag '$v2'";
         final message2 = "End tag '$v2' does not match start tag '$v1'";
-        state.fail({{start}}, ParseError.message, message1, length: length, start: {{pos}});
-        state.fail({{start}}, ParseError.message, message2, start: state.pos);
+        state.fail(state.pos, ParseError.message, message1, {{pos}}, {{end}});
+        state.fail(state.pos, ParseError.message, message2, {{start}}, state.pos);
       }
     }
   }
@@ -52,11 +51,10 @@ if (state.ok) {
       final v2 = {{res3}};
       state.ok = {{compare}};
       if (!state.ok) {
-        final length = {{end}} - {{pos}};
         final message1 = "Start tag '$v1' does not match end tag '$v2'";
         final message2 = "End tag '$v2' does not match start tag '$v1'";
-        state.fail({{start}}, ParseError.message, message1, length: length, start: {{pos}});
-        state.fail({{start}}, ParseError.message, message2, start: state.pos);
+        state.fail(state.pos, ParseError.message, message1, {{pos}}, {{end}});
+        state.fail(state.pos, ParseError.message, message2, {{start}}, state.pos);
       }
     }
   }

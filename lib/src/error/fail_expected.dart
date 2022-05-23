@@ -6,7 +6,7 @@ class FailExpected<I, O> extends _Fail<I, O> {
 state.fail({{pos}}, ParseError.expected, {{value}});''';
 
   static const _templateWithStart = '''
-state.fail({{pos}}, ParseError.expected, {{value}}, start: {{start}});''';
+state.fail({{pos}}, ParseError.expected, {{value}}, {{start}});''';
 
   final StatePos pos;
 

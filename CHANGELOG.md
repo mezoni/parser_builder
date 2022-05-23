@@ -1,3 +1,7 @@
+## 2.0.28
+
+- Breaking change. Simplified and unified way to specify the location of the generated error, different from the location of the failure. By default, an error is registerd at the location where the failure occurred. The `pos` parameter of the `state.fail()` method is responsible for this. If required to register an error in a different location, then need to specify the start and end positions of the error in the `start` and `end` parameters. If the parameter `end` is not specified or its value is less than the value of the parameter `start`, then this value is not taken into account. It is also not taken into account if the value of the parameter `start` is not specified
+
 ## 2.0.27
 
 - Breaking change. Another round to improve the error reporting system. Now errors can be registered not only in any position, but also with any length. This allows an unlimited number of errors to be registered at one failure. All this together 100% justify the choice of this error system. Because this system works very fast, does not consume memory at all, does not require the creation of any data instances for registering errors, allows to register any number of errors at one failure, at any position and with any length

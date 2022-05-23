@@ -74,7 +74,7 @@ String? alpha1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
   return $0;
 }
@@ -122,7 +122,7 @@ String? alphanumeric1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
   return $0;
 }
@@ -192,7 +192,7 @@ int? anyChar(State<String> state) {
   if (state.ok) {
     $0 = source.readRune(state);
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -214,7 +214,7 @@ int? _primaryExpression(State<String> state) {
   if (state.ok) {
     $1 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
   if (state.ok) {
     final v = $1!;
@@ -440,7 +440,7 @@ String? digit1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
   return $0;
 }
@@ -476,10 +476,10 @@ int? escapeSequence16(State<String> state) {
       state.pos++;
       $0 = v;
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -509,10 +509,10 @@ int? escapeSequence32(State<String> state) {
       $0 = v;
     } else {
       state.pos = pos;
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -537,7 +537,7 @@ String? expected2C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
     state.pos = $pos;
   }
   state.log = $log;
@@ -561,10 +561,10 @@ dynamic foldMany0Digit(State<String> state) {
         state.pos++;
         $1 = c;
       } else {
-        state.fail(state.pos, ParseError.character, null);
+        state.fail(state.pos, ParseError.character);
       }
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
     if (!state.ok) {
       break;
@@ -622,7 +622,7 @@ String? hexDigit1(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
   return $0;
 }
@@ -903,10 +903,10 @@ dynamic map4Digits(State<String> state) {
       state.pos++;
       $1 = c;
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   if (state.ok) {
     int? $2;
@@ -918,10 +918,10 @@ dynamic map4Digits(State<String> state) {
         state.pos++;
         $2 = c;
       } else {
-        state.fail(state.pos, ParseError.character, null);
+        state.fail(state.pos, ParseError.character);
       }
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
     if (state.ok) {
       int? $3;
@@ -933,10 +933,10 @@ dynamic map4Digits(State<String> state) {
           state.pos++;
           $3 = c;
         } else {
-          state.fail(state.pos, ParseError.character, null);
+          state.fail(state.pos, ParseError.character);
         }
       } else {
-        state.fail(state.pos, ParseError.character, null);
+        state.fail(state.pos, ParseError.character);
       }
       if (state.ok) {
         int? $4;
@@ -948,10 +948,10 @@ dynamic map4Digits(State<String> state) {
             state.pos++;
             $4 = c;
           } else {
-            state.fail(state.pos, ParseError.character, null);
+            state.fail(state.pos, ParseError.character);
           }
         } else {
-          state.fail(state.pos, ParseError.character, null);
+          state.fail(state.pos, ParseError.character);
         }
         if (state.ok) {
           final v1 = $1!;
@@ -1053,7 +1053,7 @@ Object? nestedC16OrTake2C32(State<String> state) {
     if (state.ok) {
       $0 = source.substring($pos1, state.pos);
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
       state.pos = $pos1;
     }
   }
@@ -1076,10 +1076,10 @@ int? noneOfC16(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1103,7 +1103,7 @@ int? noneOfOfC16OrC32(State<String> state) {
         if (c == ch) {
           state.pos = pos;
           state.ok = false;
-          state.fail(state.pos, ParseError.character, null);
+          state.fail(state.pos, ParseError.character);
           break;
         }
       }
@@ -1112,7 +1112,7 @@ int? noneOfOfC16OrC32(State<String> state) {
       }
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
     state.ok = false;
   }
   return $0;
@@ -1130,10 +1130,10 @@ int? noneOfC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1148,35 +1148,35 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
       case 97:
         if (source.startsWith('abc', pos)) {
           state.ok = false;
-          state.fail(pos, ParseError.unexpected, 'abc', length: 3);
+          state.fail(pos, ParseError.unexpected, 'abc', pos, pos + 3);
           break;
         }
         if (source.startsWith('abd', pos)) {
           state.ok = false;
-          state.fail(pos, ParseError.unexpected, 'abd', length: 3);
+          state.fail(pos, ParseError.unexpected, 'abd', pos, pos + 3);
           break;
         }
         break;
       case 100:
         if (source.startsWith('def', pos)) {
           state.ok = false;
-          state.fail(pos, ParseError.unexpected, 'def', length: 3);
+          state.fail(pos, ParseError.unexpected, 'def', pos, pos + 3);
           break;
         }
         if (source.startsWith('deg', pos)) {
           state.ok = false;
-          state.fail(pos, ParseError.unexpected, 'deg', length: 3);
+          state.fail(pos, ParseError.unexpected, 'deg', pos, pos + 3);
           break;
         }
         break;
       case 120:
         if (source.startsWith('xy', pos)) {
           state.ok = false;
-          state.fail(pos, ParseError.unexpected, 'xy', length: 2);
+          state.fail(pos, ParseError.unexpected, 'xy', pos, pos + 2);
           break;
         }
         state.ok = false;
-        state.fail(pos, ParseError.unexpected, 'x', length: 1);
+        state.fail(pos, ParseError.unexpected, 'x', pos, pos + 1);
         break;
     }
   }
@@ -1209,10 +1209,10 @@ int? oneOfC16(State<String> state) {
       state.pos++;
       $0 = c;
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1229,10 +1229,10 @@ int? oneOfC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1442,10 +1442,10 @@ int? satisfyC16(State<String> state) {
       state.pos++;
       $0 = c;
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1462,10 +1462,10 @@ int? satisfyC32(State<String> state) {
       $0 = c;
     } else {
       state.pos = pos;
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1648,7 +1648,7 @@ void skipWhile1C16(State<String> state) {
   }
   state.ok = state.pos != $pos;
   if (!state.ok) {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
 }
 
@@ -1666,7 +1666,7 @@ void skipWhile1C32(State<String> state) {
   }
   state.ok = state.pos != $pos;
   if (!state.ok) {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
 }
 
@@ -1739,10 +1739,10 @@ String? stringValue(State<String> state) {
         state.pos++;
         $1 = v;
       } else {
-        state.fail(state.pos, ParseError.character, null);
+        state.fail(state.pos, ParseError.character);
       }
     } else {
-      state.fail(state.pos, ParseError.character, null);
+      state.fail(state.pos, ParseError.character);
     }
     if (!state.ok) {
       state.pos = $pos;
@@ -1893,7 +1893,7 @@ String? tagPairAbc(State<String> state) {
     if (state.ok) {
       $1 = source.substring($pos2, state.pos);
     } else {
-      state.fail($pos2, ParseError.character, null);
+      state.fail($pos2, ParseError.character);
     }
     if (state.ok) {
       state.ok =
@@ -1959,7 +1959,7 @@ String? tagPairAbc(State<String> state) {
         if (state.ok) {
           $3 = source.substring($pos5, state.pos);
         } else {
-          state.fail($pos5, ParseError.character, null);
+          state.fail($pos5, ParseError.character);
         }
         if (state.ok) {
           state.ok =
@@ -1984,12 +1984,11 @@ String? tagPairAbc(State<String> state) {
           final v4 = Result3(v1, v3, v2);
           $0 = v4.$1;
         } else {
-          final length = $end - $pos;
           final message1 = "Start tag '$v1' does not match end tag '$v2'";
           final message2 = "End tag '$v2' does not match start tag '$v1'";
-          state.fail($start, ParseError.message, message1,
-              length: length, start: $pos);
-          state.fail($start, ParseError.message, message2, start: state.pos);
+          state.fail(state.pos, ParseError.message, message1, $pos, $end);
+          state.fail(
+              state.pos, ParseError.message, message2, $start, state.pos);
         }
       }
     }
@@ -2141,13 +2140,14 @@ String? takeUntil1Abc(State<String> state) {
       if (state.pos < source.length) {
         final pos = state.pos;
         source.readRune(state);
-        state.fail(state.pos, ParseError.expected, 'abc', length: 3);
+        state.fail(
+            state.pos, ParseError.expected, 'abc', state.pos, state.pos + 3);
         state.pos = pos;
       } else {
-        state.fail(state.pos, ParseError.character, null);
+        state.fail(state.pos, ParseError.character);
       }
     } else {
-      state.fail($pos, ParseError.unexpected, 'abc', length: 3);
+      state.fail($pos, ParseError.unexpected, 'abc', $pos, $pos + 3);
     }
   }
   return $0;
@@ -2169,7 +2169,7 @@ String? takeWhile1C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
   return $0;
 }
@@ -2191,7 +2191,7 @@ String? takeWhile1C32(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail($pos, ParseError.character, null);
+    state.fail($pos, ParseError.character);
   }
   return $0;
 }
@@ -2253,7 +2253,7 @@ String? takeWhileMN_2_4C16(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
     state.pos = $pos;
   }
   return $0;
@@ -2278,7 +2278,7 @@ String? takeWhileMN_2_4C32(State<String> state) {
   if (state.ok) {
     $0 = source.substring($pos, state.pos);
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
     state.pos = $pos;
   }
   return $0;
@@ -2322,7 +2322,7 @@ Token<dynamic>? tokenizeAlphaOrDigits(State<String> state) {
   if (state.ok) {
     $1 = source.substring($pos1, state.pos);
   } else {
-    state.fail($pos1, ParseError.character, null);
+    state.fail($pos1, ParseError.character);
   }
   if (state.ok) {
     final v1 = $pos;
@@ -2345,7 +2345,7 @@ Token<dynamic>? tokenizeAlphaOrDigits(State<String> state) {
     if (state.ok) {
       $2 = source.substring($pos3, state.pos);
     } else {
-      state.fail($pos3, ParseError.character, null);
+      state.fail($pos3, ParseError.character);
     }
     if (state.ok) {
       final v1 = $pos2;
@@ -2394,7 +2394,7 @@ Token<dynamic>? tokenizeSimilarTagsIfForWhile(State<String> state) {
     }
   }
   if (!state.ok) {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -2434,7 +2434,7 @@ dynamic tokenizeTagsIfForWhile(State<String> state) {
     }
   }
   if (!state.ok) {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -2626,7 +2626,7 @@ int? transformersVarIsNotDigit(State<String> state) {
         if (c == ch) {
           state.pos = pos;
           state.ok = false;
-          state.fail(state.pos, ParseError.character, null);
+          state.fail(state.pos, ParseError.character);
           break;
         }
       }
@@ -2635,7 +2635,7 @@ int? transformersVarIsNotDigit(State<String> state) {
       }
     }
   } else {
-    state.fail(state.pos, ParseError.character, null);
+    state.fail(state.pos, ParseError.character);
     state.ok = false;
   }
   return $0;
@@ -2665,7 +2665,7 @@ String? verifyIs3Digit(State<String> state) {
     if (state.ok) {
       $0 = v;
     } else {
-      state.fail(state.pos, ParseError.message, 'Message', start: $pos);
+      state.fail(state.pos, ParseError.message, 'Message', $pos, state.pos);
       state.pos = $pos;
     }
   }
@@ -2693,7 +2693,7 @@ void verifyIs3DigitFast(State<String> state) {
     final v = $0!;
     state.ok = v.length == 3;
     if (!state.ok) {
-      state.fail(state.pos, ParseError.message, 'Message', start: $pos);
+      state.fail(state.pos, ParseError.message, 'Message', $pos, state.pos);
       state.pos = $pos;
     }
   }
@@ -2851,11 +2851,11 @@ class State<T> {
 
   final T source;
 
+  final List<int> _ends = List.filled(150, 0);
+
   final List<int> _kinds = List.filled(150, 0);
 
   int _length = 0;
-
-  final List<int> _lengths = List.filled(150, 0);
 
   final List<MemoizedResult?> _memos = List.filled(150, null);
 
@@ -2868,8 +2868,7 @@ class State<T> {
   List<ParseError> get errors => _buildErrors();
 
   @pragma('vm:prefer-inline')
-  void fail(int pos, int kind, Object? value,
-      {int length = -1, int start = -1}) {
+  void fail(int pos, int kind, [Object? value, int start = -1, int end = -1]) {
     ok = false;
     if (log) {
       if (errorPos <= pos && minErrorPos <= pos) {
@@ -2879,7 +2878,7 @@ class State<T> {
         }
 
         _kinds[_length] = kind;
-        _lengths[_length] = length;
+        _ends[_length] = end;
         _starts[_length] = start;
         _values[_length] = value;
         _length++;
@@ -2937,34 +2936,19 @@ class State<T> {
   }
 
   List<ParseError> _buildErrors() {
-    int max(int x, int y) => x > y ? x : y;
-
-    int min(int x, int y) => x < y ? x : y;
-
-    int getStart(int index) {
-      var start = _starts[index];
+    var start = 0;
+    var end = 0;
+    void calculate(int index) {
+      start = _starts[index];
       if (start < 0) {
         start = errorPos;
+        end = start;
+      } else {
+        end = _ends[index];
+        if (end < start) {
+          end = start;
+        }
       }
-
-      start = min(start, errorPos);
-      return start;
-    }
-
-    int getEnd(int index) {
-      start = getStart(index);
-      var end = _starts[index];
-      if (end < 0) {
-        end = errorPos;
-      }
-
-      end = max(end, errorPos);
-      final length = _lengths[index];
-      if (length >= 0) {
-        end = start + length;
-      }
-
-      return end;
     }
 
     final result = <ParseError>[];
@@ -2972,8 +2956,8 @@ class State<T> {
     for (var i = 0; i < _length; i++) {
       final kind = _kinds[i];
       if (kind == ParseError.expected) {
+        calculate(i);
         final value = _values[i];
-        final start = getStart(i);
         var list = expected[start];
         if (list == null) {
           list = [];
@@ -2986,14 +2970,13 @@ class State<T> {
 
     for (final start in expected.keys) {
       final values = expected[start]!.toSet().map((e) => _escape(e));
-      final text = 'Expected: ${values.join(', ')}';
+      final text = 'Expecting: ${values.join(', ')}';
       final error = ParseError(start, start, text);
       result.add(error);
     }
 
     for (var i = 0; i < _length; i++) {
-      final start = getStart(i);
-      final end = getEnd(i);
+      calculate(i);
       final value = _values[i];
       final kind = _kinds[i];
       switch (kind) {

@@ -3,10 +3,10 @@ part of '../../error.dart';
 @experimental
 class FailCharacter<I, O> extends _Fail<I, O> {
   static const _template = '''
-state.fail({{pos}}, ParseError.character, null);''';
+state.fail({{pos}}, ParseError.character);''';
 
   static const _templateWithStart = '''
-state.fail({{pos}}, ParseError.character, start: {{start}});''';
+state.fail({{pos}}, ParseError.character, null, {{start}});''';
 
   final StatePos pos;
 

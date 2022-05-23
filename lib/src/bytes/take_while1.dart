@@ -22,7 +22,7 @@ state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  state.fail({{pos}}, ParseError.character, null);
+  state.fail({{pos}}, ParseError.character);
 }''';
 
   static const _template16Fast = '''
@@ -37,7 +37,7 @@ while (state.pos < source.length) {
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok) {
-  state.fail({{pos}}, ParseError.character, null);
+  state.fail({{pos}}, ParseError.character);
 }''';
 
   static const _template32 = '''
@@ -55,7 +55,7 @@ state.ok = state.pos != {{pos}};
 if (state.ok) {
   {{res0}} = source.substring({{pos}}, state.pos);
 } else {
-  state.fail({{pos}}, ParseError.character, null);
+  state.fail({{pos}}, ParseError.character);
 }''';
 
   static const _template32Fast = '''
@@ -71,7 +71,7 @@ while (state.pos < source.length) {
 }
 state.ok = state.pos != {{pos}};
 if (!state.ok) {
-  state.fail({{pos}}, ParseError.character, null);
+  state.fail({{pos}}, ParseError.character);
 }''';
 
   final SemanticAction<bool> predicate;

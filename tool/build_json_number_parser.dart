@@ -47,14 +47,14 @@ class Number extends ParserBuilder<String, num> {
 if (state.ok) {
   {{res0}} = {{v}};
 } else {
-  state.fail(state.pos, ParseError.character, null);
+  state.fail(state.pos, ParseError.character);
   state.pos = {{pos}};
 }''';
 
   static const _templateFast = '''
 {{parse}}
 if (!state.ok) {
-  state.fail(state.pos, ParseError.character, null);
+  state.fail(state.pos, ParseError.character);
   state.pos = {{pos}};
 }''';
 
