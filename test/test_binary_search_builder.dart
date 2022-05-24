@@ -60,6 +60,7 @@ Code: $code
               }
 
               Timer(Duration(milliseconds: 500), () {
+                response.close();
                 remote.kill(priority: Isolate.immediate);
               });
             }
