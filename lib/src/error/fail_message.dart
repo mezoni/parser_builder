@@ -1,7 +1,7 @@
 part of '../../error.dart';
 
 @experimental
-class FailMessage<I, O> extends _Fail<I, O> {
+class FailMessage<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 state.fail({{pos}}, ParseError.message, {{message}});''';
 
@@ -11,13 +11,13 @@ state.fail({{pos}}, ParseError.message, {{message}}, {{start}});''';
   static const _templateWithStartEnd = '''
 state.fail({{pos}}, ParseError.message, {{message}}, {{start}}, {{end}});''';
 
-  final StatePos? end;
+  final String? end;
 
   final String message;
 
-  final StatePos pos;
+  final String pos;
 
-  final StatePos? start;
+  final String? start;
 
   const FailMessage(this.pos, this.message, [this.start, this.end]);
 
@@ -28,10 +28,10 @@ state.fail({{pos}}, ParseError.message, {{message}}, {{start}}, {{end}});''';
     }
 
     final values = {
-      'end': _getFailPos(end),
+      'end': end ?? StatePos.unknown,
       'message': helper.escapeString(message),
-      'pos': _getFailPos(pos),
-      'start': _getFailPos(start),
+      'pos': pos,
+      'start': start ?? StatePos.unknown,
     };
     final String template;
     if (start == null) {

@@ -1,16 +1,16 @@
 part of '../../error.dart';
 
 @experimental
-class FailCharacter<I, O> extends _Fail<I, O> {
+class FailCharacter<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 state.fail({{pos}}, ParseError.character);''';
 
   static const _templateWithStart = '''
 state.fail({{pos}}, ParseError.character, null, {{start}});''';
 
-  final StatePos pos;
+  final String pos;
 
-  final StatePos? start;
+  final String? start;
 
   const FailCharacter(this.pos, [this.start]);
 
@@ -18,8 +18,8 @@ state.fail({{pos}}, ParseError.character, null, {{start}});''';
   String build(Context context, ParserResult? result) {
     final hasStart = start != null;
     final values = {
-      'pos': _getFailPos(pos),
-      'start': _getFailPos(start),
+      'pos': pos,
+      'start': start ?? StatePos.unknown,
     };
     return render2(hasStart, _templateWithStart, _template, values);
   }

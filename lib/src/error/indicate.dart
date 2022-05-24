@@ -16,10 +16,10 @@ class Indicate<I, O> extends ParserBuilder<I, O> {
 
   @override
   String build(Context context, ParserResult? result) {
-    return WithStartAndLastErrorPos(Alt2(
-      parser,
-      FailMessage(StatePos.lastErrorPos, message, StatePos.start,
-          StatePos.lastErrorPos),
+    return HandleLastErrorPos(Alt2(
+      Preceded(Unsafe('final start = state.pos;'), parser),
+      FailMessage(
+          StatePos.lastErrorPos, message, 'start', StatePos.lastErrorPos),
     )).build(context, result);
   }
 }

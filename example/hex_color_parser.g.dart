@@ -57,39 +57,44 @@ Color? _hexColor(State<String> state) {
     state.fail(state.pos, ParseError.expected, '#');
   }
   if (state.ok) {
-    final $pos2 = state.start;
-    state.start = state.pos;
-    final $pos3 = state.setLastErrorPos(-1);
-    final $pos4 = state.pos;
-    int? $1;
-    $1 = _hexPrimary(state);
+    final $pos2 = state.setLastErrorPos(-1);
+    final $pos3 = state.pos;
+    state.ok = true;
+    final start = state.pos;
     if (state.ok) {
-      int? $2;
-      $2 = _hexPrimary(state);
+      final $pos4 = state.pos;
+      int? $1;
+      $1 = _hexPrimary(state);
       if (state.ok) {
-        int? $3;
-        $3 = _hexPrimary(state);
+        int? $2;
+        $2 = _hexPrimary(state);
         if (state.ok) {
-          final v1 = $1!;
-          final v2 = $2!;
-          final v3 = $3!;
-          $0 = Color(v1, v2, v3);
+          int? $3;
+          $3 = _hexPrimary(state);
+          if (state.ok) {
+            final v1 = $1!;
+            final v2 = $2!;
+            final v3 = $3!;
+            $0 = Color(v1, v2, v3);
+          }
         }
       }
-    }
-    if (!state.ok) {
-      state.pos = $pos4;
+      if (!state.ok) {
+        state.pos = $pos4;
+      }
+      if (!state.ok) {
+        state.pos = $pos3;
+      }
     }
     if (!state.ok) {
       state.fail(
           state.lastErrorPos,
           ParseError.message,
           'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
-          state.start,
+          start,
           state.lastErrorPos);
     }
-    state.restoreLastErrorPos($pos3);
-    state.start = $pos2;
+    state.restoreLastErrorPos($pos2);
     if (!state.ok) {
       state.pos = $pos1;
     }
@@ -269,8 +274,6 @@ class State<T> {
   bool ok = false;
 
   int pos = 0;
-
-  int start = 0;
 
   final T source;
 

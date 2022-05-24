@@ -17,6 +17,6 @@ part 'src/combinator/peek.dart';
 part 'src/combinator/recognize.dart';
 part 'src/combinator/silent.dart';
 part 'src/combinator/slow.dart';
+part 'src/combinator/unsafe.dart';
 part 'src/combinator/value.dart';
 part 'src/combinator/verify.dart';
-part 'src/combinator/with_start.dart';

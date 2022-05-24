@@ -87,4 +87,10 @@ class ParserResult {
   ParserResult(this.name, this.type, this.value);
 }
 
-enum StatePos { lastErrorPos, pos, start }
+class StatePos {
+  static const lastErrorPos = 'state.lastErrorPos';
+
+  static const pos = 'state.pos';
+
+  static const unknown = '-1';
+}

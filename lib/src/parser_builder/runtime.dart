@@ -217,8 +217,6 @@ class State<T> {
 
   int pos = 0;
 
-  int start = 0;
-
   final T source;
 
   final List<int> _ends = List.filled(150, 0);
@@ -438,8 +436,6 @@ class State<T> {
   bool ok = false;
 
   int pos = 0;
-
-  int start = 0;
 
   final T source;
 

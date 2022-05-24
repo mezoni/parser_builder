@@ -66,41 +66,46 @@ int? _escapeHex(State<String> state) {
   }
   if (state.ok) {
     String? $1;
-    final $pos2 = state.start;
-    state.start = state.pos;
-    final $pos3 = state.setLastErrorPos(-1);
-    final $pos4 = state.pos;
-    var $count = 0;
-    while ($count < 4 && state.pos < source.length) {
-      final c = source.codeUnitAt(state.pos);
-      final ok = c <= 70
-          ? c <= 57
-              ? c >= 48
-              : c >= 65
-          : c <= 102 && c >= 97;
-      if (!ok) {
-        break;
-      }
-      state.pos++;
-      $count++;
-    }
-    state.ok = $count >= 4;
+    final $pos2 = state.setLastErrorPos(-1);
+    final $pos3 = state.pos;
+    state.ok = true;
+    final start = state.pos;
     if (state.ok) {
-      $1 = source.substring($pos4, state.pos);
-    } else {
-      state.fail(state.pos, ParseError.character);
-      state.pos = $pos4;
+      final $pos4 = state.pos;
+      var $count = 0;
+      while ($count < 4 && state.pos < source.length) {
+        final c = source.codeUnitAt(state.pos);
+        final ok = c <= 70
+            ? c <= 57
+                ? c >= 48
+                : c >= 65
+            : c <= 102 && c >= 97;
+        if (!ok) {
+          break;
+        }
+        state.pos++;
+        $count++;
+      }
+      state.ok = $count >= 4;
+      if (state.ok) {
+        $1 = source.substring($pos4, state.pos);
+      } else {
+        state.fail(state.pos, ParseError.character);
+        state.pos = $pos4;
+      }
+      if (!state.ok) {
+        state.pos = $pos3;
+      }
     }
     if (!state.ok) {
       state.fail(
           state.lastErrorPos,
           ParseError.message,
           'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
-          state.start,
+          start,
           state.lastErrorPos);
     }
-    state.restoreLastErrorPos($pos3);
-    state.start = $pos2;
+    state.restoreLastErrorPos($pos2);
     if (state.ok) {
       final v1 = $1!;
       $0 = _toHexValue(v1);
@@ -180,15 +185,21 @@ String? _string(State<String> state) {
   final source = state.source;
   final $pos = state.minErrorPos;
   state.minErrorPos = state.pos + 1;
-  final $pos1 = state.start;
-  state.start = state.pos;
-  final $pos2 = state.setLastErrorPos(-1);
+  final $pos1 = state.setLastErrorPos(-1);
+  final $pos2 = state.pos;
   final $pos3 = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
+  state.ok = true;
+  final start = state.pos;
   if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.fail(state.pos, ParseError.expected, '"');
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
+    if (state.ok) {
+      state.pos += 1;
+    } else {
+      state.fail(state.pos, ParseError.expected, '"');
+    }
+    if (!state.ok) {
+      state.pos = $pos3;
+    }
   }
   if (state.ok) {
     state.ok = true;
@@ -241,16 +252,15 @@ String? _string(State<String> state) {
       _quote(state);
       if (!state.ok) {
         state.fail(state.lastErrorPos, ParseError.message,
-            'Unterminated string', state.start);
+            'Unterminated string', start);
       }
     }
     if (!state.ok) {
       $0 = null;
-      state.pos = $pos3;
+      state.pos = $pos2;
     }
   }
-  state.restoreLastErrorPos($pos2);
-  state.start = $pos1;
+  state.restoreLastErrorPos($pos1);
   state.minErrorPos = $pos;
   if (!state.ok) {
     state.fail(state.pos, ParseError.expected, 'string');
@@ -979,8 +989,6 @@ class State<T> {
   bool ok = false;
 
   int pos = 0;
-
-  int start = 0;
 
   final T source;
 

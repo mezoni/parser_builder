@@ -117,13 +117,13 @@ const _string = Named<String, String>(
     '_string',
     Nested(
         'string',
-        WithStartAndLastErrorPos(Delimited(
-            Tag('"'),
+        HandleLastErrorPos(Delimited(
+            Preceded(Unsafe('final start = state.pos;'), Tag('"')),
             _stringValue,
             Alt2(
               _quote,
               FailMessage(
-                  StatePos.lastErrorPos, 'Unterminated string', StatePos.start),
+                  StatePos.lastErrorPos, 'Unterminated string', 'start'),
             )))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
