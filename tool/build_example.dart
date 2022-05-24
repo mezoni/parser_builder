@@ -118,7 +118,10 @@ const _string = Named<String, String>(
     Nested(
         'string',
         HandleLastErrorPos(Delimited(
-            Preceded(Unsafe('final start = state.pos;'), Tag('"')),
+            Preceded(
+              Unsafe('final start = state.pos;'),
+              Tag('"'),
+            ),
             _stringValue,
             Alt2(
               _quote,
