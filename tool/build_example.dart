@@ -7,6 +7,7 @@ import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
+import 'package:parser_builder/semantic_value.dart';
 import 'package:parser_builder/sequence.dart';
 import 'package:parser_builder/string.dart';
 
@@ -61,16 +62,16 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 const _escapeHex = Named<String, int>(
     '_escapeHex',
     Map3(
-        PosToVal('start'),
+        PositionToValue('start'),
         Fast(Satisfy(CharClass('[u]'))),
         HandleLastErrorPos<String, String>(
           Alt2(
             TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
             FailMessage(
-                StatePos.lastErrorPos,
+                LastErrorPositionAction(),
                 "An escape sequence starting with '\\u' must be followed by 4 hexadecimal digits",
-                '{{start|value}}',
-                StatePos.lastErrorPos),
+                FromValueAction('start'),
+                LastErrorPositionAction()),
           ),
         ),
         ExpressionAction<int>(['s'], '_toHexValue({{s}})')),
@@ -127,15 +128,17 @@ const _string = Named<String, String>(
         'string',
         HandleLastErrorPos(Delimited(
             Preceded(
-              PosToVal('start'),
+              PositionToValue('start'),
               Tag('"'),
             ),
             _stringValue,
             Alt2(
-              _quote,
-              FailMessage(StatePos.lastErrorPos, 'Unterminated string',
-                  '{{start|value}}'),
-            )))));
+                _quote,
+                FailMessage(
+                  LastErrorPositionAction(),
+                  'Unterminated string',
+                  FromValueAction('start'),
+                ))))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
 
@@ -155,13 +158,13 @@ const _value_ = Named(
             null: _number,
           },
           [
-            FailExpected(StatePos.pos, 'string'),
-            FailExpected(StatePos.pos, '['),
-            FailExpected(StatePos.pos, '}'),
-            FailExpected(StatePos.pos, 'false'),
-            FailExpected(StatePos.pos, 'true'),
-            FailExpected(StatePos.pos, 'null'),
-            FailExpected(StatePos.pos, 'number'),
+            FailExpected(PositionAction(), 'string'),
+            FailExpected(PositionAction(), '['),
+            FailExpected(PositionAction(), '}'),
+            FailExpected(PositionAction(), 'false'),
+            FailExpected(PositionAction(), 'true'),
+            FailExpected(PositionAction(), 'null'),
+            FailExpected(PositionAction(), 'number'),
           ],
         ),
         _ws));

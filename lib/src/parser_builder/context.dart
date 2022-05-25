@@ -72,6 +72,14 @@ class Context {
     return ParserResult(name, type, value);
   }
 
+  SemanticValue getSemanticValue(String name) {
+    if (!semanticValues.containsKey(name)) {
+      throw ArgumentError.value(name, 'name', 'Semantic value not declared');
+    }
+
+    return semanticValues[name]!;
+  }
+
   T readRegistryValue<T>(Map<dynamic, Map<String, dynamic>> registry, owner,
       String key, T Function() defaultValue) {
     final section = _getRegistrySection(registry, owner);
@@ -82,18 +90,6 @@ class Context {
     } else {
       return section[key] as T;
     }
-  }
-
-  String renderSemanticValues(String template) {
-    var result = template;
-    for (final key in semanticValues.keys) {
-      final value = semanticValues[key]!;
-      result = result.replaceAll('{{$key}}', value.name);
-      result = result.replaceAll('{{$key|value}}', value.value);
-      result = result.replaceAll('{{$key|safe_value}}', value.safeValue);
-    }
-
-    return result;
   }
 
   void writeRegistryValue<T>(

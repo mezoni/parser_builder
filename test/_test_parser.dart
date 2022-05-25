@@ -226,13 +226,13 @@ int? _primaryExpression(State<String> state) {
 int? _binaryExpressionMul(State<String> state) {
   int? $0;
   final source = state.source;
-  final $pos = state.pos;
   int? $left;
   int? $1;
   $1 = _primaryExpression(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      final $pos = state.pos;
       String? $2;
       final $log = state.log;
       state.log = false;
@@ -286,13 +286,13 @@ int? _binaryExpressionMul(State<String> state) {
 int? binaryExpressionAdd(State<String> state) {
   int? $0;
   final source = state.source;
-  final $pos = state.pos;
   int? $left;
   int? $1;
   $1 = _binaryExpressionMul(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      final $pos = state.pos;
       String? $2;
       final $log = state.log;
       state.log = false;
@@ -709,7 +709,7 @@ String? identifier(State<String> state) {
 String? indicateAbc4Digits(State<String> state) {
   String? $0;
   final source = state.source;
-  int? $1653480009326807;
+  int? $1653513845240015;
   final $pos = state.pos;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
@@ -724,7 +724,7 @@ String? indicateAbc4Digits(State<String> state) {
     final $pos2 = state.pos;
     state.ok = true;
     if (state.ok) {
-      $1653480009326807 = state.pos;
+      $1653513845240015 = state.pos;
     }
     if (state.ok) {
       final $pos3 = state.pos;
@@ -751,7 +751,7 @@ String? indicateAbc4Digits(State<String> state) {
     }
     if (!state.ok) {
       state.fail(state.lastErrorPos, ParseError.message, 'indicate',
-          $1653480009326807!, state.lastErrorPos);
+          $1653513845240015 as int, state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos1);
     if (!state.ok) {

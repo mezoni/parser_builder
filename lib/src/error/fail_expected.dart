@@ -8,9 +8,9 @@ state.fail({{pos}}, ParseError.expected, {{value}});''';
   static const _templateWithStart = '''
 state.fail({{pos}}, ParseError.expected, {{value}}, {{start}});''';
 
-  final String pos;
+  final SemanticAction<int> pos;
 
-  final String? start;
+  final SemanticAction<int>? start;
 
   final dynamic value;
 
@@ -18,12 +18,27 @@ state.fail({{pos}}, ParseError.expected, {{value}}, {{start}});''';
 
   @override
   String build(Context context, ParserResult? result) {
-    final hasStart = start != null;
+    if (start == null) {
+      return _build(context, result);
+    } else {
+      return _buildWithStart(context, result);
+    }
+  }
+
+  String _build(Context context, ParserResult? result) {
     final values = {
-      'pos': context.renderSemanticValues(pos),
-      'start': context.renderSemanticValues(start ?? StatePos.unknown),
+      'pos': pos.build(context, 'pos', []),
       'value': helper.getAsCode(value),
     };
-    return render2(hasStart, _templateWithStart, _template, values);
+    return render(_template, values);
+  }
+
+  String _buildWithStart(Context context, ParserResult? result) {
+    final values = {
+      'pos': pos.build(context, 'pos', []),
+      'start': start!.build(context, 'start', []),
+      'value': helper.getAsCode(value),
+    };
+    return render(_templateWithStart, values);
   }
 }

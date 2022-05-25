@@ -11,8 +11,7 @@ class ExpressionAction<T> extends SemanticAction<T> {
 
   @override
   String build(Context context, String name, List<String> arguments) {
-    final template = context.renderSemanticValues(expression);
-    return replaceParameters(template, parameters, arguments);
+    return replaceParameters(expression, parameters, arguments);
   }
 }
 

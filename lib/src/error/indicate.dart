@@ -18,9 +18,13 @@ class Indicate<I, O> extends ParserBuilder<I, O> {
   String build(Context context, ParserResult? result) {
     final name = SemanticValue.nextKey();
     return HandleLastErrorPos(Alt2(
-      Preceded(PosToVal(name), parser),
-      FailMessage(StatePos.lastErrorPos, message, '{{$name|value}}',
-          StatePos.lastErrorPos),
+      Preceded(PositionToValue(name), parser),
+      FailMessage(
+        LastErrorPositionAction(),
+        message,
+        FromValueAction(name),
+        LastErrorPositionAction(),
+      ),
     )).build(context, result);
   }
 }

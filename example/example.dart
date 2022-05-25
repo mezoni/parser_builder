@@ -100,7 +100,7 @@ int? _escapeHex(State<String> state) {
             state.lastErrorPos,
             ParseError.message,
             'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
-            $start!,
+            $start as int,
             state.lastErrorPos);
       }
       state.restoreLastErrorPos($pos2);
@@ -254,7 +254,7 @@ String? _string(State<String> state) {
       _quote(state);
       if (!state.ok) {
         state.fail(state.lastErrorPos, ParseError.message,
-            'Unterminated string', $start!);
+            'Unterminated string', $start as int);
       }
     }
     if (!state.ok) {

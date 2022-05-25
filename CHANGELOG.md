@@ -1,9 +1,9 @@
 ## 2.0.28
 
-- Implemented the concept of `semantic values`. For these purposes, the parser builders `Val`, `PosToVal` is implemented. Semantic values are available for use in `ExpressionAction` semantic action and in error generation parsee builders (for example, `FailMessage`)
-- Breaking change: Removed parser builders `WithStart`, `WithStartAndLastErrorPos`. Now the functionality to save the initial parsing position (the so-called `start`) can be implemented using the `PosToVal` parser builder. The `state.start` field has also been removed as it is no longer used
+- Implemented the concept of `semantic values`
+- Breaking change: Removed parser builders `WithStart`, `WithStartAndLastErrorPos`
 - Breaking change. The parser builder `WithLastErrorPos` has been renamed to `HandleLastErrorPos`
-- Breaking change: Changed the value types of parameters `end`, `pos`, `start` for parser builders in the `error` library (for example, `FailMessage` and others). Now the value type is `String`, which allows to specify any values (including the names of semantic values declared by the `PosToVal` parsera)
+- Breaking change: Changed the value types of parameters `end`, `pos`, `start` for parser builders in the `error` library
 - Breaking change. Simplified and unified way to specify the location of the generated error, different from the location of the failure. By default, an error is registerd at the location where the failure occurred. The `pos` parameter of the `state.fail()` method is responsible for this. If required to register an error in a different location, then need to specify the start and end positions of the error in the `start` and `end` parameters. If the parameter `end` is not specified or its value is less than the value of the parameter `start`, then this value is not taken into account. It is also not taken into account if the value of the parameter `start` is not specified
 
 ## 2.0.27

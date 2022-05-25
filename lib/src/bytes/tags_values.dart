@@ -17,7 +17,7 @@ class TagValues<O> extends ParserBuilder<String, O> {
             k,
             Value(table[k] as O, AddToPos(k.length)),
           ))),
-      keys.map((k) => FailExpected<String, O>(StatePos.pos, k)).toList(),
+      keys.map((k) => FailExpected<String, O>(PositionAction(), k)).toList(),
     ).build(context, result);
   }
 }

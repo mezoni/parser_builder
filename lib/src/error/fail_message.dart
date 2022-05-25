@@ -11,13 +11,13 @@ state.fail({{pos}}, ParseError.message, {{message}}, {{start}});''';
   static const _templateWithStartEnd = '''
 state.fail({{pos}}, ParseError.message, {{message}}, {{start}}, {{end}});''';
 
-  final String? end;
+  final SemanticAction<int>? end;
 
   final String message;
 
-  final String pos;
+  final SemanticAction<int> pos;
 
-  final String? start;
+  final SemanticAction<int>? start;
 
   const FailMessage(this.pos, this.message, [this.start, this.end]);
 
@@ -27,23 +27,41 @@ state.fail({{pos}}, ParseError.message, {{message}}, {{start}}, {{end}});''';
       throw ArgumentError.value(message, 'message', 'Must not be empty');
     }
 
-    final values = {
-      'end': context.renderSemanticValues(end ?? StatePos.unknown),
-      'message': helper.escapeString(message),
-      'pos': context.renderSemanticValues(pos),
-      'start': context.renderSemanticValues(start ?? StatePos.unknown),
-    };
-    final String template;
     if (start == null) {
-      template = _template;
+      return _build(context, result);
     } else {
       if (end == null) {
-        template = _templateWithStart;
+        return _buildWithStart(context, result);
       } else {
-        template = _templateWithStartEnd;
+        return _buildWithStartEnd(context, result);
       }
     }
+  }
 
-    return render(template, values);
+  String _build(Context context, ParserResult? result) {
+    final values = {
+      'message': helper.escapeString(message),
+      'pos': pos.build(context, 'pos', []),
+    };
+    return render(_template, values);
+  }
+
+  String _buildWithStart(Context context, ParserResult? result) {
+    final values = {
+      'message': helper.escapeString(message),
+      'pos': pos.build(context, 'pos', []),
+      'start': start!.build(context, 'start', []),
+    };
+    return render(_templateWithStart, values);
+  }
+
+  String _buildWithStartEnd(Context context, ParserResult? result) {
+    final values = {
+      'end': end!.build(context, 'end', []),
+      'message': helper.escapeString(message),
+      'pos': pos.build(context, 'pos', []),
+      'start': start!.build(context, 'start', []),
+    };
+    return render(_templateWithStartEnd, values);
   }
 }

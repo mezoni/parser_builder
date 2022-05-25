@@ -18,7 +18,8 @@ class Tags extends ParserBuilder<String, String> {
             tag,
             Value(tag, AddToPos(tag.length)),
           ))),
-      List.generate(tags.length, (i) => FailExpected(StatePos.pos, tags[i])),
+      List.generate(
+          tags.length, (i) => FailExpected(PositionAction(), tags[i])),
     ).build(context, result);
   }
 }

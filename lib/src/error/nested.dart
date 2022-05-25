@@ -18,7 +18,7 @@ class Nested<I, O> extends ParserBuilder<I, O> {
 
   @override
   String build(Context context, ParserResult? result) {
-    return Alt2(SilentAtThisPos(parser), FailExpected(StatePos.pos, tag))
+    return Alt2(SilentAtThisPos(parser), FailExpected(PositionAction(), tag))
         .build(context, result);
   }
 }

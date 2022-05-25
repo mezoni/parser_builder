@@ -1,6 +1,5 @@
-import 'package:parser_builder/combinator.dart';
-
 import 'builder_helper.dart' as helper;
+import 'combinator.dart';
 import 'parser_builder.dart';
 
 part 'src/expression/binary_expression.dart';

@@ -502,7 +502,7 @@ void _testBinaryExpression() {
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);
-      expect(state.pos, 0);
+      expect(state.pos, 3);
       expect(state.errorPos, 4);
       expect(state.errors, [ParseError(4, 5, "Unexpected 'a'")]);
     }
@@ -511,7 +511,7 @@ void _testBinaryExpression() {
       final r = parser(state);
       expect(state.ok, false);
       expect(r, null);
-      expect(state.pos, 0);
+      expect(state.pos, 3);
       expect(state.errorPos, 4);
       expect(state.errors, [ParseError(4, 4, "Unexpected 'EOF'")]);
     }
