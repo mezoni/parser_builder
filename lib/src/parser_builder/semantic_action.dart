@@ -91,8 +91,7 @@ class VariableAction<T> extends SemanticAction<T> {
     name = context.allocateLocal(name);
     final declaration = 'final $name = $init;';
     addLocalDeclaration(context, name, declaration);
-    final template = context.renderSemanticValues(expression);
-    var result = replaceParameters(template, parameters, arguments);
+    var result = replaceParameters(expression, parameters, arguments);
     result = result.replaceAll('{{$key}}', name);
     return result;
   }

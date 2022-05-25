@@ -1,6 +1,6 @@
 ## 2.0.28
 
-- Implemented the concept of `semantic values`. For these purposes, the parser builders `Val`, `PosToVal` is implemented. Semantic values are available for use in semantic actions, as well as in error generation parsee builders (for example, `FailMessage`)
+- Implemented the concept of `semantic values`. For these purposes, the parser builders `Val`, `PosToVal` is implemented. Semantic values are available for use in `ExpressionAction` semantic action and in error generation parsee builders (for example, `FailMessage`)
 - Breaking change: Removed parser builders `WithStart`, `WithStartAndLastErrorPos`. Now the functionality to save the initial parsing position (the so-called `start`) can be implemented using the `PosToVal` parser builder. The `state.start` field has also been removed as it is no longer used
 - Breaking change. The parser builder `WithLastErrorPos` has been renamed to `HandleLastErrorPos`
 - Breaking change: Changed the value types of parameters `end`, `pos`, `start` for parser builders in the `error` library (for example, `FailMessage` and others). Now the value type is `String`, which allows to specify any values (including the names of semantic values declared by the `PosToVal` parsera)
