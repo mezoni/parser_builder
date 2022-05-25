@@ -16,10 +16,18 @@ class Indicate<I, O> extends ParserBuilder<I, O> {
 
   @override
   String build(Context context, ParserResult? result) {
+    final microsecondsSinceEpoch = DateTime.now().microsecondsSinceEpoch;
+    while (true) {
+      if (DateTime.now().microsecondsSinceEpoch != microsecondsSinceEpoch) {
+        break;
+      }
+    }
+
+    final name = '$microsecondsSinceEpoch';
     return HandleLastErrorPos(Alt2(
-      Preceded(Unsafe('final start = state.pos;'), parser),
-      FailMessage(
-          StatePos.lastErrorPos, message, 'start', StatePos.lastErrorPos),
+      Preceded(PosToVal(name), parser),
+      FailMessage(StatePos.lastErrorPos, message, '{{$name|value}}',
+          StatePos.lastErrorPos),
     )).build(context, result);
   }
 }

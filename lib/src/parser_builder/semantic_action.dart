@@ -11,7 +11,8 @@ class ExpressionAction<T> extends SemanticAction<T> {
 
   @override
   String build(Context context, String name, List<String> arguments) {
-    return replaceParameters(expression, parameters, arguments);
+    final template = context.renderSemanticValues(expression);
+    return replaceParameters(template, parameters, arguments);
   }
 }
 
@@ -90,7 +91,8 @@ class VariableAction<T> extends SemanticAction<T> {
     name = context.allocateLocal(name);
     final declaration = 'final $name = $init;';
     addLocalDeclaration(context, name, declaration);
-    var result = replaceParameters(expression, parameters, arguments);
+    final template = context.renderSemanticValues(expression);
+    var result = replaceParameters(template, parameters, arguments);
     result = result.replaceAll('{{$key}}', name);
     return result;
   }

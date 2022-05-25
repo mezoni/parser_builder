@@ -12,7 +12,7 @@ The build system is already implemented and ready to use and you can try it out 
 The generated combinations of parsers are very small and very efficient.  
 Ask questions if something is not clear.  
 
-## First advantage
+## Advantage
 
 - `Very simple and clear` build and code generation system
 - `Templates-based` (visually intuitive) definition of parser builders
@@ -36,16 +36,6 @@ Ask questions if something is not clear.
 - Includes built-in parser builder `for lightweight (on demand) memoization`
 - Support for `32 bit Unicode characters` out of the box (no need to worry about that)
 - Included built-in simple script for `fast building of parsers`
-
-## Second advantage
-
-Another advantage is that the build system is very simple and straightforward. Any programmer will understand it without much difficulty.  
-This means that an ordinary programmer can keep this software up to date.  
-You do not need to be a man of seven spans in the forehead for this.  
-The author of this software is also not such and is a simple person.  
-It's just a simple but handy thing.  
-Use it and don't worry about it stopping working.  
-This software is already so simple that it couldn't be easier.
 
 ## Projects using parser builder
 
@@ -247,11 +237,22 @@ const _eof = Eof<String>();
 
 const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
-const _escapeHex = Named(
+const _escapeHex = Named<String, int>(
     '_escapeHex',
-    Indicate(
-        r"An escape sequence starting with '\u' must be followed by 4 hexadecimal digits",
-        Map2(Fast(Tag('u')), TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')), ExpressionAction<int>(['s'], '_toHexValue({{s}})'))),
+    Map3(
+        PosToVal('start'),
+        Fast(Satisfy(CharClass('[u]'))),
+        HandleLastErrorPos<String, String>(
+          Alt2(
+            TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
+            FailMessage(
+                StatePos.lastErrorPos,
+                "An escape sequence starting with '\\u' must be followed by 4 hexadecimal digits",
+                '{{start|value}}',
+                StatePos.lastErrorPos),
+          ),
+        ),
+        ExpressionAction<int>(['s'], '_toHexValue({{s}})')),
     [_inline]);
 
 const _escapeSeq = EscapeSequence({

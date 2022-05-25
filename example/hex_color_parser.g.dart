@@ -47,6 +47,7 @@ int? _hexPrimary(State<String> state) {
 Color? _hexColor(State<String> state) {
   Color? $0;
   final source = state.source;
+  int? $1653478932063755;
   final $pos = state.minErrorPos;
   state.minErrorPos = state.pos + 1;
   final $pos1 = state.pos;
@@ -60,7 +61,9 @@ Color? _hexColor(State<String> state) {
     final $pos2 = state.setLastErrorPos(-1);
     final $pos3 = state.pos;
     state.ok = true;
-    final start = state.pos;
+    if (state.ok) {
+      $1653478932063755 = state.pos;
+    }
     if (state.ok) {
       final $pos4 = state.pos;
       int? $1;
@@ -91,7 +94,7 @@ Color? _hexColor(State<String> state) {
           state.lastErrorPos,
           ParseError.message,
           'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
-          start,
+          $1653478932063755!,
           state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos2);

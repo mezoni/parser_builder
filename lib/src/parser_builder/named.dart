@@ -53,10 +53,12 @@ class Named<I, O> extends ParserBuilder<I, O> {
     final localDeclarations = context.localDeclarations;
     final localRegistry = context.localRegistry;
     final refersToStateSource = context.refersToStateSource;
+    final semanticValues = context.semanticValues;
     context.localAllocator = localAllocator.clone();
     context.localDeclarations = {};
     context.localRegistry = {};
     context.refersToStateSource = false;
+    context.semanticValues = {};
     if (parser.getResultType() == 'void') {
       fast = true;
     }
@@ -96,6 +98,7 @@ class Named<I, O> extends ParserBuilder<I, O> {
     }
 
     buffer.writeln('}');
+    context.semanticValues = semanticValues;
     context.refersToStateSource = refersToStateSource;
     context.localDeclarations = localDeclarations;
     context.localRegistry = localRegistry;

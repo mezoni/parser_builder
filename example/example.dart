@@ -51,27 +51,29 @@ dynamic _json(State<String> state) {
 int? _escapeHex(State<String> state) {
   int? $0;
   final source = state.source;
+  int? $start;
   final $pos = state.pos;
-  state.ok = state.pos < source.length;
+  state.ok = true;
   if (state.ok) {
-    final c = source.codeUnitAt(state.pos);
-    state.ok = c == 117;
+    $start = state.pos;
+  }
+  if (state.ok) {
+    state.ok = state.pos < source.length;
     if (state.ok) {
-      state.pos++;
+      final c = source.codeUnitAt(state.pos);
+      state.ok = c == 117;
+      if (state.ok) {
+        state.pos++;
+      } else {
+        state.fail(state.pos, ParseError.character);
+      }
     } else {
       state.fail(state.pos, ParseError.character);
     }
-  } else {
-    state.fail(state.pos, ParseError.character);
-  }
-  if (state.ok) {
-    String? $1;
-    final $pos2 = state.setLastErrorPos(-1);
-    final $pos3 = state.pos;
-    state.ok = true;
-    final start = state.pos;
     if (state.ok) {
-      final $pos4 = state.pos;
+      String? $1;
+      final $pos2 = state.setLastErrorPos(-1);
+      final $pos3 = state.pos;
       var $count = 0;
       while ($count < 4 && state.pos < source.length) {
         final c = source.codeUnitAt(state.pos);
@@ -88,27 +90,24 @@ int? _escapeHex(State<String> state) {
       }
       state.ok = $count >= 4;
       if (state.ok) {
-        $1 = source.substring($pos4, state.pos);
+        $1 = source.substring($pos3, state.pos);
       } else {
         state.fail(state.pos, ParseError.character);
-        state.pos = $pos4;
-      }
-      if (!state.ok) {
         state.pos = $pos3;
       }
-    }
-    if (!state.ok) {
-      state.fail(
-          state.lastErrorPos,
-          ParseError.message,
-          'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
-          start,
-          state.lastErrorPos);
-    }
-    state.restoreLastErrorPos($pos2);
-    if (state.ok) {
-      final v1 = $1!;
-      $0 = _toHexValue(v1);
+      if (!state.ok) {
+        state.fail(
+            state.lastErrorPos,
+            ParseError.message,
+            'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
+            $start!,
+            state.lastErrorPos);
+      }
+      state.restoreLastErrorPos($pos2);
+      if (state.ok) {
+        final v1 = $1!;
+        $0 = _toHexValue(v1);
+      }
     }
   }
   if (!state.ok) {
@@ -183,13 +182,16 @@ void _quote(State<String> state) {
 String? _string(State<String> state) {
   String? $0;
   final source = state.source;
+  int? $start;
   final $pos = state.minErrorPos;
   state.minErrorPos = state.pos + 1;
   final $pos1 = state.setLastErrorPos(-1);
   final $pos2 = state.pos;
   final $pos3 = state.pos;
   state.ok = true;
-  final start = state.pos;
+  if (state.ok) {
+    $start = state.pos;
+  }
   if (state.ok) {
     state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
     if (state.ok) {
@@ -207,7 +209,7 @@ String? _string(State<String> state) {
     final $list = <String>[];
     var $str = '';
     while (state.pos < source.length) {
-      final $start = state.pos;
+      final $start1 = state.pos;
       var $c = 0;
       while (state.pos < source.length) {
         final pos = state.pos;
@@ -222,7 +224,7 @@ String? _string(State<String> state) {
           break;
         }
       }
-      $str = state.pos == $start ? '' : source.substring($start, state.pos);
+      $str = state.pos == $start1 ? '' : source.substring($start1, state.pos);
       if ($str != '' && $list.isNotEmpty) {
         $list.add($str);
       }
@@ -252,7 +254,7 @@ String? _string(State<String> state) {
       _quote(state);
       if (!state.ok) {
         state.fail(state.lastErrorPos, ParseError.message,
-            'Unterminated string', start);
+            'Unterminated string', $start!);
       }
     }
     if (!state.ok) {

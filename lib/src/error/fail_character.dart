@@ -18,8 +18,8 @@ state.fail({{pos}}, ParseError.character, null, {{start}});''';
   String build(Context context, ParserResult? result) {
     final hasStart = start != null;
     final values = {
-      'pos': pos,
-      'start': start ?? StatePos.unknown,
+      'pos': context.renderSemanticValues(pos),
+      'start': context.renderSemanticValues(start ?? StatePos.unknown),
     };
     return render2(hasStart, _templateWithStart, _template, values);
   }

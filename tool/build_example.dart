@@ -58,13 +58,21 @@ const _eof = Eof<String>();
 
 const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
-const _escapeHex = Named(
+const _escapeHex = Named<String, int>(
     '_escapeHex',
-    Map2(
+    Map3(
+        PosToVal('start'),
         Fast(Satisfy(CharClass('[u]'))),
-        Indicate(
-            "An escape sequence starting with '\\u' must be followed by 4 hexadecimal digits",
-            TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]'))),
+        HandleLastErrorPos<String, String>(
+          Alt2(
+            TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
+            FailMessage(
+                StatePos.lastErrorPos,
+                "An escape sequence starting with '\\u' must be followed by 4 hexadecimal digits",
+                '{{start|value}}',
+                StatePos.lastErrorPos),
+          ),
+        ),
         ExpressionAction<int>(['s'], '_toHexValue({{s}})')),
     [_inline]);
 
@@ -119,14 +127,14 @@ const _string = Named<String, String>(
         'string',
         HandleLastErrorPos(Delimited(
             Preceded(
-              Unsafe('final start = state.pos;'),
+              PosToVal('start'),
               Tag('"'),
             ),
             _stringValue,
             Alt2(
               _quote,
-              FailMessage(
-                  StatePos.lastErrorPos, 'Unterminated string', 'start'),
+              FailMessage(StatePos.lastErrorPos, 'Unterminated string',
+                  '{{start|value}}'),
             )))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);

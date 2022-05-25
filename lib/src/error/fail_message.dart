@@ -28,10 +28,10 @@ state.fail({{pos}}, ParseError.message, {{message}}, {{start}}, {{end}});''';
     }
 
     final values = {
-      'end': end ?? StatePos.unknown,
+      'end': context.renderSemanticValues(end ?? StatePos.unknown),
       'message': helper.escapeString(message),
-      'pos': pos,
-      'start': start ?? StatePos.unknown,
+      'pos': context.renderSemanticValues(pos),
+      'start': context.renderSemanticValues(start ?? StatePos.unknown),
     };
     final String template;
     if (start == null) {

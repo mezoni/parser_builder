@@ -1,5 +1,13 @@
 part of '../../builder_helper.dart';
 
+String asNullable<T>() {
+  if (isNullableType<T>()) {
+    return '$T';
+  }
+
+  return '$T?';
+}
+
 String buildConditional(Map<String, String> branches) {
   if (branches.isEmpty) {
     throw ArgumentError.value(branches, 'branches', 'Must not be empty');
