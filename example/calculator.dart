@@ -253,13 +253,13 @@ String? _multiplicativeOperator(State<String> state) {
 
 num? _multiplicative(State<String> state) {
   num? $0;
-  final $pos = state.pos;
   num? $left;
   num? $1;
   $1 = _primary(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      final $pos = state.pos;
       String? $2;
       final $log = state.log;
       state.log = false;
@@ -325,13 +325,13 @@ String? _additiveOperator(State<String> state) {
 
 num? _additive(State<String> state) {
   num? $0;
-  final $pos = state.pos;
   num? $left;
   num? $1;
   $1 = _multiplicative(state);
   if (state.ok) {
     $left = $1;
     while (true) {
+      final $pos = state.pos;
       String? $2;
       final $log = state.log;
       state.log = false;

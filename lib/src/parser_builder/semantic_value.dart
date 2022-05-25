@@ -1,5 +1,26 @@
 part of '../../parser_builder.dart';
 
+class PosToVal<I> extends ParserBuilder<I, void> {
+  static const _template = '''
+state.ok = true;
+if (state.ok) {
+  {{value}} = state.pos;
+}''';
+
+  final String name;
+
+  const PosToVal(this.name);
+
+  @override
+  String build(Context context, ParserResult? result) {
+    final value = context.allocateSematicValue<int>(name);
+    final values = {
+      'value': value.name,
+    };
+    return render(_template, values);
+  }
+}
+
 class SemanticValue<T> {
   final String name;
 
@@ -17,6 +38,16 @@ class SemanticValue<T> {
     }
 
     return '$name!';
+  }
+
+  static String nextKey() {
+    final previous = DateTime.now().microsecondsSinceEpoch;
+    while (true) {
+      final current = DateTime.now().microsecondsSinceEpoch;
+      if (current != previous) {
+        return '$current';
+      }
+    }
   }
 }
 
@@ -50,26 +81,5 @@ if (state.ok) {
       'value': value.name,
     };
     return render2(fast, _templateFast, _template, values, [r1]);
-  }
-}
-
-class PosToVal<I> extends ParserBuilder<I, void> {
-  static const _template = '''
-state.ok = true;
-if (state.ok) {
-  {{value}} = state.pos;
-}''';
-
-  final String name;
-
-  const PosToVal(this.name);
-
-  @override
-  String build(Context context, ParserResult? result) {
-    final value = context.allocateSematicValue<int>(name);
-    final values = {
-      'value': value.name,
-    };
-    return render(_template, values);
   }
 }

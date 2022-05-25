@@ -16,14 +16,7 @@ class Indicate<I, O> extends ParserBuilder<I, O> {
 
   @override
   String build(Context context, ParserResult? result) {
-    final microsecondsSinceEpoch = DateTime.now().microsecondsSinceEpoch;
-    while (true) {
-      if (DateTime.now().microsecondsSinceEpoch != microsecondsSinceEpoch) {
-        break;
-      }
-    }
-
-    final name = '$microsecondsSinceEpoch';
+    final name = SemanticValue.nextKey();
     return HandleLastErrorPos(Alt2(
       Preceded(PosToVal(name), parser),
       FailMessage(StatePos.lastErrorPos, message, '{{$name|value}}',
