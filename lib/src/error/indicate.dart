@@ -22,7 +22,7 @@ class Indicate<I, O> extends ParserBuilder<I, O> {
       FailMessage(
         LastErrorPositionAction(),
         message,
-        FromValueAction(key, false),
+        FromValueAction(key),
         LastErrorPositionAction(),
       ),
     )).build(context, result);

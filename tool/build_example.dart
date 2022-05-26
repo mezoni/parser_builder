@@ -133,7 +133,7 @@ const _string = Named<String, String>(
                 FailMessage(
                   LastErrorPositionAction(),
                   'Unterminated string',
-                  FromValueAction('start', false),
+                  FromValueAction('start'),
                 ))))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
