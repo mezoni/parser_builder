@@ -709,7 +709,7 @@ String? identifier(State<String> state) {
 String? indicateAbc4Digits(State<String> state) {
   String? $0;
   final source = state.source;
-  int? $1653513845240015;
+  int? $1;
   final $pos = state.pos;
   state.ok = state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
@@ -723,9 +723,7 @@ String? indicateAbc4Digits(State<String> state) {
     final $pos1 = state.setLastErrorPos(-1);
     final $pos2 = state.pos;
     state.ok = true;
-    if (state.ok) {
-      $1653513845240015 = state.pos;
-    }
+    $1 = state.pos;
     if (state.ok) {
       final $pos3 = state.pos;
       var $count = 0;
@@ -751,7 +749,7 @@ String? indicateAbc4Digits(State<String> state) {
     }
     if (!state.ok) {
       state.fail(state.lastErrorPos, ParseError.message, 'indicate',
-          $1653513845240015 as int, state.lastErrorPos);
+          State.as<int>($1), state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos1);
     if (!state.ok) {
@@ -3104,4 +3102,6 @@ class State<T> {
 
     return result;
   }
+
+  static T as<T>(T? value) => value as T;
 }

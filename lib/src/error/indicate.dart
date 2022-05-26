@@ -16,13 +16,13 @@ class Indicate<I, O> extends ParserBuilder<I, O> {
 
   @override
   String build(Context context, ParserResult? result) {
-    final name = SemanticValue.nextKey();
+    final key = Object();
     return HandleLastErrorPos(Alt2(
-      Preceded(PositionToValue(name), parser),
+      Preceded(PositionToValue(key), parser),
       FailMessage(
         LastErrorPositionAction(),
         message,
-        FromValueAction(name),
+        FromValueAction(key, false),
         LastErrorPositionAction(),
       ),
     )).build(context, result);

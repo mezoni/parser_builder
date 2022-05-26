@@ -61,9 +61,8 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
 const _escapeHex = Named<String, int>(
     '_escapeHex',
-    Map3(
-        PositionToValue('start'),
-        Fast(Satisfy(CharClass('[u]'))),
+    Map2(
+        Fast(StartPositionToValue('start', Satisfy(CharClass('[u]')))),
         HandleLastErrorPos<String, String>(
           Alt2(
             TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
@@ -127,17 +126,14 @@ const _string = Named<String, String>(
     Nested(
         'string',
         HandleLastErrorPos(Delimited(
-            Preceded(
-              PositionToValue('start'),
-              Tag('"'),
-            ),
+            Fast(StartPositionToValue('start', Tag('"'))),
             _stringValue,
             Alt2(
                 _quote,
                 FailMessage(
                   LastErrorPositionAction(),
                   'Unterminated string',
-                  FromValueAction('start'),
+                  FromValueAction('start', false),
                 ))))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);

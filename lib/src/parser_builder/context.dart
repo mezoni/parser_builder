@@ -23,7 +23,7 @@ class Context {
 
   bool refersToStateSource = false;
 
-  Map<String, SemanticValue> semanticValues = {};
+  Map<Object, SemanticValue> semanticValues = {};
 
   String allocateGlobal([String name = '']) {
     final result = globalAllocator.allocate(name);
@@ -44,17 +44,25 @@ class Context {
     return result;
   }
 
-  SemanticValue allocateSematicValue<T>(String name) {
-    if (semanticValues.containsKey(name)) {
-      throw ArgumentError.value(name, 'name', 'Semantic value already exists');
+  SemanticValue allocateSematicValue<T>(Object key) {
+    if (semanticValues.containsKey(key)) {
+      throw ArgumentError.value(key, 'key', 'Semantic value already exists');
+    }
+
+    String allocate() {
+      if (key is String) {
+        return localAllocator.allocate(key);
+      }
+
+      return localAllocator.allocate();
     }
 
     while (true) {
-      final alias = localAllocator.allocate(name);
+      final alias = allocate();
       if (!localDeclarations.containsKey(alias)) {
         final value = SemanticValue<T>(alias);
         final type = helper.asNullable<T>();
-        semanticValues[name] = value;
+        semanticValues[key] = value;
         localDeclarations[alias] = '$type $alias;';
         return value;
       }
@@ -72,12 +80,12 @@ class Context {
     return ParserResult(name, type, value);
   }
 
-  SemanticValue getSemanticValue(String name) {
-    if (!semanticValues.containsKey(name)) {
-      throw ArgumentError.value(name, 'name', 'Semantic value not declared');
+  SemanticValue getSemanticValue(Object key) {
+    if (!semanticValues.containsKey(key)) {
+      throw ArgumentError.value(key, 'key', 'Semantic value not declared');
     }
 
-    return semanticValues[name]!;
+    return semanticValues[key]!;
   }
 
   T readRegistryValue<T>(Map<dynamic, Map<String, dynamic>> registry, owner,

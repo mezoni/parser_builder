@@ -7,25 +7,11 @@ class SemanticValue<T> {
 
   bool get isNullable => helper.isNullableType<T>();
 
-  String get safeValue {
-    return '$name as $T';
-  }
-
   String get value {
     if (helper.isNullableType<T>()) {
       return name;
     }
 
-    return '$name!';
-  }
-
-  static String nextKey() {
-    final previous = DateTime.now().microsecondsSinceEpoch;
-    while (true) {
-      final current = DateTime.now().microsecondsSinceEpoch;
-      if (current != previous) {
-        return '$current';
-      }
-    }
+    return 'State.as<$T>($name)';
   }
 }

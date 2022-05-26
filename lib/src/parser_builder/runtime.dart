@@ -419,6 +419,8 @@ class State<T> {
 
     return result;
   }
+
+  static T as<T>(T? value) => value as T;
 }''';
 
   static const _classStateNoMemo = r'''
@@ -623,6 +625,8 @@ class State<T> {
 
     return result;
   }
+
+  static T as<T>(T? value) => value as T;
 }''';
 
   static const _extensionString = r'''

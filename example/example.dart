@@ -53,61 +53,56 @@ int? _escapeHex(State<String> state) {
   final source = state.source;
   int? $start;
   final $pos = state.pos;
-  state.ok = true;
+  $start = state.pos;
+  state.ok = state.pos < source.length;
   if (state.ok) {
-    $start = state.pos;
-  }
-  if (state.ok) {
-    state.ok = state.pos < source.length;
+    final c = source.codeUnitAt(state.pos);
+    state.ok = c == 117;
     if (state.ok) {
-      final c = source.codeUnitAt(state.pos);
-      state.ok = c == 117;
-      if (state.ok) {
-        state.pos++;
-      } else {
-        state.fail(state.pos, ParseError.character);
-      }
+      state.pos++;
     } else {
       state.fail(state.pos, ParseError.character);
     }
+  } else {
+    state.fail(state.pos, ParseError.character);
+  }
+  if (state.ok) {
+    String? $1;
+    final $pos2 = state.setLastErrorPos(-1);
+    final $pos3 = state.pos;
+    var $count = 0;
+    while ($count < 4 && state.pos < source.length) {
+      final c = source.codeUnitAt(state.pos);
+      final ok = c <= 70
+          ? c <= 57
+              ? c >= 48
+              : c >= 65
+          : c <= 102 && c >= 97;
+      if (!ok) {
+        break;
+      }
+      state.pos++;
+      $count++;
+    }
+    state.ok = $count >= 4;
     if (state.ok) {
-      String? $1;
-      final $pos2 = state.setLastErrorPos(-1);
-      final $pos3 = state.pos;
-      var $count = 0;
-      while ($count < 4 && state.pos < source.length) {
-        final c = source.codeUnitAt(state.pos);
-        final ok = c <= 70
-            ? c <= 57
-                ? c >= 48
-                : c >= 65
-            : c <= 102 && c >= 97;
-        if (!ok) {
-          break;
-        }
-        state.pos++;
-        $count++;
-      }
-      state.ok = $count >= 4;
-      if (state.ok) {
-        $1 = source.substring($pos3, state.pos);
-      } else {
-        state.fail(state.pos, ParseError.character);
-        state.pos = $pos3;
-      }
-      if (!state.ok) {
-        state.fail(
-            state.lastErrorPos,
-            ParseError.message,
-            'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
-            $start as int,
-            state.lastErrorPos);
-      }
-      state.restoreLastErrorPos($pos2);
-      if (state.ok) {
-        final v1 = $1!;
-        $0 = _toHexValue(v1);
-      }
+      $1 = source.substring($pos3, state.pos);
+    } else {
+      state.fail(state.pos, ParseError.character);
+      state.pos = $pos3;
+    }
+    if (!state.ok) {
+      state.fail(
+          state.lastErrorPos,
+          ParseError.message,
+          'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
+          State.as<int>($start),
+          state.lastErrorPos);
+    }
+    state.restoreLastErrorPos($pos2);
+    if (state.ok) {
+      final v1 = $1!;
+      $0 = _toHexValue(v1);
     }
   }
   if (!state.ok) {
@@ -187,25 +182,16 @@ String? _string(State<String> state) {
   state.minErrorPos = state.pos + 1;
   final $pos1 = state.setLastErrorPos(-1);
   final $pos2 = state.pos;
-  final $pos3 = state.pos;
-  state.ok = true;
+  $start = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
   if (state.ok) {
-    $start = state.pos;
-  }
-  if (state.ok) {
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
-    if (state.ok) {
-      state.pos += 1;
-    } else {
-      state.fail(state.pos, ParseError.expected, '"');
-    }
-    if (!state.ok) {
-      state.pos = $pos3;
-    }
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, '"');
   }
   if (state.ok) {
     state.ok = true;
-    final $pos4 = state.pos;
+    final $pos3 = state.pos;
     final $list = <String>[];
     var $str = '';
     while (state.pos < source.length) {
@@ -235,7 +221,7 @@ String? _string(State<String> state) {
       int? $1;
       $1 = _escaped(state);
       if (!state.ok) {
-        state.pos = $pos4;
+        state.pos = $pos3;
         break;
       }
       if ($list.isEmpty && $str != '') {
@@ -254,7 +240,7 @@ String? _string(State<String> state) {
       _quote(state);
       if (!state.ok) {
         state.fail(state.lastErrorPos, ParseError.message,
-            'Unterminated string', $start as int);
+            'Unterminated string', State.as<int>($start));
       }
     }
     if (!state.ok) {
@@ -1178,6 +1164,8 @@ class State<T> {
 
     return result;
   }
+
+  static T as<T>(T? value) => value as T;
 }
 
 @pragma('vm:prefer-inline')

@@ -14,16 +14,16 @@ if (state.ok) {
   {{value}} = {{res0}};
 }''';
 
-  final String name;
+  final Object key;
 
   final ParserBuilder<I, O> parser;
 
-  const ToValue(this.name, this.parser);
+  const ToValue(this.key, this.parser);
 
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    final value = context.allocateSematicValue<O>(name);
+    final value = context.allocateSematicValue<O>(key);
     final r1 = fast ? context.getResult(parser, true) : result;
     final values = {
       'p0': Slow(parser).build(context, r1),

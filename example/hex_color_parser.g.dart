@@ -47,7 +47,7 @@ int? _hexPrimary(State<String> state) {
 Color? _hexColor(State<String> state) {
   Color? $0;
   final source = state.source;
-  int? $1653513913806937;
+  int? $1;
   final $pos = state.minErrorPos;
   state.minErrorPos = state.pos + 1;
   final $pos1 = state.pos;
@@ -61,23 +61,21 @@ Color? _hexColor(State<String> state) {
     final $pos2 = state.setLastErrorPos(-1);
     final $pos3 = state.pos;
     state.ok = true;
-    if (state.ok) {
-      $1653513913806937 = state.pos;
-    }
+    $1 = state.pos;
     if (state.ok) {
       final $pos4 = state.pos;
-      int? $1;
-      $1 = _hexPrimary(state);
+      int? $2;
+      $2 = _hexPrimary(state);
       if (state.ok) {
-        int? $2;
-        $2 = _hexPrimary(state);
+        int? $3;
+        $3 = _hexPrimary(state);
         if (state.ok) {
-          int? $3;
-          $3 = _hexPrimary(state);
+          int? $4;
+          $4 = _hexPrimary(state);
           if (state.ok) {
-            final v1 = $1!;
-            final v2 = $2!;
-            final v3 = $3!;
+            final v1 = $2!;
+            final v2 = $3!;
+            final v3 = $4!;
             $0 = Color(v1, v2, v3);
           }
         }
@@ -94,7 +92,7 @@ Color? _hexColor(State<String> state) {
           state.lastErrorPos,
           ParseError.message,
           'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
-          $1653513913806937 as int,
+          State.as<int>($1),
           state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos2);
@@ -464,4 +462,6 @@ class State<T> {
 
     return result;
   }
+
+  static T as<T>(T? value) => value as T;
 }
