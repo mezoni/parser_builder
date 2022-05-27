@@ -7,7 +7,7 @@ import 'package:parser_builder/error.dart';
 import 'package:parser_builder/fast_build.dart';
 import 'package:parser_builder/multi.dart';
 import 'package:parser_builder/parser_builder.dart';
-import 'package:parser_builder/semantic_value.dart';
+import 'package:parser_builder/capture.dart';
 import 'package:parser_builder/sequence.dart';
 import 'package:parser_builder/string.dart';
 
@@ -62,14 +62,14 @@ const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 const _escapeHex = Named<String, int>(
     '_escapeHex',
     Map2(
-        Fast(StartPositionToValue('start', Satisfy(CharClass('[u]')))),
+        Fast(CaptureStart('start', Satisfy(CharClass('[u]')))),
         HandleLastErrorPos<String, String>(
           Alt2(
             TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
             FailMessage(
                 LastErrorPositionAction(),
                 "An escape sequence starting with '\\u' must be followed by 4 hexadecimal digits",
-                FromValueAction('start'),
+                CapturedValueAction('start'),
                 LastErrorPositionAction()),
           ),
         ),
@@ -126,14 +126,14 @@ const _string = Named<String, String>(
     Nested(
         'string',
         HandleLastErrorPos(Delimited(
-            Fast(StartPositionToValue('start', Tag('"'))),
+            Fast(CaptureStart('start', Tag('"'))),
             _stringValue,
             Alt2(
                 _quote,
                 FailMessage(
                   LastErrorPositionAction(),
                   'Unterminated string',
-                  FromValueAction('start'),
+                  CapturedValueAction('start'),
                 ))))));
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);

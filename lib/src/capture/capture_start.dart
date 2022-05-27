@@ -1,6 +1,6 @@
-part of '../../semantic_value.dart';
+part of '../../capture.dart';
 
-class StartPositionToValue<I, O> extends ParserBuilder<I, O> {
+class CaptureStart<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 {{value}} = state.pos;
 {{p1}}''';
@@ -9,7 +9,7 @@ class StartPositionToValue<I, O> extends ParserBuilder<I, O> {
 
   final ParserBuilder<I, O> parser;
 
-  const StartPositionToValue(this.key, this.parser);
+  const CaptureStart(this.key, this.parser);
 
   @override
   String build(Context context, ParserResult? result) {

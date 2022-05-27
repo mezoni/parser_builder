@@ -4,7 +4,7 @@ import 'branch.dart';
 import 'builder_helper.dart' as helper;
 import 'combinator.dart';
 import 'parser_builder.dart';
-import 'semantic_value.dart';
+import 'capture.dart';
 import 'sequence.dart';
 
 part 'src/error/expected.dart';

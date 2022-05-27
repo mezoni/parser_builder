@@ -1,4 +1,4 @@
-## 2.0.28
+## 2.0.29
 
 - Implemented the concept of `semantic values`
 - Breaking change: Removed parser builders `WithStart`, `WithStartAndLastErrorPos`

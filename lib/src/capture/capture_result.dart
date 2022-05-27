@@ -1,6 +1,6 @@
-part of '../../semantic_value.dart';
+part of '../../capture.dart';
 
-class ToValue<I, O> extends ParserBuilder<I, O> {
+class CaptureResult<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 {{p1}}
 if (state.ok) {
@@ -18,7 +18,7 @@ if (state.ok) {
 
   final ParserBuilder<I, O> parser;
 
-  const ToValue(this.key, this.parser);
+  const CaptureResult(this.key, this.parser);
 
   @override
   String build(Context context, ParserResult? result) {

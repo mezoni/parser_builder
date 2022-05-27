@@ -1,9 +1,9 @@
-part of '../../semantic_value.dart';
+part of '../../capture.dart';
 
-class FromValueAction extends SemanticAction<int> {
+class CapturedValueAction extends SemanticAction<int> {
   final Object key;
 
-  const FromValueAction(this.key);
+  const CapturedValueAction(this.key);
 
   @override
   String build(Context context, String name, List<String> arguments) {
