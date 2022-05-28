@@ -24,13 +24,13 @@ if ({{memo}} != null) {
 }''';
 
   static const _templateFast = '''
-final {{memo}} = state.memoized<{{type}}>({{id}}, true, state.pos);
+final {{memo}} = state.memoized<void>({{id}}, true, state.pos);
 if ({{memo}} != null) {
   {{memo}}.restore(state);
 } else {
   final {{pos}} = state.pos;
   {{p1}}
-  state.memoize<{{type}}>({{id}}, true, {{pos}});
+  state.memoize<void>({{id}}, true, {{pos}});
 }''';
 
   final ParserBuilder<I, O> parser;
