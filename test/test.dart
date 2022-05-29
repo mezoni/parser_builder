@@ -417,7 +417,7 @@ void _testAnd() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 0, 'Unknown error')]);
+      expect(state.errors, [ParseError(0, 0, "Expecting: '$s32', '$s16'")]);
     }
     {
       final state = State(' ');
@@ -425,7 +425,7 @@ void _testAnd() {
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(state.errorPos, 0);
-      expect(state.errors, [ParseError(0, 0, 'Unknown error')]);
+      expect(state.errors, [ParseError(0, 0, "Expecting: '$s32', '$s16'")]);
     }
   });
 }

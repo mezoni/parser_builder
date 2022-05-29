@@ -171,17 +171,12 @@ int? char32(State<String> state) {
 
 void andC32OrC16(State<String> state) {
   final $pos = state.pos;
-  final $log = state.log;
-  state.log = false;
   char32(state);
   if (!state.ok) {
     char16(state);
   }
-  state.log = $log;
   if (state.ok) {
     state.pos = $pos;
-  } else {
-    state.fail(state.pos, ParseError.message, 'Unknown error');
   }
 }
 
