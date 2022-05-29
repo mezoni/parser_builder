@@ -74,6 +74,7 @@ source.tag{{size}}(state, {{tag}});''';
   String _buildForSpeed(Context context, ParserResult? result) {
     final fast = result == null;
     final cc = tag.codeUnitAt(0).toString();
+    final escaped = helper.escapeString(tag);
     final length = tag.length;
     final String test;
     switch (length) {
@@ -88,12 +89,12 @@ source.tag{{size}}(state, {{tag}});''';
         break;
       default:
         test =
-            'state.pos < source.length && source.codeUnitAt(state.pos) == $cc && source.startsWith($tag, state.pos)';
+            'state.pos < source.length && source.codeUnitAt(state.pos) == $cc && source.startsWith($escaped, state.pos)';
     }
 
     final values = {
       'length': '$length',
-      'tag': helper.escapeString(tag),
+      'tag': escaped,
       'test': test,
     };
     return render2(
