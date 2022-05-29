@@ -288,15 +288,15 @@ class State<T> {
 
   @override
   String toString() {
-    if (source is String) {
-      final s = source as String;
-      if (pos >= s.length) {
+    if (source is Utf16Reader) {
+      final reader = source as Utf16Reader;
+      if (pos >= reader.length) {
         return '$pos:';
       }
 
-      var length = s.length - pos;
+      var length = reader.length - pos;
       length = length > 40 ? 40 : length;
-      final string = s.substring(pos, pos + length);
+      final string = reader.substring(pos, pos + length);
       return '$pos:$string';
     } else {
       return super.toString();
@@ -349,10 +349,10 @@ class State<T> {
       final kind = _kinds[i];
       switch (kind) {
         case ParseError.character:
-          if (source is String) {
-            final string = source as String;
-            if (start < string.length) {
-              final value = string.runeAt(errorPos);
+          if (source is Utf16Reader) {
+            final reader = source as Utf16Reader;
+            if (start < reader.length) {
+              final value = reader.runeAt(errorPos);
               final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
               final error =
@@ -492,15 +492,15 @@ class State<T> {
 
   @override
   String toString() {
-    if (source is String) {
-      final s = source as String;
-      if (pos >= s.length) {
+    if (source is Utf16Reader) {
+      final reader = source as Utf16Reader;
+      if (pos >= reader.length) {
         return '$pos:';
       }
 
-      var length = s.length - pos;
+      var length = reader.length - pos;
       length = length > 40 ? 40 : length;
-      final string = s.substring(pos, pos + length);
+      final string = reader.substring(pos, pos + length);
       return '$pos:$string';
     } else {
       return super.toString();
@@ -553,10 +553,10 @@ class State<T> {
       final kind = _kinds[i];
       switch (kind) {
         case ParseError.character:
-          if (source is String) {
-            final string = source as String;
-            if (start < string.length) {
-              final value = string.runeAt(errorPos);
+          if (source is Utf16Reader) {
+            final reader = source as Utf16Reader;
+            if (start < reader.length) {
+              final value = reader.runeAt(errorPos);
               final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
               final error =
@@ -625,6 +625,89 @@ class State<T> {
   }
 }''';
 
+  static const _classStringReader = '''
+class StringReader implements Utf16Reader {
+  @override
+  final int length;
+
+  final String source;
+
+  StringReader(this.source) : length = source.length;
+
+  @override
+  int codeUnitAt(int index) => source.codeUnitAt(index);
+
+  @override
+  int indexOf(String text, [int start = 0]) => source.indexOf(text, start);
+
+  @override
+  @pragma('vm:prefer-inline')
+  int readRune(State<Utf16Reader> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  String slice(int start, [int? end]) => source.substring(start, end);
+
+  @override
+  bool startsWith(String pattern, [int index = 0]) =>
+      source.startsWith(pattern, index);
+
+  @override
+  String substring(int start, [int? end]) => source.substring(start, end);
+}''';
+
+  static const _classUtf16Reader = '''
+abstract class Utf16Reader {
+  int get length;
+
+  int codeUnitAt(int index);
+
+  int indexOf(String text, [int start = 0]);
+
+  int readRune(State<Utf16Reader> state);
+
+  int runeAt(int index);
+
+  String slice(int start, [int? end]);
+
+  bool startsWith(String text, int index);
+
+  String substring(int start, [int? end]);
+}''';
+
   static const _extensionString = r'''
 extension on String {
   @pragma('vm:prefer-inline')
@@ -673,11 +756,113 @@ extension on String {
   }
 }''';
 
+  static const _extensionStringSize = r'''
+extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+
+    return w1;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
+
+    return w1;
+  }
+
+  /// Returns a slice (substring) of the string from [start] to [end].
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String slice(int start, int end) {
+    return substring(start, end);
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String? tag(State<String> state, String tag) {
+    // ignore: prefer_is_empty
+    if (tag.length == 0) {
+      throw ArgumentError('Tag must not be empty');
+    }
+
+    final pos = state.pos;
+    state.ok = pos < length && codeUnitAt(pos) == tag.codeUnitAt(0) && startsWith(tag, pos);
+    if (state.ok) {
+      state.pos += tag.length;
+      return tag;
+    }
+
+    return null;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String? tag1(State<String> state, String tag) {
+    if (tag.length != 1) {
+      throw ArgumentError.value(tag, 'tag', 'Length must be equal to 1');
+    }
+
+    final pos = state.pos;
+    state.ok = pos < length && codeUnitAt(pos) == tag.codeUnitAt(0);
+    if (state.ok) {
+      state.pos++;
+      return tag;
+    }
+
+    return null;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String? tag2(State<String> state, String tag) {
+    if (tag.length != 2) {
+      throw ArgumentError.value(tag, 'tag', 'Length must be equal to 2');
+    }
+
+    final pos = state.pos;
+    state.ok = pos + 1 < length &&
+        codeUnitAt(pos) == tag.codeUnitAt(0) &&
+        codeUnitAt(pos + 1) == tag.codeUnitAt(1);
+    if (state.ok) {
+      state.pos += 2;
+      return tag;
+    }
+
+    return null;
+  }
+}''';
+
   /// Simplified (to reduce code size), experimental implementation.
   /// As a result, there is a possibility that the error position indicator may
   /// be displayed in a different position.
   static const _functionErrorMessage = r'''
-String _errorMessage(String source, List<ParseError> errors) {
+String _errorMessage(Utf16Reader source, List<ParseError> errors) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
     if (sb.isNotEmpty) {
@@ -718,14 +903,19 @@ String _errorMessage(String source, List<ParseError> errors) {
     final extraLen = lineLimit - errorLen;
     final rightLen = min(sourceLen - end2, extraLen - (extraLen >> 1));
     final leftLen = min(start, max(0, lineLimit - errorLen - rightLen));
+    var index = start2 - 1;
     final list = <int>[];
-    final iterator = RuneIterator.at(source, start2);
-    for (var i = 0; i < leftLen; i++) {
-      if (!iterator.movePrevious()) {
-        break;
+    for (var i = 0; i < leftLen && index >= 0; i++) {
+      var cc = source.codeUnitAt(index--);
+      if ((cc & 0xFC00) == 0xDC00 && (index > 0)) {
+        final pc = source.codeUnitAt(index);
+        if ((pc & 0xFC00) == 0xD800) {
+          cc = 0x10000 + ((pc & 0x3FF) << 10) + (cc & 0x3FF);
+          index--;
+        }
       }
 
-      list.add(iterator.current);
+      list.add(cc);
     }
 
     final column = start - lineStart + 1;
@@ -747,11 +937,18 @@ String _errorMessage(String source, List<ParseError> errors) {
 
   static void addClasses(Context context) {
     final hasClassMemoizedResult = _hasClass(context, 'MemoizedResult');
+    final hasClassUtf16Reader = _hasClass(context, 'Utf16Reader');
+    _addClass(context, 'ParseError', _classParseError, true);
     _addClass(context, 'State', _classState, hasClassMemoizedResult);
     _addClass(context, 'State', _classStateNoMemo, !hasClassMemoizedResult);
     _addClass(context, 'State', _classState, true);
-    _addClass(context, 'ParseError', _classParseError, true);
-    context.globalDeclarations.add(_extensionString);
+    _addClass(context, 'StringReader', _classStringReader, hasClassUtf16Reader);
+    _addClass(context, 'Utf16Reader', _classUtf16Reader, hasClassUtf16Reader);
+    if (context.optimizeForSize) {
+      context.globalDeclarations.add(_extensionStringSize);
+    } else {
+      context.globalDeclarations.add(_extensionString);
+    }
   }
 
   static addClassMemoizedResult(Context context, bool condition) {
@@ -785,6 +982,10 @@ String _errorMessage(String source, List<ParseError> errors) {
 
     final name = 'Result$size';
     _addClass(context, name, code, condition);
+  }
+
+  static addClassUtf16Reader(Context context) {
+    _addClass(context, 'Utf16Reader', _classUtf16Reader, true);
   }
 
   static String getErrorMessageProcessor() {

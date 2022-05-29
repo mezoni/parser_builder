@@ -9,7 +9,7 @@ part of '../../string.dart';
 /// ```dart
 /// StringValue(_isNormalChar, 0x5c, _escaped);
 /// ```
-class StringValue extends ParserBuilder<String, String> {
+class StringValue extends ParserBuilder<Utf16Reader, String> {
   static const _template = '''
 state.ok = true;
 final {{pos}} = state.pos;
@@ -92,7 +92,7 @@ while (state.pos < source.length) {
 
   final int controlChar;
 
-  final ParserBuilder<String, int> escape;
+  final ParserBuilder<Utf16Reader, int> escape;
 
   final SemanticAction<bool> normalChar;
 

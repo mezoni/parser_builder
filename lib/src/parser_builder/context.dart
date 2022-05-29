@@ -19,6 +19,8 @@ class Context {
 
   bool optimizeFastParsers = true;
 
+  bool optimizeForSize = false;
+
   int pass = 0;
 
   final Map<dynamic, Map<String, dynamic>> registry = {};
@@ -69,6 +71,14 @@ class Context {
     }
   }
 
+  SemanticValue getCapturedValue(Object key) {
+    if (!capturedValues.containsKey(key)) {
+      throw ArgumentError.value(key, 'key', 'Captured value not declared');
+    }
+
+    return capturedValues[key]!;
+  }
+
   ParserResult? getResult(ParserBuilder parser, bool condition) {
     if (!condition) {
       return null;
@@ -78,14 +88,6 @@ class Context {
     final type = parser.getResultType();
     final value = parser.getResultValue(name);
     return ParserResult(name, type, value);
-  }
-
-  SemanticValue getCapturedValue(Object key) {
-    if (!capturedValues.containsKey(key)) {
-      throw ArgumentError.value(key, 'key', 'Captured value not declared');
-    }
-
-    return capturedValues[key]!;
   }
 
   T readRegistryValue<T>(Map<dynamic, Map<String, dynamic>> registry, owner,

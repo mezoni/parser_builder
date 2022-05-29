@@ -1,52 +1,53 @@
-import 'package:test/test.dart';
-
 import 'package:parser_builder/src/char_class/char_class_parser.dart';
+import 'package:test/test.dart';
 
 void main(List<String> args) {
   _test();
 }
 
+State<Utf16Reader> _state(String text) => State(StringReader(text));
+
 void _test() {
   test('CharClassParser', () {
     final parser = parse;
     {
-      final state = State(' "1" ');
+      final state = _state(' "1" ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [Result2(0x31, 0x31)]);
     }
     {
-      final state = State(' #x31 ');
+      final state = _state(' #x31 ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [Result2(0x31, 0x31)]);
     }
     {
-      final state = State(' [A-Z] ');
+      final state = _state(' [A-Z] ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [Result2(0x41, 0x5a)]);
     }
     {
-      final state = State(' [#x20-#x7f] ');
+      final state = _state(' [#x20-#x7f] ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [Result2(0x20, 0x7f)]);
     }
     {
-      final state = State(' [#x10000-#x10200] ');
+      final state = _state(' [#x10000-#x10200] ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [Result2(0x10000, 0x10200)]);
     }
     {
-      final state = State(' "1" | [A-Z] ');
+      final state = _state(' "1" | [A-Z] ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [Result2(0x31, 0x31), Result2(0x41, 0x5a)]);
     }
     {
-      final state = State(' "1" | [A-Z] | [#x20-#x7f] | [#x10000-#x10200] ');
+      final state = _state(' "1" | [A-Z] | [#x20-#x7f] | [#x10000-#x10200] ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [
@@ -57,7 +58,7 @@ void _test() {
       ]);
     }
     {
-      final state = State(' [1A-Z#x20-#x7f#x10000-#x10200+,-] ');
+      final state = _state(' [1A-Z#x20-#x7f#x10000-#x10200+,-] ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [
@@ -71,7 +72,7 @@ void _test() {
       ]);
     }
     {
-      final state = State(r' [A-Za-z0-9_] | "$" ');
+      final state = _state(r' [A-Za-z0-9_] | "$" ');
       final r = parser(state);
       expect(state.ok, true);
       expect(r, [
@@ -83,14 +84,14 @@ void _test() {
       ]);
     }
     {
-      final state = State('');
+      final state = _state('');
       final r = parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);
       expect(r, null);
     }
     {
-      final state = State(' ');
+      final state = _state(' ');
       final r = parser(state);
       expect(state.ok, false);
       expect(state.pos, 0);

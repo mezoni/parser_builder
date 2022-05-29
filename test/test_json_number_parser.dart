@@ -102,7 +102,8 @@ void _test() {
 }
 
 void _testResult(String s, num? v) {
-  final state = State(s);
+  final reader = StringReader(s);
+  final state = State(reader);
   final r = number(state);
   num? v2;
   if (state.ok) {

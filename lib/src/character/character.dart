@@ -1,6 +1,6 @@
 part of '../../character.dart';
 
-abstract class _Chars0 extends ParserBuilder<String, String> {
+abstract class _Chars0 extends ParserBuilder<Utf16Reader, String> {
   const _Chars0();
 
   @override
@@ -13,7 +13,7 @@ abstract class _Chars0 extends ParserBuilder<String, String> {
   SemanticAction<bool> _getPredicate();
 }
 
-abstract class _Chars1 extends ParserBuilder<String, String> {
+abstract class _Chars1 extends ParserBuilder<Utf16Reader, String> {
   const _Chars1();
 
   @override

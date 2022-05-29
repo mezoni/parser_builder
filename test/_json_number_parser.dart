@@ -7,7 +7,8 @@ void main() {
   print(r);
 }
 
-num? parse(String source) {
+num? parse(String text) {
+  final source = StringReader(text);
   final state = State(source);
   final r = number(state);
   if (!state.ok) {
@@ -17,7 +18,7 @@ num? parse(String source) {
   return r!;
 }
 
-void _ws(State<String> state) {
+void _ws(State<Utf16Reader> state) {
   final source = state.source;
   while (state.pos < source.length) {
     final pos = state.pos;
@@ -31,7 +32,7 @@ void _ws(State<String> state) {
   state.ok = true;
 }
 
-num? number(State<String> state) {
+num? number(State<Utf16Reader> state) {
   num? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -322,7 +323,7 @@ num? number(State<String> state) {
   return $0;
 }
 
-String _errorMessage(String source, List<ParseError> errors) {
+String _errorMessage(Utf16Reader source, List<ParseError> errors) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
     if (sb.isNotEmpty) {
@@ -363,14 +364,19 @@ String _errorMessage(String source, List<ParseError> errors) {
     final extraLen = lineLimit - errorLen;
     final rightLen = min(sourceLen - end2, extraLen - (extraLen >> 1));
     final leftLen = min(start, max(0, lineLimit - errorLen - rightLen));
+    var index = start2 - 1;
     final list = <int>[];
-    final iterator = RuneIterator.at(source, start2);
-    for (var i = 0; i < leftLen; i++) {
-      if (!iterator.movePrevious()) {
-        break;
+    for (var i = 0; i < leftLen && index >= 0; i++) {
+      var cc = source.codeUnitAt(index--);
+      if ((cc & 0xFC00) == 0xDC00 && (index > 0)) {
+        final pc = source.codeUnitAt(index);
+        if ((pc & 0xFC00) == 0xD800) {
+          cc = 0x10000 + ((pc & 0x3FF) << 10) + (cc & 0x3FF);
+          index--;
+        }
       }
 
-      list.add(iterator.current);
+      list.add(cc);
     }
 
     final column = start - lineStart + 1;
@@ -540,15 +546,15 @@ class State<T> {
 
   @override
   String toString() {
-    if (source is String) {
-      final s = source as String;
-      if (pos >= s.length) {
+    if (source is Utf16Reader) {
+      final reader = source as Utf16Reader;
+      if (pos >= reader.length) {
         return '$pos:';
       }
 
-      var length = s.length - pos;
+      var length = reader.length - pos;
       length = length > 40 ? 40 : length;
-      final string = s.substring(pos, pos + length);
+      final string = reader.substring(pos, pos + length);
       return '$pos:$string';
     } else {
       return super.toString();
@@ -601,10 +607,10 @@ class State<T> {
       final kind = _kinds[i];
       switch (kind) {
         case ParseError.character:
-          if (source is String) {
-            final string = source as String;
-            if (start < string.length) {
-              final value = string.runeAt(errorPos);
+          if (source is Utf16Reader) {
+            final reader = source as Utf16Reader;
+            if (start < reader.length) {
+              final value = reader.runeAt(errorPos);
               final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
               final error =
@@ -671,4 +677,85 @@ class State<T> {
 
     return result;
   }
+}
+
+class StringReader implements Utf16Reader {
+  @override
+  final int length;
+
+  final String source;
+
+  StringReader(this.source) : length = source.length;
+
+  @override
+  int codeUnitAt(int index) => source.codeUnitAt(index);
+
+  @override
+  int indexOf(String text, [int start = 0]) => source.indexOf(text, start);
+
+  @override
+  @pragma('vm:prefer-inline')
+  int readRune(State<Utf16Reader> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  String slice(int start, [int? end]) => source.substring(start, end);
+
+  @override
+  bool startsWith(String pattern, [int index = 0]) =>
+      source.startsWith(pattern, index);
+
+  @override
+  String substring(int start, [int? end]) => source.substring(start, end);
+}
+
+abstract class Utf16Reader {
+  int get length;
+
+  int codeUnitAt(int index);
+
+  int indexOf(String text, [int start = 0]);
+
+  int readRune(State<Utf16Reader> state);
+
+  int runeAt(int index);
+
+  String slice(int start, [int? end]);
+
+  bool startsWith(String text, int index);
+
+  String substring(int start, [int? end]);
 }

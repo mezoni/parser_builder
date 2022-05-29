@@ -15,7 +15,7 @@ part of '../../string.dart';
 ///   0x74: 0x09
 /// }));
 /// ```
-class EscapeSequence extends ParserBuilder<String, int> {
+class EscapeSequence extends ParserBuilder<Utf16Reader, int> {
   static const _template16 = '''
 state.ok = state.pos < source.length;
 if (state.ok) {

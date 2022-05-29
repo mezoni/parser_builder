@@ -1,7 +1,7 @@
 part of '../../token.dart';
 
 @experimental
-class TokenizeTags<O> extends ParserBuilder<String, O> {
+class TokenizeTags<I extends Utf16Reader, O> extends ParserBuilder<I, O> {
   static const _template = '''
 state.ok = state.pos < source.length;
 if (state.ok) {

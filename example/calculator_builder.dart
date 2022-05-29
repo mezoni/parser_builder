@@ -17,8 +17,8 @@ Future<void> main(List<String> args) async {
 
 const __header = '''
 void main() {
-  final source = '1 + 2 * 3 * (1 + 2.0)';
-  final result = parse(source);
+  final text = '1 + 2 * 3 * (1 + 2.0)';
+  final result = parse(StringReader(text));
   print(result);
 }
 
@@ -55,7 +55,7 @@ const _closeParen = Named('_closeParen', Terminated(Tag(')'), _ws));
 
 const _digit1 = Named('_digit1', Digit1());
 
-const _expression = Ref<String, num>('_expression');
+const _expression = Ref<Utf16Reader, num>('_expression');
 
 const _expression_ = Named('_expression', _additive);
 
@@ -73,12 +73,14 @@ const _numberImpl = Named(
     '_numberImpl',
     Expected(
         'number',
-        Map1(Recognize(Pair(_digit1, Opt(Pair(Tag('.'), _digit1)))),
+        Map1(
+            Recognize<Utf16Reader, String>(
+                Pair(_digit1, Opt(Pair(Tag('.'), _digit1)))),
             ExpressionAction<num>(['x'], 'num.parse({{x}})'))));
 
 const _openParen = Named('_openParen', Terminated(Tag('('), _ws));
 
-const _parse = Named('_parse', Delimited(_ws, _expression, Eof<String>()));
+const _parse = Named('_parse', Delimited(_ws, _expression, Eof<Utf16Reader>()));
 
 const _primary = Named(
     '_primary',

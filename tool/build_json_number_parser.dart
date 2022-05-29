@@ -22,7 +22,8 @@ void main() {
     print(r);
 }
 
-num? parse(String source) {
+num? parse(String text) {
+  final source = StringReader(text);
   final state = State(source);
   final r = number(state);
   if (!state.ok) {
@@ -37,11 +38,12 @@ const _isWhitespace = ExpressionAction<bool>(
 
 const _number = Terminated(parser, _ws);
 
-const _parser = Named<String, num>('number', Delimited(_ws, _number, Eof()));
+const _parser =
+    Named<Utf16Reader, num>('number', Delimited(_ws, _number, Eof()));
 
 const _ws = Named('_ws', SkipWhile(_isWhitespace));
 
-class Number extends ParserBuilder<String, num> {
+class Number extends ParserBuilder<Utf16Reader, num> {
   static const _template = '''
 {{parse}}
 if (state.ok) {

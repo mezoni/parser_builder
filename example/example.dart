@@ -1,4 +1,4 @@
-dynamic parse(String source) {
+dynamic parse(Utf16Reader source) {
   final state = State(source);
   final result = _json(state);
   if (!state.ok) {
@@ -9,7 +9,7 @@ dynamic parse(String source) {
   return result;
 }
 
-void _ws(State<String> state) {
+void _ws(State<Utf16Reader> state) {
   final source = state.source;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -26,7 +26,7 @@ void _ws(State<String> state) {
   state.ok = true;
 }
 
-dynamic _json(State<String> state) {
+dynamic _json(State<Utf16Reader> state) {
   dynamic $0;
   final source = state.source;
   final $pos = state.pos;
@@ -48,7 +48,7 @@ dynamic _json(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-int? _escapeHex(State<String> state) {
+int? _escapeHex(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   int? $start;
@@ -111,7 +111,7 @@ int? _escapeHex(State<String> state) {
   return $0;
 }
 
-int? _escaped(State<String> state) {
+int? _escaped(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -157,7 +157,7 @@ int? _escaped(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-void _quote(State<String> state) {
+void _quote(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
@@ -174,7 +174,7 @@ void _quote(State<String> state) {
   }
 }
 
-String? _string(State<String> state) {
+String? _string(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   int? $start;
@@ -257,7 +257,7 @@ String? _string(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-void _openBracket(State<String> state) {
+void _openBracket(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
@@ -274,7 +274,7 @@ void _openBracket(State<String> state) {
   }
 }
 
-List<dynamic>? _values(State<String> state) {
+List<dynamic>? _values(State<Utf16Reader> state) {
   List<dynamic>? $0;
   final source = state.source;
   var $pos = state.pos;
@@ -313,7 +313,7 @@ List<dynamic>? _values(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-void _closeBracket(State<String> state) {
+void _closeBracket(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
@@ -330,7 +330,7 @@ void _closeBracket(State<String> state) {
   }
 }
 
-List<dynamic>? _array(State<String> state) {
+List<dynamic>? _array(State<Utf16Reader> state) {
   List<dynamic>? $0;
   final $pos = state.pos;
   _openBracket(state);
@@ -348,7 +348,7 @@ List<dynamic>? _array(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-void _openBrace(State<String> state) {
+void _openBrace(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
@@ -365,7 +365,7 @@ void _openBrace(State<String> state) {
   }
 }
 
-MapEntry<String, dynamic>? _keyValue(State<String> state) {
+MapEntry<String, dynamic>? _keyValue(State<Utf16Reader> state) {
   MapEntry<String, dynamic>? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -401,7 +401,7 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
   return $0;
 }
 
-List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
+List<MapEntry<String, dynamic>>? _keyValues(State<Utf16Reader> state) {
   List<MapEntry<String, dynamic>>? $0;
   final source = state.source;
   var $pos = state.pos;
@@ -440,7 +440,7 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
 }
 
 @pragma('vm:prefer-inline')
-void _closeBrace(State<String> state) {
+void _closeBrace(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
@@ -457,7 +457,7 @@ void _closeBrace(State<String> state) {
   }
 }
 
-dynamic _object(State<String> state) {
+dynamic _object(State<Utf16Reader> state) {
   dynamic $0;
   final $pos = state.pos;
   _openBrace(state);
@@ -478,7 +478,7 @@ dynamic _object(State<String> state) {
   return $0;
 }
 
-num? _number(State<String> state) {
+num? _number(State<Utf16Reader> state) {
   num? $0;
   final source = state.source;
   final $log = state.log;
@@ -753,7 +753,7 @@ num? _number(State<String> state) {
   return $0;
 }
 
-dynamic _value(State<String> state) {
+dynamic _value(State<Utf16Reader> state) {
   dynamic $0;
   final source = state.source;
   final $pos = state.pos;
@@ -815,7 +815,7 @@ dynamic _value(State<String> state) {
   return $0;
 }
 
-String _errorMessage(String source, List<ParseError> errors) {
+String _errorMessage(Utf16Reader source, List<ParseError> errors) {
   final sb = StringBuffer();
   for (var i = 0; i < errors.length; i++) {
     if (sb.isNotEmpty) {
@@ -856,14 +856,19 @@ String _errorMessage(String source, List<ParseError> errors) {
     final extraLen = lineLimit - errorLen;
     final rightLen = min(sourceLen - end2, extraLen - (extraLen >> 1));
     final leftLen = min(start, max(0, lineLimit - errorLen - rightLen));
+    var index = start2 - 1;
     final list = <int>[];
-    final iterator = RuneIterator.at(source, start2);
-    for (var i = 0; i < leftLen; i++) {
-      if (!iterator.movePrevious()) {
-        break;
+    for (var i = 0; i < leftLen && index >= 0; i++) {
+      var cc = source.codeUnitAt(index--);
+      if ((cc & 0xFC00) == 0xDC00 && (index > 0)) {
+        final pc = source.codeUnitAt(index);
+        if ((pc & 0xFC00) == 0xD800) {
+          cc = 0x10000 + ((pc & 0x3FF) << 10) + (cc & 0x3FF);
+          index--;
+        }
       }
 
-      list.add(iterator.current);
+      list.add(cc);
     }
 
     final column = start - lineStart + 1;
@@ -1033,15 +1038,15 @@ class State<T> {
 
   @override
   String toString() {
-    if (source is String) {
-      final s = source as String;
-      if (pos >= s.length) {
+    if (source is Utf16Reader) {
+      final reader = source as Utf16Reader;
+      if (pos >= reader.length) {
         return '$pos:';
       }
 
-      var length = s.length - pos;
+      var length = reader.length - pos;
       length = length > 40 ? 40 : length;
-      final string = s.substring(pos, pos + length);
+      final string = reader.substring(pos, pos + length);
       return '$pos:$string';
     } else {
       return super.toString();
@@ -1094,10 +1099,10 @@ class State<T> {
       final kind = _kinds[i];
       switch (kind) {
         case ParseError.character:
-          if (source is String) {
-            final string = source as String;
-            if (start < string.length) {
-              final value = string.runeAt(errorPos);
+          if (source is Utf16Reader) {
+            final reader = source as Utf16Reader;
+            if (start < reader.length) {
+              final value = reader.runeAt(errorPos);
               final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
               final error =
@@ -1164,6 +1169,87 @@ class State<T> {
 
     return result;
   }
+}
+
+class StringReader implements Utf16Reader {
+  @override
+  final int length;
+
+  final String source;
+
+  StringReader(this.source) : length = source.length;
+
+  @override
+  int codeUnitAt(int index) => source.codeUnitAt(index);
+
+  @override
+  int indexOf(String text, [int start = 0]) => source.indexOf(text, start);
+
+  @override
+  @pragma('vm:prefer-inline')
+  int readRune(State<Utf16Reader> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  String slice(int start, [int? end]) => source.substring(start, end);
+
+  @override
+  bool startsWith(String pattern, [int index = 0]) =>
+      source.startsWith(pattern, index);
+
+  @override
+  String substring(int start, [int? end]) => source.substring(start, end);
+}
+
+abstract class Utf16Reader {
+  int get length;
+
+  int codeUnitAt(int index);
+
+  int indexOf(String text, [int start = 0]);
+
+  int readRune(State<Utf16Reader> state);
+
+  int runeAt(int index);
+
+  String slice(int start, [int? end]);
+
+  bool startsWith(String text, int index);
+
+  String substring(int start, [int? end]);
 }
 
 @pragma('vm:prefer-inline')

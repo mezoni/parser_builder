@@ -7,7 +7,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhileMN(4, 4, CharClass('[0-9] | [a-f] | [A-F]'))
 /// ```
-class TakeWhileMN extends ParserBuilder<String, String> {
+class TakeWhileMN extends ParserBuilder<Utf16Reader, String> {
   static const _template16 = '''
 final {{pos}} = state.pos;
 var {{count}} = 0;
@@ -110,6 +110,7 @@ if (!state.ok) {
     }
 
     context.refersToStateSource = true;
+    ParseRuntime.addClassUtf16Reader(context);
     final fast = result == null;
     final values = context.allocateLocals(['count', 'pos']);
     final isUnicode = predicate.isUnicode;

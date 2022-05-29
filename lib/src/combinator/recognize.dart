@@ -1,6 +1,6 @@
 part of '../../combinator.dart';
 
-class Recognize<I> extends ParserBuilder<I, I> {
+class Recognize<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{p1}}

@@ -39,7 +39,7 @@ int _toPrefix(String operator, int expression) {
   }
 }
 
-String? alpha0(State<String> state) {
+String? alpha0(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -58,7 +58,7 @@ String? alpha0(State<String> state) {
   return $0;
 }
 
-String? alpha1(State<String> state) {
+String? alpha1(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -79,7 +79,7 @@ String? alpha1(State<String> state) {
   return $0;
 }
 
-String? alphanumeric0(State<String> state) {
+String? alphanumeric0(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -102,7 +102,7 @@ String? alphanumeric0(State<String> state) {
   return $0;
 }
 
-String? alphanumeric1(State<String> state) {
+String? alphanumeric1(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -127,7 +127,7 @@ String? alphanumeric1(State<String> state) {
   return $0;
 }
 
-int? char16(State<String> state) {
+int? char16(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
@@ -140,7 +140,7 @@ int? char16(State<String> state) {
   return $0;
 }
 
-int? altC16OrC32(State<String> state) {
+int? altC16OrC32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   $0 = char16(state);
@@ -156,7 +156,7 @@ int? altC16OrC32(State<String> state) {
   return $0;
 }
 
-int? char32(State<String> state) {
+int? char32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
@@ -169,7 +169,7 @@ int? char32(State<String> state) {
   return $0;
 }
 
-void andC32OrC16(State<String> state) {
+void andC32OrC16(State<Utf16Reader> state) {
   final $pos = state.pos;
   char32(state);
   if (!state.ok) {
@@ -180,7 +180,7 @@ void andC32OrC16(State<String> state) {
   }
 }
 
-int? anyChar(State<String> state) {
+int? anyChar(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -192,7 +192,7 @@ int? anyChar(State<String> state) {
   return $0;
 }
 
-int? _primaryExpression(State<String> state) {
+int? _primaryExpression(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   String? $1;
@@ -218,7 +218,7 @@ int? _primaryExpression(State<String> state) {
   return $0;
 }
 
-int? _binaryExpressionMul(State<String> state) {
+int? _binaryExpressionMul(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   int? $left;
@@ -278,7 +278,7 @@ int? _binaryExpressionMul(State<String> state) {
   return $0;
 }
 
-int? binaryExpressionAdd(State<String> state) {
+int? binaryExpressionAdd(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   int? $left;
@@ -336,7 +336,7 @@ int? binaryExpressionAdd(State<String> state) {
   return $0;
 }
 
-String? tagAbc(State<String> state) {
+String? tagAbc(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos < source.length &&
@@ -351,7 +351,8 @@ String? tagAbc(State<String> state) {
   return $0;
 }
 
-Result2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
+Result2<String, List<String>>? consumedSeparatedAbcC32(
+    State<Utf16Reader> state) {
   Result2<String, List<String>>? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -383,7 +384,7 @@ Result2<String, List<String>>? consumedSeparatedAbcC32(State<String> state) {
   return $0;
 }
 
-int? delimited(State<String> state) {
+int? delimited(State<Utf16Reader> state) {
   int? $0;
   final $pos = state.pos;
   char16(state);
@@ -400,7 +401,7 @@ int? delimited(State<String> state) {
   return $0;
 }
 
-String? digit0(State<String> state) {
+String? digit0(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -419,7 +420,7 @@ String? digit0(State<String> state) {
   return $0;
 }
 
-String? digit1(State<String> state) {
+String? digit1(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -440,7 +441,7 @@ String? digit1(State<String> state) {
   return $0;
 }
 
-void eof(State<String> state) {
+void eof(State<Utf16Reader> state) {
   final source = state.source;
   state.ok = state.pos >= source.length;
   if (!state.ok) {
@@ -448,7 +449,7 @@ void eof(State<String> state) {
   }
 }
 
-int? escapeSequence16(State<String> state) {
+int? escapeSequence16(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -479,7 +480,7 @@ int? escapeSequence16(State<String> state) {
   return $0;
 }
 
-int? escapeSequence32(State<String> state) {
+int? escapeSequence32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -512,7 +513,7 @@ int? escapeSequence32(State<String> state) {
   return $0;
 }
 
-String? expected2C16(State<String> state) {
+String? expected2C16(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $log = state.log;
@@ -542,7 +543,7 @@ String? expected2C16(State<String> state) {
   return $0;
 }
 
-dynamic foldMany0Digit(State<String> state) {
+dynamic foldMany0Digit(State<Utf16Reader> state) {
   dynamic $0;
   final source = state.source;
   var $acc = 0;
@@ -574,7 +575,7 @@ dynamic foldMany0Digit(State<String> state) {
   return $0;
 }
 
-String? hexDigit0(State<String> state) {
+String? hexDigit0(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -597,7 +598,7 @@ String? hexDigit0(State<String> state) {
   return $0;
 }
 
-String? hexDigit1(State<String> state) {
+String? hexDigit1(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -622,7 +623,7 @@ String? hexDigit1(State<String> state) {
   return $0;
 }
 
-String? identifier(State<String> state) {
+String? identifier(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -701,7 +702,7 @@ String? identifier(State<String> state) {
   return $0;
 }
 
-String? indicateAbc4Digits(State<String> state) {
+String? indicateAbc4Digits(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   int? $1;
@@ -754,7 +755,7 @@ String? indicateAbc4Digits(State<String> state) {
   return $0;
 }
 
-List<int>? many0C16(State<String> state) {
+List<int>? many0C16(State<Utf16Reader> state) {
   List<int>? $0;
   final source = state.source;
   final $list = <int>[];
@@ -779,7 +780,7 @@ List<int>? many0C16(State<String> state) {
   return $0;
 }
 
-List<int>? many0C32(State<String> state) {
+List<int>? many0C32(State<Utf16Reader> state) {
   List<int>? $0;
   final $list = <int>[];
   while (true) {
@@ -797,7 +798,7 @@ List<int>? many0C32(State<String> state) {
   return $0;
 }
 
-int? many0CountC32(State<String> state) {
+int? many0CountC32(State<Utf16Reader> state) {
   int? $0;
   var $count = 0;
   while (true) {
@@ -814,7 +815,7 @@ int? many0CountC32(State<String> state) {
   return $0;
 }
 
-List<int>? many1C32(State<String> state) {
+List<int>? many1C32(State<Utf16Reader> state) {
   List<int>? $0;
   final $list = <int>[];
   while (true) {
@@ -832,7 +833,7 @@ List<int>? many1C32(State<String> state) {
   return $0;
 }
 
-int? many1CountC32(State<String> state) {
+int? many1CountC32(State<Utf16Reader> state) {
   int? $0;
   var $count = 0;
   while (true) {
@@ -849,7 +850,7 @@ int? many1CountC32(State<String> state) {
   return $0;
 }
 
-List<int>? manyMNC32_2_3(State<String> state) {
+List<int>? manyMNC32_2_3(State<Utf16Reader> state) {
   List<int>? $0;
   final $pos = state.pos;
   final $list = <int>[];
@@ -870,7 +871,7 @@ List<int>? manyMNC32_2_3(State<String> state) {
   return $0;
 }
 
-List<int>? manyNC32_2(State<String> state) {
+List<int>? manyNC32_2(State<Utf16Reader> state) {
   List<int>? $0;
   final $pos = state.pos;
   final $list = <int>[];
@@ -891,7 +892,7 @@ List<int>? manyNC32_2(State<String> state) {
   return $0;
 }
 
-Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
+Result2<List<String>, String>? manyTillAOrBTillAbc(State<Utf16Reader> state) {
   Result2<List<String>, String>? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -938,7 +939,7 @@ Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
   return $0;
 }
 
-dynamic map4Digits(State<String> state) {
+dynamic map4Digits(State<Utf16Reader> state) {
   dynamic $0;
   final source = state.source;
   final $pos = state.pos;
@@ -1021,7 +1022,7 @@ dynamic map4Digits(State<String> state) {
   return $0;
 }
 
-String? mapC32ToStr(State<String> state) {
+String? mapC32ToStr(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   int? $1;
@@ -1039,8 +1040,8 @@ String? mapC32ToStr(State<String> state) {
   return $0;
 }
 
-String? memoizeC16C32OrC16(State<String> state) {
-  String? $0;
+dynamic memoizeC16C32OrC16(State<Utf16Reader> state) {
+  dynamic $0;
   final source = state.source;
   final $pos = state.pos;
   final $pos1 = state.pos;
@@ -1078,7 +1079,7 @@ String? memoizeC16C32OrC16(State<String> state) {
   return $0;
 }
 
-Object? nestedC16OrTake2C32(State<String> state) {
+Object? nestedC16OrTake2C32(State<Utf16Reader> state) {
   Object? $0;
   final source = state.source;
   final $pos = state.minErrorPos;
@@ -1112,7 +1113,7 @@ Object? nestedC16OrTake2C32(State<String> state) {
   return $0;
 }
 
-int? noneOfC16(State<String> state) {
+int? noneOfC16(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -1132,7 +1133,7 @@ int? noneOfC16(State<String> state) {
   return $0;
 }
 
-int? noneOfOfC16OrC32(State<String> state) {
+int? noneOfOfC16OrC32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   final $calculate = state.context.listOfC16AndC32 as List<int>;
@@ -1166,7 +1167,7 @@ int? noneOfOfC16OrC32(State<String> state) {
   return $0;
 }
 
-int? noneOfC32(State<String> state) {
+int? noneOfC32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -1186,7 +1187,7 @@ int? noneOfC32(State<String> state) {
   return $0;
 }
 
-void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
+void noneOfTagsAbcAbdDefDegXXY(State<Utf16Reader> state) {
   final source = state.source;
   state.ok = true;
   if (state.pos < source.length) {
@@ -1230,7 +1231,7 @@ void noneOfTagsAbcAbdDefDegXXY(State<String> state) {
   }
 }
 
-void notC32OrC16(State<String> state) {
+void notC32OrC16(State<Utf16Reader> state) {
   final $pos = state.pos;
   final $log = state.log;
   state.log = false;
@@ -1246,7 +1247,7 @@ void notC32OrC16(State<String> state) {
   }
 }
 
-int? oneOfC16(State<String> state) {
+int? oneOfC16(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -1265,7 +1266,7 @@ int? oneOfC16(State<String> state) {
   return $0;
 }
 
-int? oneOfC32(State<String> state) {
+int? oneOfC32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -1285,7 +1286,7 @@ int? oneOfC32(State<String> state) {
   return $0;
 }
 
-String? optAbc(State<String> state) {
+String? optAbc(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos < source.length &&
@@ -1303,7 +1304,7 @@ String? optAbc(State<String> state) {
   return $0;
 }
 
-Result2<int, int>? pairC16C32(State<String> state) {
+Result2<int, int>? pairC16C32(State<Utf16Reader> state) {
   Result2<int, int>? $0;
   final $pos = state.pos;
   int? $1;
@@ -1320,7 +1321,7 @@ Result2<int, int>? pairC16C32(State<String> state) {
   return $0;
 }
 
-int? peekC32(State<String> state) {
+int? peekC32(State<Utf16Reader> state) {
   int? $0;
   final $pos = state.pos;
   $0 = char32(state);
@@ -1330,7 +1331,7 @@ int? peekC32(State<String> state) {
   return $0;
 }
 
-int? postfixExpression(State<String> state) {
+int? postfixExpression(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   int? $1;
@@ -1379,7 +1380,7 @@ int? postfixExpression(State<String> state) {
   return $0;
 }
 
-int? prefixExpression(State<String> state) {
+int? prefixExpression(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -1438,7 +1439,7 @@ int? prefixExpression(State<String> state) {
   return $0;
 }
 
-int? precededC16C32(State<String> state) {
+int? precededC16C32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -1458,8 +1459,8 @@ int? precededC16C32(State<String> state) {
   return $0;
 }
 
-String? recognize3C32AbcC16(State<String> state) {
-  String? $0;
+dynamic recognize3C32AbcC16(State<Utf16Reader> state) {
+  dynamic $0;
   final source = state.source;
   final $pos = state.pos;
   final $pos1 = state.pos;
@@ -1479,7 +1480,7 @@ String? recognize3C32AbcC16(State<String> state) {
   return $0;
 }
 
-int? satisfyC16(State<String> state) {
+int? satisfyC16(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -1498,7 +1499,7 @@ int? satisfyC16(State<String> state) {
   return $0;
 }
 
-int? satisfyC32(State<String> state) {
+int? satisfyC32(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -1518,7 +1519,7 @@ int? satisfyC32(State<String> state) {
   return $0;
 }
 
-List<int>? separatedList0C32Abc(State<String> state) {
+List<int>? separatedList0C32Abc(State<Utf16Reader> state) {
   List<int>? $0;
   final source = state.source;
   var $pos = state.pos;
@@ -1557,7 +1558,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
   return $0;
 }
 
-List<int>? separatedList1C32Abc(State<String> state) {
+List<int>? separatedList1C32Abc(State<Utf16Reader> state) {
   List<int>? $0;
   final source = state.source;
   var $pos = state.pos;
@@ -1596,7 +1597,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
   return $0;
 }
 
-List<int>? separatedListN_2C32Abc(State<String> state) {
+List<int>? separatedListN_2C32Abc(State<Utf16Reader> state) {
   List<int>? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -1641,7 +1642,7 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
   return $0;
 }
 
-Result2<int, int>? separatedPairC16AbcC32(State<String> state) {
+Result2<int, int>? separatedPairC16AbcC32(State<Utf16Reader> state) {
   Result2<int, int>? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -1683,7 +1684,7 @@ Result2<int, int>? separatedPairC16AbcC32(State<String> state) {
   return $0;
 }
 
-void skipWhile1C16(State<String> state) {
+void skipWhile1C16(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   while (state.pos < source.length) {
@@ -1700,7 +1701,7 @@ void skipWhile1C16(State<String> state) {
   }
 }
 
-void skipWhile1C32(State<String> state) {
+void skipWhile1C32(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   while (state.pos < source.length) {
@@ -1718,7 +1719,7 @@ void skipWhile1C32(State<String> state) {
   }
 }
 
-void skipWhileC16(State<String> state) {
+void skipWhileC16(State<Utf16Reader> state) {
   final source = state.source;
   while (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
@@ -1731,7 +1732,7 @@ void skipWhileC16(State<String> state) {
   state.ok = true;
 }
 
-void skipWhileC32(State<String> state) {
+void skipWhileC32(State<Utf16Reader> state) {
   final source = state.source;
   while (state.pos < source.length) {
     final pos = state.pos;
@@ -1745,7 +1746,7 @@ void skipWhileC32(State<String> state) {
   state.ok = true;
 }
 
-String? stringValue(State<String> state) {
+String? stringValue(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = true;
@@ -1811,7 +1812,7 @@ String? stringValue(State<String> state) {
   return $0;
 }
 
-String? tagC16(State<String> state) {
+String? tagC16(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
@@ -1824,7 +1825,7 @@ String? tagC16(State<String> state) {
   return $0;
 }
 
-String? tagC16C32(State<String> state) {
+String? tagC16C32(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos < source.length &&
@@ -1839,7 +1840,7 @@ String? tagC16C32(State<String> state) {
   return $0;
 }
 
-String? tagC32(State<String> state) {
+String? tagC32(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos + 1 < source.length &&
@@ -1854,7 +1855,7 @@ String? tagC32(State<String> state) {
   return $0;
 }
 
-String? tagC32C16(State<String> state) {
+String? tagC32C16(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos < source.length &&
@@ -1869,7 +1870,7 @@ String? tagC32C16(State<String> state) {
   return $0;
 }
 
-String? tagNoCaseAbc(State<String> state) {
+String? tagNoCaseAbc(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $start = state.pos;
@@ -1889,7 +1890,7 @@ String? tagNoCaseAbc(State<String> state) {
   return $0;
 }
 
-String? tagOfFoo(State<String> state) {
+String? tagOfFoo(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $calculate = state.context.foo as String;
@@ -1911,7 +1912,7 @@ String? tagOfFoo(State<String> state) {
   return $0;
 }
 
-String? tagPairAbc(State<String> state) {
+String? tagPairAbc(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2047,7 +2048,7 @@ String? tagPairAbc(State<String> state) {
   return $0;
 }
 
-String? tagsAbcAbdDefDegXXYZ(State<String> state) {
+String? tagsAbcAbdDefDegXXYZ(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -2117,7 +2118,7 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
   return $0;
 }
 
-bool? tagValues(State<String> state) {
+bool? tagValues(State<Utf16Reader> state) {
   bool? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -2159,7 +2160,7 @@ bool? tagValues(State<String> state) {
   return $0;
 }
 
-String? takeUntilAbc(State<String> state) {
+String? takeUntilAbc(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2174,7 +2175,7 @@ String? takeUntilAbc(State<String> state) {
   return $0;
 }
 
-String? takeUntil1Abc(State<String> state) {
+String? takeUntil1Abc(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2201,7 +2202,7 @@ String? takeUntil1Abc(State<String> state) {
   return $0;
 }
 
-String? takeWhile1C16(State<String> state) {
+String? takeWhile1C16(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2222,7 +2223,7 @@ String? takeWhile1C16(State<String> state) {
   return $0;
 }
 
-String? takeWhile1C32(State<String> state) {
+String? takeWhile1C32(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2244,7 +2245,7 @@ String? takeWhile1C32(State<String> state) {
   return $0;
 }
 
-String? takeWhileC16(State<String> state) {
+String? takeWhileC16(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2263,7 +2264,7 @@ String? takeWhileC16(State<String> state) {
   return $0;
 }
 
-String? takeWhileC32(State<String> state) {
+String? takeWhileC32(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2283,7 +2284,7 @@ String? takeWhileC32(State<String> state) {
   return $0;
 }
 
-String? takeWhileMN_2_4C16(State<String> state) {
+String? takeWhileMN_2_4C16(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2307,7 +2308,7 @@ String? takeWhileMN_2_4C16(State<String> state) {
   return $0;
 }
 
-String? takeWhileMN_2_4C32(State<String> state) {
+String? takeWhileMN_2_4C32(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2332,7 +2333,7 @@ String? takeWhileMN_2_4C32(State<String> state) {
   return $0;
 }
 
-int? terminated(State<String> state) {
+int? terminated(State<Utf16Reader> state) {
   int? $0;
   final $pos = state.pos;
   $0 = char16(state);
@@ -2346,13 +2347,13 @@ int? terminated(State<String> state) {
   return $0;
 }
 
-int? testRef(State<String> state) {
+int? testRef(State<Utf16Reader> state) {
   int? $0;
   $0 = char16(state);
   return $0;
 }
 
-Token<dynamic>? tokenizeAlphaOrDigits(State<String> state) {
+Token<dynamic>? tokenizeAlphaOrDigits(State<Utf16Reader> state) {
   Token<dynamic>? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2404,7 +2405,7 @@ Token<dynamic>? tokenizeAlphaOrDigits(State<String> state) {
   return $0;
 }
 
-Token<dynamic>? tokenizeSimilarTagsIfForWhile(State<String> state) {
+Token<dynamic>? tokenizeSimilarTagsIfForWhile(State<Utf16Reader> state) {
   Token<dynamic>? $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -2447,7 +2448,7 @@ Token<dynamic>? tokenizeSimilarTagsIfForWhile(State<String> state) {
   return $0;
 }
 
-dynamic tokenizeTagsIfForWhile(State<String> state) {
+dynamic tokenizeTagsIfForWhile(State<Utf16Reader> state) {
   dynamic $0;
   final source = state.source;
   state.ok = state.pos < source.length;
@@ -2487,7 +2488,7 @@ dynamic tokenizeTagsIfForWhile(State<String> state) {
   return $0;
 }
 
-Result2<int, String>? tuple2C32Abc(State<String> state) {
+Result2<int, String>? tuple2C32Abc(State<Utf16Reader> state) {
   Result2<int, String>? $0;
   final $pos = state.pos;
   int? $1;
@@ -2505,7 +2506,7 @@ Result2<int, String>? tuple2C32Abc(State<String> state) {
   return $0;
 }
 
-Result3<int, String, int>? tuple3C32AbcC16(State<String> state) {
+Result3<int, String, int>? tuple3C32AbcC16(State<Utf16Reader> state) {
   Result3<int, String, int>? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2535,7 +2536,7 @@ Result3<int, String, int>? tuple3C32AbcC16(State<String> state) {
   return $0;
 }
 
-bool? valueAbcToTrueValue(State<String> state) {
+bool? valueAbcToTrueValue(State<Utf16Reader> state) {
   bool? $0;
   final source = state.source;
   state.ok = state.pos < source.length &&
@@ -2561,7 +2562,7 @@ bool? valueTrue(State<dynamic> state) {
   return $0;
 }
 
-String? transformersCharClassIsDigit(State<String> state) {
+String? transformersCharClassIsDigit(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2580,7 +2581,7 @@ String? transformersCharClassIsDigit(State<String> state) {
   return $0;
 }
 
-String? transformersExprIsDigit(State<String> state) {
+String? transformersExprIsDigit(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2600,7 +2601,7 @@ String? transformersExprIsDigit(State<String> state) {
   return $0;
 }
 
-String? transformersFuncIsDigit(State<String> state) {
+String? transformersFuncIsDigit(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   bool $test(int x) {
@@ -2624,7 +2625,7 @@ String? transformersFuncIsDigit(State<String> state) {
   return $0;
 }
 
-String? transformersNotCharClassIsDigit(State<String> state) {
+String? transformersNotCharClassIsDigit(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2644,7 +2645,7 @@ String? transformersNotCharClassIsDigit(State<String> state) {
   return $0;
 }
 
-int? transformersVarIsNotDigit(State<String> state) {
+int? transformersVarIsNotDigit(State<Utf16Reader> state) {
   int? $0;
   final source = state.source;
   final $calculate = const [
@@ -2689,7 +2690,7 @@ int? transformersVarIsNotDigit(State<String> state) {
   return $0;
 }
 
-String? verifyIs3Digit(State<String> state) {
+String? verifyIs3Digit(State<Utf16Reader> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
@@ -2720,7 +2721,7 @@ String? verifyIs3Digit(State<String> state) {
   return $0;
 }
 
-void verifyIs3DigitFast(State<String> state) {
+void verifyIs3DigitFast(State<Utf16Reader> state) {
   final source = state.source;
   final $pos = state.pos;
   String? $0;
@@ -2966,15 +2967,15 @@ class State<T> {
 
   @override
   String toString() {
-    if (source is String) {
-      final s = source as String;
-      if (pos >= s.length) {
+    if (source is Utf16Reader) {
+      final reader = source as Utf16Reader;
+      if (pos >= reader.length) {
         return '$pos:';
       }
 
-      var length = s.length - pos;
+      var length = reader.length - pos;
       length = length > 40 ? 40 : length;
-      final string = s.substring(pos, pos + length);
+      final string = reader.substring(pos, pos + length);
       return '$pos:$string';
     } else {
       return super.toString();
@@ -3027,10 +3028,10 @@ class State<T> {
       final kind = _kinds[i];
       switch (kind) {
         case ParseError.character:
-          if (source is String) {
-            final string = source as String;
-            if (start < string.length) {
-              final value = string.runeAt(errorPos);
+          if (source is Utf16Reader) {
+            final reader = source as Utf16Reader;
+            if (start < reader.length) {
+              final value = reader.runeAt(errorPos);
               final length = value >= 0xffff ? 2 : 1;
               final escaped = _escape(value);
               final error =
@@ -3097,4 +3098,85 @@ class State<T> {
 
     return result;
   }
+}
+
+class StringReader implements Utf16Reader {
+  @override
+  final int length;
+
+  final String source;
+
+  StringReader(this.source) : length = source.length;
+
+  @override
+  int codeUnitAt(int index) => source.codeUnitAt(index);
+
+  @override
+  int indexOf(String text, [int start = 0]) => source.indexOf(text, start);
+
+  @override
+  @pragma('vm:prefer-inline')
+  int readRune(State<Utf16Reader> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
+
+    return w1;
+  }
+
+  @override
+  String slice(int start, [int? end]) => source.substring(start, end);
+
+  @override
+  bool startsWith(String pattern, [int index = 0]) =>
+      source.startsWith(pattern, index);
+
+  @override
+  String substring(int start, [int? end]) => source.substring(start, end);
+}
+
+abstract class Utf16Reader {
+  int get length;
+
+  int codeUnitAt(int index);
+
+  int indexOf(String text, [int start = 0]);
+
+  int readRune(State<Utf16Reader> state);
+
+  int runeAt(int index);
+
+  String slice(int start, [int? end]);
+
+  bool startsWith(String text, int index);
+
+  String substring(int start, [int? end]);
 }

@@ -7,7 +7,7 @@ part of '../../character.dart';
 /// ```dart
 /// Satisfy(isSomeChar)
 /// ```
-class Satisfy extends ParserBuilder<String, int> {
+class Satisfy extends ParserBuilder<Utf16Reader, int> {
   static const _template16 = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
