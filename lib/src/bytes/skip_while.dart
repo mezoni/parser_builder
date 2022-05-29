@@ -6,7 +6,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// SkipWhile(CharClass('#x9 | #xA | #xD | #x20'))
 /// ```
-class SkipWhile extends ParserBuilder<Utf16Reader, void> {
+class SkipWhile extends ParserBuilder<String, void> {
   static const _template16 = '''
 while (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
@@ -37,7 +37,6 @@ state.ok = true;''';
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final isUnicode = predicate.isUnicode;
     final values = {
       'test': predicate.build(context, 'test', ['c']),

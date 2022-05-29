@@ -6,7 +6,7 @@ part of '../../character.dart';
 /// ```dart
 /// Char(0x30)
 /// ```
-class Char extends ParserBuilder<Utf16Reader, int> {
+class Char extends ParserBuilder<String, int> {
   static const _template16 = '''
 state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
 if (state.ok) {
@@ -52,7 +52,6 @@ if (state.ok) {
     }
 
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final fast = result == null;
     final values = {
       'cc': helper.getAsCode(char),

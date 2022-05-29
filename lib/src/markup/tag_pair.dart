@@ -1,7 +1,7 @@
 part of '../../markup.dart';
 
 @experimental
-class TagPair<I extends Utf16Reader, O1, O2, O> extends ParserBuilder<I, O> {
+class TagPair<O1, O2, O> extends ParserBuilder<String, O> {
   static const _template = r'''
 final {{pos}} = state.pos;
 {{var1}}
@@ -65,13 +65,13 @@ if (!state.ok) {
 
   final SemanticAction<bool> compare;
 
-  final ParserBuilder<I, O2> content;
+  final ParserBuilder<String, O2> content;
 
-  final ParserBuilder<I, O1> end;
+  final ParserBuilder<String, O1> end;
 
   final SemanticAction<O> map;
 
-  final ParserBuilder<I, O1> start;
+  final ParserBuilder<String, O1> start;
 
   const TagPair(this.start, this.content, this.end, this.compare, this.map);
 

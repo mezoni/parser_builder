@@ -6,7 +6,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// NoneOfTags(['true', 'false'])
 /// ```
-class NoneOfTags extends ParserBuilder<Utf16Reader, void> {
+class NoneOfTags extends ParserBuilder<String, void> {
   static const _template = '''
 state.ok = true;
 if (state.pos < source.length) {
@@ -45,7 +45,6 @@ state.fail(pos, ParseError.unexpected, {{tag}}, pos, pos + {{length}});''';
     }
 
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final values = context.allocateLocals(['pos']);
     final map = <int, List<String>>{};
     for (final tag in tags) {

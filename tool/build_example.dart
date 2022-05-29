@@ -55,15 +55,15 @@ const _colon = Fast(Terminated(Tag(':'), _ws));
 
 const _comma = Terminated(Tag(','), _ws);
 
-const _eof = Eof<Utf16Reader>();
+const _eof = Eof<String>();
 
 const _escaped = Named('_escaped', Alt2(_escapeSeq, _escapeHex));
 
-const _escapeHex = Named<Utf16Reader, int>(
+const _escapeHex = Named<String, int>(
     '_escapeHex',
     Map2(
         Fast(CaptureStart('start', Satisfy(CharClass('[u]')))),
-        HandleLastErrorPos<Utf16Reader, String>(
+        HandleLastErrorPos<String, String>(
           Alt2(
             TakeWhileMN(4, 4, CharClass('[0-9a-fA-F]')),
             FailMessage(
@@ -93,8 +93,7 @@ const _isNormalChar = CharClass('[#x20-#x21] | [#x23-#x5b] | [#x5d-#x10ffff]');
 
 const _isWhitespace = CharClass('#x9 | #xA | #xD | #x20');
 
-const _json =
-    Named<Utf16Reader, dynamic>('_json', Delimited(_ws, _value, _eof));
+const _json = Named<String, dynamic>('_json', Delimited(_ws, _value, _eof));
 
 const _keyValue = Named(
     '_keyValue',
@@ -122,7 +121,7 @@ const _openBracket =
 
 const _quote = Named('_quote', Fast(Terminated(Tag('"'), _ws)), [_inline]);
 
-const _string = Named<Utf16Reader, String>(
+const _string = Named<String, String>(
     '_string',
     Nested(
         'string',
@@ -139,9 +138,9 @@ const _string = Named<Utf16Reader, String>(
 
 const _stringValue = StringValue(_isNormalChar, 0x5c, _escaped);
 
-const _value = Ref<Utf16Reader, dynamic>('_value');
+const _value = Ref<String, dynamic>('_value');
 
-const _value_ = Named<Utf16Reader, dynamic>(
+const _value_ = Named(
     '_value',
     Terminated(
         SwitchTag(

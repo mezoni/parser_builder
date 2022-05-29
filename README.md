@@ -2,7 +2,7 @@
 
 Lightweight template-based parser build system. Simple prototyping. Comfortable debugging. Effective developing.
 
-Version: 3.0.0
+Version: 2.0.30
 
 It is under development (not all built-in common buildres are implemented but can be used without them), but you can already play around.  
 

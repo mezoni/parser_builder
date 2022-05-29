@@ -6,14 +6,14 @@ part of '../../bytes.dart';
 /// ```dart
 /// Tags(['true', 'false'])
 /// ```
-class Tags extends ParserBuilder<Utf16Reader, String> {
+class Tags extends ParserBuilder<String, String> {
   final List<String> tags;
 
   const Tags(this.tags);
 
   @override
   String build(Context context, ParserResult? result) {
-    return SwitchTag<Utf16Reader, String>(
+    return SwitchTag<String>(
       Map.fromEntries(tags.map((tag) => MapEntry(
             tag,
             Value(tag, Advance(tag.length)),

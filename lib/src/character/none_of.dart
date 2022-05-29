@@ -7,7 +7,7 @@ part of '../../character.dart';
 /// ```dart
 /// NoneOf([0x22, 0x27])
 /// ```
-class NoneOf extends ParserBuilder<Utf16Reader, int> {
+class NoneOf extends ParserBuilder<String, int> {
   final List<int> characters;
 
   const NoneOf(this.characters);

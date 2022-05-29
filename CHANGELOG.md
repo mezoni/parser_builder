@@ -1,6 +1,5 @@
-## 3.0.0
+## 2.0.30
 
-- Breaking change: Text parsers no longer depend on the `String` type. Thus, no memory allocation is required to fit all the data in memory. Now the parsing of the text is carried out using the `Utf16Reader` interface. To parse strings directly, it is possible to use the `StringReader` reader implementation. This is a very simple implementation that reads data directly from a string. To parse text data directly from files requires a text file reader implementation that implements the `Utf16Reader` interface. Currently, file readers of this type are not implemented, as this is not part of the current goals of the project (because it requires certain costs). This implementation (`Utf16Reader`) does not reduce the speed of parsing and does not limit the types of input data for parsing, and at the same time, it allows text parsers to get rid of such a disadvantage as the need to allocate all data in memory
 - Cosmetic code improvements
 - Breaking change: The `AddToPos` parser builder has been renamed to `Advance`
 

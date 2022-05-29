@@ -11,7 +11,7 @@ Future<void> main(List<String> args) async {
   final context = Context();
   final filename = 'lib/src/char_class/char_class_parser.dart';
   await fastBuild(context, [_parse], filename,
-      footer: __footer, publish: {'parseSource': _parse});
+      footer: __footer, publish: {'parseString': _parse});
 }
 
 const __footer = '''
@@ -72,11 +72,11 @@ const _isHexDigit = ExpressionAction<bool>([
 const _isWhiteSpace = ExpressionAction<bool>(
     ['x'], '{{x}} == 0x09 || {{x}} == 0xA || {{x}} == 0xD || {{x}} == 0x20');
 
-const _parse = Named('parse', Delimited(_ws, _ranges, Eof<Utf16Reader>()));
+const _parse = Named('parse', Delimited(_ws, _ranges, Eof<String>()));
 
 const _range = Named(
     '_range',
-    Alt<Utf16Reader, List<Result2<int, int>>>([
+    Alt<String, List<Result2<int, int>>>([
       Delimited(Tag('['), Many1(_rangeBody), Tag(']')),
       Map1(Alt([_char, _hex]),
           ExpressionAction(['x'], '[Result2({{x}}, {{x}})]')),

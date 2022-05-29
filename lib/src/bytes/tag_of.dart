@@ -1,6 +1,6 @@
 part of '../../bytes.dart';
 
-class TagOf extends ParserBuilder<Utf16Reader, String> {
+class TagOf extends ParserBuilder<String, String> {
   static const _template = '''
 {{var1}}
 {{p1}}
@@ -28,14 +28,13 @@ if (state.ok) {
   }
 }''';
 
-  final ParserBuilder<Utf16Reader, String> tag;
+  final ParserBuilder<String, String> tag;
 
   const TagOf(this.tag);
 
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final fast = result == null;
     final r1 = context.getResult(tag, true);
     final values = {

@@ -2,8 +2,7 @@ part of '../../char_class.dart';
 
 class RangesParser {
   List<int> parse(String chars) {
-    final source = char_class_parser.StringReader(chars);
-    final ranges = char_class_parser.parseSource(source);
+    final ranges = char_class_parser.parseString(chars);
     String rangeToString(int start, int end) {
       return '[#x${start.toRadixString(16)}-#x${end.toRadixString(16)}]';
     }

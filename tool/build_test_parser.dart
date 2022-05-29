@@ -211,9 +211,7 @@ const _char16 = Named('char16', Char(c16));
 const _char32 = Named('char32', Char(c32));
 
 const _consumedSeparatedAbcC32 = Named(
-    'consumedSeparatedAbcC32',
-    Consumed<Utf16Reader, String, List<String>>(
-        SeparatedList1(_tagAbc, _char32)));
+    'consumedSeparatedAbcC32', Consumed(SeparatedList1(_tagAbc, _char32)));
 
 const _delimited = Named('delimited', Delimited(_char16, _char32, _char16));
 
@@ -221,7 +219,7 @@ const _digit0 = Named('digit0', Digit0());
 
 const _digit1 = Named('digit1', Digit1());
 
-const _eof = Named('eof', Eof<Utf16Reader>());
+const _eof = Named('eof', Eof<String>());
 
 const _escapeSequence16 =
     Named('escapeSequence16', EscapeSequence({0x6e: 0xa, 0x72: 0xd, c16: c16}));
@@ -346,7 +344,7 @@ const _primaryExpression = Named('_primaryExpression',
 const _recognize3C32AbcC16 =
     Named('recognize3C32AbcC16', Recognize(Tuple3(_char32, _tagAbc, _char16)));
 
-const _ref = Ref<Utf16Reader, int>('char16');
+const _ref = Ref<String, int>('char16');
 
 const _satisfyC16 = Named('satisfyC16', Satisfy(_isC16));
 
@@ -441,7 +439,7 @@ const _terminatedC16C32 = Named('terminated', Terminated(_char16, _char32));
 
 const _testRef_ = Named('testRef', _ref);
 
-const _tokenizeAlphaOrDigits = Named<Utf16Reader, Token>(
+const _tokenizeAlphaOrDigits = Named<String, Token>(
     'tokenizeAlphaOrDigits',
     Alt2(
         Tokenize(

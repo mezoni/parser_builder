@@ -1,7 +1,7 @@
 part of '../../token.dart';
 
 @experimental
-class Tokenize<I extends Utf16Reader, O1, O> extends ParserBuilder<I, O> {
+class Tokenize<O1, O> extends ParserBuilder<String, O> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{var1}}
@@ -15,7 +15,7 @@ if (state.ok) {
   static const _templateFast = '''
 {{p1}}''';
 
-  final ParserBuilder<I, O1> parser;
+  final ParserBuilder<String, O1> parser;
 
   final SemanticAction<O> tokenize;
 

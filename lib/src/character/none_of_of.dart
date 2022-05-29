@@ -7,7 +7,7 @@ part of '../../character.dart';
 /// ```dart
 /// NoneOfOf(GetChars()))
 /// ```
-class NoneOfOf extends ParserBuilder<Utf16Reader, int> {
+class NoneOfOf extends ParserBuilder<String, int> {
   static const _template = '''
 if (state.pos < source.length) {
   {{var1}}
@@ -57,14 +57,13 @@ if (state.pos < source.length) {
   state.ok = false;
 }''';
 
-  final ParserBuilder<Utf16Reader, List<int>> chars;
+  final ParserBuilder<String, List<int>> chars;
 
   const NoneOfOf(this.chars);
 
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final fast = result == null;
     final r1 = context.getResult(chars, true);
     final values = {

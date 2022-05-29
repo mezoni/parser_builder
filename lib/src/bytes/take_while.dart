@@ -7,7 +7,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeWhile(CharClass('[#x21-#x7e]'))
 /// ```
-class TakeWhile extends ParserBuilder<Utf16Reader, String> {
+class TakeWhile extends ParserBuilder<String, String> {
   static const _template16 = '''
 final {{pos}} = state.pos;
 while (state.pos < source.length) {
@@ -69,7 +69,6 @@ state.ok = true;''';
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final fast = result == null;
     final values = context.allocateLocals(['pos']);
     values.addAll({

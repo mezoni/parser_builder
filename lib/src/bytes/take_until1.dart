@@ -7,7 +7,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// TakeUntil1('{{')
 /// ```
-class TakeUntil1 extends ParserBuilder<Utf16Reader, String> {
+class TakeUntil1 extends ParserBuilder<String, String> {
   static const _template = '''
 final {{pos}} = state.pos;
 final {{index}} = source.indexOf({{tag}}, {{pos}});
@@ -58,7 +58,6 @@ if (state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final fast = result == null;
     final values = context.allocateLocals(['index', 'pos']);
     values.addAll({

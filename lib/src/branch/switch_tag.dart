@@ -1,6 +1,6 @@
 part of '../../branch.dart';
 
-class SwitchTag<I extends Utf16Reader, O> extends ParserBuilder<I, O> {
+class SwitchTag<O> extends ParserBuilder<String, O> {
   static const _template = '''
 state.ok = state.pos < source.length;
 if (state.ok) {
@@ -13,9 +13,9 @@ if (!state.ok) {
   {{errors}}
 }''';
 
-  final List<ParserBuilder<I, O>> errors;
+  final List<ParserBuilder<String, O>> errors;
 
-  final Map<String?, ParserBuilder<I, O>> table;
+  final Map<String?, ParserBuilder<String, O>> table;
 
   const SwitchTag(this.table, this.errors);
 
@@ -32,7 +32,6 @@ if (!state.ok) {
     }
 
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final values = context.allocateLocals(['pos']);
     final map = <int, List<String>>{};
     for (final tag in table.keys) {

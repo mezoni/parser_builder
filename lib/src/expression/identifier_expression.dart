@@ -1,7 +1,6 @@
 part of '../../expression.dart';
 
-class IdentifierExpression<I extends Utf16Reader>
-    extends ParserBuilder<I, String> {
+class IdentifierExpression extends ParserBuilder<String, String> {
   static const _template = '''
 final {{pos}} = state.pos;
 state.ok = state.pos < source.length;

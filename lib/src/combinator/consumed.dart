@@ -1,6 +1,6 @@
 part of '../../combinator.dart';
 
-class Consumed<I, O1, O2> extends ParserBuilder<I, Result2<O1, O2>> {
+class Consumed<I, O> extends ParserBuilder<I, Result2<I, O>> {
   static const _template = '''
 final {{pos}} = state.pos;
 {{var1}}
@@ -13,7 +13,7 @@ if (state.ok) {
   static const _templateFast = '''
 {{p1}}''';
 
-  final ParserBuilder<I, O2> parser;
+  final ParserBuilder<I, O> parser;
 
   const Consumed(this.parser);
 

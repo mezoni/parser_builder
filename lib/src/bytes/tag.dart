@@ -6,7 +6,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// Tag('{')
 /// ```
-class Tag extends ParserBuilder<Utf16Reader, String> {
+class Tag extends ParserBuilder<String, String> {
   static const _templateForSpeed = '''
 state.ok = {{test}};
 if (state.ok) {
@@ -41,7 +41,6 @@ source.tag{{size}}(state, {{tag}});''';
     }
 
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     if (context.optimizeForSize) {
       return _buildForSize(context, result);
     } else {
@@ -75,7 +74,6 @@ source.tag{{size}}(state, {{tag}});''';
   String _buildForSpeed(Context context, ParserResult? result) {
     final fast = result == null;
     final cc = tag.codeUnitAt(0).toString();
-    final escaped = helper.escapeString(tag);
     final length = tag.length;
     final String test;
     switch (length) {
@@ -90,12 +88,12 @@ source.tag{{size}}(state, {{tag}});''';
         break;
       default:
         test =
-            'state.pos < source.length && source.codeUnitAt(state.pos) == $cc && source.startsWith($escaped, state.pos)';
+            'state.pos < source.length && source.codeUnitAt(state.pos) == $cc && source.startsWith($tag, state.pos)';
     }
 
     final values = {
       'length': '$length',
-      'tag': escaped,
+      'tag': helper.escapeString(tag),
       'test': test,
     };
     return render2(

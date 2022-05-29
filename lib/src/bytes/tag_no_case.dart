@@ -7,7 +7,7 @@ part of '../../bytes.dart';
 /// ```dart
 /// TagNoCase('if')
 /// ```
-class TagNoCase extends ParserBuilder<Utf16Reader, String> {
+class TagNoCase extends ParserBuilder<String, String> {
   static const _template = '''
 final {{start}} = state.pos;
 final {{end}} = {{start}} + {{length}};
@@ -46,7 +46,6 @@ if (!state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
-    ParseRuntime.addClassUtf16Reader(context);
     final fast = result == null;
     final values = context.allocateLocals(['end', 'start']);
     values.addAll({

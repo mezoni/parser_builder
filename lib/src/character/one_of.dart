@@ -7,7 +7,7 @@ part of '../../character.dart';
 /// ```dart
 /// OneOf([0x22, 0x27])
 /// ```
-class OneOf extends ParserBuilder<Utf16Reader, int> {
+class OneOf extends ParserBuilder<String, int> {
   final List<int> characters;
 
   const OneOf(this.characters);
