@@ -717,8 +717,6 @@ class State<T> {
 
     return result;
   }
-
-  static T as<T>(T? value) => value as T;
 }
 
 List<T> _flatten<T>(List<List<T>> data, List<T> result) {

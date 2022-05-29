@@ -92,7 +92,7 @@ Color? _hexColor(State<String> state) {
           state.lastErrorPos,
           ParseError.message,
           'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
-          State.as<int>($1),
+          ($1 as dynamic) as int,
           state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos2);
@@ -462,6 +462,4 @@ class State<T> {
 
     return result;
   }
-
-  static T as<T>(T? value) => value as T;
 }

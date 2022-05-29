@@ -1,6 +1,7 @@
 ## 2.0.30
 
 - Cosmetic code improvements
+- Breaking change: The `AddToPos` parser builder has been renamed to `Advance`
 
 ## 2.0.29
 

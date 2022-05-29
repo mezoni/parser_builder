@@ -1,6 +1,8 @@
 part of '../../parser_builder.dart';
 
 class Context {
+  Map<Object, SemanticValue> capturedValues = {};
+
   final Map<String, String> classDeclarations = {};
 
   final List<String> globalDeclarations = [];
@@ -23,8 +25,6 @@ class Context {
 
   bool refersToStateSource = false;
 
-  Map<Object, SemanticValue> semanticValues = {};
-
   String allocateGlobal([String name = '']) {
     final result = globalAllocator.allocate(name);
     return result;
@@ -45,7 +45,7 @@ class Context {
   }
 
   SemanticValue allocateSematicValue<T>(Object key) {
-    if (semanticValues.containsKey(key)) {
+    if (capturedValues.containsKey(key)) {
       throw ArgumentError.value(key, 'key', 'Semantic value already exists');
     }
 
@@ -62,7 +62,7 @@ class Context {
       if (!localDeclarations.containsKey(alias)) {
         final value = SemanticValue<T>(alias);
         final type = helper.asNullable<T>();
-        semanticValues[key] = value;
+        capturedValues[key] = value;
         localDeclarations[alias] = '$type $alias;';
         return value;
       }
@@ -80,12 +80,12 @@ class Context {
     return ParserResult(name, type, value);
   }
 
-  SemanticValue getSemanticValue(Object key) {
-    if (!semanticValues.containsKey(key)) {
-      throw ArgumentError.value(key, 'key', 'Semantic value not declared');
+  SemanticValue getCapturedValue(Object key) {
+    if (!capturedValues.containsKey(key)) {
+      throw ArgumentError.value(key, 'key', 'Captured value not declared');
     }
 
-    return semanticValues[key]!;
+    return capturedValues[key]!;
   }
 
   T readRegistryValue<T>(Map<dynamic, Map<String, dynamic>> registry, owner,

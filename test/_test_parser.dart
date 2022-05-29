@@ -749,7 +749,7 @@ String? indicateAbc4Digits(State<String> state) {
     }
     if (!state.ok) {
       state.fail(state.lastErrorPos, ParseError.message, 'indicate',
-          State.as<int>($1), state.lastErrorPos);
+          ($1 as dynamic) as int, state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos1);
     if (!state.ok) {
@@ -3102,6 +3102,4 @@ class State<T> {
 
     return result;
   }
-
-  static T as<T>(T? value) => value as T;
 }

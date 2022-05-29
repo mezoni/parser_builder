@@ -96,7 +96,7 @@ int? _escapeHex(State<String> state) {
           state.lastErrorPos,
           ParseError.message,
           'An escape sequence starting with \'\\u\' must be followed by 4 hexadecimal digits',
-          State.as<int>($start),
+          ($start as dynamic) as int,
           state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos2);
@@ -240,7 +240,7 @@ String? _string(State<String> state) {
       _quote(state);
       if (!state.ok) {
         state.fail(state.lastErrorPos, ParseError.message,
-            'Unterminated string', State.as<int>($start));
+            'Unterminated string', ($start as dynamic) as int);
       }
     }
     if (!state.ok) {
@@ -1164,8 +1164,6 @@ class State<T> {
 
     return result;
   }
-
-  static T as<T>(T? value) => value as T;
 }
 
 @pragma('vm:prefer-inline')

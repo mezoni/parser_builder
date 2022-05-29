@@ -148,9 +148,9 @@ const _value_ = Named(
             '"': _string,
             '[': _array,
             '{': _object,
-            'false': Value(false, AddToPos(5)),
-            'true': Value(true, AddToPos(4)),
-            'null': Value(null as dynamic, AddToPos(4)),
+            'false': Value(false, Advance(5)),
+            'true': Value(true, Advance(4)),
+            'null': Value(null as dynamic, Advance(4)),
             null: _number,
           },
           [

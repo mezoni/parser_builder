@@ -15,7 +15,7 @@ class TagValues<O> extends ParserBuilder<String, O> {
     return SwitchTag<O>(
       Map.fromEntries(keys.map((k) => MapEntry(
             k,
-            Value(table[k] as O, AddToPos(k.length)),
+            Value(table[k] as O, Advance(k.length)),
           ))),
       keys.map((k) => FailExpected<String, O>(PositionAction(), k)).toList(),
     ).build(context, result);

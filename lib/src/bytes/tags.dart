@@ -16,7 +16,7 @@ class Tags extends ParserBuilder<String, String> {
     return SwitchTag<String>(
       Map.fromEntries(tags.map((tag) => MapEntry(
             tag,
-            Value(tag, AddToPos(tag.length)),
+            Value(tag, Advance(tag.length)),
           ))),
       List.generate(
           tags.length, (i) => FailExpected(PositionAction(), tags[i])),

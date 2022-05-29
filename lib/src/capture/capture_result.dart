@@ -3,16 +3,12 @@ part of '../../capture.dart';
 class CaptureResult<I, O> extends ParserBuilder<I, O> {
   static const _template = '''
 {{p1}}
-if (state.ok) {
-  {{value}} = {{res0}};
-}''';
+{{value}} = {{res0}};''';
 
   static const _templateFast = '''
 {{var0}}
 {{p0}}
-if (state.ok) {
-  {{value}} = {{res0}};
-}''';
+{{value}} = {{res0}};''';
 
   final Object key;
 

@@ -12,6 +12,6 @@ class SemanticValue<T> {
       return name;
     }
 
-    return 'State.as<$T>($name)';
+    return '($name as dynamic) as $T';
   }
 }

@@ -12,10 +12,10 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
     Map<String, Named> publish = const {}}) async {
   for (var i = 0; i < 2; i++) {
     context.pass = i;
+    context.classDeclarations.clear();
     context.globalDeclarations.clear();
     context.globalRegistry.clear();
     context.globalAllocator = context.globalAllocator.clone();
-    context.classDeclarations.clear();
     for (final parser in parsers) {
       context.localAllocator = context.localAllocator.clone();
       final result = context.getResult(parser, true);

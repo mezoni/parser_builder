@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 import 'combinator.dart';
 import 'parser_builder.dart';
 

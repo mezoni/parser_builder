@@ -1,13 +1,13 @@
 part of '../../combinator.dart';
 
-class AddToPos<I> extends ParserBuilder<I, void> {
+class Advance<I> extends ParserBuilder<I, void> {
   static const _template = '''
 state.ok = true;
 state.pos += {{value}};''';
 
   final int value;
 
-  const AddToPos(this.value);
+  const Advance(this.value);
 
   @override
   String build(Context context, ParserResult? result) {
