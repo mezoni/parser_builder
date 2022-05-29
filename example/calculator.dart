@@ -4,6 +4,23 @@ void main() {
   print(result);
 }
 
+num _calculate(num left, String operator, num right) {
+  switch (operator) {
+    case '+':
+      return left + right;
+    case '-':
+      return left - right;
+    case '*':
+      return left * right;
+    case '/':
+      return left / right;
+    case '~/':
+      return left ~/ right;
+    default:
+      throw StateError('Unknown operator: $operator');
+  }
+}
+
 num parse(String source) {
   final state = State(source);
   final result = _parse(state);
@@ -15,11 +32,230 @@ num parse(String source) {
   return result!;
 }
 
-num? _additive(State<String> state) {
+void _ws(State<String> state) {
+  final source = state.source;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c <= 13
+        ? c <= 10
+            ? c >= 9
+            : c == 13
+        : c == 32;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = true;
+}
+
+num? _parse(State<String> state) {
+  num? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  _ws(state);
+  if (state.ok) {
+    $0 = _expression(state);
+    if (state.ok) {
+      state.ok = state.pos >= source.length;
+      if (!state.ok) {
+        state.fail(state.pos, ParseError.expected, 'EOF');
+      }
+    }
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
+  }
+  return $0;
+}
+
+void _digit1(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  while (state.pos < source.length) {
+    final c = source.codeUnitAt(state.pos);
+    final ok = c <= 57 && c >= 48;
+    if (!ok) {
+      break;
+    }
+    state.pos++;
+  }
+  state.ok = state.pos != $pos;
+  if (!state.ok) {
+    state.fail($pos, ParseError.character);
+  }
+}
+
+num? _numberImpl(State<String> state) {
+  num? $0;
+  final source = state.source;
+  final $log = state.log;
+  state.log = false;
+  String? $1;
+  final $pos = state.pos;
+  final $pos1 = state.pos;
+  _digit1(state);
+  if (state.ok) {
+    final $pos2 = state.pos;
+    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 46;
+    if (state.ok) {
+      state.pos += 1;
+    } else {
+      state.fail(state.pos, ParseError.expected, '.');
+    }
+    if (state.ok) {
+      _digit1(state);
+      if (!state.ok) {
+        state.pos = $pos2;
+      }
+    }
+    if (!state.ok) {
+      state.ok = true;
+    }
+    if (!state.ok) {
+      state.pos = $pos1;
+    }
+  }
+  if (state.ok) {
+    $1 = source.slice($pos, state.pos);
+  }
+  if (state.ok) {
+    final v = $1!;
+    $0 = num.parse(v);
+  }
+  state.log = $log;
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.expected, 'number');
+  }
+  return $0;
+}
+
+num? _number(State<String> state) {
+  num? $0;
+  final $pos = state.pos;
+  $0 = _numberImpl(state);
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
+  }
+  return $0;
+}
+
+void _openParen(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 40;
+  if (state.ok) {
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, '(');
+  }
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  }
+}
+
+void _closeParen(State<String> state) {
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 41;
+  if (state.ok) {
+    state.pos += 1;
+  } else {
+    state.fail(state.pos, ParseError.expected, ')');
+  }
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      state.pos = $pos;
+    }
+  }
+}
+
+num? _primary(State<String> state) {
+  num? $0;
+  final $pos = state.minErrorPos;
+  state.minErrorPos = state.pos + 1;
+  $0 = _number(state);
+  if (!state.ok) {
+    final $pos1 = state.pos;
+    _openParen(state);
+    if (state.ok) {
+      $0 = _expression(state);
+      if (state.ok) {
+        _closeParen(state);
+      }
+      if (!state.ok) {
+        $0 = null;
+        state.pos = $pos1;
+      }
+    }
+  }
+  state.minErrorPos = $pos;
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.expected, 'expression');
+  }
+  return $0;
+}
+
+String? _multiplicativeOperator(State<String> state) {
+  String? $0;
+  final source = state.source;
+  final $pos = state.pos;
+  state.ok = state.pos < source.length;
+  if (state.ok) {
+    final pos = state.pos;
+    final c = source.codeUnitAt(pos);
+    state.ok = false;
+    if (c == 42) {
+      state.ok = true;
+      state.pos += 1;
+      if (state.ok) {
+        $0 = '*';
+      }
+    } else if (c == 47) {
+      state.ok = true;
+      state.pos += 1;
+      if (state.ok) {
+        $0 = '/';
+      }
+    } else if (c == 126) {
+      if (source.startsWith('~/', pos)) {
+        state.ok = true;
+        state.pos += 2;
+        if (state.ok) {
+          $0 = '~/';
+        }
+      }
+    }
+  }
+  if (!state.ok) {
+    state.fail(state.pos, ParseError.expected, '*');
+    state.fail(state.pos, ParseError.expected, '/');
+    state.fail(state.pos, ParseError.expected, '~/');
+  }
+  if (state.ok) {
+    _ws(state);
+    if (!state.ok) {
+      $0 = null;
+      state.pos = $pos;
+    }
+  }
+  return $0;
+}
+
+num? _multiplicative(State<String> state) {
   num? $0;
   num? $left;
   num? $1;
-  $1 = _multiplicative(state);
+  $1 = _primary(state);
   if (state.ok) {
     $left = $1;
     while (true) {
@@ -27,14 +263,14 @@ num? _additive(State<String> state) {
       String? $2;
       final $log = state.log;
       state.log = false;
-      $2 = _additiveOperator(state);
+      $2 = _multiplicativeOperator(state);
       state.log = $log;
       if (!state.ok) {
         state.ok = true;
         break;
       }
       num? $3;
-      $3 = _multiplicative(state);
+      $3 = _primary(state);
       if (!state.ok) {
         state.pos = $pos;
         break;
@@ -87,55 +323,45 @@ String? _additiveOperator(State<String> state) {
   return $0;
 }
 
-num _calculate(num left, String operator, num right) {
-  switch (operator) {
-    case '+':
-      return left + right;
-    case '-':
-      return left - right;
-    case '*':
-      return left * right;
-    case '/':
-      return left / right;
-    case '~/':
-      return left ~/ right;
-    default:
-      throw StateError('Unknown operator: $operator');
-  }
-}
-
-void _closeParen(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 41;
+num? _additive(State<String> state) {
+  num? $0;
+  num? $left;
+  num? $1;
+  $1 = _multiplicative(state);
   if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.fail(state.pos, ParseError.expected, ')');
-  }
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
+    $left = $1;
+    while (true) {
+      final $pos = state.pos;
+      String? $2;
+      final $log = state.log;
+      state.log = false;
+      $2 = _additiveOperator(state);
+      state.log = $log;
+      if (!state.ok) {
+        state.ok = true;
+        break;
+      }
+      num? $3;
+      $3 = _multiplicative(state);
+      if (!state.ok) {
+        state.pos = $pos;
+        break;
+      }
+      final $op = $2!;
+      final $right = $3!;
+      $left = _calculate($left!, $op, $right);
     }
   }
+  if (state.ok) {
+    $0 = $left;
+  }
+  return $0;
 }
 
-void _digit1(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  while (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c <= 57 && c >= 48;
-    if (!ok) {
-      break;
-    }
-    state.pos++;
-  }
-  state.ok = state.pos != $pos;
-  if (!state.ok) {
-    state.fail($pos, ParseError.character);
-  }
+num? _expression(State<String> state) {
+  num? $0;
+  $0 = _additive(state);
+  return $0;
 }
 
 String _errorMessage(String source, List<ParseError> errors) {
@@ -206,230 +432,51 @@ String _errorMessage(String source, List<ParseError> errors) {
   return sb.toString();
 }
 
-num? _expression(State<String> state) {
-  num? $0;
-  $0 = _additive(state);
-  return $0;
-}
+extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
 
-num? _multiplicative(State<String> state) {
-  num? $0;
-  num? $left;
-  num? $1;
-  $1 = _primary(state);
-  if (state.ok) {
-    $left = $1;
-    while (true) {
-      final $pos = state.pos;
-      String? $2;
-      final $log = state.log;
-      state.log = false;
-      $2 = _multiplicativeOperator(state);
-      state.log = $log;
-      if (!state.ok) {
-        state.ok = true;
-        break;
+        state.pos--;
       }
-      num? $3;
-      $3 = _primary(state);
-      if (!state.ok) {
-        state.pos = $pos;
-        break;
-      }
-      final $op = $2!;
-      final $right = $3!;
-      $left = _calculate($left!, $op, $right);
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
     }
-  }
-  if (state.ok) {
-    $0 = $left;
-  }
-  return $0;
-}
 
-String? _multiplicativeOperator(State<String> state) {
-  String? $0;
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
-    if (c == 42) {
-      state.ok = true;
-      state.pos += 1;
-      if (state.ok) {
-        $0 = '*';
-      }
-    } else if (c == 47) {
-      state.ok = true;
-      state.pos += 1;
-      if (state.ok) {
-        $0 = '/';
-      }
-    } else if (c == 126) {
-      if (source.startsWith('~/', pos)) {
-        state.ok = true;
-        state.pos += 2;
-        if (state.ok) {
-          $0 = '~/';
+    return w1;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
         }
       }
-    }
-  }
-  if (!state.ok) {
-    state.fail(state.pos, ParseError.expected, '*');
-    state.fail(state.pos, ParseError.expected, '/');
-    state.fail(state.pos, ParseError.expected, '~/');
-  }
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      $0 = null;
-      state.pos = $pos;
-    }
-  }
-  return $0;
-}
 
-num? _number(State<String> state) {
-  num? $0;
-  final $pos = state.pos;
-  $0 = _numberImpl(state);
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      $0 = null;
-      state.pos = $pos;
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
     }
-  }
-  return $0;
-}
 
-num? _numberImpl(State<String> state) {
-  num? $0;
-  final source = state.source;
-  final $log = state.log;
-  state.log = false;
-  String? $1;
-  final $pos = state.pos;
-  final $pos1 = state.pos;
-  _digit1(state);
-  if (state.ok) {
-    final $pos2 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 46;
-    if (state.ok) {
-      state.pos += 1;
-    } else {
-      state.fail(state.pos, ParseError.expected, '.');
-    }
-    if (state.ok) {
-      _digit1(state);
-      if (!state.ok) {
-        state.pos = $pos2;
-      }
-    }
-    if (!state.ok) {
-      state.ok = true;
-    }
-    if (!state.ok) {
-      state.pos = $pos1;
-    }
+    return w1;
   }
-  if (state.ok) {
-    $1 = source.slice($pos, state.pos);
-  }
-  if (state.ok) {
-    final v = $1!;
-    $0 = num.parse(v);
-  }
-  state.log = $log;
-  if (!state.ok) {
-    state.fail(state.pos, ParseError.expected, 'number');
-  }
-  return $0;
-}
 
-void _openParen(State<String> state) {
-  final source = state.source;
-  final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 40;
-  if (state.ok) {
-    state.pos += 1;
-  } else {
-    state.fail(state.pos, ParseError.expected, '(');
+  /// Returns a slice (substring) of the string from [start] to [end].
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String slice(int start, int end) {
+    return substring(start, end);
   }
-  if (state.ok) {
-    _ws(state);
-    if (!state.ok) {
-      state.pos = $pos;
-    }
-  }
-}
-
-num? _parse(State<String> state) {
-  num? $0;
-  final source = state.source;
-  final $pos = state.pos;
-  _ws(state);
-  if (state.ok) {
-    $0 = _expression(state);
-    if (state.ok) {
-      state.ok = state.pos >= source.length;
-      if (!state.ok) {
-        state.fail(state.pos, ParseError.expected, 'EOF');
-      }
-    }
-    if (!state.ok) {
-      $0 = null;
-      state.pos = $pos;
-    }
-  }
-  return $0;
-}
-
-num? _primary(State<String> state) {
-  num? $0;
-  final $pos = state.minErrorPos;
-  state.minErrorPos = state.pos + 1;
-  $0 = _number(state);
-  if (!state.ok) {
-    final $pos1 = state.pos;
-    _openParen(state);
-    if (state.ok) {
-      $0 = _expression(state);
-      if (state.ok) {
-        _closeParen(state);
-      }
-      if (!state.ok) {
-        $0 = null;
-        state.pos = $pos1;
-      }
-    }
-  }
-  state.minErrorPos = $pos;
-  if (!state.ok) {
-    state.fail(state.pos, ParseError.expected, 'expression');
-  }
-  return $0;
-}
-
-void _ws(State<String> state) {
-  final source = state.source;
-  while (state.pos < source.length) {
-    final c = source.codeUnitAt(state.pos);
-    final ok = c <= 13
-        ? c <= 10
-            ? c >= 9
-            : c == 13
-        : c == 32;
-    if (!ok) {
-      break;
-    }
-    state.pos++;
-  }
-  state.ok = true;
 }
 
 class ParseError {
@@ -665,107 +712,5 @@ class State<T> {
     }
 
     return result;
-  }
-}
-
-extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readRune(State<String> state) {
-    final w1 = codeUnitAt(state.pos++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (state.pos < length) {
-        final w2 = codeUnitAt(state.pos++);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-
-        state.pos--;
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
-    }
-
-    return w1;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int runeAt(int index) {
-    final w1 = codeUnitAt(index++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 1);
-    }
-
-    return w1;
-  }
-
-  /// Returns a slice (substring) of the string from [start] to [end].
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  String slice(int start, int end) {
-    return substring(start, end);
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  String? tag(State<String> state, String tag) {
-    // ignore: prefer_is_empty
-    if (tag.length == 0) {
-      throw ArgumentError('Tag must not be empty');
-    }
-
-    final pos = state.pos;
-    state.ok =
-        pos < length && codeUnitAt(pos) == tag.codeUnitAt(0) && startsWith(tag);
-    if (state.ok) {
-      state.pos += tag.length;
-      return tag;
-    }
-
-    return null;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  String? tag1(State<String> state, String tag) {
-    if (tag.length != 1) {
-      throw ArgumentError.value(tag, 'tag', 'Length must be equal to 1');
-    }
-
-    final pos = state.pos;
-    state.ok = pos < length && codeUnitAt(pos) == tag.codeUnitAt(0);
-    if (state.ok) {
-      state.pos++;
-      return tag;
-    }
-
-    return null;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  String? tag2(State<String> state, String tag) {
-    if (tag.length != 2) {
-      throw ArgumentError.value(tag, 'tag', 'Length must be equal to 2');
-    }
-
-    final pos = state.pos;
-    state.ok = pos + 1 < length &&
-        codeUnitAt(pos) == tag.codeUnitAt(0) &&
-        codeUnitAt(pos + 1) == tag.codeUnitAt(1);
-    if (state.ok) {
-      state.pos += 2;
-      return tag;
-    }
-
-    return null;
   }
 }

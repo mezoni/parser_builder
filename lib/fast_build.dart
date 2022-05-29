@@ -61,8 +61,10 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
   if (format) {
     final process =
         await Process.start(Platform.executable, ['format', filename]);
-    await process.stdout.transform(utf8.decoder).forEach(print);
-    await process.stderr.transform(utf8.decoder).forEach(print);
+    // ignore: unawaited_futures
+    process.stdout.transform(utf8.decoder).forEach(print);
+    // ignore: unawaited_futures
+    process.stderr.transform(utf8.decoder).forEach(print);
   }
 }
 
