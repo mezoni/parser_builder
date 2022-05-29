@@ -821,7 +821,7 @@ int? many0CountC32(State<String> state) {
 
 List<int>? many1C32(State<String> state) {
   List<int>? $0;
-  var $list = <int>[];
+  final $list = <int>[];
   while (true) {
     int? $1;
     $1 = char32(state);
@@ -1049,13 +1049,13 @@ String? memoizeC16C32OrC16(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   final $pos1 = state.pos;
-  final $memo = state.memoized<int?>(0, true, state.pos);
+  final $memo = state.memoized<void>(0, true, state.pos);
   if ($memo != null) {
     $memo.restore(state);
   } else {
     final $pos2 = state.pos;
     char16(state);
-    state.memoize<int?>(0, true, $pos2);
+    state.memoize<void>(0, true, $pos2);
   }
   if (state.ok) {
     char32(state);
@@ -1068,13 +1068,13 @@ String? memoizeC16C32OrC16(State<String> state) {
   }
   if (!state.ok) {
     final $pos3 = state.pos;
-    final $memo1 = state.memoized<int?>(0, true, state.pos);
+    final $memo1 = state.memoized<void>(0, true, state.pos);
     if ($memo1 != null) {
       $memo1.restore(state);
     } else {
       final $pos4 = state.pos;
       char16(state);
-      state.memoize<int?>(0, true, $pos4);
+      state.memoize<void>(0, true, $pos4);
     }
     if (state.ok) {
       $0 = source.slice($pos3, state.pos);
@@ -1149,7 +1149,7 @@ int? noneOfOfC16OrC32(State<String> state) {
     }
     if (state.ok) {
       final pos = state.pos;
-      var c = source.readRune(state);
+      final c = source.readRune(state);
       final list = $1!;
       for (var i = 0; i < list.length; i++) {
         final ch = list[i];
@@ -2672,7 +2672,7 @@ int? transformersVarIsNotDigit(State<String> state) {
     }
     if (state.ok) {
       final pos = state.pos;
-      var c = source.readRune(state);
+      final c = source.readRune(state);
       final list = $1!;
       for (var i = 0; i < list.length; i++) {
         final ch = list[i];
@@ -3020,7 +3020,7 @@ class State<T> {
     }
 
     for (final start in expected.keys) {
-      final values = expected[start]!.toSet().map((e) => _escape(e));
+      final values = expected[start]!.toSet().map(_escape);
       final text = 'Expecting: ${values.join(', ')}';
       final error = ParseError(start, start, text);
       result.add(error);

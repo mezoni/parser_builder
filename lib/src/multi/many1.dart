@@ -2,7 +2,7 @@ part of '../../multi.dart';
 
 class Many1<I, O> extends ParserBuilder<I, List<O>> {
   static const _template = '''
-var {{list}} = <{{O}}>[];
+final {{list}} = <{{O}}>[];
 while (true) {
   {{var1}}
   {{p1}}

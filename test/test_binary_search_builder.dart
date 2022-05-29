@@ -48,7 +48,7 @@ void main() async {
               final results = message as List<bool>;
               for (var i = 0; i < results.length; i++) {
                 final result = results[i];
-                var found =
+                final found =
                     ranges.where((e) => i >= e.start && i <= e.end).isEmpty;
                 final matcher = negate ? found : !found;
                 expect(result, matcher, reason: '''

@@ -14,7 +14,7 @@ if (state.pos < source.length) {
   {{p1}}
   if (state.ok) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final list = {{val1}};
     for (var i = 0; i < list.length; i++) {
       final ch = list[i];
@@ -40,7 +40,7 @@ if (state.pos < source.length) {
   {{p1}}
   if (state.ok) {
     final pos = state.pos;
-    var c = source.readRune(state);
+    final c = source.readRune(state);
     final list = {{val1}};
     for (var i = 0; i < list.length; i++) {
       final ch = list[i];

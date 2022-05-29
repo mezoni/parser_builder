@@ -36,7 +36,7 @@ abstract class ParserBuilder<I, O> {
     }
 
     final isNullable = isNullableResultType();
-    return (isNullable ? name : '$name!');
+    return isNullable ? name : '$name!';
   }
 
   bool isNullableResultType() {

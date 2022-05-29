@@ -1082,7 +1082,7 @@ class State<T> {
     }
 
     for (final start in expected.keys) {
-      final values = expected[start]!.toSet().map((e) => _escape(e));
+      final values = expected[start]!.toSet().map(_escape);
       final text = 'Expecting: ${values.join(', ')}';
       final error = ParseError(start, start, text);
       result.add(error);

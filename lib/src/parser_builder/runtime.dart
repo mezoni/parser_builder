@@ -337,7 +337,7 @@ class State<T> {
     }
 
     for (final start in expected.keys) {
-      final values = expected[start]!.toSet().map((e) => _escape(e));
+      final values = expected[start]!.toSet().map(_escape);
       final text = 'Expecting: ${values.join(', ')}';
       final error = ParseError(start, start, text);
       result.add(error);
@@ -543,7 +543,7 @@ class State<T> {
     }
 
     for (final start in expected.keys) {
-      final values = expected[start]!.toSet().map((e) => _escape(e));
+      final values = expected[start]!.toSet().map(_escape);
       final text = 'Expecting: ${values.join(', ')}';
       final error = ParseError(start, start, text);
       result.add(error);
@@ -792,7 +792,7 @@ String _errorMessage(String source, List<ParseError> errors) {
   }
 
   static String getErrorMessageProcessor() {
-    var result = _functionErrorMessage;
+    final result = _functionErrorMessage;
     return result;
   }
 

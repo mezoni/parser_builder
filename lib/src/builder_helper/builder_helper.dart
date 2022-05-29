@@ -74,7 +74,7 @@ String escapeString(String text, [bool quote = true]) {
   return '\'$text\'';
 }
 
-String getAsCode(dynamic value) {
+String getAsCode(Object? value) {
   final result = tryGetAsCode(value);
   if (result != null) {
     return result;
@@ -86,7 +86,7 @@ String getAsCode(dynamic value) {
 bool isNullableType<T>() {
   try {
     // ignore: unused_local_variable
-    T val = null as T;
+    final T val = null as T;
   } catch (e) {
     return false;
   }
@@ -103,7 +103,7 @@ String toHex(int value) {
   return '0x${value.toRadixString(16).toUpperCase()}';
 }
 
-String? tryGetAsCode(dynamic value) {
+String? tryGetAsCode(Object? value) {
   if (value is String) {
     final escaped = escapeString(value);
     return escaped;

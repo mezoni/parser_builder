@@ -1,3 +1,7 @@
+## 2.0.30
+
+- Cosmetic code improvements
+
 ## 2.0.29
 
 - Breaking change: Because `semantic values` doesn't exactly match what was implemented as `semantic values`, what was implemented as `semantic values` was renamed to `capture`. The `capture` in this case means to capture some value for arbitrary use of this value later. The main purpose is to provide the ability to generate errors of any complexity anywhere. All the problems are that Dart, unlike other modern languages, does not have support for functions that return constant values. I don’t understand at all how one can do without it and simultaneously develop static meta programming where macro annotations built on heavy use of constants (to define meta features). If Dart supported such features, then there would be no need for these `tricks`. Because defining a parser as one huge constant is the essence of what is part of static meta-programming

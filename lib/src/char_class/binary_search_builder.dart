@@ -135,7 +135,7 @@ class BinarySearchBuilder {
   String _buildTriple(String name, _Triple triple) {
     var less = triple.less;
     final middle = triple.middle;
-    var greater = triple.greater;
+    final greater = triple.greater;
     final range = middle.range;
     final start = range.start;
     final end = range.end;

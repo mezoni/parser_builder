@@ -79,7 +79,7 @@ const _range = Named(
     Alt<String, List<Result2<int, int>>>([
       Delimited(Tag('['), Many1(_rangeBody), Tag(']')),
       Map1(Alt([_char, _hex]),
-          ExpressionAction(['x'], ('[Result2({{x}}, {{x}})]'))),
+          ExpressionAction(['x'], '[Result2({{x}}, {{x}})]')),
     ]));
 
 const _rangeBody = Named(

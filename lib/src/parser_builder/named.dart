@@ -120,7 +120,7 @@ class Named<I, O> extends ParserBuilder<I, O> {
   }
 
   void _registerParserMode(Context context, bool fast) {
-    var modes = _getParserModes(context);
+    final modes = _getParserModes(context);
     modes.add(fast);
   }
 }

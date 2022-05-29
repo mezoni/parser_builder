@@ -61,8 +61,8 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
   if (format) {
     final process =
         await Process.start(Platform.executable, ['format', filename]);
-    process.stdout.transform(utf8.decoder).forEach(print);
-    process.stderr.transform(utf8.decoder).forEach(print);
+    await process.stdout.transform(utf8.decoder).forEach(print);
+    await process.stderr.transform(utf8.decoder).forEach(print);
   }
 }
 

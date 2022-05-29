@@ -53,7 +53,7 @@ if ({{memo}} != null) {
 
   int _allocateId(Context context) {
     int getId() {
-      var id = context.readRegistryValue(
+      final id = context.readRegistryValue(
           context.globalRegistry, Memoize, 'id', () => 0);
       context.writeRegistryValue(context.globalRegistry, Memoize, 'id', id + 1);
       return id;

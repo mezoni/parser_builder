@@ -237,7 +237,7 @@ List<Result2<int, int>>? _range(State<String> state) {
     state.fail(state.pos, ParseError.expected, '[');
   }
   if (state.ok) {
-    var $list = <Result2<int, int>>[];
+    final $list = <Result2<int, int>>[];
     while (true) {
       Result2<int, int>? $1;
       $1 = _rangeBody(state);
@@ -635,7 +635,7 @@ class State<T> {
     }
 
     for (final start in expected.keys) {
-      final values = expected[start]!.toSet().map((e) => _escape(e));
+      final values = expected[start]!.toSet().map(_escape);
       final text = 'Expecting: ${values.join(', ')}';
       final error = ParseError(start, start, text);
       result.add(error);
@@ -717,6 +717,8 @@ class State<T> {
 
     return result;
   }
+
+  static T as<T>(T? value) => value as T;
 }
 
 List<T> _flatten<T>(List<List<T>> data, List<T> result) {
