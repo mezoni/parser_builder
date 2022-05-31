@@ -1,3 +1,7 @@
+## 2.0.32
+
+- The `bool optimizeForSize` parameter has been added to the `fastBuild` function. This allows to reduce the size of the generated parser code. At the moment, this refers to the generation of `Tag` parsers. Instead of fast and cumbersome (inlined) code, compact and slightly slow code (of calling a static extension method) will be generated
+
 ## 2.0.31
 
  - Unused templates have been removed from the `ParseRuntime` class

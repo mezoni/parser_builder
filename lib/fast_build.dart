@@ -8,8 +8,10 @@ Future<void> fastBuild(Context context, List<Named> parsers, String filename,
     String? footer,
     bool format = true,
     String? header,
+    bool optimizeForSize = false,
     String? partOf,
     Map<String, Named> publish = const {}}) async {
+  context.optimizeForSize = optimizeForSize;
   for (var i = 0; i < 2; i++) {
     context.pass = i;
     context.classDeclarations.clear();
