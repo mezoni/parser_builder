@@ -691,6 +691,13 @@ abstract class Utf16Reader {
   String substring(int start, [int? end]);
 }''';
 
+  static const _extensionAs = '''
+extension on Object {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  R as<R>() => this as R;
+}''';
+
   static const _extensionString = r'''
 extension on String {
   @pragma('vm:prefer-inline')
@@ -919,6 +926,7 @@ String _errorMessage(String source, List<ParseError> errors) {
     _addClass(context, 'State', _classStateNoMemo, !hasClassMemoizedResult);
     _addClass(context, 'State', _classState, true);
     _addClass(context, 'ParseError', _classParseError, true);
+    context.globalDeclarations.add(_extensionAs);
     if (context.optimizeForSize) {
       context.globalDeclarations.add(_extensionStringSize);
     } else {

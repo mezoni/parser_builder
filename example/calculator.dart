@@ -432,6 +432,12 @@ String _errorMessage(String source, List<ParseError> errors) {
   return sb.toString();
 }
 
+extension on Object {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  R as<R>() => this as R;
+}
+
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element

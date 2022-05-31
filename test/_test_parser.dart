@@ -743,8 +743,8 @@ String? indicateAbc4Digits(State<String> state) {
       }
     }
     if (!state.ok) {
-      state.fail(state.lastErrorPos, ParseError.message, 'indicate',
-          ($1 as dynamic) as int, state.lastErrorPos);
+      state.fail(state.lastErrorPos, ParseError.message, 'indicate', $1.as(),
+          state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos1);
     if (!state.ok) {
@@ -2745,6 +2745,12 @@ void verifyIs3DigitFast(State<String> state) {
       state.pos = $pos;
     }
   }
+}
+
+extension on Object {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  R as<R>() => this as R;
 }
 
 extension on String {

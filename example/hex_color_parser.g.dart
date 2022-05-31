@@ -92,7 +92,7 @@ Color? _hexColor(State<String> state) {
           state.lastErrorPos,
           ParseError.message,
           'A hexadecimal color starting with "#" must be followed by 6 hexadecimal digits',
-          ($1 as dynamic) as int,
+          $1.as(),
           state.lastErrorPos);
     }
     state.restoreLastErrorPos($pos2);
@@ -179,6 +179,12 @@ String _errorMessage(String source, List<ParseError> errors) {
   }
 
   return sb.toString();
+}
+
+extension on Object {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  R as<R>() => this as R;
 }
 
 extension on String {
