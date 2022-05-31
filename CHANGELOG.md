@@ -1,3 +1,8 @@
+## 2.0.31
+
+ - Unused templates have been removed from the `ParseRuntime` class
+ - The runtime code has been modified in order to eliminate the `Missing type argument for list literal` Dart analyzer error when the `implicit_dynamic_list_literal` lint is enabled
+
 ## 2.0.30
 
 - Cosmetic code improvements

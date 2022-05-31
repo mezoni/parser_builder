@@ -1071,7 +1071,7 @@ class State<T> {
     }
 
     final result = <ParseError>[];
-    final expected = <int, List>{};
+    final expected = <int, List<Object?>>{};
     for (var i = 0; i < _length; i++) {
       final kind = _kinds[i];
       if (kind == ParseError.expected) {

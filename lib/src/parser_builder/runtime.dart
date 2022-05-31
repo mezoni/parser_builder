@@ -320,7 +320,7 @@ class State<T> {
     }
 
     final result = <ParseError>[];
-    final expected = <int, List>{};
+    final expected = <int, List<Object?>>{};
     for (var i = 0; i < _length; i++) {
       final kind = _kinds[i];
       if (kind == ParseError.expected) {
@@ -524,7 +524,7 @@ class State<T> {
     }
 
     final result = <ParseError>[];
-    final expected = <int, List>{};
+    final expected = <int, List<Object?>>{};
     for (var i = 0; i < _length; i++) {
       final kind = _kinds[i];
       if (kind == ParseError.expected) {
@@ -623,72 +623,6 @@ class State<T> {
 
     return result;
   }
-}''';
-
-  static const _classStringReader = '''
-class StringReader implements Utf16Reader {
-  @override
-  final int length;
-
-  StringReader(this.source) : length = source.length;
-
-  int codeUnitAt(int index) => source.codeUnitAt(index);
-
-  @pragma('vm:prefer-inline')
-  int readRune(State<StringReader> state) {
-    final w1 = codeUnitAt(state.pos++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (state.pos < length) {
-        final w2 = codeUnitAt(state.pos++);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-
-        state.pos--;
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
-    }
-
-    return w1;
-  }
-
-  @pragma('vm:prefer-inline')
-  int runeAt(int index) {
-    final w1 = codeUnitAt(index++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 1);
-    }
-
-    return w1;
-  }
-
-  bool startsWith(String pattern, [int index = 0]) =>
-      source.startsWith(pattern, index);
-
-  String substring(int start, [int? end]) => source.substring(start, end);
-}''';
-
-  static const _classUtf16Reader = '''
-abstract class Utf16Reader {
-  int get length;
-
-  int codeUnitAt(int index);
-
-  int readRune(State<StringReader> state);
-
-  int runeAt(int index);
-
-  bool startsWith(String pattern, int index);
-
-  String substring(int start, [int? end]);
 }''';
 
   static const _extensionAs = '''
