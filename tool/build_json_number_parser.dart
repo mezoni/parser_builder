@@ -6,7 +6,7 @@ import 'package:parser_builder/sequence.dart';
 
 Future<void> main(List<String> args) async {
   final context = Context();
-  final filename = 'test/_json_number_parser.dart';
+  const filename = 'test/_json_number_parser.dart';
   await fastBuild(context, [_parser], filename, header: __header);
 }
 

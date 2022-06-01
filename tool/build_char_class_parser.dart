@@ -9,7 +9,7 @@ import 'package:parser_builder/sequence.dart';
 
 Future<void> main(List<String> args) async {
   final context = Context();
-  final filename = 'lib/src/char_class/char_class_parser.dart';
+  const filename = 'lib/src/char_class/char_class_parser.dart';
   await fastBuild(context, [_parse], filename,
       footer: __footer, publish: {'parseString': _parse});
 }

@@ -1,5 +1,5 @@
 void main() {
-  final source = '1 + 2 * 3 * (1 + 2.0)';
+  const source = '1 + 2 * 3 * (1 + 2.0)';
   final result = parse(source);
   print(result);
 }

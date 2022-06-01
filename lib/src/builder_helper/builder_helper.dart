@@ -85,7 +85,7 @@ String getAsCode(Object? value) {
 
 bool isNullableType<T>() {
   try {
-    // ignore: unused_local_variable
+    // ignore: unused_local_variable, prefer_const_declarations
     final T val = null as T;
   } catch (e) {
     return false;

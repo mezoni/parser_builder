@@ -654,7 +654,7 @@ String? identifier(State<String> state) {
       final text = source.slice($pos, state.pos);
       final length = text.length;
       final c = text.codeUnitAt(0);
-      final words = const <List<String>>[
+      const words = <List<String>>[
         ['else'],
         ['for', 'foreach'],
         ['if', 'in', 'int'],
@@ -2460,7 +2460,7 @@ dynamic tokenizeTagsIfForWhile(State<String> state) {
         state.pos += 2;
         state.ok = true;
         final v1 = pos;
-        final v2 = 'if';
+        const v2 = 'if';
         $0 = Token<String>(TokenKind.text, v2, v1, state.pos, v2);
       }
     } else if (c == 102) {
@@ -2468,7 +2468,7 @@ dynamic tokenizeTagsIfForWhile(State<String> state) {
         state.pos += 3;
         state.ok = true;
         final v1 = pos;
-        final v2 = 'for';
+        const v2 = 'for';
         $0 = Token<String>(TokenKind.text, v2, v1, state.pos, v2);
       }
     } else if (c == 119) {
@@ -2476,7 +2476,7 @@ dynamic tokenizeTagsIfForWhile(State<String> state) {
         state.pos += 5;
         state.ok = true;
         final v1 = pos;
-        final v2 = 'while';
+        const v2 = 'while';
         $0 = Token<String>(TokenKind.text, v2, v1, state.pos, v2);
       }
     }
@@ -2647,7 +2647,7 @@ String? transformersNotCharClassIsDigit(State<String> state) {
 int? transformersVarIsNotDigit(State<String> state) {
   int? $0;
   final source = state.source;
-  final $calculate = const [
+  const $calculate = [
     0x30,
     0x31,
     0x32,

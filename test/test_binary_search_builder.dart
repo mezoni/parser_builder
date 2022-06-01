@@ -6,7 +6,7 @@ import 'package:parser_builder/src/char_class/binary_search_builder.dart';
 import 'package:test/test.dart';
 
 void main() async {
-  final count = 250;
+  const count = 250;
   final generators = [
     _generateComplexNotStartighWithZero,
     _generateComplexStartingWithZero,
@@ -24,7 +24,7 @@ void main() async {
           var contents = _template;
           contents = contents.replaceAll('{{code}}', code);
           final directory = Directory.current;
-          final relative = 'test/_test_test_binary_search_builder.dart';
+          const relative = 'test/_test_test_binary_search_builder.dart';
           final path = '${directory.path}/$relative';
           final uri = Uri.file(path);
           File(relative).writeAsStringSync(contents);

@@ -1,5 +1,5 @@
 void main() {
-  final s = '100000.00123e3';
+  const s = '100000.00123e3';
   final x = double.parse(s);
   print(s);
   print(x);

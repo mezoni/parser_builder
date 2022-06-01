@@ -115,7 +115,7 @@ Future<void> main(List<String> args) async {
     _verifyIs3DigitFast,
   ];
 
-  final filename = 'test/_test_parser.dart';
+  const filename = 'test/_test_parser.dart';
   await fastBuild(context, builders, filename,
       addErrorMessageProcessor: false, header: __header);
 }

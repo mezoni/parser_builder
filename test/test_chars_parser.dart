@@ -8,7 +8,7 @@ void main(List<String> args) {
 
 void _test() {
   test('CharClassParser', () {
-    final parser = parse;
+    const parser = parse;
     {
       final state = State(' "1" ');
       final r = parser(state);

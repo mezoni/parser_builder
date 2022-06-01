@@ -902,7 +902,7 @@ String _errorMessage(String source, List<ParseError> errors) {
   }
 
   static String getErrorMessageProcessor() {
-    final result = _functionErrorMessage;
+    const result = _functionErrorMessage;
     return result;
   }
 

@@ -97,7 +97,7 @@ void _test() {
 
 void _testAlpha0() {
   test('Alpha0', () {
-    final parser = alpha0;
+    const parser = alpha0;
     {
       final state = State('a');
       final r = parser(state);
@@ -159,7 +159,7 @@ void _testAlpha0() {
 
 void _testAlpha1() {
   test('Alpha1', () {
-    final parser = alpha1;
+    const parser = alpha1;
     {
       final state = State('a');
       final r = parser(state);
@@ -204,7 +204,7 @@ void _testAlpha1() {
 
 void _testAlphanumeric0() {
   test('Alphanumeric0', () {
-    final parser = alphanumeric0;
+    const parser = alphanumeric0;
     {
       final state = State('a');
       final r = parser(state);
@@ -280,7 +280,7 @@ void _testAlphanumeric0() {
 
 void _testAlphanumeric1() {
   test('Alphanumeric1', () {
-    final parser = alphanumeric1;
+    const parser = alphanumeric1;
     {
       final state = State('a');
       final r = parser(state);
@@ -360,7 +360,7 @@ void _testAlphanumeric1() {
 
 void _testAlt() {
   test('Alt', () {
-    final parser = altC16OrC32;
+    const parser = altC16OrC32;
     {
       final state = State('$s16');
       final r = parser(state);
@@ -398,7 +398,7 @@ void _testAlt() {
 
 void _testAnd() {
   test('And', () {
-    final parser = andC32OrC16;
+    const parser = andC32OrC16;
     {
       final state = State('$s32');
       parser(state);
@@ -432,7 +432,7 @@ void _testAnd() {
 
 void _testAnyChar() {
   test('AnyChar', () {
-    final parser = anyChar;
+    const parser = anyChar;
     {
       final state = State('$s16');
       final r = parser(state);
@@ -461,7 +461,7 @@ void _testAnyChar() {
 
 void _testBinaryExpression() {
   test('BinaryExpression', () {
-    final parser = binaryExpressionAdd;
+    const parser = binaryExpressionAdd;
     {
       final state = State('1');
       final r = parser(state);
@@ -563,7 +563,7 @@ void _testChar() {
 
 void _testConsumed() {
   test('Consumed', () {
-    final parser = consumedSeparatedAbcC32;
+    const parser = consumedSeparatedAbcC32;
     {
       final state = State('$abc$s32$abc');
       final r = parser(state);
@@ -587,7 +587,7 @@ void _testConsumed() {
 
 void _testDelimited() {
   test('Delimited', () {
-    final parser = delimited;
+    const parser = delimited;
     {
       final state = State('$s16$s32$s16');
       final r = parser(state);
@@ -627,7 +627,7 @@ void _testDelimited() {
 
 void _testDigit0() {
   test('Digit0', () {
-    final parser = digit0;
+    const parser = digit0;
     {
       final state = State('1');
       final r = parser(state);
@@ -668,7 +668,7 @@ void _testDigit0() {
 
 void _testDigit1() {
   test('Digit1', () {
-    final parser = digit1;
+    const parser = digit1;
     {
       final state = State('1');
       final r = parser(state);
@@ -713,7 +713,7 @@ void _testDigit1() {
 
 void _testEof() {
   test('Eof', () {
-    final parser = eof;
+    const parser = eof;
     {
       final state = State('');
       parser(state);
@@ -733,7 +733,7 @@ void _testEof() {
 
 void _testEscapeSequence() {
   test('EscapeSequence', () {
-    final parser16 = escapeSequence16;
+    const parser16 = escapeSequence16;
     {
       final state = State('n');
       final r = parser16(state);
@@ -782,7 +782,7 @@ void _testEscapeSequence() {
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 2, "Unexpected '$s32'")]);
     }
-    final parser32 = escapeSequence32;
+    const parser32 = escapeSequence32;
     {
       final state = State('n');
       final r = parser32(state);
@@ -834,7 +834,7 @@ void _testEscapeSequence() {
 
 void _testExpected() {
   test('Expected', () {
-    final parser = expected2C16;
+    const parser = expected2C16;
     {
       final state = State('$s16$s16');
       final r = parser(state);
@@ -874,7 +874,7 @@ void _testExpected() {
 
 void _testFoldMany0() {
   test('Many0Fold', () {
-    final parser = foldMany0Digit;
+    const parser = foldMany0Digit;
     {
       final state = State('');
       final r = parser(state);
@@ -915,7 +915,7 @@ void _testFoldMany0() {
 
 void _testHexDigit0() {
   test('hexDigit0', () {
-    final parser = hexDigit0;
+    const parser = hexDigit0;
     {
       final state = State('0123456789abcdefABCDEF');
       final r = parser(state);
@@ -949,7 +949,7 @@ void _testHexDigit0() {
 
 void _testHexDigit1() {
   test('hexDigit1', () {
-    final parser = hexDigit1;
+    const parser = hexDigit1;
     {
       final state = State('0123456789abcdefABCDEF');
       final r = parser(state);
@@ -987,7 +987,7 @@ void _testHexDigit1() {
 
 void _testIdentifierExpression() {
   test('IdentifierExpression', () {
-    final parser = identifier;
+    const parser = identifier;
     {
       final state = State('a ');
       final r = parser(state);
@@ -1065,7 +1065,7 @@ void _testIdentifierExpression() {
 
 void _testMany0() {
   test('Many0', () {
-    final parser16 = many0C16;
+    const parser16 = many0C16;
     {
       final state = State('');
       final r = parser16(state);
@@ -1095,7 +1095,7 @@ void _testMany0() {
       expect(state.pos, 0);
     }
 
-    final parser32 = many0C32;
+    const parser32 = many0C32;
     {
       final state = State('');
       final r = parser32(state);
@@ -1129,7 +1129,7 @@ void _testMany0() {
 
 void _testMany0Count() {
   test('Many0Count', () {
-    final parser = many0CountC32;
+    const parser = many0CountC32;
     {
       final state = State('');
       final r = parser(state);
@@ -1163,7 +1163,7 @@ void _testMany0Count() {
 
 void _testMany1() {
   test('Many1', () {
-    final parser = many1C32;
+    const parser = many1C32;
     {
       final state = State('');
       final r = parser(state);
@@ -1201,7 +1201,7 @@ void _testMany1() {
 
 void _testMany1Count() {
   test('Many1Count', () {
-    final parser = many1CountC32;
+    const parser = many1CountC32;
     {
       final state = State('');
       final r = parser(state);
@@ -1238,7 +1238,7 @@ void _testMany1Count() {
 
 void _testManyMN() {
   test('ManyMN', () {
-    final parser2_3 = manyMNC32_2_3;
+    const parser2_3 = manyMNC32_2_3;
     {
       final state = State('');
       final r = parser2_3(state);
@@ -1292,7 +1292,7 @@ void _testManyMN() {
 
 void _testManyN() {
   test('ManyN', () {
-    final parser2 = manyNC32_2;
+    const parser2 = manyNC32_2;
     {
       final state = State('');
       final r = parser2(state);
@@ -1339,7 +1339,7 @@ void _testManyN() {
 
 void _testManyTill() {
   test('ManyTill', () {
-    final parser = manyTillAOrBTillAbc;
+    const parser = manyTillAOrBTillAbc;
     {
       final state = State('$abc');
       final r = parser(state);
@@ -1399,7 +1399,7 @@ void _testManyTill() {
 
 void _testMap() {
   test('Map4', () {
-    final parser = map4Digits;
+    const parser = map4Digits;
     {
       final state = State('1234');
       final r = parser(state);
@@ -1439,7 +1439,7 @@ void _testMap() {
 
 void _testMap1() {
   test('Map\$', () {
-    final parser = mapC32ToStr;
+    const parser = mapC32ToStr;
     {
       final state = State('$s32');
       final r = parser(state);
@@ -1461,7 +1461,7 @@ void _testMap1() {
 
 void _testMemoize() {
   test('Memoize', () {
-    final parser = memoizeC16C32OrC16;
+    const parser = memoizeC16C32OrC16;
     {
       final state = State('$s16');
       final r = parser(state);
@@ -1499,7 +1499,7 @@ void _testMemoize() {
 
 void _testNested() {
   test('Nested', () {
-    final parser = nestedC16OrTake2C32;
+    const parser = nestedC16OrTake2C32;
     {
       final state = State('$s16');
       final r = parser(state);
@@ -1546,7 +1546,7 @@ void _testNested() {
 
 void _testNoneOf() {
   test('NoneOf', () {
-    final parser16 = noneOfC16;
+    const parser16 = noneOfC16;
     {
       final state = State('a');
       final r = parser16(state);
@@ -1580,7 +1580,7 @@ void _testNoneOf() {
       expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
 
-    final parser32 = noneOfC32;
+    const parser32 = noneOfC32;
     {
       final state = State('a');
       final r = parser32(state);
@@ -1618,7 +1618,7 @@ void _testNoneOf() {
 
 void _testNoneOfEx() {
   test('NoneOfOf', () {
-    final parser1 = noneOfOfC16OrC32;
+    const parser1 = noneOfOfC16OrC32;
     {
       final state = State('a');
       state.context = _StateContext();
@@ -1670,7 +1670,7 @@ void _testNoneOfEx() {
 
 void _testNoneOfTags() {
   test('NoneOfTags', () {
-    final parser = noneOfTagsAbcAbdDefDegXXY;
+    const parser = noneOfTagsAbcAbdDefDegXXY;
     {
       final state = State('abc');
       parser(state);
@@ -1736,7 +1736,7 @@ void _testNoneOfTags() {
 
 void _testNot() {
   test('Not', () {
-    final parser = notC32OrC16;
+    const parser = notC32OrC16;
     {
       final state = State('$abc');
       parser(state);
@@ -1770,7 +1770,7 @@ void _testNot() {
 
 void _testOneOf() {
   test('OneOf', () {
-    final parser16 = oneOfC16;
+    const parser16 = oneOfC16;
     {
       final state = State('$s16');
       final r = parser16(state);
@@ -1806,7 +1806,7 @@ void _testOneOf() {
       expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
 
-    final parser32 = oneOfC32;
+    const parser32 = oneOfC32;
     {
       final state = State('$s32');
       final r = parser32(state);
@@ -1846,7 +1846,7 @@ void _testOneOf() {
 
 void _testOpt() {
   test('Opt', () {
-    final parser = optAbc;
+    const parser = optAbc;
     {
       final state = State(abc);
       final r = parser(state);
@@ -1873,7 +1873,7 @@ void _testOpt() {
 
 void _testPair() {
   test('Pair', () {
-    final parser = pairC16C32;
+    const parser = pairC16C32;
     {
       final state = State('$s16$s32');
       final r = parser(state);
@@ -1904,7 +1904,7 @@ void _testPair() {
 
 void _testPeek() {
   test('Peek', () {
-    final parser = peekC32;
+    const parser = peekC32;
     {
       final state = State('$s32');
       final r = parser(state);
@@ -1935,7 +1935,7 @@ void _testPeek() {
 
 void _testPostfixExpression() {
   test('PostfixExpression', () {
-    final parser = postfixExpression;
+    const parser = postfixExpression;
     {
       final state = State('1');
       final r = parser(state);
@@ -1980,7 +1980,7 @@ void _testPostfixExpression() {
 
 void _testPreceded() {
   test('Preceded', () {
-    final parser = precededC16C32;
+    const parser = precededC16C32;
     {
       final state = State('$s16$s32');
       final r = parser(state);
@@ -2020,7 +2020,7 @@ void _testPreceded() {
 
 void _testPrefixExpression() {
   test('PrefixExpression', () {
-    final parser = prefixExpression;
+    const parser = prefixExpression;
     {
       final state = State('1');
       final r = parser(state);
@@ -2081,7 +2081,7 @@ void _testPrefixExpression() {
 
 void _testRecognize() {
   test('Recognize', () {
-    final parser = recognize3C32AbcC16;
+    const parser = recognize3C32AbcC16;
     {
       final state = State('$s32$abc$s16');
       final r = parser(state);
@@ -2128,7 +2128,7 @@ void _testRecognize() {
 
 void _testRef() {
   test('Ref', () {
-    final parser = testRef;
+    const parser = testRef;
     {
       final state = State('$s16');
       final r = parser(state);
@@ -2150,7 +2150,7 @@ void _testRef() {
 
 void _testIndicate() {
   test('Indicate', () {
-    final parser = indicateAbc4Digits;
+    const parser = indicateAbc4Digits;
     {
       final state = State('abc1234');
       final r = parser(state);
@@ -2196,7 +2196,7 @@ void _testIndicate() {
 
 void _testSatisfy() {
   test('Satisfy', () {
-    final parser16 = satisfyC16;
+    const parser16 = satisfyC16;
     {
       final state = State('$s16');
       final r = parser16(state);
@@ -2230,7 +2230,7 @@ void _testSatisfy() {
       expect(state.errors, [ParseError(0, 2, "Unexpected '$s32'")]);
     }
 
-    final parser32 = satisfyC32;
+    const parser32 = satisfyC32;
     {
       final state = State('$s32');
       final r = parser32(state);
@@ -2307,7 +2307,7 @@ void _testSemanticActions() {
     });
 
     test('Semantic action VariableAction', () {
-      final parser = transformersVarIsNotDigit;
+      const parser = transformersVarIsNotDigit;
       {
         final state = State('a');
         final r = parser(state);
@@ -2339,7 +2339,7 @@ void _testSemanticActions() {
 
 void _testSeparatedList0() {
   test('SeparatedList0', () {
-    final parser = separatedList0C32Abc;
+    const parser = separatedList0C32Abc;
     {
       final state = State('$s32');
       final r = parser(state);
@@ -2387,7 +2387,7 @@ void _testSeparatedList0() {
 
 void _testSeparatedList1() {
   test('SeparatedList1', () {
-    final parser = separatedList1C32Abc;
+    const parser = separatedList1C32Abc;
     {
       final state = State('$s32');
       final r = parser(state);
@@ -2439,7 +2439,7 @@ void _testSeparatedList1() {
 
 void _testSeparatedListN() {
   test('SeparatedListN', () {
-    final parser = separatedListN_2C32Abc;
+    const parser = separatedListN_2C32Abc;
     {
       final state = State('$s32');
       final r = parser(state);
@@ -2502,7 +2502,7 @@ void _testSeparatedListN() {
 
 void _testSeparatedPair() {
   test('SeparatedPair', () {
-    final parser = separatedPairC16AbcC32;
+    const parser = separatedPairC16AbcC32;
     {
       final state = State('$s16$abc$s32');
       final r = parser(state);
@@ -2542,7 +2542,7 @@ void _testSeparatedPair() {
 
 void _testSkipWhile() {
   test('SkipWhile', () {
-    final parser16 = skipWhileC16;
+    const parser16 = skipWhileC16;
     {
       final state = State('$s16');
       parser16(state);
@@ -2573,7 +2573,7 @@ void _testSkipWhile() {
       expect(state.ok, true);
       expect(state.pos, 0);
     }
-    final parser32 = skipWhileC32;
+    const parser32 = skipWhileC32;
     {
       final state = State('$s32');
       parser32(state);
@@ -2609,7 +2609,7 @@ void _testSkipWhile() {
 
 void _testSkipWhile1() {
   test('SkipWhile1', () {
-    final parser16 = skipWhile1C16;
+    const parser16 = skipWhile1C16;
     {
       final state = State('$s16');
       parser16(state);
@@ -2644,7 +2644,7 @@ void _testSkipWhile1() {
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 2, "Unexpected '$s32'")]);
     }
-    final parser32 = skipWhile1C32;
+    const parser32 = skipWhile1C32;
     {
       final state = State('$s32');
       parser32(state);
@@ -2684,7 +2684,7 @@ void _testSkipWhile1() {
 
 void _testStringValue() {
   test('StringValue', () {
-    final parser = stringValue;
+    const parser = stringValue;
     {
       final state = State('');
       final r = parser(state);
@@ -2760,7 +2760,7 @@ void _testStringValue() {
 
 void _testTag() {
   test('Tag', () {
-    final parser16 = tagC16;
+    const parser16 = tagC16;
     {
       final state = State('$s16');
       final r = parser16(state);
@@ -2793,7 +2793,7 @@ void _testTag() {
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 0, "Expecting: '$s16'")]);
     }
-    final parserC16C32 = tagC16C32;
+    const parserC16C32 = tagC16C32;
     {
       final state = State('$s16$s32');
       final r = parserC16C32(state);
@@ -2826,7 +2826,7 @@ void _testTag() {
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 0, "Expecting: '$s16$s32'")]);
     }
-    final parser32 = tagC32;
+    const parser32 = tagC32;
     {
       final state = State('$s32');
       final r = parser32(state);
@@ -2859,7 +2859,7 @@ void _testTag() {
       expect(state.errorPos, 0);
       expect(state.errors, [ParseError(0, 0, "Expecting: '$s32'")]);
     }
-    final parserC32C16 = tagC32C16;
+    const parserC32C16 = tagC32C16;
     {
       final state = State('$s32$s16');
       final r = parserC32C16(state);
@@ -2897,7 +2897,7 @@ void _testTag() {
 
 void _testTagNoCase() {
   test('TagNoCase', () {
-    final parser = tagNoCaseAbc;
+    const parser = tagNoCaseAbc;
     {
       final state = State(abc);
       final r = parser(state);
@@ -2942,8 +2942,8 @@ void _testTagNoCase() {
 
 void _testTagOf() {
   test('TagOf', () {
-    final parser = tagOfFoo;
-    final foo = 'foo';
+    const parser = tagOfFoo;
+    const foo = 'foo';
     {
       final state = State(foo);
       state.context = _StateContext();
@@ -2985,7 +2985,7 @@ void _testTagOf() {
 
 void _testTagPair() {
   test('TagPair', () {
-    final parser = tagPairAbc;
+    const parser = tagPairAbc;
     {
       final state = State(r'<abc>123<\abc>');
       final r = parser(state);
@@ -3037,7 +3037,7 @@ void _testTagPair() {
 
 void _testTags() {
   test('Tags', () {
-    final parser = tagsAbcAbdDefDegXXYZ;
+    const parser = tagsAbcAbdDefDegXXYZ;
     {
       final state = State('abc');
       final r = parser(state);
@@ -3116,7 +3116,7 @@ void _testTags() {
 
 void _testTagValues() {
   test('TagValues', () {
-    final parser = tagValues;
+    const parser = tagValues;
     {
       final state = State('false ');
       final r = parser(state);
@@ -3163,7 +3163,7 @@ void _testTagValues() {
 
 void _testTakeUntil() {
   test('TakeUntil', () {
-    final parser = takeUntilAbc;
+    const parser = takeUntilAbc;
     {
       final state = State('$abc');
       final r = parser(state);
@@ -3199,7 +3199,7 @@ void _testTakeUntil() {
 
 void _testTakeUntil1() {
   test('TakeUntil1', () {
-    final parser = takeUntil1Abc;
+    const parser = takeUntil1Abc;
     {
       final state = State('$s16$abc');
       final r = parser(state);
@@ -3410,7 +3410,7 @@ void _testTakeWhileMN() {
             state.errors, [ParseError(1 * len, 1 * len, "Unexpected 'EOF'")]);
       }
       {
-        final sBad = '0';
+        const sBad = '0';
         final state = State('$s$sBad');
         final r = parser(state);
         expect(state.ok, false);
@@ -3421,7 +3421,7 @@ void _testTakeWhileMN() {
             state.errors, [ParseError(1 * len, 1 * len + 1, "Unexpected '0'")]);
       }
       {
-        final sBad = '0';
+        const sBad = '0';
         final state = State('$sBad$s');
         final r = parser(state);
         expect(state.ok, false);
@@ -3436,7 +3436,7 @@ void _testTakeWhileMN() {
 
 void _testTerminated() {
   test('Terminated', () {
-    final parser = terminated;
+    const parser = terminated;
     {
       final state = State('$s16$s32');
       final r = parser(state);
@@ -3476,7 +3476,7 @@ void _testTerminated() {
 
 void _testTokenize() {
   test('Tokenize', () {
-    final parser = tokenizeAlphaOrDigits;
+    const parser = tokenizeAlphaOrDigits;
     {
       final state = State('123');
       final r = parser(state);
@@ -3492,7 +3492,7 @@ void _testTokenize() {
       expect(state.pos, 3);
     }
     {
-      final source = '';
+      const source = '';
       final state = State(source);
       final r = parser(state);
       expect(state.ok, false);
@@ -3501,7 +3501,7 @@ void _testTokenize() {
       expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
-      final source = ' ';
+      const source = ' ';
       final state = State(source);
       final r = parser(state);
       expect(state.ok, false);
@@ -3514,7 +3514,7 @@ void _testTokenize() {
 
 void _testTokenizeSimilarTags() {
   test('TokenizeSimilarTags', () {
-    final parser = tokenizeSimilarTagsIfForWhile;
+    const parser = tokenizeSimilarTagsIfForWhile;
     {
       final state = State('if');
       final r = parser(state);
@@ -3537,7 +3537,7 @@ void _testTokenizeSimilarTags() {
       expect(state.pos, 5);
     }
     {
-      final source = '';
+      const source = '';
       final state = State(source);
       final r = parser(state);
       expect(state.ok, false);
@@ -3546,7 +3546,7 @@ void _testTokenizeSimilarTags() {
       expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
-      final source = ' ';
+      const source = ' ';
       final state = State(source);
       final r = parser(state);
       expect(state.ok, false);
@@ -3559,7 +3559,7 @@ void _testTokenizeSimilarTags() {
 
 void _testTokenizeTags() {
   test('TokenizeTags', () {
-    final parser = tokenizeTagsIfForWhile;
+    const parser = tokenizeTagsIfForWhile;
     {
       final state = State('if');
       final r = parser(state);
@@ -3582,7 +3582,7 @@ void _testTokenizeTags() {
       expect(state.pos, 5);
     }
     {
-      final source = '';
+      const source = '';
       final state = State(source);
       final r = parser(state);
       expect(state.ok, false);
@@ -3591,7 +3591,7 @@ void _testTokenizeTags() {
       expect(state.errors, [ParseError(0, 0, "Unexpected 'EOF'")]);
     }
     {
-      final source = ' ';
+      const source = ' ';
       final state = State(source);
       final r = parser(state);
       expect(state.ok, false);
@@ -3604,7 +3604,7 @@ void _testTokenizeTags() {
 
 void _testTuple() {
   test('Tuple', () {
-    final parser1 = tuple2C32Abc;
+    const parser1 = tuple2C32Abc;
     {
       final state = State('$s32$abc');
       final r = parser1(state);
@@ -3631,7 +3631,7 @@ void _testTuple() {
       expect(state.errors, [ParseError(2, 2, "Expecting: 'abc'")]);
     }
 
-    final parser2 = tuple3C32AbcC16;
+    const parser2 = tuple3C32AbcC16;
     {
       final state = State('$s32$abc$s16');
       final r = parser2(state);
@@ -3671,7 +3671,7 @@ void _testTuple() {
 
 void _testValue() {
   test('Value', () {
-    final parser1 = valueAbcToTrueValue;
+    const parser1 = valueAbcToTrueValue;
     {
       final state = State(abc);
       final r = parser1(state);
@@ -3698,7 +3698,7 @@ void _testValue() {
       expect(state.errors, [ParseError(0, 0, "Expecting: 'abc'")]);
     }
 
-    final parser2 = valueTrue;
+    const parser2 = valueTrue;
     {
       final state = State(abc);
       final r = parser2(state);
@@ -3725,7 +3725,7 @@ void _testValue() {
 
 void _testVerify() {
   test('Verify', () {
-    final parser = verifyIs3Digit;
+    const parser = verifyIs3Digit;
     {
       final state = State('123');
       final r = parser(state);
@@ -3751,7 +3751,7 @@ void _testVerify() {
       expect(state.errorPos, 2);
       expect(state.errors, [ParseError(0, 2, 'Message')]);
     }
-    final parserFast = verifyIs3DigitFast;
+    const parserFast = verifyIs3DigitFast;
     {
       final state = State('123');
       parserFast(state);
