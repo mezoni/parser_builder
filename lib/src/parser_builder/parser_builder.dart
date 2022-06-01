@@ -1,5 +1,6 @@
 part of '../../parser_builder.dart';
 
+@immutable
 abstract class ParserBuilder<I, O> {
   const ParserBuilder();
 
