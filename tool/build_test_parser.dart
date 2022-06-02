@@ -502,8 +502,9 @@ const _transformersVarIsNotDigit = Named(
     'transformersVarIsNotDigit',
     NoneOfOf(Calculate(VariableAction([], '{{digits}}',
         key: 'digits',
+        modifier: 'const',
         init:
-            'const [0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]'))));
+            '[0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39]'))));
 
 const _tuple2C32Abc = Named('tuple2C32Abc', Tuple2(_char32, _tagAbc));
 

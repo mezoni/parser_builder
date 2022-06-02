@@ -80,15 +80,17 @@ class VariableAction<T> extends SemanticAction<T> {
 
   final String key;
 
+  final String modifier;
+
   final List<String> parameters;
 
   const VariableAction(this.parameters, this.expression,
-      {required this.init, required this.key});
+      {required this.init, required this.key, this.modifier = 'final'});
 
   @override
   String build(Context context, String name, List<String> arguments) {
     name = context.allocateLocal(name);
-    final declaration = 'final $name = $init;';
+    final declaration = '$modifier $name = $init;';
     addLocalDeclaration(context, name, declaration);
     var result = replaceParameters(expression, parameters, arguments);
     result = result.replaceAll('{{$key}}', name);

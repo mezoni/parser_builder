@@ -30,14 +30,14 @@ if (!state.ok) {
 state.pos += {{length}};
 state.ok = true;
 final v1 = pos;
-final v2 = {{tag}};
+const v2 = {{tag}};
 {{res0}} = {{tokenize}};''';
 
   static const _templateTestShort = '''
 state.pos++;
 state.ok = true;
 final v1 = pos;
-final v2 = {{tag}};
+const v2 = {{tag}};
 {{res0}} = {{tokenize}};''';
 
   final Map<String, SemanticAction<O>> table;

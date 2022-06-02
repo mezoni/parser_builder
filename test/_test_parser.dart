@@ -650,47 +650,19 @@ String? identifier(State<String> state) {
           break;
         }
       }
-      state.ok = true;
-      final text = source.slice($pos, state.pos);
-      final length = text.length;
-      final c = text.codeUnitAt(0);
-      const words = <List<String>>[
-        ['else'],
-        ['for', 'foreach'],
-        ['if', 'in', 'int'],
-        ['while']
-      ];
-      var index = -1;
-      var min = 0;
-      var max = words.length - 1;
-      while (min <= max) {
-        final mid = min + (max - min) ~/ 2;
-        final x = words[mid][0].codeUnitAt(0);
-        if (x == c) {
-          index = mid;
-          break;
-        }
-        if (x < c) {
-          min = mid + 1;
-        } else {
-          max = mid - 1;
-        }
-      }
-      if (index != -1) {
-        final list = words[index];
-        for (var i = list.length - 1; i >= 0; i--) {
-          final v = list[i];
-          if (length > v.length) {
-            break;
-          }
-          if (length == v.length && text == v) {
-            state.ok = false;
-            break;
-          }
-        }
-      }
+      final word = source.slice($pos, state.pos);
+      const words = <String>{
+        'if',
+        'int',
+        'for',
+        'foreach',
+        'else',
+        'in',
+        'while'
+      };
+      state.ok = words.isEmpty || !words.contains(word);
       if (state.ok) {
-        $0 = text;
+        $0 = word;
       }
     }
   }

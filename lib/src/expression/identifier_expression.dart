@@ -17,42 +17,11 @@ if (state.ok) {
         break;
       }
     }
-    state.ok = true;
-    final text = source.slice({{pos}}, state.pos);
-    final length = text.length;
-    final c = text.codeUnitAt(0);
-    final words = const <List<String>>{{words}};
-    var index = -1;
-    var min = 0;
-    var max = words.length - 1;
-    while (min <= max) {
-      final mid = min + (max - min) ~/ 2;
-      final x = words[mid][0].codeUnitAt(0);
-      if (x == c) {
-        index = mid;
-        break;
-      }
-      if (x < c) {
-        min = mid + 1;
-      } else {
-        max = mid - 1;
-      }
-    }
-    if (index != -1) {
-      final list = words[index];
-      for (var i = list.length - 1; i >= 0; i--) {
-        final v = list[i];
-        if (length > v.length) {
-          break;
-        }
-        if (length == v.length && text == v) {
-          state.ok = false;
-          break;
-        }
-      }
-    }
+    final word = source.slice({{pos}}, state.pos);
+    const words = <String>{{words}};
+    state.ok = words.isEmpty || !words.contains(word);
     if (state.ok) {
-      {{res0}} = text;
+      {{res0}} = word;
     }
   }
 }
@@ -77,40 +46,9 @@ if (state.ok) {
         break;
       }
     }
-    state.ok = true;
-    final text = source.slice({{pos}}, state.pos);
-    final length = text.length;
-    final c = text.codeUnitAt(0);
-    final words = const <List<String>>{{words}};
-    var index = -1;
-    var min = 0;
-    var max = words.length - 1;
-    while (min <= max) {
-      final mid = min + (max - min) ~/ 2;
-      final x = words[mid][0].codeUnitAt(0);
-      if (x == c) {
-        index = mid;
-        break;
-      }
-      if (x < c) {
-        min = mid + 1;
-      } else {
-        max = mid - 1;
-      }
-    }
-    if (index != -1) {
-      final list = words[index];
-      for (var i = list.length - 1; i >= 0; i--) {
-        final v = list[i];
-        if (length > v.length) {
-          break;
-        }
-        if (length == v.length && text == v) {
-          state.ok = false;
-          break;
-        }
-      }
-    }
+    final word = source.slice({{pos}}, state.pos);
+    const words = <String>{{words}};
+    state.ok = words.isEmpty || !words.contains(word);
   }
 }
 if (!state.ok) {
@@ -143,21 +81,13 @@ if (!state.ok) {
     final isStartUnicode = identStart.isUnicode;
     final sortedWords = reservedWords.toSet().toList();
     sortedWords.sort();
-    final words = <List<String>>[];
-    final firstChars = sortedWords.map((e) => e.codeUnitAt(0)).toSet().toList();
-    for (final item in firstChars) {
-      final selected =
-          sortedWords.where((e) => e.codeUnitAt(0) == item).toList();
-      words.add(selected);
-    }
-
     values.addAll({
       'identCont': identCont.build(context, 'identCont', ['c']),
       'identStart': identStart.build(context, 'identStart', ['c']),
       'readCont': isContUnicode ? 'readRune(state)' : 'codeUnitAt(state.pos++)',
       'readStart':
           isStartUnicode ? 'readRune(state)' : 'codeUnitAt(state.pos++)',
-      'words': helper.getAsCode(words),
+      'words': helper.getAsCode(reservedWords.toSet()),
     });
     return render2(fast, _templateFast, _template, values, [result]);
   }

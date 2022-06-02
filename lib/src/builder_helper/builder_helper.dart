@@ -123,6 +123,14 @@ String? tryGetAsCode(Object? value) {
     }
 
     return '[${values.join(', ')}]';
+  } else if (value is Set) {
+    final values = [];
+    for (var item in value) {
+      final code = tryGetAsCode(item);
+      values.add(code);
+    }
+
+    return '{${values.join(', ')}}';
   }
 
   return null;
