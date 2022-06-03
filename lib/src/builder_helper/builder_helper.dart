@@ -131,6 +131,15 @@ String? tryGetAsCode(Object? value) {
     }
 
     return '{${values.join(', ')}}';
+  } else if (value is Map) {
+    final values = [];
+    for (var key in value.keys) {
+      final k = tryGetAsCode(key);
+      final v = tryGetAsCode(value[key]);
+      values.add('$k: $v');
+    }
+
+    return '{${values.join(', ')}}';
   }
 
   return null;
