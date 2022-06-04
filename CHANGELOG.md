@@ -1,3 +1,7 @@
+## 2.0.34
+
+- An optional parameter `message` has been added to the `Not` parser builder
+
 ## 2.0.33
 
 - Minor improvements have been made to the `Char`, `EscapeSequence`, `Satisfy`, `SwitchTag`, `Tag` parser builders
