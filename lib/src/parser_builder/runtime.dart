@@ -326,13 +326,7 @@ class State<T> {
       if (kind == ParseError.expected) {
         calculate(i);
         final value = _values[i];
-        var list = expected[start];
-        if (list == null) {
-          list = [];
-          expected[start] = list;
-        }
-
-        list.add(value);
+        (expected[start] ??= []).add(value);
       }
     }
 
@@ -530,13 +524,7 @@ class State<T> {
       if (kind == ParseError.expected) {
         calculate(i);
         final value = _values[i];
-        var list = expected[start];
-        if (list == null) {
-          list = [];
-          expected[start] = list;
-        }
-
-        list.add(value);
+        (expected[start] ??= []).add(value);
       }
     }
 
@@ -868,11 +856,11 @@ String _errorMessage(String source, List<ParseError> errors) {
     }
   }
 
-  static addClassMemoizedResult(Context context, bool condition) {
+  static void addClassMemoizedResult(Context context, bool condition) {
     _addClass(context, 'MemoizedResult', _classMemoizedResult, condition);
   }
 
-  static addClassResult(Context context, int size, bool condition) {
+  static void addClassResult(Context context, int size, bool condition) {
     final String code;
     switch (size) {
       case 2:
@@ -906,7 +894,8 @@ String _errorMessage(String source, List<ParseError> errors) {
     return result;
   }
 
-  static _addClass(Context context, String name, String code, bool condition) {
+  static void _addClass(
+      Context context, String name, String code, bool condition) {
     if (condition) {
       if (!context.classDeclarations.containsKey(name)) {
         context.classDeclarations[name] = code;

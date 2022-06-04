@@ -1,6 +1,5 @@
-import 'package:test/test.dart';
-
 import 'package:parser_builder/src/char_class/char_class_parser.dart';
+import 'package:test/test.dart';
 
 void main(List<String> args) {
   _test();

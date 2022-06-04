@@ -2,9 +2,9 @@ import 'package:meta/meta.dart';
 
 import 'branch.dart';
 import 'builder_helper.dart' as helper;
+import 'capture.dart';
 import 'combinator.dart';
 import 'parser_builder.dart';
-import 'capture.dart';
 import 'sequence.dart';
 
 part 'src/error/expected.dart';

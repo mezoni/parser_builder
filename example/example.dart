@@ -1069,13 +1069,7 @@ class State<T> {
       if (kind == ParseError.expected) {
         calculate(i);
         final value = _values[i];
-        var list = expected[start];
-        if (list == null) {
-          list = [];
-          expected[start] = list;
-        }
-
-        list.add(value);
+        (expected[start] ??= []).add(value);
       }
     }
 
