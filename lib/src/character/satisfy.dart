@@ -38,33 +38,33 @@ if (state.ok) {
 }''';
 
   static const _template32 = '''
-state.ok = state.pos < source.length;
+final {{pos}} = state.pos;
+state.ok = {{pos}} < source.length;
 if (state.ok) {
-  final pos = state.pos;
   final c = source.readRune(state);
   state.ok = {{test}};
   if (state.ok) {
     {{res0}} = c;
   } else {
-    state.pos = pos;
-    state.fail(state.pos, ParseError.character);
+    state.pos = {{pos}};
+    state.fail({{pos}}, ParseError.character);
   }
 } else {
-  state.fail(state.pos, ParseError.character);
+  state.fail({{pos}}, ParseError.character);
 }''';
 
   static const _template32Fast = '''
-state.ok = state.pos < source.length;
+final {{pos}} = state.pos;
+state.ok = {{pos}} < source.length;
 if (state.ok) {
-  final pos = state.pos;
   final c = source.readRune(state);
   state.ok = {{test}};
   if (!state.ok) {
-    state.pos = pos;
-    state.fail(state.pos, ParseError.character);
+    state.pos = {{pos}};
+    state.fail({{pos}}, ParseError.character);
   }
 } else {
-  state.fail(state.pos, ParseError.character);
+  state.fail({{pos}}, ParseError.character);
 }''';
 
   final SemanticAction<bool> predicate;
