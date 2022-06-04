@@ -67,6 +67,40 @@ if (state.ok) {
   state.fail({{pos}}, ParseError.character);
 }''';
 
+  static const _templateOne16 = '''
+state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
+if (state.ok) {
+  state.pos++;
+  {{res0}} = {{cc}};
+} else {
+  state.fail(state.pos, ParseError.character);
+}''';
+
+  static const _templateOne16Fast = '''
+state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
+if (state.ok) {
+  state.pos++;
+} else {
+  state.fail(state.pos, ParseError.character);
+}''';
+
+  static const _templateOne32 = '''
+state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
+if (state.ok) {
+  state.pos += 2;
+  {{res0}} = {{cc}};
+} else {
+  state.fail(state.pos, ParseError.character);
+}''';
+
+  static const _templateOne32Fast = '''
+state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
+if (state.ok) {
+  state.pos += 2;
+} else {
+  state.fail(state.pos, ParseError.character);
+}''';
+
   final SemanticAction<bool> predicate;
 
   const Satisfy(this.predicate);
@@ -74,6 +108,18 @@ if (state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     context.refersToStateSource = true;
+    if (predicate is CharClass) {
+      final charClass = predicate as CharClass;
+      final charList = charClass.getCharList();
+      if (charList.length == 2 && charList[0] == charList[1]) {
+        return _buildOne(context, result);
+      }
+    }
+
+    return _build(context, result);
+  }
+
+  String _build(Context context, ParserResult? result) {
     final fast = result == null;
     final values = context.allocateLocals(['pos']);
     values.addAll({
@@ -95,6 +141,29 @@ if (state.ok) {
       }
     }
 
+    return render(template, values, [result]);
+  }
+
+  String _buildOne(Context context, ParserResult? result) {
+    final fast = result == null;
+    final charClass = predicate as CharClass;
+    final charList = charClass.getCharList();
+    if (charList.length != 2 || charList[0] != charList[1]) {
+      throw StateError('Internal error');
+    }
+
+    final char = charList[0];
+    final isUnicode = char > 0xffff;
+    final String template;
+    if (isUnicode) {
+      template = fast ? _templateOne32Fast : _templateOne32;
+    } else {
+      template = fast ? _templateOne16Fast : _templateOne16;
+    }
+
+    final values = {
+      'cc': '$char',
+    };
     return render(template, values, [result]);
   }
 }

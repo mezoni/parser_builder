@@ -548,19 +548,18 @@ dynamic foldMany0Digit(State<String> state) {
   var $acc = 0;
   while (true) {
     int? $1;
-    final $pos = state.pos;
-    state.ok = $pos < source.length;
+    state.ok = state.pos < source.length;
     if (state.ok) {
-      final c = source.codeUnitAt($pos);
+      final c = source.codeUnitAt(state.pos);
       state.ok = c <= 57 && c >= 48;
       if (state.ok) {
         state.pos++;
         $1 = c;
       } else {
-        state.fail($pos, ParseError.character);
+        state.fail(state.pos, ParseError.character);
       }
     } else {
-      state.fail($pos, ParseError.character);
+      state.fail(state.pos, ParseError.character);
     }
     if (!state.ok) {
       break;
@@ -916,67 +915,63 @@ dynamic map4Digits(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $1;
-  final $pos1 = state.pos;
-  state.ok = $pos1 < source.length;
+  state.ok = state.pos < source.length;
   if (state.ok) {
-    final c = source.codeUnitAt($pos1);
+    final c = source.codeUnitAt(state.pos);
     state.ok = c <= 57 && c >= 48;
     if (state.ok) {
       state.pos++;
       $1 = c;
     } else {
-      state.fail($pos1, ParseError.character);
+      state.fail(state.pos, ParseError.character);
     }
   } else {
-    state.fail($pos1, ParseError.character);
+    state.fail(state.pos, ParseError.character);
   }
   if (state.ok) {
     int? $2;
-    final $pos2 = state.pos;
-    state.ok = $pos2 < source.length;
+    state.ok = state.pos < source.length;
     if (state.ok) {
-      final c = source.codeUnitAt($pos2);
+      final c = source.codeUnitAt(state.pos);
       state.ok = c <= 57 && c >= 48;
       if (state.ok) {
         state.pos++;
         $2 = c;
       } else {
-        state.fail($pos2, ParseError.character);
+        state.fail(state.pos, ParseError.character);
       }
     } else {
-      state.fail($pos2, ParseError.character);
+      state.fail(state.pos, ParseError.character);
     }
     if (state.ok) {
       int? $3;
-      final $pos3 = state.pos;
-      state.ok = $pos3 < source.length;
+      state.ok = state.pos < source.length;
       if (state.ok) {
-        final c = source.codeUnitAt($pos3);
+        final c = source.codeUnitAt(state.pos);
         state.ok = c <= 57 && c >= 48;
         if (state.ok) {
           state.pos++;
           $3 = c;
         } else {
-          state.fail($pos3, ParseError.character);
+          state.fail(state.pos, ParseError.character);
         }
       } else {
-        state.fail($pos3, ParseError.character);
+        state.fail(state.pos, ParseError.character);
       }
       if (state.ok) {
         int? $4;
-        final $pos4 = state.pos;
-        state.ok = $pos4 < source.length;
+        state.ok = state.pos < source.length;
         if (state.ok) {
-          final c = source.codeUnitAt($pos4);
+          final c = source.codeUnitAt(state.pos);
           state.ok = c <= 57 && c >= 48;
           if (state.ok) {
             state.pos++;
             $4 = c;
           } else {
-            state.fail($pos4, ParseError.character);
+            state.fail(state.pos, ParseError.character);
           }
         } else {
-          state.fail($pos4, ParseError.character);
+          state.fail(state.pos, ParseError.character);
         }
         if (state.ok) {
           final v1 = $1!;
@@ -1226,19 +1221,12 @@ void notC32OrC16(State<String> state) {
 int? oneOfC16(State<String> state) {
   int? $0;
   final source = state.source;
-  final $pos = state.pos;
-  state.ok = $pos < source.length;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
   if (state.ok) {
-    final c = source.codeUnitAt($pos);
-    state.ok = c == 80;
-    if (state.ok) {
-      state.pos++;
-      $0 = c;
-    } else {
-      state.fail($pos, ParseError.character);
-    }
+    state.pos++;
+    $0 = 80;
   } else {
-    state.fail($pos, ParseError.character);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1246,19 +1234,12 @@ int? oneOfC16(State<String> state) {
 int? oneOfC32(State<String> state) {
   int? $0;
   final source = state.source;
-  final $pos = state.pos;
-  state.ok = $pos < source.length;
+  state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
   if (state.ok) {
-    final c = source.readRune(state);
-    state.ok = c == 119296;
-    if (state.ok) {
-      $0 = c;
-    } else {
-      state.pos = $pos;
-      state.fail($pos, ParseError.character);
-    }
+    state.pos += 2;
+    $0 = 119296;
   } else {
-    state.fail($pos, ParseError.character);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1460,19 +1441,12 @@ String? recognize3C32AbcC16(State<String> state) {
 int? satisfyC16(State<String> state) {
   int? $0;
   final source = state.source;
-  final $pos = state.pos;
-  state.ok = $pos < source.length;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
   if (state.ok) {
-    final c = source.codeUnitAt($pos);
-    state.ok = c == 80;
-    if (state.ok) {
-      state.pos++;
-      $0 = c;
-    } else {
-      state.fail($pos, ParseError.character);
-    }
+    state.pos++;
+    $0 = 80;
   } else {
-    state.fail($pos, ParseError.character);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }
@@ -1480,19 +1454,12 @@ int? satisfyC16(State<String> state) {
 int? satisfyC32(State<String> state) {
   int? $0;
   final source = state.source;
-  final $pos = state.pos;
-  state.ok = $pos < source.length;
+  state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
   if (state.ok) {
-    final c = source.readRune(state);
-    state.ok = c == 119296;
-    if (state.ok) {
-      $0 = c;
-    } else {
-      state.pos = $pos;
-      state.fail($pos, ParseError.character);
-    }
+    state.pos += 2;
+    $0 = 119296;
   } else {
-    state.fail($pos, ParseError.character);
+    state.fail(state.pos, ParseError.character);
   }
   return $0;
 }

@@ -54,22 +54,16 @@ int? _escapeHex(State<String> state) {
   int? $start;
   final $pos = state.pos;
   $start = state.pos;
-  state.ok = state.pos < source.length;
+  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 117;
   if (state.ok) {
-    final c = source.codeUnitAt(state.pos);
-    state.ok = c == 117;
-    if (state.ok) {
-      state.pos++;
-    } else {
-      state.fail(state.pos, ParseError.character);
-    }
+    state.pos++;
   } else {
     state.fail(state.pos, ParseError.character);
   }
   if (state.ok) {
     String? $1;
-    final $pos2 = state.setLastErrorPos(-1);
-    final $pos3 = state.pos;
+    final $pos1 = state.setLastErrorPos(-1);
+    final $pos2 = state.pos;
     var $count = 0;
     while ($count < 4 && state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
@@ -86,10 +80,10 @@ int? _escapeHex(State<String> state) {
     }
     state.ok = $count >= 4;
     if (state.ok) {
-      $1 = source.substring($pos3, state.pos);
+      $1 = source.substring($pos2, state.pos);
     } else {
       state.fail(state.pos, ParseError.character);
-      state.pos = $pos3;
+      state.pos = $pos2;
     }
     if (!state.ok) {
       state.fail(
@@ -99,7 +93,7 @@ int? _escapeHex(State<String> state) {
           $start.as(),
           state.lastErrorPos);
     }
-    state.restoreLastErrorPos($pos2);
+    state.restoreLastErrorPos($pos1);
     if (state.ok) {
       final v1 = $1!;
       $0 = _toHexValue(v1);
