@@ -54,8 +54,8 @@ int? _escapeHex(State<String> state) {
   int? $start;
   final $pos = state.pos;
   $start = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 117;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 117) {
+    state.ok = true;
     state.pos++;
   } else {
     state.fail(state.pos, ParseError.character);
@@ -108,8 +108,7 @@ int? _escapeHex(State<String> state) {
 int? _escaped(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
+  if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     int? v;
     switch (c) {
@@ -154,8 +153,8 @@ int? _escaped(State<String> state) {
 void _quote(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '"');
@@ -177,8 +176,8 @@ String? _string(State<String> state) {
   final $pos1 = state.setLastErrorPos(-1);
   final $pos2 = state.pos;
   $start = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '"');
@@ -254,8 +253,8 @@ String? _string(State<String> state) {
 void _openBracket(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 91) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '[');
@@ -283,8 +282,8 @@ List<dynamic>? _values(State<String> state) {
     $list.add($1);
     $pos = state.pos;
     final $pos1 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
-    if (state.ok) {
+    if (state.pos < source.length && source.codeUnitAt(state.pos) == 44) {
+      state.ok = true;
       state.pos += 1;
     } else {
       state.fail(state.pos, ParseError.expected, ',');
@@ -310,8 +309,8 @@ List<dynamic>? _values(State<String> state) {
 void _closeBracket(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 93;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 93) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, ']');
@@ -345,8 +344,8 @@ List<dynamic>? _array(State<String> state) {
 void _openBrace(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 123;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 123) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '{');
@@ -367,8 +366,8 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
   $1 = _string(state);
   if (state.ok) {
     final $pos1 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 58;
-    if (state.ok) {
+    if (state.pos < source.length && source.codeUnitAt(state.pos) == 58) {
+      state.ok = true;
       state.pos += 1;
     } else {
       state.fail(state.pos, ParseError.expected, ':');
@@ -410,8 +409,8 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
     $list.add($1!);
     $pos = state.pos;
     final $pos1 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 44;
-    if (state.ok) {
+    if (state.pos < source.length && source.codeUnitAt(state.pos) == 44) {
+      state.ok = true;
       state.pos += 1;
     } else {
       state.fail(state.pos, ParseError.expected, ',');
@@ -437,8 +436,8 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
 void _closeBrace(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 125;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 125) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '}');
@@ -751,11 +750,10 @@ dynamic _value(State<String> state) {
   dynamic $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final $pos1 = state.pos;
+    final c = source.codeUnitAt($pos1);
     if (c == 34) {
       $0 = _string(state);
     } else if (c == 91) {
@@ -763,7 +761,7 @@ dynamic _value(State<String> state) {
     } else if (c == 123) {
       $0 = _object(state);
     } else if (c == 102) {
-      if (source.startsWith('false', pos)) {
+      if (source.startsWith('false', $pos1)) {
         state.ok = true;
         state.pos += 5;
         if (state.ok) {
@@ -771,7 +769,7 @@ dynamic _value(State<String> state) {
         }
       }
     } else if (c == 116) {
-      if (source.startsWith('true', pos)) {
+      if (source.startsWith('true', $pos1)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {
@@ -779,7 +777,7 @@ dynamic _value(State<String> state) {
         }
       }
     } else if (c == 110) {
-      if (source.startsWith('null', pos)) {
+      if (source.startsWith('null', $pos1)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {

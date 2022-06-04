@@ -8,8 +8,8 @@ part of '../../bytes.dart';
 /// ```
 class Tag extends ParserBuilder<String, String> {
   static const _templateForSpeed = '''
-state.ok = {{test}};
-if (state.ok) {
+if ({{test}}) {
+  state.ok = true;
   state.pos += {{length}};
   {{res0}} = {{tag}};
 } else {
@@ -17,8 +17,8 @@ if (state.ok) {
 }''';
 
   static const _templateForSpeedFast = '''
-state.ok = {{test}};
-if (state.ok) {
+if ({{test}}) {
+  state.ok = true;
   state.pos += {{length}};
 } else {
   state.fail(state.pos, ParseError.expected, {{tag}});

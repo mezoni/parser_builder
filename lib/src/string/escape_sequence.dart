@@ -17,8 +17,7 @@ part of '../../string.dart';
 /// ```
 class EscapeSequence extends ParserBuilder<String, int> {
   static const _template16 = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   int? v;
   switch (c) {
@@ -36,8 +35,7 @@ if (state.ok) {
 }''';
 
   static const _template16Fast = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   int? v;
   switch (c) {
@@ -55,8 +53,7 @@ if (state.ok) {
 }''';
 
   static const _template32 = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
   final pos = state.pos;
   final c = source.readRune(state);
   int? v;
@@ -75,8 +72,7 @@ if (state.ok) {
 }''';
 
   static const _template32Fast = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
   final pos = state.pos;
   final c = source.readRune(state);
   int? v;

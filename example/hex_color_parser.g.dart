@@ -51,8 +51,8 @@ Color? _hexColor(State<String> state) {
   final $pos = state.minErrorPos;
   state.minErrorPos = state.pos + 1;
   final $pos1 = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 35;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 35) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '#');

@@ -1,6 +1,6 @@
 ## 2.0.33
 
-- Minor improvements have been made to the `Satisfy` parser builder
+- Minor improvements have been made to the `Char`, `EscapeSequence`, `Satisfy`, `SwitchTag`, `Tag` parser builders
 
 ## 2.0.32
 

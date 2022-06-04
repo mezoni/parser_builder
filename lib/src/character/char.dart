@@ -8,8 +8,8 @@ part of '../../character.dart';
 /// ```
 class Char extends ParserBuilder<String, int> {
   static const _template16 = '''
-state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos++;
   {{res0}} = {{cc}};
 } else {
@@ -17,16 +17,16 @@ if (state.ok) {
 }''';
 
   static const _template16Fast = '''
-state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos++;
 } else {
   state.fail(state.pos, ParseError.expected, {{cc}});
 }''';
 
   static const _template32 = '''
-state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos += 2;
   {{res0}} = {{cc}};
 } else {
@@ -34,8 +34,8 @@ if (state.ok) {
 }''';
 
   static const _template32Fast = '''
-state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos += 2;
 } else {
   state.fail(state.pos, ParseError.expected, {{cc}});

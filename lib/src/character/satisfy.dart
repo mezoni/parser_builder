@@ -9,8 +9,7 @@ part of '../../character.dart';
 /// ```
 class Satisfy extends ParserBuilder<String, int> {
   static const _template16 = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   state.ok = {{test}};
   if (state.ok) {
@@ -24,8 +23,7 @@ if (state.ok) {
 }''';
 
   static const _template16Fast = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
   final c = source.codeUnitAt(state.pos);
   state.ok = {{test}};
   if (state.ok) {
@@ -39,8 +37,7 @@ if (state.ok) {
 
   static const _template32 = '''
 final {{pos}} = state.pos;
-state.ok = {{pos}} < source.length;
-if (state.ok) {
+if ({{pos}} < source.length) {
   final c = source.readRune(state);
   state.ok = {{test}};
   if (state.ok) {
@@ -55,8 +52,7 @@ if (state.ok) {
 
   static const _template32Fast = '''
 final {{pos}} = state.pos;
-state.ok = {{pos}} < source.length;
-if (state.ok) {
+if ({{pos}} < source.length) {
   final c = source.readRune(state);
   state.ok = {{test}};
   if (!state.ok) {
@@ -68,8 +64,8 @@ if (state.ok) {
 }''';
 
   static const _templateOne16 = '''
-state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos++;
   {{res0}} = {{cc}};
 } else {
@@ -77,16 +73,16 @@ if (state.ok) {
 }''';
 
   static const _templateOne16Fast = '''
-state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos++;
 } else {
   state.fail(state.pos, ParseError.character);
 }''';
 
   static const _templateOne32 = '''
-state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos += 2;
   {{res0}} = {{cc}};
 } else {
@@ -94,8 +90,8 @@ if (state.ok) {
 }''';
 
   static const _templateOne32Fast = '''
-state.ok = state.pos < source.length && source.runeAt(state.pos) == {{cc}};
-if (state.ok) {
+if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+  state.ok = true;
   state.pos += 2;
 } else {
   state.fail(state.pos, ParseError.character);

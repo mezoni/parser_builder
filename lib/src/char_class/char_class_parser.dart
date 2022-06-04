@@ -56,10 +56,10 @@ int? _hex(State<String> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos + 1 < source.length &&
+  if (state.pos + 1 < source.length &&
       source.codeUnitAt(state.pos) == 35 &&
-      source.codeUnitAt(state.pos + 1) == 120;
-  if (state.ok) {
+      source.codeUnitAt(state.pos + 1) == 120) {
+    state.ok = true;
     state.pos += 2;
   } else {
     state.fail(state.pos, ParseError.expected, '#x');
@@ -80,11 +80,10 @@ int? _rangeChar(State<String> state) {
   final $pos1 = state.pos;
   final $log = state.log;
   state.log = false;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final $pos2 = state.pos;
+    final c = source.codeUnitAt($pos2);
     if (c == 91) {
       state.ok = true;
       state.pos += 1;
@@ -104,19 +103,18 @@ int? _rangeChar(State<String> state) {
     state.fail(state.pos, ParseError.message, 'Unknown error');
   }
   if (state.ok) {
-    state.ok = state.pos < source.length;
-    if (state.ok) {
-      final pos = state.pos;
+    final $pos3 = state.pos;
+    if ($pos3 < source.length) {
       final c = source.readRune(state);
       state.ok = c >= 0x20 && c < 0x7f;
       if (state.ok) {
         $0 = c;
       } else {
-        state.pos = pos;
-        state.fail(state.pos, ParseError.character);
+        state.pos = $pos3;
+        state.fail($pos3, ParseError.character);
       }
     } else {
-      state.fail(state.pos, ParseError.character);
+      state.fail($pos3, ParseError.character);
     }
     if (!state.ok) {
       state.pos = $pos;
@@ -141,8 +139,8 @@ Result2<int, int>? _rangeBody(State<String> state) {
   int? $1;
   $1 = _hexOrRangeChar(state);
   if (state.ok) {
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 45;
-    if (state.ok) {
+    if (state.pos < source.length && source.codeUnitAt(state.pos) == 45) {
+      state.ok = true;
       state.pos += 1;
     } else {
       state.fail(state.pos, ParseError.expected, '-');
@@ -180,19 +178,18 @@ Result2<int, int>? _rangeBody(State<String> state) {
 int? _charCode(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
+  final $pos = state.pos;
+  if ($pos < source.length) {
     final c = source.readRune(state);
     state.ok = c >= 0x20 && c < 0x7f;
     if (state.ok) {
       $0 = c;
     } else {
-      state.pos = pos;
-      state.fail(state.pos, ParseError.character);
+      state.pos = $pos;
+      state.fail($pos, ParseError.character);
     }
   } else {
-    state.fail(state.pos, ParseError.character);
+    state.fail($pos, ParseError.character);
   }
   return $0;
 }
@@ -201,8 +198,8 @@ int? _char(State<String> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 34;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '"');
@@ -210,9 +207,8 @@ int? _char(State<String> state) {
   if (state.ok) {
     $0 = _charCode(state);
     if (state.ok) {
-      state.ok =
-          state.pos < source.length && source.codeUnitAt(state.pos) == 34;
-      if (state.ok) {
+      if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+        state.ok = true;
         state.pos += 1;
       } else {
         state.fail(state.pos, ParseError.expected, '"');
@@ -230,8 +226,8 @@ List<Result2<int, int>>? _range(State<String> state) {
   List<Result2<int, int>>? $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 91;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 91) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '[');
@@ -251,9 +247,8 @@ List<Result2<int, int>>? _range(State<String> state) {
       $0 = $list;
     }
     if (state.ok) {
-      state.ok =
-          state.pos < source.length && source.codeUnitAt(state.pos) == 93;
-      if (state.ok) {
+      if (state.pos < source.length && source.codeUnitAt(state.pos) == 93) {
+        state.ok = true;
         state.pos += 1;
       } else {
         state.fail(state.pos, ParseError.expected, ']');
@@ -281,8 +276,8 @@ List<Result2<int, int>>? _range(State<String> state) {
 void _verbar(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 124;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 124) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '|');

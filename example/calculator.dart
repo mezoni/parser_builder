@@ -98,8 +98,8 @@ num? _numberImpl(State<String> state) {
   _digit1(state);
   if (state.ok) {
     final $pos2 = state.pos;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 46;
-    if (state.ok) {
+    if (state.pos < source.length && source.codeUnitAt(state.pos) == 46) {
+      state.ok = true;
       state.pos += 1;
     } else {
       state.fail(state.pos, ParseError.expected, '.');
@@ -148,8 +148,8 @@ num? _number(State<String> state) {
 void _openParen(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 40;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 40) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '(');
@@ -165,8 +165,8 @@ void _openParen(State<String> state) {
 void _closeParen(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 41;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 41) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, ')');
@@ -209,11 +209,10 @@ String? _multiplicativeOperator(State<String> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final $pos1 = state.pos;
+    final c = source.codeUnitAt($pos1);
     if (c == 42) {
       state.ok = true;
       state.pos += 1;
@@ -227,7 +226,7 @@ String? _multiplicativeOperator(State<String> state) {
         $0 = '/';
       }
     } else if (c == 126) {
-      if (source.startsWith('~/', pos)) {
+      if (source.startsWith('~/', $pos1)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -290,11 +289,10 @@ String? _additiveOperator(State<String> state) {
   String? $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final $pos1 = state.pos;
+    final c = source.codeUnitAt($pos1);
     if (c == 43) {
       state.ok = true;
       state.pos += 1;

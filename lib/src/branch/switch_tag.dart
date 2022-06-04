@@ -2,11 +2,10 @@ part of '../../branch.dart';
 
 class SwitchTag<O> extends ParserBuilder<String, O> {
   static const _template = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
-  final pos = state.pos;
-  final c = source.codeUnitAt(pos);
-  state.ok = false;
+state.ok = false;
+if (state.pos < source.length) {
+  final {{pos}} = state.pos;
+  final c = source.codeUnitAt({{pos}});
   {{tests}}
 }
 if (!state.ok) {
@@ -33,6 +32,7 @@ if (!state.ok) {
 
     context.refersToStateSource = true;
     final values = context.allocateLocals(['pos']);
+    final pos = values['pos']!;
     final map = <int, List<String>>{};
     for (final tag in table.keys) {
       if (tag == null) {
@@ -64,7 +64,7 @@ if (!state.ok) {
         final parser = table[tag]!;
         final isLong = tag.length > 1;
         final branch = parser.build(context, result);
-        final condition = isLong ? 'source.startsWith($escaped, pos)' : '';
+        final condition = isLong ? 'source.startsWith($escaped, $pos)' : '';
         tests[condition] = branch;
       }
 

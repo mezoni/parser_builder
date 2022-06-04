@@ -130,8 +130,8 @@ String? alphanumeric1(State<String> state) {
 int? char16(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+    state.ok = true;
     state.pos++;
     $0 = 80;
   } else {
@@ -145,8 +145,8 @@ int? altC16OrC32(State<String> state) {
   final source = state.source;
   $0 = char16(state);
   if (!state.ok) {
-    state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-    if (state.ok) {
+    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+      state.ok = true;
       state.pos += 2;
       $0 = 119296;
     } else {
@@ -159,8 +159,8 @@ int? altC16OrC32(State<String> state) {
 int? char32(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-  if (state.ok) {
+  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    state.ok = true;
     state.pos += 2;
     $0 = 119296;
   } else {
@@ -231,11 +231,10 @@ int? _binaryExpressionMul(State<String> state) {
       String? $2;
       final $log = state.log;
       state.log = false;
-      state.ok = state.pos < source.length;
-      if (state.ok) {
-        final pos = state.pos;
-        final c = source.codeUnitAt(pos);
-        state.ok = false;
+      state.ok = false;
+      if (state.pos < source.length) {
+        final $pos1 = state.pos;
+        final c = source.codeUnitAt($pos1);
         if (c == 42) {
           state.ok = true;
           state.pos += 1;
@@ -243,7 +242,7 @@ int? _binaryExpressionMul(State<String> state) {
             $2 = '*';
           }
         } else if (c == 126) {
-          if (source.startsWith('~/', pos)) {
+          if (source.startsWith('~/', $pos1)) {
             state.ok = true;
             state.pos += 2;
             if (state.ok) {
@@ -291,11 +290,10 @@ int? binaryExpressionAdd(State<String> state) {
       String? $2;
       final $log = state.log;
       state.log = false;
-      state.ok = state.pos < source.length;
-      if (state.ok) {
-        final pos = state.pos;
-        final c = source.codeUnitAt(pos);
-        state.ok = false;
+      state.ok = false;
+      if (state.pos < source.length) {
+        final $pos1 = state.pos;
+        final c = source.codeUnitAt($pos1);
         if (c == 43) {
           state.ok = true;
           state.pos += 1;
@@ -339,10 +337,10 @@ int? binaryExpressionAdd(State<String> state) {
 String? tagAbc(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = state.pos < source.length &&
+  if (state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos);
-  if (state.ok) {
+      source.startsWith('abc', state.pos)) {
+    state.ok = true;
     state.pos += 3;
     $0 = 'abc';
   } else {
@@ -451,8 +449,7 @@ void eof(State<String> state) {
 int? escapeSequence16(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
+  if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     int? v;
     switch (c) {
@@ -482,8 +479,7 @@ int? escapeSequence16(State<String> state) {
 int? escapeSequence32(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
+  if (state.pos < source.length) {
     final pos = state.pos;
     final c = source.readRune(state);
     int? v;
@@ -548,8 +544,7 @@ dynamic foldMany0Digit(State<String> state) {
   var $acc = 0;
   while (true) {
     int? $1;
-    state.ok = state.pos < source.length;
-    if (state.ok) {
+    if (state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
       state.ok = c <= 57 && c >= 48;
       if (state.ok) {
@@ -678,10 +673,10 @@ String? indicateAbc4Digits(State<String> state) {
   final source = state.source;
   int? $1;
   final $pos = state.pos;
-  state.ok = state.pos < source.length &&
+  if (state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos);
-  if (state.ok) {
+      source.startsWith('abc', state.pos)) {
+    state.ok = true;
     state.pos += 3;
   } else {
     state.fail(state.pos, ParseError.expected, 'abc');
@@ -732,8 +727,8 @@ List<int>? many0C16(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
-    if (state.ok) {
+    if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+      state.ok = true;
       state.pos++;
       $1 = 80;
     } else {
@@ -870,10 +865,10 @@ Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
   final $list = <String>[];
   while (true) {
     String? $1;
-    state.ok = state.pos < source.length &&
+    if (state.pos < source.length &&
         source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos);
-    if (state.ok) {
+        source.startsWith('abc', state.pos)) {
+      state.ok = true;
       state.pos += 3;
       $1 = 'abc';
     } else {
@@ -884,17 +879,16 @@ Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       break;
     }
     String? $2;
-    state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 97;
-    if (state.ok) {
+    if (state.pos < source.length && source.codeUnitAt(state.pos) == 97) {
+      state.ok = true;
       state.pos += 1;
       $2 = 'a';
     } else {
       state.fail(state.pos, ParseError.expected, 'a');
     }
     if (!state.ok) {
-      state.ok =
-          state.pos < source.length && source.codeUnitAt(state.pos) == 98;
-      if (state.ok) {
+      if (state.pos < source.length && source.codeUnitAt(state.pos) == 98) {
+        state.ok = true;
         state.pos += 1;
         $2 = 'b';
       } else {
@@ -915,8 +909,7 @@ dynamic map4Digits(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $1;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
+  if (state.pos < source.length) {
     final c = source.codeUnitAt(state.pos);
     state.ok = c <= 57 && c >= 48;
     if (state.ok) {
@@ -930,8 +923,7 @@ dynamic map4Digits(State<String> state) {
   }
   if (state.ok) {
     int? $2;
-    state.ok = state.pos < source.length;
-    if (state.ok) {
+    if (state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
       state.ok = c <= 57 && c >= 48;
       if (state.ok) {
@@ -945,8 +937,7 @@ dynamic map4Digits(State<String> state) {
     }
     if (state.ok) {
       int? $3;
-      state.ok = state.pos < source.length;
-      if (state.ok) {
+      if (state.pos < source.length) {
         final c = source.codeUnitAt(state.pos);
         state.ok = c <= 57 && c >= 48;
         if (state.ok) {
@@ -960,8 +951,7 @@ dynamic map4Digits(State<String> state) {
       }
       if (state.ok) {
         int? $4;
-        state.ok = state.pos < source.length;
-        if (state.ok) {
+        if (state.pos < source.length) {
           final c = source.codeUnitAt(state.pos);
           state.ok = c <= 57 && c >= 48;
           if (state.ok) {
@@ -997,8 +987,8 @@ String? mapC32ToStr(State<String> state) {
   String? $0;
   final source = state.source;
   int? $1;
-  state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-  if (state.ok) {
+  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    state.ok = true;
     state.pos += 2;
     $1 = 119296;
   } else {
@@ -1088,8 +1078,7 @@ int? noneOfC16(State<String> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = $pos < source.length;
-  if (state.ok) {
+  if ($pos < source.length) {
     final c = source.readRune(state);
     state.ok = c != 80;
     if (state.ok) {
@@ -1142,8 +1131,7 @@ int? noneOfC32(State<String> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
-  state.ok = $pos < source.length;
-  if (state.ok) {
+  if ($pos < source.length) {
     final c = source.readRune(state);
     state.ok = c != 119296;
     if (state.ok) {
@@ -1221,8 +1209,8 @@ void notC32OrC16(State<String> state) {
 int? oneOfC16(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+    state.ok = true;
     state.pos++;
     $0 = 80;
   } else {
@@ -1234,8 +1222,8 @@ int? oneOfC16(State<String> state) {
 int? oneOfC32(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-  if (state.ok) {
+  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    state.ok = true;
     state.pos += 2;
     $0 = 119296;
   } else {
@@ -1247,10 +1235,10 @@ int? oneOfC32(State<String> state) {
 String? optAbc(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = state.pos < source.length &&
+  if (state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos);
-  if (state.ok) {
+      source.startsWith('abc', state.pos)) {
+    state.ok = true;
     state.pos += 3;
     $0 = 'abc';
   } else {
@@ -1298,13 +1286,12 @@ int? postfixExpression(State<String> state) {
     String? $2;
     final $log = state.log;
     state.log = false;
-    state.ok = state.pos < source.length;
-    if (state.ok) {
-      final pos = state.pos;
-      final c = source.codeUnitAt(pos);
-      state.ok = false;
+    state.ok = false;
+    if (state.pos < source.length) {
+      final $pos = state.pos;
+      final c = source.codeUnitAt($pos);
       if (c == 45) {
-        if (source.startsWith('--', pos)) {
+        if (source.startsWith('--', $pos)) {
           state.ok = true;
           state.pos += 2;
           if (state.ok) {
@@ -1312,7 +1299,7 @@ int? postfixExpression(State<String> state) {
           }
         }
       } else if (c == 43) {
-        if (source.startsWith('++', pos)) {
+        if (source.startsWith('++', $pos)) {
           state.ok = true;
           state.pos += 2;
           if (state.ok) {
@@ -1345,13 +1332,12 @@ int? prefixExpression(State<String> state) {
   String? $1;
   final $log = state.log;
   state.log = false;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final $pos1 = state.pos;
+    final c = source.codeUnitAt($pos1);
     if (c == 45) {
-      if (source.startsWith('--', pos)) {
+      if (source.startsWith('--', $pos1)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -1365,7 +1351,7 @@ int? prefixExpression(State<String> state) {
         }
       }
     } else if (c == 43) {
-      if (source.startsWith('++', pos)) {
+      if (source.startsWith('++', $pos1)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -1403,8 +1389,8 @@ int? precededC16C32(State<String> state) {
   final $pos = state.pos;
   char16(state);
   if (state.ok) {
-    state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-    if (state.ok) {
+    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+      state.ok = true;
       state.pos += 2;
       $0 = 119296;
     } else {
@@ -1441,8 +1427,8 @@ String? recognize3C32AbcC16(State<String> state) {
 int? satisfyC16(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+    state.ok = true;
     state.pos++;
     $0 = 80;
   } else {
@@ -1454,8 +1440,8 @@ int? satisfyC16(State<String> state) {
 int? satisfyC32(State<String> state) {
   int? $0;
   final source = state.source;
-  state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-  if (state.ok) {
+  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    state.ok = true;
     state.pos += 2;
     $0 = 119296;
   } else {
@@ -1471,8 +1457,8 @@ List<int>? separatedList0C32Abc(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-    if (state.ok) {
+    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+      state.ok = true;
       state.pos += 2;
       $1 = 119296;
     } else {
@@ -1484,10 +1470,10 @@ List<int>? separatedList0C32Abc(State<String> state) {
     }
     $list.add($1!);
     $pos = state.pos;
-    state.ok = state.pos < source.length &&
+    if (state.pos < source.length &&
         source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos);
-    if (state.ok) {
+        source.startsWith('abc', state.pos)) {
+      state.ok = true;
       state.pos += 3;
     } else {
       state.fail(state.pos, ParseError.expected, 'abc');
@@ -1510,8 +1496,8 @@ List<int>? separatedList1C32Abc(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-    if (state.ok) {
+    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+      state.ok = true;
       state.pos += 2;
       $1 = 119296;
     } else {
@@ -1523,10 +1509,10 @@ List<int>? separatedList1C32Abc(State<String> state) {
     }
     $list.add($1!);
     $pos = state.pos;
-    state.ok = state.pos < source.length &&
+    if (state.pos < source.length &&
         source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos);
-    if (state.ok) {
+        source.startsWith('abc', state.pos)) {
+      state.ok = true;
       state.pos += 3;
     } else {
       state.fail(state.pos, ParseError.expected, 'abc');
@@ -1550,8 +1536,8 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    state.ok = state.pos < source.length && source.runeAt(state.pos) == 119296;
-    if (state.ok) {
+    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+      state.ok = true;
       state.pos += 2;
       $1 = 119296;
     } else {
@@ -1566,10 +1552,10 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
       break;
     }
     $last = state.pos;
-    state.ok = state.pos < source.length &&
+    if (state.pos < source.length &&
         source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos);
-    if (state.ok) {
+        source.startsWith('abc', state.pos)) {
+      state.ok = true;
       state.pos += 3;
     } else {
       state.fail(state.pos, ParseError.expected, 'abc');
@@ -1592,27 +1578,26 @@ Result2<int, int>? separatedPairC16AbcC32(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $1;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+    state.ok = true;
     state.pos++;
     $1 = 80;
   } else {
     state.fail(state.pos, ParseError.expected, 80);
   }
   if (state.ok) {
-    state.ok = state.pos < source.length &&
+    if (state.pos < source.length &&
         source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos);
-    if (state.ok) {
+        source.startsWith('abc', state.pos)) {
+      state.ok = true;
       state.pos += 3;
     } else {
       state.fail(state.pos, ParseError.expected, 'abc');
     }
     if (state.ok) {
       int? $2;
-      state.ok =
-          state.pos < source.length && source.runeAt(state.pos) == 119296;
-      if (state.ok) {
+      if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+        state.ok = true;
         state.pos += 2;
         $2 = 119296;
       } else {
@@ -1719,8 +1704,7 @@ String? stringValue(State<String> state) {
     }
     state.pos += 1;
     int? $1;
-    state.ok = state.pos < source.length;
-    if (state.ok) {
+    if (state.pos < source.length) {
       final c = source.codeUnitAt(state.pos);
       int? v;
       switch (c) {
@@ -1760,8 +1744,8 @@ String? stringValue(State<String> state) {
 String? tagC16(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 80;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+    state.ok = true;
     state.pos += 1;
     $0 = 'P';
   } else {
@@ -1773,10 +1757,10 @@ String? tagC16(State<String> state) {
 String? tagC16C32(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = state.pos < source.length &&
+  if (state.pos < source.length &&
       source.codeUnitAt(state.pos) == 80 &&
-      source.startsWith('P𝈀', state.pos);
-  if (state.ok) {
+      source.startsWith('P𝈀', state.pos)) {
+    state.ok = true;
     state.pos += 3;
     $0 = 'P𝈀';
   } else {
@@ -1788,10 +1772,10 @@ String? tagC16C32(State<String> state) {
 String? tagC32(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = state.pos + 1 < source.length &&
+  if (state.pos + 1 < source.length &&
       source.codeUnitAt(state.pos) == 55348 &&
-      source.codeUnitAt(state.pos + 1) == 56832;
-  if (state.ok) {
+      source.codeUnitAt(state.pos + 1) == 56832) {
+    state.ok = true;
     state.pos += 2;
     $0 = '𝈀';
   } else {
@@ -1803,10 +1787,10 @@ String? tagC32(State<String> state) {
 String? tagC32C16(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = state.pos < source.length &&
+  if (state.pos < source.length &&
       source.codeUnitAt(state.pos) == 55348 &&
-      source.startsWith('𝈀P', state.pos);
-  if (state.ok) {
+      source.startsWith('𝈀P', state.pos)) {
+    state.ok = true;
     state.pos += 3;
     $0 = '𝈀P';
   } else {
@@ -1863,8 +1847,8 @@ String? tagPairAbc(State<String> state) {
   final $pos = state.pos;
   String? $1;
   final $pos1 = state.pos;
-  state.ok = state.pos < source.length && source.codeUnitAt(state.pos) == 60;
-  if (state.ok) {
+  if (state.pos < source.length && source.codeUnitAt(state.pos) == 60) {
+    state.ok = true;
     state.pos += 1;
   } else {
     state.fail(state.pos, ParseError.expected, '<');
@@ -1890,9 +1874,8 @@ String? tagPairAbc(State<String> state) {
       state.fail($pos2, ParseError.character);
     }
     if (state.ok) {
-      state.ok =
-          state.pos < source.length && source.codeUnitAt(state.pos) == 62;
-      if (state.ok) {
+      if (state.pos < source.length && source.codeUnitAt(state.pos) == 62) {
+        state.ok = true;
         state.pos += 1;
       } else {
         state.fail(state.pos, ParseError.expected, '>');
@@ -1927,10 +1910,10 @@ String? tagPairAbc(State<String> state) {
       final $start = state.pos;
       String? $3;
       final $pos4 = state.pos;
-      state.ok = state.pos + 1 < source.length &&
+      if (state.pos + 1 < source.length &&
           source.codeUnitAt(state.pos) == 60 &&
-          source.codeUnitAt(state.pos + 1) == 92;
-      if (state.ok) {
+          source.codeUnitAt(state.pos + 1) == 92) {
+        state.ok = true;
         state.pos += 2;
       } else {
         state.fail(state.pos, ParseError.expected, '<\\');
@@ -1956,9 +1939,8 @@ String? tagPairAbc(State<String> state) {
           state.fail($pos5, ParseError.character);
         }
         if (state.ok) {
-          state.ok =
-              state.pos < source.length && source.codeUnitAt(state.pos) == 62;
-          if (state.ok) {
+          if (state.pos < source.length && source.codeUnitAt(state.pos) == 62) {
+            state.ok = true;
             state.pos += 1;
           } else {
             state.fail(state.pos, ParseError.expected, '>');
@@ -1996,19 +1978,18 @@ String? tagPairAbc(State<String> state) {
 String? tagsAbcAbdDefDegXXYZ(State<String> state) {
   String? $0;
   final source = state.source;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final $pos = state.pos;
+    final c = source.codeUnitAt($pos);
     if (c == 97) {
-      if (source.startsWith('abc', pos)) {
+      if (source.startsWith('abc', $pos)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
           $0 = 'abc';
         }
-      } else if (source.startsWith('abd', pos)) {
+      } else if (source.startsWith('abd', $pos)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
@@ -2016,13 +1997,13 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
         }
       }
     } else if (c == 100) {
-      if (source.startsWith('def', pos)) {
+      if (source.startsWith('def', $pos)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
           $0 = 'def';
         }
-      } else if (source.startsWith('deg', pos)) {
+      } else if (source.startsWith('deg', $pos)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
@@ -2030,7 +2011,7 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
         }
       }
     } else if (c == 120) {
-      if (source.startsWith('xy', pos)) {
+      if (source.startsWith('xy', $pos)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -2066,13 +2047,12 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
 bool? tagValues(State<String> state) {
   bool? $0;
   final source = state.source;
-  state.ok = state.pos < source.length;
-  if (state.ok) {
-    final pos = state.pos;
-    final c = source.codeUnitAt(pos);
-    state.ok = false;
+  state.ok = false;
+  if (state.pos < source.length) {
+    final $pos = state.pos;
+    final c = source.codeUnitAt($pos);
     if (c == 102) {
-      if (source.startsWith('false', pos)) {
+      if (source.startsWith('false', $pos)) {
         state.ok = true;
         state.pos += 5;
         if (state.ok) {
@@ -2080,7 +2060,7 @@ bool? tagValues(State<String> state) {
         }
       }
     } else if (c == 116) {
-      if (source.startsWith('true', pos)) {
+      if (source.startsWith('true', $pos)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {
@@ -2088,7 +2068,7 @@ bool? tagValues(State<String> state) {
         }
       }
     } else if (c == 110) {
-      if (source.startsWith('null', pos)) {
+      if (source.startsWith('null', $pos)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {
@@ -2462,9 +2442,8 @@ Result3<int, String, int>? tuple3C32AbcC16(State<String> state) {
     $2 = tagAbc(state);
     if (state.ok) {
       int? $3;
-      state.ok =
-          state.pos < source.length && source.codeUnitAt(state.pos) == 80;
-      if (state.ok) {
+      if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+        state.ok = true;
         state.pos++;
         $3 = 80;
       } else {
@@ -2484,10 +2463,10 @@ Result3<int, String, int>? tuple3C32AbcC16(State<String> state) {
 bool? valueAbcToTrueValue(State<String> state) {
   bool? $0;
   final source = state.source;
-  state.ok = state.pos < source.length &&
+  if (state.pos < source.length &&
       source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos);
-  if (state.ok) {
+      source.startsWith('abc', state.pos)) {
+    state.ok = true;
     state.pos += 3;
   } else {
     state.fail(state.pos, ParseError.expected, 'abc');
