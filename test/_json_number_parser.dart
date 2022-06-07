@@ -399,6 +399,46 @@ extension on Object {
 extension on String {
   @pragma('vm:prefer-inline')
   // ignore: unused_element
+  bool contains1(int index, int c) =>
+      index < length ? codeUnitAt(index) == c : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains2(int index, int c1, int c2) => index + 1 < length
+      ? codeUnitAt(index) == c1 && codeUnitAt(index + 1) == c2
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains3(int index, int c1, int c2, int c3) => index + 2 < length
+      ? codeUnitAt(index) == c1 &&
+          codeUnitAt(index + 1) == c2 &&
+          codeUnitAt(index + 2) == c3
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains4(int index, int c1, int c2, int c3, int c4) =>
+      index + 3 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4
+          : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains5(int index, int c1, int c2, int c3, int c4, int c5) =>
+      index + 4 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4 &&
+              codeUnitAt(index + 4) == c5
+          : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
   int readRune(State<String> state) {
     final w1 = codeUnitAt(state.pos++);
     if (w1 > 0xd7ff && w1 < 0xe000) {

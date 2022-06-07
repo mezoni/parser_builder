@@ -64,7 +64,7 @@ if ({{pos}} < source.length) {
 }''';
 
   static const _templateOne16 = '''
-if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+if (source.contains1(state.pos, {{c0}})) {
   state.ok = true;
   state.pos++;
   {{res0}} = {{cc}};
@@ -73,7 +73,7 @@ if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
 }''';
 
   static const _templateOne16Fast = '''
-if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+if (source.contains1(state.pos, {{c0}})) {
   state.ok = true;
   state.pos++;
 } else {
@@ -81,7 +81,7 @@ if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
 }''';
 
   static const _templateOne32 = '''
-if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+if (source.contains2(state.pos, {{c0}}, {{c1}})) {
   state.ok = true;
   state.pos += 2;
   {{res0}} = {{cc}};
@@ -90,7 +90,7 @@ if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
 }''';
 
   static const _templateOne32Fast = '''
-if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+if (source.contains2(state.pos, {{c0}}, {{c1}})) {
   state.ok = true;
   state.pos += 2;
 } else {
@@ -149,7 +149,8 @@ if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
     }
 
     final char = charList[0];
-    final isUnicode = char > 0xffff;
+    final str = String.fromCharCode(char);
+    final isUnicode = str.length > 1;
     final String template;
     if (isUnicode) {
       template = fast ? _templateOne32Fast : _templateOne32;
@@ -158,6 +159,8 @@ if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
     }
 
     final values = {
+      'c0': '${str.codeUnitAt(0)}',
+      'c1': isUnicode ? '${str.codeUnitAt(1)}' : '',
       'cc': '$char',
     };
     return render(template, values, [result]);

@@ -73,23 +73,16 @@ source.tag{{size}}(state, {{tag}});''';
 
   String _buildForSpeed(Context context, ParserResult? result) {
     final fast = result == null;
-    final cc = tag.codeUnitAt(0).toString();
     final escaped = helper.escapeString(tag);
     final length = tag.length;
     final String test;
-    switch (length) {
-      case 1:
-        test =
-            'state.pos < source.length && source.codeUnitAt(state.pos) == $cc';
-        break;
-      case 2:
-        final cc2 = tag.codeUnitAt(1).toString();
-        test =
-            'state.pos + 1 < source.length && source.codeUnitAt(state.pos) == $cc && source.codeUnitAt(state.pos + 1) == $cc2';
-        break;
-      default:
-        test =
-            'state.pos < source.length && source.codeUnitAt(state.pos) == $cc && source.startsWith($escaped, state.pos)';
+    if (length <= 5) {
+      final codeUnits = tag.codeUnits.join(', ');
+      test = 'source.contains$length(state.pos, $codeUnits)';
+    } else {
+      final c = tag.codeUnitAt(0);
+      test =
+          'source.codeUnitAt(state.pos) == $c && source.startsWith($escaped, state.pos)';
     }
 
     final values = {

@@ -56,9 +56,7 @@ int? _hex(State<String> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos + 1 < source.length &&
-      source.codeUnitAt(state.pos) == 35 &&
-      source.codeUnitAt(state.pos + 1) == 120) {
+  if (source.contains2(state.pos, 35, 120)) {
     state.ok = true;
     state.pos += 2;
   } else {
@@ -139,7 +137,7 @@ Result2<int, int>? _rangeBody(State<String> state) {
   int? $1;
   $1 = _hexOrRangeChar(state);
   if (state.ok) {
-    if (state.pos < source.length && source.codeUnitAt(state.pos) == 45) {
+    if (source.contains1(state.pos, 45)) {
       state.ok = true;
       state.pos += 1;
     } else {
@@ -198,7 +196,7 @@ int? _char(State<String> state) {
   int? $0;
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+  if (source.contains1(state.pos, 34)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -207,7 +205,7 @@ int? _char(State<String> state) {
   if (state.ok) {
     $0 = _charCode(state);
     if (state.ok) {
-      if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+      if (source.contains1(state.pos, 34)) {
         state.ok = true;
         state.pos += 1;
       } else {
@@ -226,7 +224,7 @@ List<Result2<int, int>>? _range(State<String> state) {
   List<Result2<int, int>>? $0;
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 91) {
+  if (source.contains1(state.pos, 91)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -247,7 +245,7 @@ List<Result2<int, int>>? _range(State<String> state) {
       $0 = $list;
     }
     if (state.ok) {
-      if (state.pos < source.length && source.codeUnitAt(state.pos) == 93) {
+      if (source.contains1(state.pos, 93)) {
         state.ok = true;
         state.pos += 1;
       } else {
@@ -276,7 +274,7 @@ List<Result2<int, int>>? _range(State<String> state) {
 void _verbar(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 124) {
+  if (source.contains1(state.pos, 124)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -424,6 +422,46 @@ extension on Object {
 }
 
 extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains1(int index, int c) =>
+      index < length ? codeUnitAt(index) == c : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains2(int index, int c1, int c2) => index + 1 < length
+      ? codeUnitAt(index) == c1 && codeUnitAt(index + 1) == c2
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains3(int index, int c1, int c2, int c3) => index + 2 < length
+      ? codeUnitAt(index) == c1 &&
+          codeUnitAt(index + 1) == c2 &&
+          codeUnitAt(index + 2) == c3
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains4(int index, int c1, int c2, int c3, int c4) =>
+      index + 3 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4
+          : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains5(int index, int c1, int c2, int c3, int c4, int c5) =>
+      index + 4 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4 &&
+              codeUnitAt(index + 4) == c5
+          : false;
+
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

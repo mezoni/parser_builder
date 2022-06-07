@@ -130,7 +130,7 @@ String? alphanumeric1(State<String> state) {
 int? char16(State<String> state) {
   int? $0;
   final source = state.source;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+  if (source.contains1(state.pos, 80)) {
     state.ok = true;
     state.pos++;
     $0 = 80;
@@ -145,7 +145,7 @@ int? altC16OrC32(State<String> state) {
   final source = state.source;
   $0 = char16(state);
   if (!state.ok) {
-    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    if (source.contains2(state.pos, 55348, 56832)) {
       state.ok = true;
       state.pos += 2;
       $0 = 119296;
@@ -159,7 +159,7 @@ int? altC16OrC32(State<String> state) {
 int? char32(State<String> state) {
   int? $0;
   final source = state.source;
-  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+  if (source.contains2(state.pos, 55348, 56832)) {
     state.ok = true;
     state.pos += 2;
     $0 = 119296;
@@ -242,7 +242,7 @@ int? _binaryExpressionMul(State<String> state) {
             $2 = '*';
           }
         } else if (c == 126) {
-          if (source.startsWith('~/', $pos1)) {
+          if (source.contains1($pos1 + 1, 47)) {
             state.ok = true;
             state.pos += 2;
             if (state.ok) {
@@ -337,9 +337,7 @@ int? binaryExpressionAdd(State<String> state) {
 String? tagAbc(State<String> state) {
   String? $0;
   final source = state.source;
-  if (state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos)) {
+  if (source.contains3(state.pos, 97, 98, 99)) {
     state.ok = true;
     state.pos += 3;
     $0 = 'abc';
@@ -673,9 +671,7 @@ String? indicateAbc4Digits(State<String> state) {
   final source = state.source;
   int? $1;
   final $pos = state.pos;
-  if (state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos)) {
+  if (source.contains3(state.pos, 97, 98, 99)) {
     state.ok = true;
     state.pos += 3;
   } else {
@@ -727,7 +723,7 @@ List<int>? many0C16(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+    if (source.contains1(state.pos, 80)) {
       state.ok = true;
       state.pos++;
       $1 = 80;
@@ -865,9 +861,7 @@ Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
   final $list = <String>[];
   while (true) {
     String? $1;
-    if (state.pos < source.length &&
-        source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos)) {
+    if (source.contains3(state.pos, 97, 98, 99)) {
       state.ok = true;
       state.pos += 3;
       $1 = 'abc';
@@ -879,7 +873,7 @@ Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       break;
     }
     String? $2;
-    if (state.pos < source.length && source.codeUnitAt(state.pos) == 97) {
+    if (source.contains1(state.pos, 97)) {
       state.ok = true;
       state.pos += 1;
       $2 = 'a';
@@ -887,7 +881,7 @@ Result2<List<String>, String>? manyTillAOrBTillAbc(State<String> state) {
       state.fail(state.pos, ParseError.expected, 'a');
     }
     if (!state.ok) {
-      if (state.pos < source.length && source.codeUnitAt(state.pos) == 98) {
+      if (source.contains1(state.pos, 98)) {
         state.ok = true;
         state.pos += 1;
         $2 = 'b';
@@ -987,7 +981,7 @@ String? mapC32ToStr(State<String> state) {
   String? $0;
   final source = state.source;
   int? $1;
-  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+  if (source.contains2(state.pos, 55348, 56832)) {
     state.ok = true;
     state.pos += 2;
     $1 = 119296;
@@ -1209,7 +1203,7 @@ void notC32OrC16(State<String> state) {
 int? oneOfC16(State<String> state) {
   int? $0;
   final source = state.source;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+  if (source.contains1(state.pos, 80)) {
     state.ok = true;
     state.pos++;
     $0 = 80;
@@ -1222,7 +1216,7 @@ int? oneOfC16(State<String> state) {
 int? oneOfC32(State<String> state) {
   int? $0;
   final source = state.source;
-  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+  if (source.contains2(state.pos, 55348, 56832)) {
     state.ok = true;
     state.pos += 2;
     $0 = 119296;
@@ -1235,9 +1229,7 @@ int? oneOfC32(State<String> state) {
 String? optAbc(State<String> state) {
   String? $0;
   final source = state.source;
-  if (state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos)) {
+  if (source.contains3(state.pos, 97, 98, 99)) {
     state.ok = true;
     state.pos += 3;
     $0 = 'abc';
@@ -1291,7 +1283,7 @@ int? postfixExpression(State<String> state) {
       final $pos = state.pos;
       final c = source.codeUnitAt($pos);
       if (c == 45) {
-        if (source.startsWith('--', $pos)) {
+        if (source.contains1($pos + 1, 45)) {
           state.ok = true;
           state.pos += 2;
           if (state.ok) {
@@ -1299,7 +1291,7 @@ int? postfixExpression(State<String> state) {
           }
         }
       } else if (c == 43) {
-        if (source.startsWith('++', $pos)) {
+        if (source.contains1($pos + 1, 43)) {
           state.ok = true;
           state.pos += 2;
           if (state.ok) {
@@ -1337,7 +1329,7 @@ int? prefixExpression(State<String> state) {
     final $pos1 = state.pos;
     final c = source.codeUnitAt($pos1);
     if (c == 45) {
-      if (source.startsWith('--', $pos1)) {
+      if (source.contains1($pos1 + 1, 45)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -1351,7 +1343,7 @@ int? prefixExpression(State<String> state) {
         }
       }
     } else if (c == 43) {
-      if (source.startsWith('++', $pos1)) {
+      if (source.contains1($pos1 + 1, 43)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -1389,7 +1381,7 @@ int? precededC16C32(State<String> state) {
   final $pos = state.pos;
   char16(state);
   if (state.ok) {
-    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    if (source.contains2(state.pos, 55348, 56832)) {
       state.ok = true;
       state.pos += 2;
       $0 = 119296;
@@ -1427,7 +1419,7 @@ String? recognize3C32AbcC16(State<String> state) {
 int? satisfyC16(State<String> state) {
   int? $0;
   final source = state.source;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+  if (source.contains1(state.pos, 80)) {
     state.ok = true;
     state.pos++;
     $0 = 80;
@@ -1440,7 +1432,7 @@ int? satisfyC16(State<String> state) {
 int? satisfyC32(State<String> state) {
   int? $0;
   final source = state.source;
-  if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+  if (source.contains2(state.pos, 55348, 56832)) {
     state.ok = true;
     state.pos += 2;
     $0 = 119296;
@@ -1457,7 +1449,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    if (source.contains2(state.pos, 55348, 56832)) {
       state.ok = true;
       state.pos += 2;
       $1 = 119296;
@@ -1470,9 +1462,7 @@ List<int>? separatedList0C32Abc(State<String> state) {
     }
     $list.add($1!);
     $pos = state.pos;
-    if (state.pos < source.length &&
-        source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos)) {
+    if (source.contains3(state.pos, 97, 98, 99)) {
       state.ok = true;
       state.pos += 3;
     } else {
@@ -1496,7 +1486,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    if (source.contains2(state.pos, 55348, 56832)) {
       state.ok = true;
       state.pos += 2;
       $1 = 119296;
@@ -1509,9 +1499,7 @@ List<int>? separatedList1C32Abc(State<String> state) {
     }
     $list.add($1!);
     $pos = state.pos;
-    if (state.pos < source.length &&
-        source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos)) {
+    if (source.contains3(state.pos, 97, 98, 99)) {
       state.ok = true;
       state.pos += 3;
     } else {
@@ -1536,7 +1524,7 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
   final $list = <int>[];
   while (true) {
     int? $1;
-    if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+    if (source.contains2(state.pos, 55348, 56832)) {
       state.ok = true;
       state.pos += 2;
       $1 = 119296;
@@ -1552,9 +1540,7 @@ List<int>? separatedListN_2C32Abc(State<String> state) {
       break;
     }
     $last = state.pos;
-    if (state.pos < source.length &&
-        source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos)) {
+    if (source.contains3(state.pos, 97, 98, 99)) {
       state.ok = true;
       state.pos += 3;
     } else {
@@ -1578,7 +1564,7 @@ Result2<int, int>? separatedPairC16AbcC32(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
   int? $1;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+  if (source.contains1(state.pos, 80)) {
     state.ok = true;
     state.pos++;
     $1 = 80;
@@ -1586,9 +1572,7 @@ Result2<int, int>? separatedPairC16AbcC32(State<String> state) {
     state.fail(state.pos, ParseError.expected, 80);
   }
   if (state.ok) {
-    if (state.pos < source.length &&
-        source.codeUnitAt(state.pos) == 97 &&
-        source.startsWith('abc', state.pos)) {
+    if (source.contains3(state.pos, 97, 98, 99)) {
       state.ok = true;
       state.pos += 3;
     } else {
@@ -1596,7 +1580,7 @@ Result2<int, int>? separatedPairC16AbcC32(State<String> state) {
     }
     if (state.ok) {
       int? $2;
-      if (state.pos < source.length && source.runeAt(state.pos) == 119296) {
+      if (source.contains2(state.pos, 55348, 56832)) {
         state.ok = true;
         state.pos += 2;
         $2 = 119296;
@@ -1744,7 +1728,7 @@ String? stringValue(State<String> state) {
 String? tagC16(State<String> state) {
   String? $0;
   final source = state.source;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+  if (source.contains1(state.pos, 80)) {
     state.ok = true;
     state.pos += 1;
     $0 = 'P';
@@ -1757,9 +1741,7 @@ String? tagC16(State<String> state) {
 String? tagC16C32(State<String> state) {
   String? $0;
   final source = state.source;
-  if (state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 80 &&
-      source.startsWith('P𝈀', state.pos)) {
+  if (source.contains3(state.pos, 80, 55348, 56832)) {
     state.ok = true;
     state.pos += 3;
     $0 = 'P𝈀';
@@ -1772,9 +1754,7 @@ String? tagC16C32(State<String> state) {
 String? tagC32(State<String> state) {
   String? $0;
   final source = state.source;
-  if (state.pos + 1 < source.length &&
-      source.codeUnitAt(state.pos) == 55348 &&
-      source.codeUnitAt(state.pos + 1) == 56832) {
+  if (source.contains2(state.pos, 55348, 56832)) {
     state.ok = true;
     state.pos += 2;
     $0 = '𝈀';
@@ -1787,9 +1767,7 @@ String? tagC32(State<String> state) {
 String? tagC32C16(State<String> state) {
   String? $0;
   final source = state.source;
-  if (state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 55348 &&
-      source.startsWith('𝈀P', state.pos)) {
+  if (source.contains3(state.pos, 55348, 56832, 80)) {
     state.ok = true;
     state.pos += 3;
     $0 = '𝈀P';
@@ -1847,7 +1825,7 @@ String? tagPairAbc(State<String> state) {
   final $pos = state.pos;
   String? $1;
   final $pos1 = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 60) {
+  if (source.contains1(state.pos, 60)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -1874,7 +1852,7 @@ String? tagPairAbc(State<String> state) {
       state.fail($pos2, ParseError.character);
     }
     if (state.ok) {
-      if (state.pos < source.length && source.codeUnitAt(state.pos) == 62) {
+      if (source.contains1(state.pos, 62)) {
         state.ok = true;
         state.pos += 1;
       } else {
@@ -1910,9 +1888,7 @@ String? tagPairAbc(State<String> state) {
       final $start = state.pos;
       String? $3;
       final $pos4 = state.pos;
-      if (state.pos + 1 < source.length &&
-          source.codeUnitAt(state.pos) == 60 &&
-          source.codeUnitAt(state.pos + 1) == 92) {
+      if (source.contains2(state.pos, 60, 92)) {
         state.ok = true;
         state.pos += 2;
       } else {
@@ -1939,7 +1915,7 @@ String? tagPairAbc(State<String> state) {
           state.fail($pos5, ParseError.character);
         }
         if (state.ok) {
-          if (state.pos < source.length && source.codeUnitAt(state.pos) == 62) {
+          if (source.contains1(state.pos, 62)) {
             state.ok = true;
             state.pos += 1;
           } else {
@@ -1983,13 +1959,13 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
     final $pos = state.pos;
     final c = source.codeUnitAt($pos);
     if (c == 97) {
-      if (source.startsWith('abc', $pos)) {
+      if (source.contains2($pos + 1, 98, 99)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
           $0 = 'abc';
         }
-      } else if (source.startsWith('abd', $pos)) {
+      } else if (source.contains2($pos + 1, 98, 100)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
@@ -1997,13 +1973,13 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
         }
       }
     } else if (c == 100) {
-      if (source.startsWith('def', $pos)) {
+      if (source.contains2($pos + 1, 101, 102)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
           $0 = 'def';
         }
-      } else if (source.startsWith('deg', $pos)) {
+      } else if (source.contains2($pos + 1, 101, 103)) {
         state.ok = true;
         state.pos += 3;
         if (state.ok) {
@@ -2011,7 +1987,7 @@ String? tagsAbcAbdDefDegXXYZ(State<String> state) {
         }
       }
     } else if (c == 120) {
-      if (source.startsWith('xy', $pos)) {
+      if (source.contains1($pos + 1, 121)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -2052,7 +2028,7 @@ bool? tagValues(State<String> state) {
     final $pos = state.pos;
     final c = source.codeUnitAt($pos);
     if (c == 102) {
-      if (source.startsWith('false', $pos)) {
+      if (source.contains4($pos + 1, 97, 108, 115, 101)) {
         state.ok = true;
         state.pos += 5;
         if (state.ok) {
@@ -2060,7 +2036,7 @@ bool? tagValues(State<String> state) {
         }
       }
     } else if (c == 116) {
-      if (source.startsWith('true', $pos)) {
+      if (source.contains3($pos + 1, 114, 117, 101)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {
@@ -2068,7 +2044,7 @@ bool? tagValues(State<String> state) {
         }
       }
     } else if (c == 110) {
-      if (source.startsWith('null', $pos)) {
+      if (source.contains3($pos + 1, 117, 108, 108)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {
@@ -2442,7 +2418,7 @@ Result3<int, String, int>? tuple3C32AbcC16(State<String> state) {
     $2 = tagAbc(state);
     if (state.ok) {
       int? $3;
-      if (state.pos < source.length && source.codeUnitAt(state.pos) == 80) {
+      if (source.contains1(state.pos, 80)) {
         state.ok = true;
         state.pos++;
         $3 = 80;
@@ -2463,9 +2439,7 @@ Result3<int, String, int>? tuple3C32AbcC16(State<String> state) {
 bool? valueAbcToTrueValue(State<String> state) {
   bool? $0;
   final source = state.source;
-  if (state.pos < source.length &&
-      source.codeUnitAt(state.pos) == 97 &&
-      source.startsWith('abc', state.pos)) {
+  if (source.contains3(state.pos, 97, 98, 99)) {
     state.ok = true;
     state.pos += 3;
   } else {
@@ -2679,6 +2653,46 @@ extension on Object {
 }
 
 extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains1(int index, int c) =>
+      index < length ? codeUnitAt(index) == c : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains2(int index, int c1, int c2) => index + 1 < length
+      ? codeUnitAt(index) == c1 && codeUnitAt(index + 1) == c2
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains3(int index, int c1, int c2, int c3) => index + 2 < length
+      ? codeUnitAt(index) == c1 &&
+          codeUnitAt(index + 1) == c2 &&
+          codeUnitAt(index + 2) == c3
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains4(int index, int c1, int c2, int c3, int c4) =>
+      index + 3 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4
+          : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains5(int index, int c1, int c2, int c3, int c4, int c5) =>
+      index + 4 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4 &&
+              codeUnitAt(index + 4) == c5
+          : false;
+
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

@@ -8,7 +8,7 @@ part of '../../character.dart';
 /// ```
 class Char extends ParserBuilder<String, int> {
   static const _template16 = '''
-if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+if (source.contains1(state.pos, {{c0}})) {
   state.ok = true;
   state.pos++;
   {{res0}} = {{cc}};
@@ -17,7 +17,7 @@ if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
 }''';
 
   static const _template16Fast = '''
-if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
+if (source.contains1(state.pos, {{c0}})) {
   state.ok = true;
   state.pos++;
 } else {
@@ -25,7 +25,7 @@ if (state.pos < source.length && source.codeUnitAt(state.pos) == {{cc}}) {
 }''';
 
   static const _template32 = '''
-if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+if (source.contains2(state.pos, {{c0}}, {{c1}})) {
   state.ok = true;
   state.pos += 2;
   {{res0}} = {{cc}};
@@ -34,7 +34,7 @@ if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
 }''';
 
   static const _template32Fast = '''
-if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
+if (source.contains2(state.pos, {{c0}}, {{c1}})) {
   state.ok = true;
   state.pos += 2;
 } else {
@@ -53,25 +53,20 @@ if (state.pos < source.length && source.runeAt(state.pos) == {{cc}}) {
 
     context.refersToStateSource = true;
     final fast = result == null;
-    final values = {
-      'cc': helper.getAsCode(char),
-    };
-    final isUnicode = char > 0xffff;
+    final str = String.fromCharCode(char);
+    final isUnicode = str.length > 1;
     final String template;
     if (isUnicode) {
-      if (fast) {
-        template = _template32Fast;
-      } else {
-        template = _template32;
-      }
+      template = fast ? _template32Fast : _template32;
     } else {
-      if (fast) {
-        template = _template16Fast;
-      } else {
-        template = _template16;
-      }
+      template = fast ? _template16Fast : _template16;
     }
 
+    final values = {
+      'c0': '${str.codeUnitAt(0)}',
+      'c1': isUnicode ? '${str.codeUnitAt(1)}' : '',
+      'cc': '$char',
+    };
     return render(template, values, [result]);
   }
 }

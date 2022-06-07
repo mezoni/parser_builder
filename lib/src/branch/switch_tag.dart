@@ -62,9 +62,19 @@ if (!state.ok) {
       for (final tag in tags) {
         final escaped = helper.escapeString(tag);
         final parser = table[tag]!;
-        final isLong = tag.length > 1;
+        final length = tag.length;
+        final isLong = length > 1;
         final branch = parser.build(context, result);
-        final condition = isLong ? 'source.startsWith($escaped, $pos)' : '';
+        final String test;
+        if (length > 1 && length <= 6) {
+          final size = length - 1;
+          final codeUnits = tag.codeUnits.skip(1).join(', ');
+          test = 'source.contains$size($pos + 1, $codeUnits)';
+        } else {
+          test = 'source.startsWith($escaped, $pos)';
+        }
+
+        final condition = isLong ? test : '';
         tests[condition] = branch;
       }
 

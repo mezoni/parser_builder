@@ -98,7 +98,7 @@ num? _numberImpl(State<String> state) {
   _digit1(state);
   if (state.ok) {
     final $pos2 = state.pos;
-    if (state.pos < source.length && source.codeUnitAt(state.pos) == 46) {
+    if (source.contains1(state.pos, 46)) {
       state.ok = true;
       state.pos += 1;
     } else {
@@ -148,7 +148,7 @@ num? _number(State<String> state) {
 void _openParen(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 40) {
+  if (source.contains1(state.pos, 40)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -165,7 +165,7 @@ void _openParen(State<String> state) {
 void _closeParen(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 41) {
+  if (source.contains1(state.pos, 41)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -226,7 +226,7 @@ String? _multiplicativeOperator(State<String> state) {
         $0 = '/';
       }
     } else if (c == 126) {
-      if (source.startsWith('~/', $pos1)) {
+      if (source.contains1($pos1 + 1, 47)) {
         state.ok = true;
         state.pos += 2;
         if (state.ok) {
@@ -437,6 +437,46 @@ extension on Object {
 }
 
 extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains1(int index, int c) =>
+      index < length ? codeUnitAt(index) == c : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains2(int index, int c1, int c2) => index + 1 < length
+      ? codeUnitAt(index) == c1 && codeUnitAt(index + 1) == c2
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains3(int index, int c1, int c2, int c3) => index + 2 < length
+      ? codeUnitAt(index) == c1 &&
+          codeUnitAt(index + 1) == c2 &&
+          codeUnitAt(index + 2) == c3
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains4(int index, int c1, int c2, int c3, int c4) =>
+      index + 3 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4
+          : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains5(int index, int c1, int c2, int c3, int c4, int c5) =>
+      index + 4 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4 &&
+              codeUnitAt(index + 4) == c5
+          : false;
+
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

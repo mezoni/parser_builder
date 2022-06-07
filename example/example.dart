@@ -54,7 +54,7 @@ int? _escapeHex(State<String> state) {
   int? $start;
   final $pos = state.pos;
   $start = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 117) {
+  if (source.contains1(state.pos, 117)) {
     state.ok = true;
     state.pos++;
   } else {
@@ -153,7 +153,7 @@ int? _escaped(State<String> state) {
 void _quote(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+  if (source.contains1(state.pos, 34)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -176,7 +176,7 @@ String? _string(State<String> state) {
   final $pos1 = state.setLastErrorPos(-1);
   final $pos2 = state.pos;
   $start = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 34) {
+  if (source.contains1(state.pos, 34)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -253,7 +253,7 @@ String? _string(State<String> state) {
 void _openBracket(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 91) {
+  if (source.contains1(state.pos, 91)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -282,7 +282,7 @@ List<dynamic>? _values(State<String> state) {
     $list.add($1);
     $pos = state.pos;
     final $pos1 = state.pos;
-    if (state.pos < source.length && source.codeUnitAt(state.pos) == 44) {
+    if (source.contains1(state.pos, 44)) {
       state.ok = true;
       state.pos += 1;
     } else {
@@ -309,7 +309,7 @@ List<dynamic>? _values(State<String> state) {
 void _closeBracket(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 93) {
+  if (source.contains1(state.pos, 93)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -344,7 +344,7 @@ List<dynamic>? _array(State<String> state) {
 void _openBrace(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 123) {
+  if (source.contains1(state.pos, 123)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -366,7 +366,7 @@ MapEntry<String, dynamic>? _keyValue(State<String> state) {
   $1 = _string(state);
   if (state.ok) {
     final $pos1 = state.pos;
-    if (state.pos < source.length && source.codeUnitAt(state.pos) == 58) {
+    if (source.contains1(state.pos, 58)) {
       state.ok = true;
       state.pos += 1;
     } else {
@@ -409,7 +409,7 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
     $list.add($1!);
     $pos = state.pos;
     final $pos1 = state.pos;
-    if (state.pos < source.length && source.codeUnitAt(state.pos) == 44) {
+    if (source.contains1(state.pos, 44)) {
       state.ok = true;
       state.pos += 1;
     } else {
@@ -436,7 +436,7 @@ List<MapEntry<String, dynamic>>? _keyValues(State<String> state) {
 void _closeBrace(State<String> state) {
   final source = state.source;
   final $pos = state.pos;
-  if (state.pos < source.length && source.codeUnitAt(state.pos) == 125) {
+  if (source.contains1(state.pos, 125)) {
     state.ok = true;
     state.pos += 1;
   } else {
@@ -761,7 +761,7 @@ dynamic _value(State<String> state) {
     } else if (c == 123) {
       $0 = _object(state);
     } else if (c == 102) {
-      if (source.startsWith('false', $pos1)) {
+      if (source.contains4($pos1 + 1, 97, 108, 115, 101)) {
         state.ok = true;
         state.pos += 5;
         if (state.ok) {
@@ -769,7 +769,7 @@ dynamic _value(State<String> state) {
         }
       }
     } else if (c == 116) {
-      if (source.startsWith('true', $pos1)) {
+      if (source.contains3($pos1 + 1, 114, 117, 101)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {
@@ -777,7 +777,7 @@ dynamic _value(State<String> state) {
         }
       }
     } else if (c == 110) {
-      if (source.startsWith('null', $pos1)) {
+      if (source.contains3($pos1 + 1, 117, 108, 108)) {
         state.ok = true;
         state.pos += 4;
         if (state.ok) {
@@ -882,6 +882,46 @@ extension on Object {
 }
 
 extension on String {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains1(int index, int c) =>
+      index < length ? codeUnitAt(index) == c : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains2(int index, int c1, int c2) => index + 1 < length
+      ? codeUnitAt(index) == c1 && codeUnitAt(index + 1) == c2
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains3(int index, int c1, int c2, int c3) => index + 2 < length
+      ? codeUnitAt(index) == c1 &&
+          codeUnitAt(index + 1) == c2 &&
+          codeUnitAt(index + 2) == c3
+      : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains4(int index, int c1, int c2, int c3, int c4) =>
+      index + 3 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4
+          : false;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  bool contains5(int index, int c1, int c2, int c3, int c4, int c5) =>
+      index + 4 < length
+          ? codeUnitAt(index) == c1 &&
+              codeUnitAt(index + 1) == c2 &&
+              codeUnitAt(index + 2) == c3 &&
+              codeUnitAt(index + 3) == c4 &&
+              codeUnitAt(index + 4) == c5
+          : false;
+
   @pragma('vm:prefer-inline')
   // ignore: unused_element
   int readRune(State<String> state) {

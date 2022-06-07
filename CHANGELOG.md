@@ -1,6 +1,7 @@
 ## 2.0.34
 
 - An optional parameter `message` has been added to the `Not` parser builder
+- Minor improvements have been made to some of the parser builders that generate string and character parsers. This results in a slight increase in parsing performance in some cases
 
 ## 2.0.33
 
