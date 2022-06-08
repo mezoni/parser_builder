@@ -1178,11 +1178,10 @@ extension on String {
 
 @pragma('vm:prefer-inline')
 int _toHexValue(String s) {
-  final l = s.codeUnits;
   var r = 0;
-  for (var i = l.length - 1, j = 0; i >= 0; i--, j += 4) {
-    final c = l[i];
-    var v = 0;
+  for (var i = s.length - 1, j = 0; i >= 0; i--, j += 4) {
+    final c = s.codeUnitAt(i);
+    final int v;
     if (c >= 0x30 && c <= 0x39) {
       v = c - 0x30;
     } else if (c >= 0x41 && c <= 0x46) {
