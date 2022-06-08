@@ -8,16 +8,16 @@ part of '../../character.dart';
 /// ```
 class AnyChar extends ParserBuilder<String, int> {
   static const _template = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
+  state.ok = true;
   {{res0}} = source.readRune(state);
 } else {
   state.fail(state.pos, ParseError.character);
 }''';
 
   static const _templateFast = '''
-state.ok = state.pos < source.length;
-if (state.ok) {
+if (state.pos < source.length) {
+  state.ok = true;
   source.readRune(state);
 } else {
   state.fail(state.pos, ParseError.character);
