@@ -157,7 +157,7 @@ abstract class _Tuple<I, O> extends _Sequence<I, O> {
   String build(Context context, ParserResult? result) {
     final parsers = _getParsers();
     final length = parsers.length;
-    ParseRuntime.addClassResult(context, length, true);
+    ParseRuntime.addCapabilityByName(context, 'result$length', true);
     return super.build(context, result);
   }
 

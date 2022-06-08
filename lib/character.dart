@@ -1,4 +1,3 @@
-import 'builder_helper.dart' as helper;
 import 'bytes.dart';
 import 'char_class.dart';
 import 'parser_builder.dart';

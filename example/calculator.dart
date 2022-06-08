@@ -430,99 +430,6 @@ String _errorMessage(String source, List<ParseError> errors) {
   return sb.toString();
 }
 
-extension on Object {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  R as<R>() => this as R;
-}
-
-extension on String {
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool contains1(int index, int c) =>
-      index < length ? codeUnitAt(index) == c : false;
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool contains2(int index, int c1, int c2) => index + 1 < length
-      ? codeUnitAt(index) == c1 && codeUnitAt(index + 1) == c2
-      : false;
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool contains3(int index, int c1, int c2, int c3) => index + 2 < length
-      ? codeUnitAt(index) == c1 &&
-          codeUnitAt(index + 1) == c2 &&
-          codeUnitAt(index + 2) == c3
-      : false;
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool contains4(int index, int c1, int c2, int c3, int c4) =>
-      index + 3 < length
-          ? codeUnitAt(index) == c1 &&
-              codeUnitAt(index + 1) == c2 &&
-              codeUnitAt(index + 2) == c3 &&
-              codeUnitAt(index + 3) == c4
-          : false;
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  bool contains5(int index, int c1, int c2, int c3, int c4, int c5) =>
-      index + 4 < length
-          ? codeUnitAt(index) == c1 &&
-              codeUnitAt(index + 1) == c2 &&
-              codeUnitAt(index + 2) == c3 &&
-              codeUnitAt(index + 3) == c4 &&
-              codeUnitAt(index + 4) == c5
-          : false;
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int readRune(State<String> state) {
-    final w1 = codeUnitAt(state.pos++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (state.pos < length) {
-        final w2 = codeUnitAt(state.pos++);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-
-        state.pos--;
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
-    }
-
-    return w1;
-  }
-
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  int runeAt(int index) {
-    final w1 = codeUnitAt(index++);
-    if (w1 > 0xd7ff && w1 < 0xe000) {
-      if (index < length) {
-        final w2 = codeUnitAt(index);
-        if ((w2 & 0xfc00) == 0xdc00) {
-          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
-        }
-      }
-
-      throw FormatException('Invalid UTF-16 character', this, index - 1);
-    }
-
-    return w1;
-  }
-
-  /// Returns a slice (substring) of the string from [start] to [end].
-  @pragma('vm:prefer-inline')
-  // ignore: unused_element
-  String slice(int start, int end) {
-    return substring(start, end);
-  }
-}
-
 class ParseError {
   static const character = 0;
 
@@ -597,8 +504,8 @@ class State<T> {
           _length = 0;
         }
 
-        _ends[_length] = end;
         _kinds[_length] = kind;
+        _ends[_length] = end;
         _starts[_length] = start;
         _values[_length] = value;
         _length++;
@@ -750,5 +657,61 @@ class State<T> {
     }
 
     return result;
+  }
+}
+
+extension on Object {
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  R as<R>() => this as R;
+}
+
+extension on String {
+  @pragma('vm:prefer-inline')
+  bool contains1(int index, int c) => index < length && codeUnitAt(index) == c;
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int readRune(State<String> state) {
+    final w1 = codeUnitAt(state.pos++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (state.pos < length) {
+        final w2 = codeUnitAt(state.pos++);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+
+        state.pos--;
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, state.pos - 1);
+    }
+
+    return w1;
+  }
+
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  int runeAt(int index) {
+    final w1 = codeUnitAt(index++);
+    if (w1 > 0xd7ff && w1 < 0xe000) {
+      if (index < length) {
+        final w2 = codeUnitAt(index);
+        if ((w2 & 0xfc00) == 0xdc00) {
+          return 0x10000 + ((w1 & 0x3ff) << 10) + (w2 & 0x3ff);
+        }
+      }
+
+      throw FormatException('Invalid UTF-16 character', this, index - 1);
+    }
+
+    return w1;
+  }
+
+  /// Returns a slice (substring) of the string from [start] to [end].
+  @pragma('vm:prefer-inline')
+  // ignore: unused_element
+  String slice(int start, int end) {
+    return substring(start, end);
   }
 }

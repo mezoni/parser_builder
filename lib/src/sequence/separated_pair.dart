@@ -43,7 +43,7 @@ if (!state.ok) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    ParseRuntime.addClassResult(context, 2, !fast);
+    ParseRuntime.addCapability(context, ParseRuntimeCapability.result2, !fast);
     final values = context.allocateLocals(['pos']);
     final r1 = context.getResult(first, !fast);
     final r2 = context.getResult(second, !fast);

@@ -69,7 +69,9 @@ if (!state.ok) {
         if (length > 1 && length <= 6) {
           final size = length - 1;
           final codeUnits = tag.codeUnits.skip(1).join(', ');
-          test = 'source.contains$size($pos + 1, $codeUnits)';
+          final contains = 'contains$size';
+          ParseRuntime.addCapabilityByName(context, contains, true);
+          test = 'source.$contains($pos + 1, $codeUnits)';
         } else {
           test = 'source.startsWith($escaped, $pos)';
         }

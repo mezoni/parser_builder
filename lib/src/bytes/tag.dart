@@ -78,7 +78,9 @@ source.tag{{size}}(state, {{tag}});''';
     final String test;
     if (length <= 5) {
       final codeUnits = tag.codeUnits.join(', ');
-      test = 'source.contains$length(state.pos, $codeUnits)';
+      final contains = 'contains$length';
+      ParseRuntime.addCapabilityByName(context, contains, true);
+      test = 'source.$contains(state.pos, $codeUnits)';
     } else {
       final c = tag.codeUnitAt(0);
       test =

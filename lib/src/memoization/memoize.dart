@@ -40,7 +40,8 @@ if ({{memo}} != null) {
   @override
   String build(Context context, ParserResult? result) {
     final fast = result == null;
-    ParseRuntime.addClassMemoizedResult(context, true);
+    ParseRuntime.addCapability(
+        context, ParseRuntimeCapability.memoization, true);
     final values = context.allocateLocals(['memo', 'pos']);
     final id = _allocateId(context);
     values.addAll({

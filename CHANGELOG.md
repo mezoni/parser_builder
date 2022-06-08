@@ -2,6 +2,7 @@
 
 - An optional parameter `message` has been added to the `Not` parser builder
 - Minor improvements have been made to some of the parser builders that generate string and character parsers. This results in a slight increase in parsing performance in some cases
+- The `ParseRuntime` class have been redesigned to provide the ability to reduce the size of the runtime code by eliminating unused classes and their members
 
 ## 2.0.33
 

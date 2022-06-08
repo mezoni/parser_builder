@@ -153,8 +153,12 @@ if (source.contains2(state.pos, {{c0}}, {{c1}})) {
     final isUnicode = str.length > 1;
     final String template;
     if (isUnicode) {
+      ParseRuntime.addCapability(
+          context, ParseRuntimeCapability.contains2, true);
       template = fast ? _templateOne32Fast : _templateOne32;
     } else {
+      ParseRuntime.addCapability(
+          context, ParseRuntimeCapability.contains1, true);
       template = fast ? _templateOne16Fast : _templateOne16;
     }
 
